@@ -1,7 +1,8 @@
 package com.sos.joc.orders.impl;
 
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -22,17 +23,15 @@ import com.sos.joc.orders.resource.IOrdersResourceOverviewSummary;
 @Path("orders")
 public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implements IOrdersResourceOverviewSummary {
 
-	private static final String API_CALL = "./orders/overview/summary";
+    private static final String API_CALL = "./orders/overview/summary";
 
-	@Override
-	public JOCDefaultResponse postOrdersOverviewSummary(String xAccessToken, String accessToken,
-			OrdersFilter ordersFilter) throws Exception {
-		return postOrdersOverviewSummary(getAccessToken(xAccessToken, accessToken), ordersFilter);
-	}
+    @Override
+    public JOCDefaultResponse postOrdersOverviewSummary(String xAccessToken, String accessToken, OrdersFilter ordersFilter) throws Exception {
+        return postOrdersOverviewSummary(getAccessToken(xAccessToken, accessToken), ordersFilter);
+    }
 
-	public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter)
-			throws Exception {
-		SOSHibernateSession connection = null;
+    public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter) throws Exception {
+        SOSHibernateSession connection = null;
 
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken,
@@ -40,58 +39,64 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 					getPermissonsJocCockpit(ordersFilter.getJobschedulerId(), accessToken).getOrder().getView()
 							.isStatus());
 
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
-
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-			OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
-			Globals.beginTransaction(connection);
-
-			ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
-			reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
-
-			if (ordersFilter.getDateFrom() != null) {
-				reportTriggerDBLayer.getFilter().setExecutedFrom(
-						JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter.getTimeZone()));
-			}
-			if (ordersFilter.getDateTo() != null) {
-				reportTriggerDBLayer.getFilter().setExecutedTo(
-						JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
-			}
-
-			if (ordersFilter.getOrders().size() > 0) {
-				for (OrderPath orderPath : ordersFilter.getOrders()) {
-					reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()),
-							orderPath.getOrderId());
-				}
-			}
-
-			reportTriggerDBLayer.getFilter().setListOfFolders(folderPermissions.getListOfFolders());
-            if (ordersFilter.getFolders().size() > 0) {
-			    reportTriggerDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(ordersFilter.getFolders()));
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
             }
-			
-			OrdersOverView entity = new OrdersOverView();
-			entity.setDeliveryDate(new Date());
-			entity.setSurveyDate(new Date());
-			entity.setOrders(ordersHistoricSummary);
-			reportTriggerDBLayer.getFilter().setFailed(true);
-			ordersHistoricSummary.setFailed(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
 
-			reportTriggerDBLayer.getFilter().setSuccess(true);
-			ordersHistoricSummary
-					.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            Globals.beginTransaction(connection);
 
-			return JOCDefaultResponse.responseStatus200(entity);
-		} catch (JocException e) {
-			e.addErrorMetaInfo(getJocError());
-			return JOCDefaultResponse.responseStatusJSError(e);
-		} catch (Exception e) {
-			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		} finally {
-			Globals.disconnect(connection);
-		}
-	}
+            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
+            reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
+            boolean withFolderFilter = ordersFilter.getFolders() != null && !ordersFilter.getFolders().isEmpty();
+            boolean hasPermission = true;
+            List<Folder> folders = addPermittedFolder(ordersFilter.getFolders());
+
+            if (ordersFilter.getDateFrom() != null) {
+                reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter
+                        .getTimeZone()));
+            }
+            if (ordersFilter.getDateTo() != null) {
+                reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
+            }
+
+            if (ordersFilter.getOrders().size() > 0) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                for (OrderPath orderPath : ordersFilter.getOrders()) {
+                    if (orderPath != null && canAdd(orderPath.getJobChain(), permittedFolders)) {
+                        reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
+                    }
+                }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                hasPermission = false;
+            } else if (folders != null && !folders.isEmpty()) {
+                reportTriggerDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(folders));
+            }
+
+            OrdersOverView entity = new OrdersOverView();
+            entity.setDeliveryDate(new Date());
+            entity.setSurveyDate(new Date());
+            if (hasPermission) {
+                OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
+                entity.setOrders(ordersHistoricSummary);
+                reportTriggerDBLayer.getFilter().setFailed(true);
+                ordersHistoricSummary.setFailed(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
+
+                reportTriggerDBLayer.getFilter().setSuccess(true);
+                ordersHistoricSummary.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
+            } else {
+                entity.setOrders(null);
+            }
+
+            return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
+        }
+    }
 
 }

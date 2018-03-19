@@ -33,16 +33,15 @@ import com.sos.joc.schedules.resource.ISchedulesResource;
 @Path("schedules")
 public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedulesResource {
 
-	private static final String API_CALL = "./schedules";
+    private static final String API_CALL = "./schedules";
 
-	@Override
-	public JOCDefaultResponse postSchedules(String xAccessToken, String accessToken, SchedulesFilter schedulesFilter)
-			throws Exception {
-		return postSchedules(getAccessToken(xAccessToken, accessToken), schedulesFilter);
-	}
+    @Override
+    public JOCDefaultResponse postSchedules(String xAccessToken, String accessToken, SchedulesFilter schedulesFilter) throws Exception {
+        return postSchedules(getAccessToken(xAccessToken, accessToken), schedulesFilter);
+    }
 
-	public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
-		SOSHibernateSession connection = null;
+    public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
+        SOSHibernateSession connection = null;
 
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, schedulesFilter, accessToken,
@@ -53,102 +52,96 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
 				return jocDefaultResponse;
 			}
 
-			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-			String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders", null);
-			jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
-			Date surveyDate = jocXmlCommand.getSurveyDate();
+            List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
+            boolean withFolderFilter = schedulesFilter.getFolders() != null && !schedulesFilter.getFolders().isEmpty();
+            boolean hasPermission = true;
+            List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
 
-			NodeList schedules = jocXmlCommand.getSosxml().selectNodeList("/spooler/answer//schedules/schedule");
-			List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
+            Set<String> setOfSchedules = new HashSet<String>();
+            if (schedulesFilter.getSchedules() != null && !schedulesFilter.getSchedules().isEmpty()) {
+                for (SchedulePath schedule : schedulesFilter.getSchedules()) {
+                    checkRequiredParameter("schedules.schedule", schedule.getSchedule());
+                    setOfSchedules.add(normalizePath(schedule.getSchedule()));
+                }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                hasPermission = false;
+            }
 
-			Set<String> setOfSchedules = new HashSet<String>();
-			for (SchedulePath schedule : schedulesFilter.getSchedules()) {
-				checkRequiredParameter("schedules.schedule", schedule.getSchedule());
-				setOfSchedules.add(normalizePath(schedule.getSchedule()));
-			}
+            if (hasPermission) {
 
-			InventorySchedulesDBLayer dbLayer = null;
-			try {
-				connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-				Globals.beginTransaction(connection);
-				dbLayer = new InventorySchedulesDBLayer(connection);
-			} catch (Exception e) {
-			}
+                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
+                String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders", null);
+                jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
+                Date surveyDate = jocXmlCommand.getSurveyDate();
 
-			List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
+                NodeList schedules = jocXmlCommand.getSosxml().selectNodeList("/spooler/answer//schedules/schedule");
 
-			for (int i = 0; i < schedules.getLength(); i++) {
-				Element scheduleElement = (Element) schedules.item(i);
-				ScheduleVolatile scheduleV = new ScheduleVolatile(surveyDate, scheduleElement, dbLayer,
-						dbItemInventoryInstance);
+                InventorySchedulesDBLayer dbLayer = null;
+                try {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                    Globals.beginTransaction(connection);
+                    dbLayer = new InventorySchedulesDBLayer(connection);
+                } catch (Exception e) {
+                }
 
-				if (!setOfSchedules.isEmpty() && !setOfSchedules.contains(scheduleV.getPath())) {
-					continue;
-				}
-				if (!FilterAfterResponse.matchRegex(schedulesFilter.getRegex(), scheduleV.getPath())) {
-					continue;
-				}
-				if (!FilterAfterResponse.filterStateHasState(schedulesFilter.getStates(),
-						scheduleV.getState().get_text())) {
-					continue;
-				}
-				if (!isInFolderList(folders, scheduleV.getPath())) {
-					continue;
-				}
-				listOfSchedules.add(scheduleV);
-			}
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
 
-			SchedulesV entity = new SchedulesV();
-            listOfSchedules = addAllPermittedSchedules(listOfSchedules);
-			entity.setSchedules(listOfSchedules);
-			entity.setDeliveryDate(Date.from(Instant.now()));
-			return JOCDefaultResponse.responseStatus200(entity);
+                for (int i = 0; i < schedules.getLength(); i++) {
+                    Element scheduleElement = (Element) schedules.item(i);
+                    ScheduleVolatile scheduleV = new ScheduleVolatile(surveyDate, scheduleElement, dbLayer, dbItemInventoryInstance);
 
-		} catch (JocException e) {
-			e.addErrorMetaInfo(getJocError());
-			return JOCDefaultResponse.responseStatusJSError(e);
-		} catch (Exception e) {
-			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		} finally {
-			Globals.disconnect(connection);
-		}
-	}
+                    if (!setOfSchedules.isEmpty() && !setOfSchedules.contains(scheduleV.getPath())) {
+                        continue;
+                    }
+                    if (!setOfSchedules.isEmpty() && !canAdd(scheduleV.getPath(), permittedFolders)) {
+                        continue;
+                    }
+                    if (!FilterAfterResponse.matchRegex(schedulesFilter.getRegex(), scheduleV.getPath())) {
+                        continue;
+                    }
+                    if (!FilterAfterResponse.filterStateHasState(schedulesFilter.getStates(), scheduleV.getState().get_text())) {
+                        continue;
+                    }
+                    if (!isInFolderList(folders, scheduleV.getPath())) {
+                        continue;
+                    }
+                    listOfSchedules.add(scheduleV);
+                }
+            }
 
-	private boolean isInFolderList(List<Folder> folders, String path) throws JocMissingRequiredParameterException {
-		if (folders == null || folders.isEmpty()) {
-			return true;
-		}
-		java.nio.file.Path folderOfSchedule = Paths.get(path).getParent();
-		for (Folder folder : folders) {
-			checkRequiredParameter("folders.folder", folder.getFolder());
-			java.nio.file.Path folderFromFilter = Paths.get(normalizeFolder(folder.getFolder()));
-			if (folder.getRecursive() == null || folder.getRecursive()) {
-				if (folderOfSchedule.startsWith(folderFromFilter)) {
-					return true;
-				}
-			} else {
-				if (folderOfSchedule.equals(folderFromFilter)) {
-					return true;
-				}
-			}
-		}
-		return false;
+            SchedulesV entity = new SchedulesV();
+            entity.setSchedules(listOfSchedules);
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            return JOCDefaultResponse.responseStatus200(entity);
+
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
+        }
     }
-    
-    private List<ScheduleV> addAllPermittedSchedules(List<ScheduleV> schedulesToAdd) {
-        if (folderPermissions == null || schedulesToAdd == null) {
-            return schedulesToAdd;
+
+    private boolean isInFolderList(List<Folder> folders, String path) throws JocMissingRequiredParameterException {
+        if (folders == null || folders.isEmpty()) {
+            return true;
         }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return schedulesToAdd;
-        }
-        List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
-        for (ScheduleV schedule : schedulesToAdd) {
-            if (schedule != null && canAdd(schedule.getPath(), folders)) {
-                listOfSchedules.add(schedule);
+        java.nio.file.Path folderOfSchedule = Paths.get(path).getParent();
+        for (Folder folder : folders) {
+            checkRequiredParameter("folders.folder", folder.getFolder());
+            java.nio.file.Path folderFromFilter = Paths.get(normalizeFolder(folder.getFolder()));
+            if (folder.getRecursive() == null || folder.getRecursive()) {
+                if (folderOfSchedule.startsWith(folderFromFilter)) {
+                    return true;
+                }
+            } else {
+                if (folderOfSchedule.equals(folderFromFilter)) {
+                    return true;
+                }
             }
         }
-        return listOfSchedules;
-	}
+        return false;
+    }
 }

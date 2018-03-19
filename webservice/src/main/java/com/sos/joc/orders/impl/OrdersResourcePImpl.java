@@ -28,10 +28,6 @@ import com.sos.joc.orders.resource.IOrdersResourceP;
 public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResourceP {
 
     private static final String API_CALL = "./orders/p";
-    private String regex = null;
-    private List<OrderPath> orderPaths = null;
-    private List<Folder> folders = null;
-    private Boolean compact = null;
 
     @Override
     public JOCDefaultResponse postOrdersP(String xAccessToken, String accessToken, OrdersFilter ordersFilter) throws Exception {
@@ -51,20 +47,25 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             OrdersP entity = new OrdersP();
             Long instanceId = dbItemInventoryInstance.getId();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
-            regex = ordersFilter.getRegex();
-            orderPaths = ordersFilter.getOrders();
-            folders = addPermittedFolder(ordersFilter.getFolders());
-
-            compact = ordersFilter.getCompact();
+            String regex = ordersFilter.getRegex();
+            List<OrderPath> orderPaths = ordersFilter.getOrders();
+            boolean withFolderFilter = ordersFilter.getFolders() != null && !ordersFilter.getFolders().isEmpty();
+            List<Folder> folders = addPermittedFolder(ordersFilter.getFolders());
+            
             List<DBItemInventoryOrder> ordersFromDB = new ArrayList<DBItemInventoryOrder>();
             if (orderPaths != null && !orderPaths.isEmpty()) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (OrderPath order : orderPaths) {
-                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(normalizePath(order.getJobChain()), order
-                            .getOrderId(), instanceId);
-                    if (filteredOrders != null && !filteredOrders.isEmpty()) {
-                        ordersFromDB.addAll(filteredOrders);
+                    if (order != null && canAdd(order.getJobChain(), permittedFolders)) {
+                        List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(normalizePath(order.getJobChain()), order
+                                .getOrderId(), instanceId);
+                        if (filteredOrders != null && !filteredOrders.isEmpty()) {
+                            ordersFromDB.addAll(filteredOrders);
+                        }
                     }
                 }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                // no permission
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(normalizeFolder(folder.getFolder()),
@@ -90,8 +91,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                     ordersFromDB.addAll(filteredOrders);
                 }
             }
-            ordersFromDB = addAllPermittedOrders(ordersFromDB);
-            entity.setOrders(OrderPermanent.fillOutputOrders(ordersFromDB, dbLayer, compact));
+            entity.setOrders(OrderPermanent.fillOutputOrders(ordersFromDB, dbLayer, ordersFilter.getCompact()));
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -102,22 +102,5 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
         } finally {
             Globals.disconnect(connection);
         }
-    }
-
-    private List<DBItemInventoryOrder> addAllPermittedOrders(List<DBItemInventoryOrder> ordersToAdd) {
-        if (folderPermissions == null || ordersToAdd == null) {
-            return ordersToAdd;
-        }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return ordersToAdd;
-        }
-        List<DBItemInventoryOrder> listOfOrders = new ArrayList<DBItemInventoryOrder>();
-        for (DBItemInventoryOrder order : ordersToAdd) {
-            if (order != null && canAdd(order.getName(), folders)) {
-                listOfOrders.add(order);
-            }
-        }
-        return listOfOrders;
     }
 }

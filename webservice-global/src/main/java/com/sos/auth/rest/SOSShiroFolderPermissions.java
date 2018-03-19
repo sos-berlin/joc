@@ -1,7 +1,9 @@
 package com.sos.auth.rest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,6 +44,9 @@ public class SOSShiroFolderPermissions {
 
         for (int i = 0; i < stringlistOfFolders.length; i++) {
             String f = stringlistOfFolders[i].trim();
+            if (f == null || f.isEmpty()) {
+                continue;
+            }
             Folder filterFolder = new Folder();
             filterFolder.setRecursive(f.endsWith("/*"));
             filterFolder.setFolder(normalizeFolder(f));
@@ -57,11 +62,91 @@ public class SOSShiroFolderPermissions {
         }
         return folder;
     }
+    
+    public List<Folder> getPermittedFolders(List<Folder> folders) {
+        return getPermittedFolders(folders, getListOfFolders());
+    }
+
+    public List<Folder> getPermittedFolders(List<Folder> folders, Set<Folder> listOfFolders) {
+        List<Folder> permittedFolders = new ArrayList<Folder>();
+        if (folders != null && !folders.isEmpty()) {
+            for (Folder folder : folders) {
+                permittedFolders.addAll(getPermittedFolders(folder, listOfFolders));
+            }
+        } else if (listOfFolders != null) {
+            permittedFolders.addAll(listOfFolders);
+        }
+        return permittedFolders;
+    }
+
+    public Set<Folder> getPermittedFolders(Set<Folder> folders) {
+        return getPermittedFolders(folders, getListOfFolders());
+    }
+    
+    public Set<Folder> getPermittedFolders(Set<Folder> folders, Set<Folder> listOfFolders) {
+        Set<Folder> permittedFolders = new HashSet<Folder>();
+        if (folders != null && !folders.isEmpty()) {
+            for (Folder folder : folders) {
+                permittedFolders.addAll(getPermittedFolders(folder, listOfFolders));
+            }
+        } else {
+            permittedFolders = listOfFolders;
+        }
+        return permittedFolders;
+    }
+
+    public Set<Folder> getPermittedFolders(Folder folder, Set<Folder> listOfFolders) {
+        Set<Folder> permittedFolders = new HashSet<Folder>();
+        if (this.force) {
+            permittedFolders.add(folder);
+            return permittedFolders;
+        }
+        if (listOfFolders == null || listOfFolders.isEmpty()) {
+            permittedFolders.add(folder);
+            return permittedFolders;
+        }
+
+        folder.setFolder(normalizeFolder(folder.getFolder()));
+        if (listOfFolders.contains(folder)) {
+            permittedFolders.add(folder);
+            return permittedFolders;
+        }
+        String folderPathWithSlash = (folder.getFolder() + "/").replaceAll("//+", "/");
+        if (folder.getRecursive()) {
+            for (Folder f : listOfFolders) {
+                if (f.getRecursive()) {
+                    if (f.getFolder().startsWith(folderPathWithSlash)) {
+                        permittedFolders.add(f);
+                    } else if (folder.getFolder().startsWith((f.getFolder() + "/").replaceAll("//+", "/"))) {
+                        permittedFolders.add(folder);
+                    } 
+                } else {
+                    if (f.getFolder().equals(folder.getFolder())) {
+                        permittedFolders.add(f);
+                    } else if (f.getFolder().startsWith(folderPathWithSlash)) {
+                        permittedFolders.add(f);
+                    }
+                }
+            }
+        } else {
+            for (Folder f : listOfFolders) {
+                if (f.getFolder().equals(folder.getFolder())) {
+                    permittedFolders.add(folder);
+                    break;
+                }
+                if (f.getRecursive() && folder.getFolder().startsWith((f.getFolder() + "/").replaceAll("//+", "/"))) {
+                    permittedFolders.add(folder);
+                    break;
+                }
+            }
+        }
+        return permittedFolders;
+    }
 
     public boolean isPermittedForFolder(String folder) {
         return isPermittedForFolder(folder, getListOfFolders());
     }
-    
+
     public boolean isPermittedForFolder(String folder, Set<Folder> listOfFolders) {
         if (this.force) {
             return true;
@@ -73,6 +158,9 @@ public class SOSShiroFolderPermissions {
 
         for (Folder f : listOfFolders) {
             if (f.getFolder().equals(folder)) {
+                return true;
+            }
+            if (f.getRecursive() && "/".equals(f.getFolder())) {
                 return true;
             }
             if (f.getRecursive() && folder.startsWith(f.getFolder() + "/")) {

@@ -35,13 +35,12 @@ import com.sos.joc.orders.resource.IOrdersResource;
 @Path("orders")
 public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResource {
 
-	private static final String API_CALL = "./orders";
+    private static final String API_CALL = "./orders";
 
-	@Override
-	public JOCDefaultResponse postOrders(String xAccessToken, String accessToken, OrdersFilter ordersBody)
-			throws Exception {
-		return postOrders(getAccessToken(xAccessToken, accessToken), ordersBody);
-	}
+    @Override
+    public JOCDefaultResponse postOrders(String xAccessToken, String accessToken, OrdersFilter ordersBody) throws Exception {
+        return postOrders(getAccessToken(xAccessToken, accessToken), ordersBody);
+    }
 
 	public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
 		SOSHibernateSession connection = null;
@@ -53,51 +52,58 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 				return jocDefaultResponse;
 			}
 
-			// TODO date post body parameters are not yet considered
-			JOCJsonCommand command = new JOCJsonCommand(this);
-			command.setUriBuilderForOrders();
-			command.addOrderCompactQuery(ordersBody.getCompact());
+            // TODO date post body parameters are not yet considered
+            JOCJsonCommand command = new JOCJsonCommand(this);
+            command.setUriBuilderForOrders();
+            command.addOrderCompactQuery(ordersBody.getCompact());
 
-			Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
-			List<OrderPath> orders = ordersBody.getOrders();
-			List<Folder> folders = addPermittedFolder(ordersBody.getFolders());
+            Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
+            List<OrderPath> orders = ordersBody.getOrders();
+            boolean withFolderFilter = ordersBody.getFolders() != null && !ordersBody.getFolders().isEmpty();
+            List<Folder> folders = addPermittedFolder(ordersBody.getFolders());
 
-			List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
+            List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-			Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
-			if (orders != null && !orders.isEmpty()) {
-				InventoryJobChainsDBLayer dbJCLayer = new InventoryJobChainsDBLayer(connection);
-				List<String> outerJobChains = dbJCLayer.getOuterJobChains(dbItemInventoryInstance.getId());
-				for (OrderPath order : orders) {
-					if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
-						throw new JocMissingRequiredParameterException("jobChain");
-					} else {
-						order.setJobChain(normalizePath(order.getJobChain()));
-					}
-					OrdersPerJobChain opj;
-					if (ordersLists.containsKey(order.getJobChain())) {
-						opj = ordersLists.get(order.getJobChain());
-						if (opj.containsOrder(order.getOrderId())) {
-							continue;
-						} else {
-							opj.addOrder(order.getOrderId());
-						}
-					} else {
-						opj = new OrdersPerJobChain();
-						opj.setJobChain(order.getJobChain());
-						opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain()));
-						opj.addOrder(order.getOrderId());
-					}
-					ordersLists.put(order.getJobChain(), opj);
-				}
-			}
+            Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
+            if (orders != null && !orders.isEmpty()) {
+                InventoryJobChainsDBLayer dbJCLayer = new InventoryJobChainsDBLayer(connection);
+                List<String> outerJobChains = dbJCLayer.getOuterJobChains(dbItemInventoryInstance.getId());
+
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                for (OrderPath order : orders) {
+                    if (order != null && canAdd(order.getJobChain(), permittedFolders)) {
+                        if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
+                            throw new JocMissingRequiredParameterException("jobChain");
+                        } else {
+                            order.setJobChain(normalizePath(order.getJobChain()));
+                        }
+                        OrdersPerJobChain opj;
+                        if (ordersLists.containsKey(order.getJobChain())) {
+                            opj = ordersLists.get(order.getJobChain());
+                            if (opj.containsOrder(order.getOrderId())) {
+                                continue;
+                            } else {
+                                opj.addOrder(order.getOrderId());
+                            }
+                        } else {
+                            opj = new OrdersPerJobChain();
+                            opj.setJobChain(order.getJobChain());
+                            opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain()));
+                            opj.addOrder(order.getOrderId());
+                        }
+                        ordersLists.put(order.getJobChain(), opj);
+                    }
+                }
+            }
 
 			if (!ordersLists.isEmpty()) {
 				for (OrdersPerJobChain opj : ordersLists.values()) {
 					tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken));
 				}
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                // no permission
 			} else if (folders != null && !folders.isEmpty()) {
 				for (Folder folder : folders) {
 					folder.setFolder(normalizeFolder(folder.getFolder()));
@@ -130,39 +136,21 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 				}
 			}
 
-			OrdersV entity = new OrdersV();
+            OrdersV entity = new OrdersV();
             List<OrderV> permittedOrders = new ArrayList<OrderV>(listOrders.values());
-            permittedOrders = addAllPermittedOrders(permittedOrders);
 
             entity.setOrders(permittedOrders);
-			entity.setDeliveryDate(Date.from(Instant.now()));
+            entity.setDeliveryDate(Date.from(Instant.now()));
 
-			return JOCDefaultResponse.responseStatus200(entity);
-		} catch (JocException e) {
-			e.addErrorMetaInfo(getJocError());
-			return JOCDefaultResponse.responseStatusJSError(e);
-		} catch (Exception e) {
-			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		} finally {
-			Globals.disconnect(connection);
-		}
-	}
-
-    private List<OrderV> addAllPermittedOrders(List<OrderV> ordersToAdd) {
-        if (folderPermissions == null || ordersToAdd == null) {
-            return ordersToAdd;
+            return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
         }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return ordersToAdd;
-        }
-        List<OrderV> listOfOrders = new ArrayList<OrderV>();
-        for (OrderV order : ordersToAdd) {
-            if (order != null && canAdd(order.getPath(), folders)) {
-                listOfOrders.add(order);
-            }
-        }
-        return listOfOrders;
     }
 
 }

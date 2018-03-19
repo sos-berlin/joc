@@ -54,28 +54,29 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
 			InventoryProcessClassesDBLayer dbLayer = new InventoryProcessClassesDBLayer(connection);
 			List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
 			List<ProcessClassPath> processClassPaths = processClassFilter.getProcessClasses();
-			List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
+            boolean withFolderFilter = processClassFilter.getFolders() != null && !processClassFilter.getFolders().isEmpty();
+            List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
 
-			if (processClassPaths != null && !processClassPaths.isEmpty()) {
-                Set<Folder> foldersSet = folderPermissions.getListOfFolders();
-				for (ProcessClassPath processClassPath : processClassPaths) {
-					checkRequiredParameter("processClass", processClassPath.getProcessClass());
-					DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(
-							normalizePath(processClassPath.getProcessClass()), dbItemInventoryInstance.getId());
-                    if (processClassFromDb == null) {
-						continue;
-					}
-                    if (canAdd(processClassFromDb.getName(), foldersSet)) {
+            if (processClassPaths != null && !processClassPaths.isEmpty()) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                for (ProcessClassPath processClassPath : processClassPaths) {
+                    checkRequiredParameter("processClass", processClassPath.getProcessClass());
+                    if (processClassPath != null && canAdd(processClassPath.getProcessClass(), permittedFolders)) {
+                        DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(normalizePath(processClassPath.getProcessClass()),
+                                dbItemInventoryInstance.getId());
+                        if (processClassFromDb == null) {
+                            continue;
+                        }
                         listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb));
                     }
                 }
-			} else if (folders != null && !folders.isEmpty()) {
-				Map<String, ProcessClassP> mapOfProcessClasses = new HashMap<String, ProcessClassP>();
-				for (Folder folder : folders) {
-					List<DBItemInventoryProcessClass> processClassesFromDb = null;
-					processClassesFromDb = dbLayer.getProcessClassesByFolders(normalizeFolder(folder.getFolder()),
-							dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
-                    processClassesFromDb = addAllPermittedProcessClasses(processClassesFromDb);
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                // no permission
+            } else if (folders != null && !folders.isEmpty()) {
+                Map<String, ProcessClassP> mapOfProcessClasses = new HashMap<String, ProcessClassP>();
+                for (Folder folder : folders) {
+                    List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(folder.getFolder(),
+                            dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
                     Map<String, ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesMap(dbLayer, processClassesFromDb,
                             processClassFilter.getRegex());
                     mapOfProcessClasses.putAll(processClassesToAdd);
@@ -83,38 +84,18 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                 listOfProcessClasses = new ArrayList<ProcessClassP>(mapOfProcessClasses.values());
             } else {
                 List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClasses(dbItemInventoryInstance.getId());
-                processClassesFromDb = addAllPermittedProcessClasses(processClassesFromDb);
-				listOfProcessClasses = ProcessClassPermanent.getProcessClassesList(dbLayer, processClassesFromDb,
-						processClassFilter.getRegex());
-			}
-			entity.setProcessClasses(listOfProcessClasses);
-			entity.setDeliveryDate(Date.from(Instant.now()));
-			return JOCDefaultResponse.responseStatus200(entity);
-		} catch (JocException e) {
-			e.addErrorMetaInfo(getJocError());
-			return JOCDefaultResponse.responseStatusJSError(e);
-		} catch (Exception e) {
-			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		} finally {
-			Globals.disconnect(connection);
-		}
-    }
-    
-    private List<DBItemInventoryProcessClass> addAllPermittedProcessClasses(List<DBItemInventoryProcessClass> processClassesToAdd) {
-        if (folderPermissions == null || processClassesToAdd == null) {
-            return processClassesToAdd;
-        }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return processClassesToAdd;
-        }
-        List<DBItemInventoryProcessClass> listOfProcessClasses = new ArrayList<DBItemInventoryProcessClass>();
-        for (DBItemInventoryProcessClass processClass : processClassesToAdd) {
-            if (processClass != null && canAdd(processClass.getName(), folders)) {
-                listOfProcessClasses.add(processClass);
+                listOfProcessClasses = ProcessClassPermanent.getProcessClassesList(dbLayer, processClassesFromDb, processClassFilter.getRegex());
             }
+            entity.setProcessClasses(listOfProcessClasses);
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
         }
-        return listOfProcessClasses;
-	}
-
+    }
 }

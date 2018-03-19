@@ -180,6 +180,6 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
         if (path == null || path.isEmpty()) {
             return false;
         }
-        return folderPermissions.isPermittedForFolder(getParent(path), folders);
+        return canAdd(path, folders);
     }
 }

@@ -1,7 +1,8 @@
 package com.sos.joc.jobs.impl;
 
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -30,7 +31,7 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    jobsFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
+                    accessToken).getOrder().getView().isStatus());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -43,6 +44,10 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
             ReportTaskExecutionsDBLayer reportTaskExecDBLayer = new ReportTaskExecutionsDBLayer(connection);
             reportTaskExecDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
 
+            boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
+            boolean hasPermission = true;
+            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+
             if (jobsFilter.getDateFrom() != null) {
                 reportTaskExecDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
             }
@@ -50,22 +55,26 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
                 reportTaskExecDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
             }
 
-            reportTaskExecDBLayer.getFilter().setListOfFolders(folderPermissions.getListOfFolders());
-            if (jobsFilter.getFolders().size() > 0) {
-                reportTaskExecDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(jobsFilter.getFolders()));
-            }
-
             if (jobsFilter.getJobs().size() > 0) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (JobPath jobPath : jobsFilter.getJobs()) {
-                    reportTaskExecDBLayer.getFilter().addJobPath(normalizePath(jobPath.getJob()));
+                    if (jobPath != null && canAdd(jobPath.getJob(), permittedFolders)) {
+                        reportTaskExecDBLayer.getFilter().addJobPath(normalizePath(jobPath.getJob()));
+                    }
                 }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                hasPermission = false;
+            } else if (folders != null && !folders.isEmpty()) {
+                reportTaskExecDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(jobsFilter.getFolders()));
             }
 
             JobsOverView entity = new JobsOverView();
             entity.setSurveyDate(new Date());
             entity.setJobs(jobsHistoricSummary);
-            jobsHistoricSummary.setFailed(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(false).intValue());
-            jobsHistoricSummary.setSuccessful(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(true).intValue());
+            if (hasPermission) {
+                jobsHistoricSummary.setFailed(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(false).intValue());
+                jobsHistoricSummary.setSuccessful(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(true).intValue()); 
+            }
             entity.setDeliveryDate(new Date());
 
             return JOCDefaultResponse.responseStatus200(entity);

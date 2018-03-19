@@ -40,17 +40,28 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
 
             JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
             List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
+            boolean withFolderFilter = jobChainsFilter.getFolders() != null && !jobChainsFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
             List<JobChainV> listOfJobChains = null;
 
             if (jobChains != null && !jobChains.isEmpty()) {
-                listOfJobChains = jocXmlCommand.getJobChainsFromShowJobChain(jobChains, jobChainsFilter);
+                List<JobChainPath> permittedJobChains = new ArrayList<JobChainPath>();
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                for (JobChainPath jobChain : jobChains) {
+                    if (jobChain != null && canAdd(jobChain.getJobChain(), permittedFolders)) {
+                        permittedJobChains.add(jobChain);
+                    }
+                }
+                if (!permittedJobChains.isEmpty()) {
+                    listOfJobChains = jocXmlCommand.getJobChainsFromShowJobChain(permittedJobChains, jobChainsFilter);
+                }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                // no permission
             } else if (folders != null && !folders.isEmpty()) {
                 listOfJobChains = jocXmlCommand.getJobChainsFromShowState(folders, jobChainsFilter);
             } else {
                 listOfJobChains = jocXmlCommand.getJobChainsFromShowState(jobChainsFilter);
             }
-            listOfJobChains = addAllPermittedJobChains(listOfJobChains);
             entity.setJobChains(listOfJobChains);
             entity.setNestedJobChains(jocXmlCommand.getNestedJobChains());
             entity.setDeliveryDate(new Date());
@@ -62,23 +73,5 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
-    }
-
-    private List<JobChainV> addAllPermittedJobChains(List<JobChainV> jobChainsToAdd) {
-        if (folderPermissions == null || jobChainsToAdd == null) {
-            return jobChainsToAdd;
-        }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return jobChainsToAdd;
-        }
-        List<JobChainV> listOfJobChains = new ArrayList<JobChainV>();
-        for (JobChainV jobChain : jobChainsToAdd) {
-            if (jobChain != null && canAdd(jobChain.getPath(), folders)) {
-                listOfJobChains.add(jobChain);
-            }
-        }
-        return listOfJobChains;
-
     }
 }
