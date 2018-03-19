@@ -37,12 +37,12 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
 
     @Override
     public JOCDefaultResponse postSchedules(String xAccessToken, String accessToken, SchedulesFilter schedulesFilter) throws Exception {
-        return postSchedules(getAccessToken(xAccessToken, accessToken),  schedulesFilter);
+        return postSchedules(getAccessToken(xAccessToken, accessToken), schedulesFilter);
     }
 
     public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
         SOSHibernateSession connection = null;
-        
+
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, schedulesFilter, accessToken, schedulesFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getSchedule().getView().isStatus());
@@ -50,51 +50,64 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
                 return jocDefaultResponse;
             }
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-            String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders", null);
-            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
-            Date surveyDate = jocXmlCommand.getSurveyDate();
-
-            NodeList schedules = jocXmlCommand.getSosxml().selectNodeList("/spooler/answer//schedules/schedule");
             List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
-
-            Set<String> setOfSchedules = new HashSet<String>();
-            for (SchedulePath schedule : schedulesFilter.getSchedules()) {
-                checkRequiredParameter("schedules.schedule", schedule.getSchedule());
-                setOfSchedules.add(normalizePath(schedule.getSchedule()));
-            }
-            
-            InventorySchedulesDBLayer dbLayer = null;
-            try {
-                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-                Globals.beginTransaction(connection);
-                dbLayer = new InventorySchedulesDBLayer(connection);
-            } catch (Exception e) {
-            }
-            
+            boolean withFolderFilter = schedulesFilter.getFolders() != null && !schedulesFilter.getFolders().isEmpty();
+            boolean hasPermission = true;
             List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
 
-            for (int i = 0; i < schedules.getLength(); i++) {
-                Element scheduleElement = (Element) schedules.item(i);
-                ScheduleVolatile scheduleV = new ScheduleVolatile(surveyDate, scheduleElement, dbLayer, dbItemInventoryInstance);
+            Set<String> setOfSchedules = new HashSet<String>();
+            if (schedulesFilter.getSchedules() != null && !schedulesFilter.getSchedules().isEmpty()) {
+                for (SchedulePath schedule : schedulesFilter.getSchedules()) {
+                    checkRequiredParameter("schedules.schedule", schedule.getSchedule());
+                    setOfSchedules.add(normalizePath(schedule.getSchedule()));
+                }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                hasPermission = false;
+            }
 
-                if (!setOfSchedules.isEmpty() && !setOfSchedules.contains(scheduleV.getPath())) {
-                    continue;
+            if (hasPermission) {
+
+                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
+                String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders", null);
+                jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
+                Date surveyDate = jocXmlCommand.getSurveyDate();
+
+                NodeList schedules = jocXmlCommand.getSosxml().selectNodeList("/spooler/answer//schedules/schedule");
+
+                InventorySchedulesDBLayer dbLayer = null;
+                try {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                    Globals.beginTransaction(connection);
+                    dbLayer = new InventorySchedulesDBLayer(connection);
+                } catch (Exception e) {
                 }
-                if (!FilterAfterResponse.matchRegex(schedulesFilter.getRegex(), scheduleV.getPath())) {
-                    continue;
+
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+
+                for (int i = 0; i < schedules.getLength(); i++) {
+                    Element scheduleElement = (Element) schedules.item(i);
+                    ScheduleVolatile scheduleV = new ScheduleVolatile(surveyDate, scheduleElement, dbLayer, dbItemInventoryInstance);
+
+                    if (!setOfSchedules.isEmpty() && !setOfSchedules.contains(scheduleV.getPath())) {
+                        continue;
+                    }
+                    if (!setOfSchedules.isEmpty() && !canAdd(scheduleV.getPath(), permittedFolders)) {
+                        continue;
+                    }
+                    if (!FilterAfterResponse.matchRegex(schedulesFilter.getRegex(), scheduleV.getPath())) {
+                        continue;
+                    }
+                    if (!FilterAfterResponse.filterStateHasState(schedulesFilter.getStates(), scheduleV.getState().get_text())) {
+                        continue;
+                    }
+                    if (!isInFolderList(folders, scheduleV.getPath())) {
+                        continue;
+                    }
+                    listOfSchedules.add(scheduleV);
                 }
-                if (!FilterAfterResponse.filterStateHasState(schedulesFilter.getStates(), scheduleV.getState().get_text())) {
-                    continue;
-                }
-                if (!isInFolderList(folders, scheduleV.getPath())) {
-                    continue;
-                }
-                listOfSchedules.add(scheduleV);
             }
 
             SchedulesV entity = new SchedulesV();
-            listOfSchedules = addAllPermittedSchedules(listOfSchedules);
             entity.setSchedules(listOfSchedules);
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
@@ -128,22 +141,5 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
             }
         }
         return false;
-    }
-    
-    private List<ScheduleV> addAllPermittedSchedules(List<ScheduleV> schedulesToAdd) {
-        if (folderPermissions == null || schedulesToAdd == null) {
-            return schedulesToAdd;
-        }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return schedulesToAdd;
-        }
-        List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
-        for (ScheduleV schedule : schedulesToAdd) {
-            if (schedule != null && canAdd(schedule.getPath(), folders)) {
-                listOfSchedules.add(schedule);
-            }
-        }
-        return listOfSchedules;
     }
 }

@@ -3,7 +3,6 @@ package com.sos.joc.classes;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -370,9 +369,6 @@ public class JOCResourceImpl {
     }
 
     protected List<Folder> addPermittedFolder(List<Folder> folders) {
-        if (folders == null || folders.isEmpty()) {
-            folders = new ArrayList<Folder>(folderPermissions.getListOfFolders());
-        }
-        return folders;
+        return folderPermissions.getPermittedFolders(folders);
     }
 }

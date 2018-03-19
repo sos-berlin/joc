@@ -1,6 +1,8 @@
 package com.sos.joc.orders.impl;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -40,11 +42,13 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             }
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
             Globals.beginTransaction(connection);
 
             ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
+            boolean withFolderFilter = ordersFilter.getFolders() != null && !ordersFilter.getFolders().isEmpty();
+            boolean hasPermission = true;
+            List<Folder> folders = addPermittedFolder(ordersFilter.getFolders());
 
             if (ordersFilter.getDateFrom() != null) {
                 reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter
@@ -55,24 +59,34 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             }
 
             if (ordersFilter.getOrders().size() > 0) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
-                    reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
+                    if (orderPath != null && canAdd(orderPath.getJobChain(), permittedFolders)) {
+                        reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
+                    }
                 }
-            }
-
-            for (Folder folder : folderPermissions.getListOfFolders()) {
-                reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                hasPermission = false;
+            } else if (folders != null && !folders.isEmpty()) {
+                for (Folder folder : folders) {
+                    reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
+                }
             }
 
             OrdersOverView entity = new OrdersOverView();
             entity.setDeliveryDate(new Date());
             entity.setSurveyDate(new Date());
-            entity.setOrders(ordersHistoricSummary);
-            reportTriggerDBLayer.getFilter().setFailed(true);
-            ordersHistoricSummary.setFailed(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
+            if (hasPermission) {
+                OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
+                entity.setOrders(ordersHistoricSummary);
+                reportTriggerDBLayer.getFilter().setFailed(true);
+                ordersHistoricSummary.setFailed(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
 
-            reportTriggerDBLayer.getFilter().setSuccess(true);
-            ordersHistoricSummary.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
+                reportTriggerDBLayer.getFilter().setSuccess(true);
+                ordersHistoricSummary.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
+            } else {
+                entity.setOrders(null);
+            }
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

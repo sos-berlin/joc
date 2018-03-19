@@ -56,16 +56,22 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 
             List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
             Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(processClassFilter.getProcessClasses());
+            boolean withFolderFilter = processClassFilter.getFolders() != null && !processClassFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
 
             List<ProcessClassV> listProcessClasses = new ArrayList<ProcessClassV>();
             ProcessClassesV entity = new ProcessClassesV();
             if (processClasses != null && !processClasses.isEmpty()) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (ProcessClassPath processClass : processClasses) {
                     checkRequiredParameter("processClass", processClass.getProcessClass());
-                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken,
-                            jobViewStatusEnabled));
+                    if (processClass != null && canAdd(processClass.getProcessClass(), permittedFolders)) {
+                        tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken,
+                                jobViewStatusEnabled));
+                    }
                 }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                // no permission
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));
@@ -99,7 +105,6 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 }
             }
 
-            listProcessClasses = addAllPermittedProcessClasses(listProcessClasses);
             entity.setProcessClasses(listProcessClasses);
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
@@ -114,22 +119,4 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-
-    private List<ProcessClassV> addAllPermittedProcessClasses(List<ProcessClassV> processClassesToAdd) {
-        if (folderPermissions == null || processClassesToAdd == null) {
-            return processClassesToAdd;
-        }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return processClassesToAdd;
-        }
-        List<ProcessClassV> listOfProcessClasses = new ArrayList<ProcessClassV>();
-        for (ProcessClassV processClass : processClassesToAdd) {
-            if (processClass != null && canAdd(processClass.getPath(), folders)) {
-                listOfProcessClasses.add(processClass);
-            }
-        }
-        return listOfProcessClasses;
-    }
-
 }

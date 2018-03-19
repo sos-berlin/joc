@@ -3,6 +3,7 @@ package com.sos.joc.orders.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +56,9 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             Globals.beginTransaction(connection);
 
             List<OrderHistoryItem> listHistory = new ArrayList<OrderHistoryItem>();
+            boolean withFolderFilter = ordersFilter.getFolders() != null && !ordersFilter.getFolders().isEmpty();
+            boolean hasPermission = true;
+            List<Folder> folders = addPermittedFolder(ordersFilter.getFolders());
 
             ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
@@ -78,18 +82,23 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 if (!ordersFilter.getJobschedulerId().isEmpty()) {
                     instanceId = dbItemInventoryInstance.getId();
                 }
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
-                    String normalizeJobChain = normalizePath(orderPath.getJobChain());
-                    List<String> innerChains = jobChainDbLayer.getInnerJobChains(normalizeJobChain, instanceId);
-                    if (innerChains == null) {
-                        reportTriggerDBLayer.getFilter().addOrderPath(normalizeJobChain, orderPath.getOrderId());
-                    } else {
-                        for (String innerChain : innerChains) {
-                            reportTriggerDBLayer.getFilter().addOrderPath(innerChain, orderPath.getOrderId());
+                    if (orderPath != null && canAdd(orderPath.getJobChain(), permittedFolders)) {
+                        String normalizeJobChain = normalizePath(orderPath.getJobChain());
+                        List<String> innerChains = jobChainDbLayer.getInnerJobChains(normalizeJobChain, instanceId);
+                        if (innerChains == null) {
+                            reportTriggerDBLayer.getFilter().addOrderPath(normalizeJobChain, orderPath.getOrderId());
+                        } else {
+                            for (String innerChain : innerChains) {
+                                reportTriggerDBLayer.getFilter().addOrderPath(innerChain, orderPath.getOrderId());
+                            }
                         }
                     }
                 }
                 ordersFilter.setRegex("");
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                hasPermission = false;
             } else {
 
                 if (ordersFilter.getExcludeOrders().size() > 0) {
@@ -98,72 +107,71 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                     }
                 }
 
-                if (ordersFilter.getFolders().size() > 0) {
-                    for (Folder folder : ordersFilter.getFolders()) {
+                if (folders != null && !folders.isEmpty()) {
+                    for (Folder folder : folders) {
                         reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
                     }
                 }
             }
 
-            for (Folder folder : folderPermissions.getListOfFolders()) {
-                reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
-            }
+            if (hasPermission) {
 
-            if (ordersFilter.getLimit() == null) {
-                ordersFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
-            }
-            reportTriggerDBLayer.getFilter().setLimit(ordersFilter.getLimit());
-            List<DBItemReportTrigger> listOfDBItemReportTrigger = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
-
-            Matcher regExMatcher = null;
-            if (ordersFilter.getRegex() != null && !ordersFilter.getRegex().isEmpty()) {
-                regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher("");
-            }
-
-            for (DBItemReportTrigger dbItemReportTrigger : listOfDBItemReportTrigger) {
-
-                boolean add = true;
-
-                OrderHistoryItem history = new OrderHistoryItem();
-                if (ordersFilter.getJobschedulerId().isEmpty()) {
-                    history.setJobschedulerId(dbItemReportTrigger.getSchedulerId());
+                if (ordersFilter.getLimit() == null) {
+                    ordersFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
                 }
-                history.setEndTime(dbItemReportTrigger.getEndTime());
-                history.setHistoryId(String.valueOf(dbItemReportTrigger.getHistoryId()));
-                history.setJobChain(dbItemReportTrigger.getParentName());
-                history.setNode(dbItemReportTrigger.getState());
-                history.setOrderId(dbItemReportTrigger.getName());
-                history.setPath(dbItemReportTrigger.getFullOrderQualifier());
-                history.setStartTime(dbItemReportTrigger.getStartTime());
-                HistoryState state = new HistoryState();
+                reportTriggerDBLayer.getFilter().setLimit(ordersFilter.getLimit());
+                List<DBItemReportTrigger> listOfDBItemReportTrigger = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
 
-                if (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null) {
-                    state.setSeverity(1);
-                    state.set_text(HistoryStateText.INCOMPLETE);
-                } else {
-                    if (dbItemReportTrigger.getResultError()) {
-                        state.setSeverity(2);
-                        state.set_text(HistoryStateText.FAILED);
+                Matcher regExMatcher = null;
+                if (ordersFilter.getRegex() != null && !ordersFilter.getRegex().isEmpty()) {
+                    regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher("");
+                }
+
+                for (DBItemReportTrigger dbItemReportTrigger : listOfDBItemReportTrigger) {
+
+                    boolean add = true;
+
+                    OrderHistoryItem history = new OrderHistoryItem();
+                    if (ordersFilter.getJobschedulerId().isEmpty()) {
+                        history.setJobschedulerId(dbItemReportTrigger.getSchedulerId());
+                    }
+                    history.setEndTime(dbItemReportTrigger.getEndTime());
+                    history.setHistoryId(String.valueOf(dbItemReportTrigger.getHistoryId()));
+                    history.setJobChain(dbItemReportTrigger.getParentName());
+                    history.setNode(dbItemReportTrigger.getState());
+                    history.setOrderId(dbItemReportTrigger.getName());
+                    history.setPath(dbItemReportTrigger.getFullOrderQualifier());
+                    history.setStartTime(dbItemReportTrigger.getStartTime());
+                    HistoryState state = new HistoryState();
+
+                    if (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null) {
+                        state.setSeverity(1);
+                        state.set_text(HistoryStateText.INCOMPLETE);
                     } else {
-                        if (dbItemReportTrigger.getEndTime() != null && !dbItemReportTrigger.getResultError()) {
-                            state.setSeverity(0);
-                            state.set_text(HistoryStateText.SUCCESSFUL);
+                        if (dbItemReportTrigger.getResultError()) {
+                            state.setSeverity(2);
+                            state.set_text(HistoryStateText.FAILED);
+                        } else {
+                            if (dbItemReportTrigger.getEndTime() != null && !dbItemReportTrigger.getResultError()) {
+                                state.setSeverity(0);
+                                state.set_text(HistoryStateText.SUCCESSFUL);
+                            }
                         }
+
+                    }
+                    history.setState(state);
+                    history.setSurveyDate(dbItemReportTrigger.getCreated());
+
+                    if (regExMatcher != null) {
+                        regExMatcher.reset(dbItemReportTrigger.getParentName() + "," + dbItemReportTrigger.getName());
+                        add = regExMatcher.find();
+                    }
+
+                    if (add && FilterAfterResponse.filterStateHasState(ordersFilter.getHistoryStates(), history.getState().get_text())) {
+                        listHistory.add(history);
                     }
 
                 }
-                history.setState(state);
-                history.setSurveyDate(dbItemReportTrigger.getCreated());
-
-                if (regExMatcher != null) {
-                    regExMatcher.reset(dbItemReportTrigger.getParentName() + "," + dbItemReportTrigger.getName());
-                    add = regExMatcher.find();
-                }
-
-                if (add && FilterAfterResponse.filterStateHasState(ordersFilter.getHistoryStates(), history.getState().get_text())) {
-                    listHistory.add(history);
-                }
-
             }
 
             OrderHistory entity = new OrderHistory();

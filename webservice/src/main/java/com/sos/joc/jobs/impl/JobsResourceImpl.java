@@ -44,19 +44,30 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
             JobsV entity = new JobsV();
-            List<JobV> listOfJobs=null;
+            List<JobV> listOfJobs = null;
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
             List<JobPath> jobs = jobsFilter.getJobs();
+            boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
 
             if (jobs != null && !jobs.isEmpty()) {
-                listOfJobs = jocXmlCommand.getJobsFromShowJob(jobs, jobsFilter);
+                List<JobPath> permittedJobs = new ArrayList<JobPath>();
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                for (JobPath job : jobs) {
+                    if (job != null && canAdd(job.getJob(), permittedFolders)) {
+                        permittedJobs.add(job);
+                    }
+                }
+                if (!permittedJobs.isEmpty()) {
+                    listOfJobs = jocXmlCommand.getJobsFromShowJob(permittedJobs, jobsFilter);
+                }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                // no permission
             } else if (folders != null && !folders.isEmpty()) {
                 listOfJobs = jocXmlCommand.getJobsFromShowState(folders, jobsFilter);
             } else {
                 listOfJobs = jocXmlCommand.getJobsFromShowState(jobsFilter);
             }
-            listOfJobs = addAllPermittedJobs(listOfJobs);
             entity.setJobs(listOfJobs);
             entity.setDeliveryDate(new Date());
 
@@ -71,22 +82,4 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             Globals.disconnect(connection);
         }
     }
-    
-    private List<JobV> addAllPermittedJobs(List<JobV> jobsToAdd) {
-        if (folderPermissions == null || jobsToAdd == null) {
-            return jobsToAdd;
-        }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return jobsToAdd;
-        }
-        List<JobV> listOfJobs = new ArrayList<JobV>();
-        for (JobV job : jobsToAdd) {
-            if (job != null && canAdd(job.getPath(), folders)) {
-                listOfJobs.add(job);
-            }
-        }
-        return listOfJobs;
-    }
-
 }

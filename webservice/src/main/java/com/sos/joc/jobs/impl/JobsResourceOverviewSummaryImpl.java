@@ -1,6 +1,8 @@
 package com.sos.joc.jobs.impl;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -28,8 +30,8 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
         SOSHibernateSession connection = null;
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getOrder().getView().isStatus());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -42,31 +44,41 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
             ReportTaskExecutionsDBLayer reportTaskExecDBLayer = new ReportTaskExecutionsDBLayer(connection);
             reportTaskExecDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
 
+            boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
+            boolean hasPermission = true;
+            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+
             if (jobsFilter.getDateFrom() != null) {
-                reportTaskExecDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter
-                        .getTimeZone()));
+                reportTaskExecDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
             }
             if (jobsFilter.getDateTo() != null) {
                 reportTaskExecDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
             }
-            
-            if (jobsFilter.getJobs().size() > 0) {
-                for (JobPath jobPath : jobsFilter.getJobs()) {
-                    reportTaskExecDBLayer.getFilter().addJobPath(normalizePath(jobPath.getJob()));
-                }
-            }
 
-            for (Folder folder : folderPermissions.getListOfFolders()) {
-                reportTaskExecDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
+            if (jobsFilter.getJobs().size() > 0) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                for (JobPath jobPath : jobsFilter.getJobs()) {
+                    if (jobPath != null && canAdd(jobPath.getJob(), permittedFolders)) {
+                        reportTaskExecDBLayer.getFilter().addJobPath(normalizePath(jobPath.getJob()));
+                    }
+                }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                hasPermission = false;
+            } else if (folders != null && !folders.isEmpty()) {
+                for (Folder folder : folders) {
+                    reportTaskExecDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
+                }
             }
 
             JobsOverView entity = new JobsOverView();
             entity.setSurveyDate(new Date());
             entity.setJobs(jobsHistoricSummary);
-            jobsHistoricSummary.setFailed(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(false).intValue());
-            jobsHistoricSummary.setSuccessful(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(true).intValue());
+            if (hasPermission) {
+                jobsHistoricSummary.setFailed(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(false).intValue());
+                jobsHistoricSummary.setSuccessful(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(true).intValue()); 
+            }
             entity.setDeliveryDate(new Date());
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

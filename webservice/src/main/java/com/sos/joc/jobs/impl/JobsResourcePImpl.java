@@ -29,10 +29,6 @@ import com.sos.joc.model.job.JobsP;
 public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP {
 
     private static final String API_CALL = "./jobs/p";
-    private String regex;
-    private List<Folder> folders;
-    private List<JobPath> jobs;
-    private Boolean isOrderJob;
 
     @Override
     public JOCDefaultResponse postJobsP(String xAccessToken, String accessToken, JobsFilter jobsFilter) {
@@ -51,20 +47,16 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             }
             session = Globals.createSosHibernateStatelessConnection(API_CALL);
             session.beginTransaction();
-            Boolean compact = jobsFilter.getCompact();
-            regex = jobsFilter.getRegex();
-            folders = addPermittedFolder(jobsFilter.getFolders());
-            
-            jobs = jobsFilter.getJobs();
-            isOrderJob = jobsFilter.getIsOrderJob();
 
             List<JobP> listJobs = new ArrayList<JobP>();
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(session);
             Long instanceId = dbItemInventoryInstance.getId();
-            List<DBItemInventoryJob> listOfJobs = processFilters(dbLayer);
-            for (DBItemInventoryJob inventoryJob : listOfJobs) {
-                JobP job = JobPermanent.getJob(inventoryJob, dbLayer, compact, instanceId);
-                 listJobs.add(job);
+            List<DBItemInventoryJob> listOfJobs = processFilters(dbLayer, jobsFilter);
+            if (listOfJobs != null) {
+                for (DBItemInventoryJob inventoryJob : listOfJobs) {
+                    JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobsFilter.getCompact(), instanceId);
+                    listJobs.add(job);
+                }
             }
             JobsP entity = new JobsP();
             entity.setJobs(listJobs);
@@ -95,24 +87,35 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         }
     }
 
-    private List<DBItemInventoryJob> processFilters(InventoryJobsDBLayer dbLayer) throws Exception {
+    private List<DBItemInventoryJob> processFilters(InventoryJobsDBLayer dbLayer, JobsFilter jobsFilter) throws Exception {
         List<DBItemInventoryJob> listOfJobs = null;
+        List<JobPath> jobs = jobsFilter.getJobs();
+        boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
+        List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+        String regex = jobsFilter.getRegex();
+
         if (jobs != null && !jobs.isEmpty()) {
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;
-            for (JobPath jobPathFilter : jobs) {
-                filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePath(jobPathFilter.getJob()), isOrderJob, dbItemInventoryInstance
-                        .getId());
-                if (filteredJobs != null) {
-                    listOfJobs.addAll(filteredJobs);
+
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+            for (JobPath job : jobs) {
+                if (job != null && canAdd(job.getJob(), permittedFolders)) {
+                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePath(job.getJob()), jobsFilter.getIsOrderJob(),
+                            dbItemInventoryInstance.getId());
+                    if (filteredJobs != null) {
+                        listOfJobs.addAll(filteredJobs);
+                    }
                 }
             }
+        } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+            // no permission
         } else if (folders != null && !folders.isEmpty()) {
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;
             for (Folder folderFilter : folders) {
-                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(normalizeFolder(folderFilter.getFolder()), isOrderJob, folderFilter
-                        .getRecursive(), dbItemInventoryInstance.getId());
+                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(normalizeFolder(folderFilter.getFolder()), jobsFilter.getIsOrderJob(),
+                        folderFilter.getRecursive(), dbItemInventoryInstance.getId());
                 if (filteredJobs != null && !filteredJobs.isEmpty()) {
                     if (regex != null && !regex.isEmpty()) {
                         List<DBItemInventoryJob> jobsFilteredByRegex = filterByRegex(filteredJobs, regex);
@@ -127,7 +130,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         } else {
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> unfilteredJobs = null;
-            unfilteredJobs = dbLayer.getInventoryJobs(isOrderJob, dbItemInventoryInstance.getId());
+            unfilteredJobs = dbLayer.getInventoryJobs(jobsFilter.getIsOrderJob(), dbItemInventoryInstance.getId());
             if (unfilteredJobs != null && !unfilteredJobs.isEmpty()) {
                 if (regex != null && !regex.isEmpty()) {
                     List<DBItemInventoryJob> jobsFilteredByRegex = filterByRegex(unfilteredJobs, regex);
@@ -139,25 +142,6 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
                 }
             }
         }
-        listOfJobs = addAllPermittedJobs(listOfJobs);
         return listOfJobs;
     }
-    
-    private List<DBItemInventoryJob> addAllPermittedJobs(List<DBItemInventoryJob> jobsToAdd) {
-        if (folderPermissions == null || jobsToAdd == null) {
-            return jobsToAdd;
-        }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return jobsToAdd;
-        }
-        List<DBItemInventoryJob> listOfJobs = new ArrayList<DBItemInventoryJob>();
-        for (DBItemInventoryJob job : jobsToAdd) {
-            if (job != null && canAdd(job.getName(), folders)) {
-                listOfJobs.add(job);
-            }
-        }
-        return listOfJobs;
-    }
-
 }

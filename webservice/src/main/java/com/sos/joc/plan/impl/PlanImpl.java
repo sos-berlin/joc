@@ -105,12 +105,12 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
         Date maxPlannedTime = dailyPlanDBLayer.getMaxPlannedStart(schedulerId);
         return maxPlannedTime;
     }
-    
+
     @Override
     public JOCDefaultResponse postPlan(String xAccessToken, String accessToken, PlanFilter planFilter) throws Exception {
-       return postPlan(getAccessToken(xAccessToken, accessToken), planFilter);       
+        return postPlan(getAccessToken(xAccessToken, accessToken), planFilter);
     }
-    
+
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
         SOSHibernateSession sosHibernateSession = null;
         try {
@@ -123,6 +123,9 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection("postPlan");
             DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(sosHibernateSession);
+            boolean withFolderFilter = planFilter.getFolders() != null && !planFilter.getFolders().isEmpty();
+            boolean hasPermission = true;
+            List<Folder> folders = addPermittedFolder(planFilter.getFolders());
 
             Globals.beginTransaction(sosHibernateSession);
 
@@ -148,14 +151,12 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 dailyPlanDBLayer.getFilter().addState(state.name());
             }
 
-            if (planFilter.getFolders().size() > 0) {
-                for (com.sos.joc.model.common.Folder folder : planFilter.getFolders()) {
-                    dailyPlanDBLayer.getFilter().addFolderPath(folder.getFolder(), folder.getRecursive());
+            if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                hasPermission = false;
+            } else if (folders != null && !folders.isEmpty()) {
+                for (Folder folder : folders) {
+                    dailyPlanDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
                 }
-            }
-
-            for (Folder folder : folderPermissions.getListOfFolders()) {
-                dailyPlanDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
             }
 
             Matcher regExMatcher = null;
@@ -163,181 +164,186 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 regExMatcher = Pattern.compile(planFilter.getRegex()).matcher("");
             }
 
-            List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(0);
-            List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(0);
-            List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(0);
-            List<DailyPlanWithReportExecutionDBItem> listOfDailyPlanStandaloneDBItems = dailyPlanDBLayer.getDailyPlanListStandalone(0);
             ArrayList<PlanItem> result = new ArrayList<PlanItem>();
-
             Plan entity = new Plan();
 
-            for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfWaitingDailyPlanStandaloneDBItems) {
+            if (hasPermission) {
+                List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(0);
+                List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(
+                        0);
+                List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(0);
+                List<DailyPlanWithReportExecutionDBItem> listOfDailyPlanStandaloneDBItems = dailyPlanDBLayer.getDailyPlanListStandalone(0);
 
-                boolean add = true;
-                PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
-                p.setStartMode(dailyPlanDBItem.getStartMode());
+                for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfWaitingDailyPlanStandaloneDBItems) {
 
-                if (regExMatcher != null) {
-                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
-                    add = regExMatcher.find();
-                }
-                p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
+                    boolean add = true;
+                    PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
+                    p.setStartMode(dailyPlanDBItem.getStartMode());
 
-                if (dailyPlanDBItem.getDbItemReportTask() != null) {
-                    p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
-                    p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
-                    p.setHistoryId(dailyPlanDBItem.getDbItemReportTask().getHistoryIdAsString());
-                }
-
-                if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() == null) {
-                    result.add(p);
-                }
-            }
-
-            for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfWaitingDailyPlanOrderDBItems) {
-
-                boolean add = true;
-
-                PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
-                p.setStartMode(dailyPlanDBItem.getStartMode());
-
-                if (regExMatcher != null) {
-                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
-                    add = regExMatcher.find();
-                }
-                p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
-                p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
-
-                if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() == null) {
-                    result.add(p);
-                }
-            }
-
-            for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfDailyPlanStandaloneDBItems) {
-
-                boolean add = true;
-                PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
-                p.setStartMode(dailyPlanDBItem.getStartMode());
-
-                Err err = new Err();
-
-                if (regExMatcher != null) {
-                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
-                    add = regExMatcher.find();
-                }
-                p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
-
-                if (dailyPlanDBItem.getDbItemReportTask() != null) {
-                    p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
-                    p.setHistoryId(dailyPlanDBItem.getDbItemReportTask().getHistoryIdAsString());
-                    p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
-                    p.setExitCode(dailyPlanDBItem.getDbItemReportTask().getExitCode());
-                    err.setCode(dailyPlanDBItem.getDbItemReportTask().getErrorCode());
-                    err.setMessage(dailyPlanDBItem.getDbItemReportTask().getErrorText());
-                    p.setError(err);
-                }
-                if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() != null) {
-                    result.add(p);
-                }
-            }
-
-            for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfDailyPlanOrderDBItems) {
-
-                boolean add = true;
-
-                PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
-
-                p.setStartMode(dailyPlanDBItem.getStartMode());
-
-                if (regExMatcher != null) {
-                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
-                    add = regExMatcher.find();
-                }
-                p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
-                p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
-
-                if (dailyPlanDBItem.getDbItemReportTrigger() != null) {
-                    p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
-                    p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId().toString());
-                    p.setStartTime(dailyPlanDBItem.getDbItemReportTrigger().getStartTime());
-                    p.setNode(dailyPlanDBItem.getDbItemReportTrigger().getState());
-                    p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getName());
-                }
-
-                if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() != null) {
-                    result.add(p);
-                }
-            }
-
-            if (fromDate != null && toDate != null && (planFilter.getLate() == null || !planFilter.getLate()) && (planFilter.getStates() == null
-                    || planFilter.getStates().size() == 0 || planFilter.getStates().get(0).name() == "PLANNED")) {
-                Calendar2DB calendar2Db = null;
-                try {
-                    CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
-                    createDailyPlanOptions.dayOffset.value(0);
-                    String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
-                    LOGGER.debug("commandUrl:" + commandUrl);
-                    createDailyPlanOptions.commandUrl.setValue(commandUrl);
-                    calendar2Db = new Calendar2DB(sosHibernateSession, dbItemInventoryInstance.getSchedulerId());
-                    if (dbItemInventoryInstance.getAuth() != null &&!dbItemInventoryInstance.getAuth().isEmpty()) {
-                        LOGGER.debug("basicAuthorization:" + dbItemInventoryInstance.getAuth());
-                        createDailyPlanOptions.basicAuthorization.setValue(dbItemInventoryInstance.getAuth());
+                    if (regExMatcher != null) {
+                        regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+                        add = regExMatcher.find();
                     }
-                    calendar2Db.setOptions(createDailyPlanOptions);
+                    p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
 
-                    if (maxDate.before(toDate)) {
-                        Date f = calendar2Db.addCalendar(maxDate, 1, java.util.Calendar.SECOND);
-                        if (f.before(fromDate)) {
-                            f = fromDate;
+                    if (dailyPlanDBItem.getDbItemReportTask() != null) {
+                        p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
+                        p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
+                        p.setHistoryId(dailyPlanDBItem.getDbItemReportTask().getHistoryIdAsString());
+                    }
+
+                    if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() == null) {
+                        result.add(p);
+                    }
+                }
+
+                for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfWaitingDailyPlanOrderDBItems) {
+
+                    boolean add = true;
+
+                    PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
+                    p.setStartMode(dailyPlanDBItem.getStartMode());
+
+                    if (regExMatcher != null) {
+                        regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem.getDailyPlanDbItem()
+                                .getOrderId());
+                        add = regExMatcher.find();
+                    }
+                    p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
+                    p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
+
+                    if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() == null) {
+                        result.add(p);
+                    }
+                }
+
+                for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfDailyPlanStandaloneDBItems) {
+
+                    boolean add = true;
+                    PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
+                    p.setStartMode(dailyPlanDBItem.getStartMode());
+
+                    Err err = new Err();
+
+                    if (regExMatcher != null) {
+                        regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+                        add = regExMatcher.find();
+                    }
+                    p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
+
+                    if (dailyPlanDBItem.getDbItemReportTask() != null) {
+                        p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
+                        p.setHistoryId(dailyPlanDBItem.getDbItemReportTask().getHistoryIdAsString());
+                        p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
+                        p.setExitCode(dailyPlanDBItem.getDbItemReportTask().getExitCode());
+                        err.setCode(dailyPlanDBItem.getDbItemReportTask().getErrorCode());
+                        err.setMessage(dailyPlanDBItem.getDbItemReportTask().getErrorText());
+                        p.setError(err);
+                    }
+                    if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() != null) {
+                        result.add(p);
+                    }
+                }
+
+                for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfDailyPlanOrderDBItems) {
+
+                    boolean add = true;
+
+                    PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
+
+                    p.setStartMode(dailyPlanDBItem.getStartMode());
+
+                    if (regExMatcher != null) {
+                        regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem.getDailyPlanDbItem()
+                                .getOrderId());
+                        add = regExMatcher.find();
+                    }
+                    p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
+                    p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
+
+                    if (dailyPlanDBItem.getDbItemReportTrigger() != null) {
+                        p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
+                        p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId().toString());
+                        p.setStartTime(dailyPlanDBItem.getDbItemReportTrigger().getStartTime());
+                        p.setNode(dailyPlanDBItem.getDbItemReportTrigger().getState());
+                        p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getName());
+                    }
+
+                    if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() != null) {
+                        result.add(p);
+                    }
+                }
+
+                if (fromDate != null && toDate != null && (planFilter.getLate() == null || !planFilter.getLate()) && (planFilter.getStates() == null
+                        || planFilter.getStates().size() == 0 || planFilter.getStates().get(0).name() == "PLANNED")) {
+                    Calendar2DB calendar2Db = null;
+                    try {
+                        CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
+                        createDailyPlanOptions.dayOffset.value(0);
+                        String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
+                        LOGGER.debug("commandUrl:" + commandUrl);
+                        createDailyPlanOptions.commandUrl.setValue(commandUrl);
+                        calendar2Db = new Calendar2DB(sosHibernateSession, dbItemInventoryInstance.getSchedulerId());
+                        if (dbItemInventoryInstance.getAuth() != null && !dbItemInventoryInstance.getAuth().isEmpty()) {
+                            LOGGER.debug("basicAuthorization:" + dbItemInventoryInstance.getAuth());
+                            createDailyPlanOptions.basicAuthorization.setValue(dbItemInventoryInstance.getAuth());
                         }
-                        List<DailyPlanDBItem> listOfCalenderItems = calendar2Db.getStartTimesFromScheduler(f, toDate);
+                        calendar2Db.setOptions(createDailyPlanOptions);
 
-                        for (DailyPlanDBItem dailyPlanDBItem : listOfCalenderItems) {
-                            DailyPlanWithReportTriggerDBItem dailyPlanWithReportTriggerDBItem = new DailyPlanWithReportTriggerDBItem(dailyPlanDBItem,
-                                    null);
-
-                            boolean add = true;
-
-                            PlanItem p = createPlanItem(dailyPlanDBItem);
-
-                            p.setStartMode(dailyPlanWithReportTriggerDBItem.getStartMode());
-
-                            if (regExMatcher != null) {
-                                regExMatcher.reset(dailyPlanDBItem.getJobChain() + "," + dailyPlanDBItem.getOrderId());
-                                add = regExMatcher.find();
+                        if (maxDate.before(toDate)) {
+                            Date f = calendar2Db.addCalendar(maxDate, 1, java.util.Calendar.SECOND);
+                            if (f.before(fromDate)) {
+                                f = fromDate;
                             }
-                            p.setJobChain(dailyPlanDBItem.getJobChainOrNull());
-                            p.setOrderId(dailyPlanDBItem.getOrderIdOrNull());
-                            p.setJob(dailyPlanDBItem.getJobOrNull());
+                            List<DailyPlanDBItem> listOfCalenderItems = calendar2Db.getStartTimesFromScheduler(f, toDate);
 
-                            String path;
-                            if (dailyPlanDBItem.getJob() != null) {
-                                path = dailyPlanDBItem.getJob();
-                            } else {
-                                path = dailyPlanDBItem.getJobChain();
-                            }
+                            for (DailyPlanDBItem dailyPlanDBItem : listOfCalenderItems) {
+                                DailyPlanWithReportTriggerDBItem dailyPlanWithReportTriggerDBItem = new DailyPlanWithReportTriggerDBItem(
+                                        dailyPlanDBItem, null);
 
-                            add = add && (planFilter.getJob() == null || planFilter.getJob().equals(dailyPlanDBItem.getJob()));
-                            add = add && (planFilter.getJobChain() == null || planFilter.getJobChain().equals(dailyPlanDBItem.getJobChain()));
-                            add = add && (planFilter.getOrderId() == null || planFilter.getOrderId().equals(dailyPlanDBItem.getOrderId()));
-                            add = add && (dailyPlanDBLayer.getFilter().containsFolder(path));
+                                boolean add = true;
 
-                            if (add) {
-                                result.add(p);
+                                PlanItem p = createPlanItem(dailyPlanDBItem);
+
+                                p.setStartMode(dailyPlanWithReportTriggerDBItem.getStartMode());
+
+                                if (regExMatcher != null) {
+                                    regExMatcher.reset(dailyPlanDBItem.getJobChain() + "," + dailyPlanDBItem.getOrderId());
+                                    add = regExMatcher.find();
+                                }
+                                p.setJobChain(dailyPlanDBItem.getJobChainOrNull());
+                                p.setOrderId(dailyPlanDBItem.getOrderIdOrNull());
+                                p.setJob(dailyPlanDBItem.getJobOrNull());
+
+                                String path;
+                                if (dailyPlanDBItem.getJob() != null) {
+                                    path = dailyPlanDBItem.getJob();
+                                } else {
+                                    path = dailyPlanDBItem.getJobChain();
+                                }
+
+                                add = add && (planFilter.getJob() == null || planFilter.getJob().equals(dailyPlanDBItem.getJob()));
+                                add = add && (planFilter.getJobChain() == null || planFilter.getJobChain().equals(dailyPlanDBItem.getJobChain()));
+                                add = add && (planFilter.getOrderId() == null || planFilter.getOrderId().equals(dailyPlanDBItem.getOrderId()));
+                                add = add && (dailyPlanDBLayer.getFilter().containsFolder(path));
+
+                                if (add) {
+                                    result.add(p);
+                                }
                             }
                         }
-                    }
-                } catch (Exception e) {
-                    String cause="";
-                    if (e.getCause() != null) {
-                        cause = e.getCause().toString();
-                    }
-                    LOGGER.warn("->" + e.toString() + ":" + cause);
-                    if (calendar2Db != null) {
-                        PlanCreated planCreated = new PlanCreated();
-                        planCreated.setUntil(calendar2Db.getMaxPlannedTime(planFilter.getJobschedulerId()));
-                        planCreated.setDays(calendar2Db.getDayOffset());
-                        entity.setCreated(planCreated);
+                    } catch (Exception e) {
+                        String cause = "";
+                        if (e.getCause() != null) {
+                            cause = e.getCause().toString();
+                        }
+                        LOGGER.warn("->" + e.toString() + ":" + cause);
+                        if (calendar2Db != null) {
+                            PlanCreated planCreated = new PlanCreated();
+                            planCreated.setUntil(calendar2Db.getMaxPlannedTime(planFilter.getJobschedulerId()));
+                            planCreated.setDays(calendar2Db.getDayOffset());
+                            entity.setCreated(planCreated);
+                        }
                     }
                 }
             }

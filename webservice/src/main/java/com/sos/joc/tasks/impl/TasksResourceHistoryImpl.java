@@ -3,6 +3,7 @@ package com.sos.joc.tasks.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +55,9 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             Globals.beginTransaction(connection);
 
             List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
+            boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
+            boolean hasPermission = true;
+            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
 
             ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(connection);
             reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
@@ -72,8 +76,11 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             }
 
             if (jobsFilter.getJobs().size() > 0) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (JobPath jobPath : jobsFilter.getJobs()) {
-                    reportTaskExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
+                    if (jobPath != null && canAdd(jobPath.getJob(), permittedFolders)) {
+                        reportTaskExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
+                    }
                 }
                 jobsFilter.setRegex("");
             } else {
@@ -83,78 +90,79 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                     }
                 }
 
-                if (jobsFilter.getFolders().size() > 0) {
-                    for (Folder folder : jobsFilter.getFolders()) {
-                        reportTaskExecutionsDBLayer.getFilter().addFolderPath(folder.getFolder(), folder.getRecursive());
+                if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                    hasPermission = false;
+                } else if (folders != null && !folders.isEmpty()) {
+                    for (Folder folder : folders) {
+                        reportTaskExecutionsDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
                     }
                 }
             }
 
-            if (jobsFilter.getLimit() == null) {
-                jobsFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
-            }
+            if (hasPermission) {
 
-            reportTaskExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
-
-            for (Folder folder : folderPermissions.getListOfFolders()) {
-                reportTaskExecutionsDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
-            }
-
-            List<DBItemReportTask> listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
-
-            Matcher regExMatcher = null;
-            if (jobsFilter.getRegex() != null && !jobsFilter.getRegex().isEmpty()) {
-                regExMatcher = Pattern.compile(jobsFilter.getRegex()).matcher("");
-            }
-
-            for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
-                boolean add = true;
-                TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
-                if (jobsFilter.getJobschedulerId().isEmpty()) {
-                    taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
-                }
-                taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
-                taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
-                taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
-                if (dbItemReportTask.getError()) {
-                    Err error = new Err();
-                    error.setCode(dbItemReportTask.getErrorCode());
-                    error.setMessage(dbItemReportTask.getErrorText());
-                    taskHistoryItem.setError(error);
+                if (jobsFilter.getLimit() == null) {
+                    jobsFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
                 }
 
-                taskHistoryItem.setExitCode(dbItemReportTask.getExitCode());
-                taskHistoryItem.setJob(dbItemReportTask.getName());
-                taskHistoryItem.setStartTime(dbItemReportTask.getStartTime());
+                reportTaskExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
 
-                HistoryState state = new HistoryState();
-                if (dbItemReportTask.isSuccessFull()) {
-                    state.setSeverity(0);
-                    state.set_text(HistoryStateText.SUCCESSFUL);
-                }
-                if (dbItemReportTask.isInComplete()) {
-                    state.setSeverity(1);
-                    state.set_text(HistoryStateText.INCOMPLETE);
-                }
-                if (dbItemReportTask.isFailed()) {
-                    state.setSeverity(2);
-                    state.set_text(HistoryStateText.FAILED);
-                }
-                taskHistoryItem.setState(state);
-                taskHistoryItem.setSurveyDate(dbItemReportTask.getCreated());
+                List<DBItemReportTask> listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
 
-                // taskHistoryItem.setSteps(dbItemReportExecution.getStep());
-                taskHistoryItem.setTaskId(dbItemReportTask.getHistoryIdAsString());
-
-                if (regExMatcher != null) {
-                    regExMatcher.reset(dbItemReportTask.getName());
-                    add = regExMatcher.find();
+                Matcher regExMatcher = null;
+                if (jobsFilter.getRegex() != null && !jobsFilter.getRegex().isEmpty()) {
+                    regExMatcher = Pattern.compile(jobsFilter.getRegex()).matcher("");
                 }
 
-                if (add) {
-                    listOfHistory.add(taskHistoryItem);
-                }
+                for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
+                    boolean add = true;
+                    TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
+                    if (jobsFilter.getJobschedulerId().isEmpty()) {
+                        taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
+                    }
+                    taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
+                    taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
+                    taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
+                    if (dbItemReportTask.getError()) {
+                        Err error = new Err();
+                        error.setCode(dbItemReportTask.getErrorCode());
+                        error.setMessage(dbItemReportTask.getErrorText());
+                        taskHistoryItem.setError(error);
+                    }
 
+                    taskHistoryItem.setExitCode(dbItemReportTask.getExitCode());
+                    taskHistoryItem.setJob(dbItemReportTask.getName());
+                    taskHistoryItem.setStartTime(dbItemReportTask.getStartTime());
+
+                    HistoryState state = new HistoryState();
+                    if (dbItemReportTask.isSuccessFull()) {
+                        state.setSeverity(0);
+                        state.set_text(HistoryStateText.SUCCESSFUL);
+                    }
+                    if (dbItemReportTask.isInComplete()) {
+                        state.setSeverity(1);
+                        state.set_text(HistoryStateText.INCOMPLETE);
+                    }
+                    if (dbItemReportTask.isFailed()) {
+                        state.setSeverity(2);
+                        state.set_text(HistoryStateText.FAILED);
+                    }
+                    taskHistoryItem.setState(state);
+                    taskHistoryItem.setSurveyDate(dbItemReportTask.getCreated());
+
+                    // taskHistoryItem.setSteps(dbItemReportExecution.getStep());
+                    taskHistoryItem.setTaskId(dbItemReportTask.getHistoryIdAsString());
+
+                    if (regExMatcher != null) {
+                        regExMatcher.reset(dbItemReportTask.getName());
+                        add = regExMatcher.find();
+                    }
+
+                    if (add) {
+                        listOfHistory.add(taskHistoryItem);
+                    }
+
+                }
             }
 
             TaskHistory entity = new TaskHistory();

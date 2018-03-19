@@ -27,9 +27,6 @@ import com.sos.joc.model.lock.LocksP;
 public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourceP {
 
     private static final String API_CALL = "./locks/p";
-    private String regex;
-    private List<Folder> folders;
-    private List<LockPath> locks;
 
     @Override
     public JOCDefaultResponse postLocksP(String xAccessToken, String accessToken, LocksFilter locksFilter) throws Exception {
@@ -47,36 +44,38 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             // FILTER
-            locks = locksFilter.getLocks();
-
-            regex = locksFilter.getRegex();
-            folders = addPermittedFolder(locksFilter.getFolders());
+            List<LockPath> locks = locksFilter.getLocks();
+            String regex = locksFilter.getRegex();
+            boolean withFolderFilter = locksFilter.getFolders() != null && !locksFilter.getFolders().isEmpty();
+            List<Folder> folders = addPermittedFolder(locksFilter.getFolders());
 
             InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(connection);
             LocksP entity = new LocksP();
             List<LockP> listOfLocks = new ArrayList<LockP>();
-            List<LockP> locksToAdd = new ArrayList<LockP>();
             if (locks != null && !locks.isEmpty()) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (LockPath lockPath : locks) {
-                    DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePath(lockPath.getLock()), dbItemInventoryInstance.getId());
-                    if (lockFromDb == null) {
-                        continue;
+                    if (lockPath != null && canAdd(lockPath.getLock(), permittedFolders)) {
+                        DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePath(lockPath.getLock()), dbItemInventoryInstance.getId());
+                        if (lockFromDb == null) {
+                            continue;
+                        }
+                        LockP lock = LockPermanent.getLockP(dbLayer, lockFromDb);
+                        listOfLocks.add(lock);
                     }
-                    LockP lock = LockPermanent.getLockP(dbLayer, lockFromDb);
-                    locksToAdd.add(lock);
                 }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                // no permission
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventoryLock> locksFromDb = null;
-                    locksFromDb = dbLayer.getLocksByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance.getId(), folder
-                            .getRecursive().booleanValue());
-                    locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
+                    List<DBItemInventoryLock> locksFromDb = dbLayer.getLocksByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance
+                            .getId(), folder.getRecursive().booleanValue());
+                    listOfLocks.addAll(LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex));
                 }
             } else {
                 List<DBItemInventoryLock> locksFromDb = dbLayer.getLocks(dbItemInventoryInstance.getId());
-                locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
+                listOfLocks = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
             }
-            listOfLocks = addAllPermittedLocks(locksToAdd);
             entity.setLocks(listOfLocks);
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
@@ -89,23 +88,6 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             Globals.disconnect(connection);
         }
 
-    }
-
-    private List<LockP> addAllPermittedLocks(List<LockP> locksToAdd) {
-        if (folderPermissions == null || locksToAdd == null) {
-            return locksToAdd;
-        }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return locksToAdd;
-        }
-        List<LockP> listOfLocks = new ArrayList<LockP>();
-        for (LockP lock : locksToAdd) {
-            if (lock != null && canAdd(lock.getPath(), folders)) {
-                listOfLocks.add(lock);
-            }
-        }
-        return listOfLocks;
     }
 
 }

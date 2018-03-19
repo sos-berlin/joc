@@ -30,9 +30,6 @@ import com.sos.joc.schedules.resource.ISchedulesResourceP;
 public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedulesResourceP {
 
     private static final String API_CALL = "./schedules/p";
-    private String regex;
-    private List<Folder> folders;
-    private List<SchedulePath> schedules;
 
     @Override
     public JOCDefaultResponse postSchedulesP(String xAccessToken, String accessToken, SchedulesFilter schedulesFilter) throws Exception {
@@ -50,9 +47,9 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             // FILTER
-            folders = addPermittedFolder(schedulesFilter.getFolders());
-            schedules = schedulesFilter.getSchedules();
-            regex = schedulesFilter.getRegex();
+            boolean withFolderFilter = schedulesFilter.getFolders() != null && !schedulesFilter.getFolders().isEmpty();
+            List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
+            List<SchedulePath> schedules = schedulesFilter.getSchedules();
 
             Globals.beginTransaction(connection);
             InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(connection);
@@ -60,33 +57,39 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 
             if (schedules != null && !schedules.isEmpty()) {
                 List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (SchedulePath schedulePath : schedules) {
-                    DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePath(schedulePath.getSchedule()), dbItemInventoryInstance
-                            .getId());
-                    if (scheduleFromDb == null) {
-                        continue;
-                    }
-                    ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbItemInventoryInstance);
-                    if (scheduleP != null) {
-                        schedulesToAdd.add(scheduleP);
+                    if (schedulePath != null && canAdd(schedulePath.getSchedule(), permittedFolders)) {
+                        DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePath(schedulePath.getSchedule()),
+                                dbItemInventoryInstance.getId());
+                        if (scheduleFromDb == null) {
+                            continue;
+                        }
+                        ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbItemInventoryInstance);
+                        if (scheduleP != null) {
+                            schedulesToAdd.add(scheduleP);
+                        }
                     }
                 }
                 if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                     listOfSchedules.addAll(schedulesToAdd);
                 }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                // no permission
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventorySchedule> schedulesFromDb = null;
                     schedulesFromDb = dbLayer.getSchedulesByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance.getId(), folder
                             .getRecursive().booleanValue());
-                    List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, schedulesFromDb, dbItemInventoryInstance);
+                    List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, schedulesFromDb, dbItemInventoryInstance, schedulesFilter.getRegex());
                     if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                         listOfSchedules.addAll(schedulesToAdd);
                     }
                 }
             } else {
                 List<DBItemInventorySchedule> processClassesFromDb = dbLayer.getSchedules(dbItemInventoryInstance.getId());
-                List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, processClassesFromDb, dbItemInventoryInstance);
+                List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, processClassesFromDb, dbItemInventoryInstance, schedulesFilter
+                        .getRegex());
                 if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                     listOfSchedules.addAll(schedulesToAdd);
                 }
@@ -106,9 +109,8 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
     }
 
     private List<ScheduleP> getSchedulesToAdd(InventorySchedulesDBLayer dbLayer, List<DBItemInventorySchedule> schedulesFromDb,
-            DBItemInventoryInstance instance) throws Exception {
+            DBItemInventoryInstance instance, String regex) throws Exception {
         List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
-        schedulesFromDb = addAllPermittedSchedules(schedulesFromDb);
         if (schedulesFromDb != null) {
             for (DBItemInventorySchedule scheduleFromDb : schedulesFromDb) {
                 if (regex != null && !regex.isEmpty()) {
@@ -122,22 +124,5 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             }
         }
         return schedulesToAdd;
-    }
-
-    private List<DBItemInventorySchedule> addAllPermittedSchedules(List<DBItemInventorySchedule> schedulesClassesToAdd) {
-        if (folderPermissions == null || schedulesClassesToAdd == null) {
-            return schedulesClassesToAdd;
-        }
-        Set<Folder> folders = folderPermissions.getListOfFolders();
-        if (folders.isEmpty()) {
-            return schedulesClassesToAdd;
-        }
-        List<DBItemInventorySchedule> listOfSchedules = new ArrayList<DBItemInventorySchedule>();
-        for (DBItemInventorySchedule schedule : schedulesClassesToAdd) {
-            if (schedule != null && canAdd(schedule.getName(), folders)) {
-                listOfSchedules.add(schedule);
-            }
-        }
-        return listOfSchedules;
     }
 }

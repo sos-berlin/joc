@@ -1,5 +1,9 @@
 package com.sos.joc.orders.impl;
 
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+
 import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -8,8 +12,10 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.Orders;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.order.OrdersSnapshot;
+import com.sos.joc.model.order.OrdersSummary;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
 
 @Path("orders")
@@ -30,11 +36,18 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                 return jocDefaultResponse;
             }
 
-            if (jobChainsFilter.getFolders().isEmpty()) {
-                jobChainsFilter.getFolders().addAll(folderPermissions.getListOfFolders());
+            boolean withFolderFilter = jobChainsFilter.getFolders() != null && !jobChainsFilter.getFolders().isEmpty();
+            List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
+            OrdersSnapshot entity = new OrdersSnapshot();
+            
+            if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                entity.setOrders(null);
+                entity.setSurveyDate(Date.from(Instant.now()));
+                entity.setDeliveryDate(entity.getSurveyDate());
+            } else {
+                jobChainsFilter.setFolders(folders);
+                entity = Orders.getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter);
             }
-
-            OrdersSnapshot entity = Orders.getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter);
 
             return JOCDefaultResponse.responseStatus200(entity);
 
