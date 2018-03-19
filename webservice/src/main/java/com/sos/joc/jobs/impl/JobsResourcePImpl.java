@@ -41,7 +41,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getJob().getView().isStatus());
+                    jobsFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -55,9 +55,10 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             if (listOfJobs != null) {
                 for (DBItemInventoryJob inventoryJob : listOfJobs) {
                     JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobsFilter.getCompact(), instanceId);
-				if (job != null) {
-					listJobs.add(job);
-				}
+                    if (job != null) {
+                        listJobs.add(job);
+                    }
+                }
             }
             JobsP entity = new JobsP();
             entity.setJobs(listJobs);

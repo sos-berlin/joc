@@ -1,6 +1,7 @@
 package com.sos.joc.jobs.impl;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getOrder().getView().isStatus());
+                    jobsFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -73,7 +74,7 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
             entity.setJobs(jobsHistoricSummary);
             if (hasPermission) {
                 jobsHistoricSummary.setFailed(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(false).intValue());
-                jobsHistoricSummary.setSuccessful(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(true).intValue()); 
+                jobsHistoricSummary.setSuccessful(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(true).intValue());
             }
             entity.setDeliveryDate(new Date());
 

@@ -117,53 +117,55 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
                 for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
                     TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
-                    if (jobsFilter.getJobschedulerId().isEmpty()) {
                     if (!getPermissonsJocCockpit(dbItemReportTask.getSchedulerId(), accessToken).getHistory().getView().isStatus()) {
                         continue;
                     }
-                }
-                taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
-                taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
-                taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
-                taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
-                if (dbItemReportTask.getError()) {
-                    Err error = new Err();
-                    error.setCode(dbItemReportTask.getErrorCode());
-                    error.setMessage(dbItemReportTask.getErrorText());
-                    taskHistoryItem.setError(error);
-                }
-
-                taskHistoryItem.setExitCode(dbItemReportTask.getExitCode());
-                taskHistoryItem.setJob(dbItemReportTask.getName());
-                taskHistoryItem.setStartTime(dbItemReportTask.getStartTime());
-
-                HistoryState state = new HistoryState();
-                if (dbItemReportTask.isSuccessFull()) {
-                    state.setSeverity(0);
-                    state.set_text(HistoryStateText.SUCCESSFUL);
-                }
-                if (dbItemReportTask.isInComplete()) {
-                    state.setSeverity(1);
-                    state.set_text(HistoryStateText.INCOMPLETE);
-                }
-                if (dbItemReportTask.isFailed()) {
-                    state.setSeverity(2);
-                    state.set_text(HistoryStateText.FAILED);
-                }
-                taskHistoryItem.setState(state);
-                taskHistoryItem.setSurveyDate(dbItemReportTask.getCreated());
-
-                // taskHistoryItem.setSteps(dbItemReportExecution.getStep());
-                taskHistoryItem.setTaskId(dbItemReportTask.getHistoryIdAsString());
-
-                if (regExMatcher != null) {
-                    regExMatcher.reset(dbItemReportTask.getName());
-                    if (!regExMatcher.find()) {
-                        continue;
+                    if (jobsFilter.getJobschedulerId().isEmpty()) {
+                        taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
                     }
-                }
 
-                listOfHistory.add(taskHistoryItem);
+                    taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
+                    taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
+                    taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
+                    taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
+                    if (dbItemReportTask.getError()) {
+                        Err error = new Err();
+                        error.setCode(dbItemReportTask.getErrorCode());
+                        error.setMessage(dbItemReportTask.getErrorText());
+                        taskHistoryItem.setError(error);
+                    }
+
+                    taskHistoryItem.setExitCode(dbItemReportTask.getExitCode());
+                    taskHistoryItem.setJob(dbItemReportTask.getName());
+                    taskHistoryItem.setStartTime(dbItemReportTask.getStartTime());
+
+                    HistoryState state = new HistoryState();
+                    if (dbItemReportTask.isSuccessFull()) {
+                        state.setSeverity(0);
+                        state.set_text(HistoryStateText.SUCCESSFUL);
+                    }
+                    if (dbItemReportTask.isInComplete()) {
+                        state.setSeverity(1);
+                        state.set_text(HistoryStateText.INCOMPLETE);
+                    }
+                    if (dbItemReportTask.isFailed()) {
+                        state.setSeverity(2);
+                        state.set_text(HistoryStateText.FAILED);
+                    }
+                    taskHistoryItem.setState(state);
+                    taskHistoryItem.setSurveyDate(dbItemReportTask.getCreated());
+
+                    // taskHistoryItem.setSteps(dbItemReportExecution.getStep());
+                    taskHistoryItem.setTaskId(dbItemReportTask.getHistoryIdAsString());
+
+                    if (regExMatcher != null) {
+                        regExMatcher.reset(dbItemReportTask.getName());
+                        if (!regExMatcher.find()) {
+                            continue;
+                        }
+                    }
+                    listOfHistory.add(taskHistoryItem);
+                }
             }
 
             TaskHistory entity = new TaskHistory();

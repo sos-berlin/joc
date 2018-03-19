@@ -45,7 +45,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getJobChain().getView().isStatus());
+                    getPermissonsJocCockpit(jobChainsFilter.getJobschedulerId(), accessToken).getJobChain().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

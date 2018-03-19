@@ -165,11 +165,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 regExMatcher = Pattern.compile(planFilter.getRegex()).matcher("");
             }
 
-			List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer
-					.getWaitingDailyPlanOrderList(0);
-			List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer
-					.getWaitingDailyPlanStandaloneList(0);
-            ArrayList<PlanItem> result = new ArrayList<PlanItem>();
+			ArrayList<PlanItem> result = new ArrayList<PlanItem>();
             Plan entity = new Plan();
 
             if (hasPermission) {
