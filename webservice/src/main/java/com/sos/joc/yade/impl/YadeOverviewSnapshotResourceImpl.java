@@ -3,8 +3,13 @@ package com.sos.joc.yade.impl;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.ws.rs.Path;
 
@@ -45,6 +50,7 @@ public class YadeOverviewSnapshotResourceImpl extends JOCResourceImpl implements
 			OrdersFilter ordersBody = new OrdersFilter();
 			ordersBody.setOrders(new ArrayList<OrderPath>());
 			ordersBody.setCompact(true);
+			List<Folder> folders = addPermittedFolder(null);
 
 			JOCJsonCommand command = new JOCJsonCommand(this);
 			command.setUriBuilderForOrders();
@@ -53,13 +59,42 @@ public class YadeOverviewSnapshotResourceImpl extends JOCResourceImpl implements
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			InventoryJobsDBLayer jobDbLayer = new InventoryJobsDBLayer(connection);
 			List<String> yadeJobs = jobDbLayer.getYadeJobs(dbItemInventoryInstance.getId());
+			
+			Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
+			List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
+			
+			if (folders != null && !folders.isEmpty()) {
+                for (Folder folder : folders) {
+                    folder.setFolder(normalizeFolder(folder.getFolder()));
+                    tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken, yadeJobs));
+                }
+            } else {
+                Folder rootFolder = new Folder();
+                rootFolder.setFolder("/");
+                rootFolder.setRecursive(true);
+                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken, yadeJobs);
+                listOrders.putAll(callable.call());
+            }
 
-			Folder rootFolder = new Folder();
-			rootFolder.setFolder("/");
-			rootFolder.setRecursive(true);
-			OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken, yadeJobs);
-			Map<String, OrderVolatile> listOrders = callable.call();
-
+			if (tasks != null && !tasks.isEmpty()) {
+                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                try {
+                    for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
+                        try {
+                            listOrders.putAll(result.get());
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
+                            }
+                        }
+                    }
+                } finally {
+                    executorService.shutdown();
+                }
+            }
+			
 			int running = 0;
 			int setback = 0;
 			int suspended = 0;
