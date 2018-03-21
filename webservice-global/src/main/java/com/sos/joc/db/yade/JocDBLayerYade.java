@@ -264,7 +264,7 @@ public class JocDBLayerYade extends DBLayer {
                 }
                 if (filter.getDateTo() != null) {
                     sql.append(" and");
-                    sql.append(" yt.start <= :dateTo");
+                    sql.append(" yt.start < :dateTo");
                 }
             }
             Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
