@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -29,6 +30,7 @@ import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.calendar.CalendarsFilter;
 import com.sos.joc.model.calendar.UsedBy;
+import com.sos.joc.model.common.Folder;
 
 @Path("calendars")
 public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICalendarsExportResource {
@@ -58,9 +60,13 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
             List<Calendar> calendarList = new ArrayList<Calendar>();
             List<DBItemCalendar> calendarsFromDb = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getId(), new HashSet<String>(calendarsFilter
                     .getCalendars()));
+            Set<Folder> folders = folderPermissions.getListOfFolders();
             if (calendarsFromDb != null && !calendarsFromDb.isEmpty()) {
                 for (DBItemCalendar dbCalendar : calendarsFromDb) {
                     if (dbCalendar.getConfiguration() != null) {
+                        if (!canAdd(dbCalendar.getName(), folders)) {
+                            continue;
+                        }
                         Calendar calendar = objectMapper.readValue(dbCalendar.getConfiguration(), Calendar.class);
                         calendar.setPath(dbCalendar.getName());
                         calendarList.add(calendar);

@@ -81,6 +81,9 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 									.getEdit().isChange())) {
 				return accessDeniedResponse();
 			}
+			if (!canAdd(calendar.getPath(), folderPermissions.getListOfFolders())) {
+			    return accessDeniedResponse("Access to folder " + getParent(calendar.getPath()) + " denied.");
+			}
 
 			ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(),
 					calendarFilter.getAuditLog(), calendarFilter.getJobschedulerId());
@@ -249,6 +252,9 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 			checkRequiredComment(calendarFilter.getAuditLog());
 
 			Calendar calendar = checkRequirements(calendarFilter.getCalendar());
+			if (!canAdd(calendar.getPath(), folderPermissions.getListOfFolders())) {
+                return accessDeniedResponse("Access to folder " + getParent(calendar.getPath()) + " denied.");
+            }
 
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL_SAVE_AS);
 			CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
@@ -306,10 +312,13 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 			checkRequiredParameter("calendar path", calendarFilter.getPath());
 			checkRequiredParameter("calendar new path", calendarFilter.getNewPath());
 
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL_MOVE);
 			String calendarPath = normalizePath(calendarFilter.getPath());
 			String calendarNewPath = normalizePath(calendarFilter.getNewPath());
-
+			if (!canAdd(calendarNewPath, folderPermissions.getListOfFolders())) {
+                return accessDeniedResponse("Access to folder " + getParent(calendarNewPath) + " denied.");
+            }
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL_MOVE);
+            
 			ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, calendarPath,
 					calendarFilter.getAuditLog(), calendarFilter.getJobschedulerId());
 			logAuditMessage(calendarAudit);

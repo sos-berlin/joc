@@ -49,6 +49,7 @@ import com.sos.joc.model.calendar.CalendarImportFilter;
 import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.Dates;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 
 @Path("calendars")
 public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICalendarsImportResource {
@@ -74,6 +75,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
 			}
 
 			List<Calendar> calendars = calendarImportFilter.getCalendars();
+			Set<Folder> folders = folderPermissions.getListOfFolders();
 
 			if (calendars != null && !calendars.isEmpty()) {
 
@@ -89,6 +91,9 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
 
 				for (Calendar calendar : calendars) {
 					checkRequirements(calendar);
+					if (!canAdd(calendar.getPath(), folders)) {
+                        continue;
+                    }
 					if (calendar.getBasedOn() == null || calendar.getBasedOn().isEmpty()) {
 						DBItemCalendar dbItemCalendar = calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(),
 								calendar.getPath());
@@ -112,6 +117,9 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
 				}
 
 				for (Calendar calendar : calendars) {
+				    if (!canAdd(calendar.getPath(), folders)) {
+                        continue;
+                    }
 					if (calendar.getBasedOn() != null && !calendar.getBasedOn().isEmpty()
 							&& calendarsMap.containsKey(calendar.getBasedOn())) {
 						// check if corresponding order, job or schedule exists

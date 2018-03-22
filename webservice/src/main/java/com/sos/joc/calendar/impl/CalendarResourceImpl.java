@@ -2,6 +2,7 @@ package com.sos.joc.calendar.impl;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -19,6 +20,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendar200;
 import com.sos.joc.model.calendar.CalendarId;
+import com.sos.joc.model.common.Folder;
 
 @Path("calendar")
 public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarResource {
@@ -57,6 +59,10 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
 							String.format("calendar with id '%1$d' not found", calendarFilter.getId()));
 				}
 			}
+			
+			if (!canAdd(calendarItem.getName(), folderPermissions.getListOfFolders())) {
+			    return accessDeniedResponse("Access to folder " + getParent(calendarItem.getName()) + " denied.");
+            }
 
 			Calendar calendar = new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class);
 			calendar.setId(calendarItem.getId());

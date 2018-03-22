@@ -279,9 +279,13 @@ public class JOCResourceImpl {
 	}
 
 	public JOCDefaultResponse accessDeniedResponse() {
-		jocError.setMessage("Access denied");
-		return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, jocError));
+		return accessDeniedResponse("Access denied");
 	}
+	
+	public JOCDefaultResponse accessDeniedResponse(String message) {
+        jocError.setMessage(message);
+        return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, jocError));
+    }
 
 	private void initLogging(String request, Object body) {
 		String user;
