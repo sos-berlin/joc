@@ -204,7 +204,7 @@ public class JocDBLayerYade extends DBLayer {
             sql.append(" where");
             sql.append(" yt.sourceProtocolId = yps.id");
             sql.append(" and");
-            sql.append(" yt.targetProtocolId = ypt.id");
+            sql.append(" yt.targetProtocolId is not null and yt.targetProtocolId = ypt.id");
             if (hasFilter) {
                 if (filter.getJobschedulerId() != null && !filter.getJobschedulerId().isEmpty()) {
                     sql.append(" and");
