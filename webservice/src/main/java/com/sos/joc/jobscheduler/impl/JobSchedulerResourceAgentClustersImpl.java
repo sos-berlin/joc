@@ -229,6 +229,9 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                 return true;
             }
             if (folder.getRecursive() == null || folder.getRecursive()) {
+                if ("/".equals(f)) {
+                    return true;
+                }
                 if (parent.startsWith(f + "/")) {
                     return true;
                 }
