@@ -85,6 +85,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                 }
             }
             Set<String> agentSet = new HashSet<String>();
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             Set<AgentClusterVolatile> listAgentCluster = new HashSet<AgentClusterVolatile>();
             connection.beginTransaction();
 
@@ -93,13 +94,14 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                 Date surveyDate = JobSchedulerDate.getDateFromEventId(jsonObjectFromPost.getJsonNumber("eventId").longValue());
                 for (JsonObject processClass : jsonObjectFromPost.getJsonArray("elements").getValuesAs(JsonObject.class)) {
                     JsonArray agents = processClass.getJsonArray("agents");
-                    if (agents == null || agents.isEmpty()) { // consider only
-                                                              // process classes
-                                                              // with agents
+                    if (agents == null || agents.isEmpty()) { // consider only process classes with agents
                         continue;
                     }
                     AgentClusterVolatile agentClusterV = new AgentClusterVolatile(processClass, surveyDate);
                     agentClusterV.setAgentClusterPath();
+                    if (!canAdd(agentClusterV.getPath(), permittedFolders)) {
+                        continue;
+                    }
                     if (!agentClusterPaths.isEmpty() && !agentClusterPaths.contains(agentClusterV.getPath())) {
                         continue;
                     }
@@ -158,6 +160,9 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
 
                 List<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
                 for (AgentClusterPermanent agentCluster : agentClusters) {
+                    if (!canAdd(agentCluster.getPath(), permittedFolders)) {
+                        continue;
+                    }
                     if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(), agentCluster.getPath())) {
                         continue;
                     }
@@ -220,12 +225,13 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
         }
         for (Folder folder : folders) {
             String f = normalizeFolder(folder.getFolder());
+            if (parent.equals(f)) {
+                return true;
+            }
             if (folder.getRecursive() == null || folder.getRecursive()) {
-                if (parent.startsWith(f)) {
+                if (parent.startsWith(f + "/")) {
                     return true;
                 }
-            } else if (parent.equals(f)) {
-                return true;
             }
         }
         return false;
