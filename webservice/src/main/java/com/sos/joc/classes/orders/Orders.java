@@ -16,6 +16,7 @@ import org.apache.shiro.session.Session;
 
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
@@ -79,7 +80,9 @@ public class Orders {
                         eventId = event; 
                     }
                 } catch (ExecutionException e) {
-                    if (e.getCause() instanceof JocException) {
+                    if (e.getCause() instanceof JobSchedulerObjectNotExistException) {
+                        //
+                    } else if (e.getCause() instanceof JocException) {
                         throw (JocException) e.getCause();
                     } else {
                         throw (Exception) e.getCause();
