@@ -45,6 +45,10 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             jocXmlCommand.setBasicAuthorization(getBasicAuthorization());
 
             JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
+          
+            if (!jobschedulerUser.resetTimeOut()) {
+                return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
+            }
 
             String xml = "";
             for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
