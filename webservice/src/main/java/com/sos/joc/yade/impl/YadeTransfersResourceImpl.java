@@ -48,7 +48,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
 					filterBody.getJobschedulerId(), getPermissonsJocCockpit(filterBody.getJobschedulerId(),
-					        accessToken).getYADE().getView().isTransfers());
+					        accessToken).getYADE().getView().isStatus());
 			if (jocDefaultResponse != null) {
 				return jocDefaultResponse;
 			}

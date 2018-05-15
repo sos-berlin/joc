@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2018.02.12 um 03:26:23 PM CET 
+// Generiert: 2018.05.15 um 11:57:31 AM CEST 
 //
 
 
@@ -646,7 +646,6 @@ import javax.xml.bind.annotation.XmlType;
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
  *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                             &lt;element name="transfers" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="files" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
@@ -6503,7 +6502,6 @@ public class SOSPermissionJocCockpit {
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
      *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="transfers" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="files" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
@@ -6647,7 +6645,6 @@ public class SOSPermissionJocCockpit {
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
          *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="transfers" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="files" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
@@ -6660,13 +6657,11 @@ public class SOSPermissionJocCockpit {
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
             "status",
-            "transfers",
             "files"
         })
         public static class View {
 
             protected boolean status;
-            protected boolean transfers;
             protected boolean files;
 
             /**
@@ -6683,22 +6678,6 @@ public class SOSPermissionJocCockpit {
              */
             public void setStatus(boolean value) {
                 this.status = value;
-            }
-
-            /**
-             * Ruft den Wert der transfers-Eigenschaft ab.
-             * 
-             */
-            public boolean isTransfers() {
-                return transfers;
-            }
-
-            /**
-             * Legt den Wert der transfers-Eigenschaft fest.
-             * 
-             */
-            public void setTransfers(boolean value) {
-                this.transfers = value;
             }
 
             /**
