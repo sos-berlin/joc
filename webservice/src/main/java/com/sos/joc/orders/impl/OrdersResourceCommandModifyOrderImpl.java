@@ -4,7 +4,9 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -34,6 +36,7 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.order.ModifyOrder;
@@ -214,9 +217,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 								order.getTimeZone(), dbItemInventoryInstance.getTimeZone()));
 					}
 				}
-				if (order.getParams() != null && !order.getParams().isEmpty()) {
-					xml.add(getParams(order.getParams()));
-				}
+				xml.add(getParams(order.getParams()));
 				if (order.getEndState() != null && !"".equals(order.getEndState())) {
 					xml.addAttribute("end_state", order.getEndState());
 				}
@@ -241,18 +242,14 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 						xml.addAttribute("suspended", "no");
 					}
 				}
-				if (order.getParams() != null && !order.getParams().isEmpty()) {
-					xml.add(getParams(order.getParams()));
-				}
+				xml.add(getParams(order.getParams()));
 				break;
 			case "suspend":
 				xml.addAttribute("suspended", "yes");
 				break;
 			case "resume":
 				xml.addAttribute("suspended", "no");
-				if (order.getParams() != null && !order.getParams().isEmpty()) {
-					xml.add(getParams(order.getParams()));
-				}
+				xml.add(getParams(order.getParams()));
 				if (order.getEndState() != null && !"".equals(order.getEndState())) {
 					xml.addAttribute("end_state", order.getEndState());
 				}
@@ -349,9 +346,18 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 		return JOCDefaultResponse.responseStatusJSOk(surveyDate);
 	}
 
-	private Element getParams(List<NameValuePair> params) {
-		Element paramsElem = XMLBuilder.create("params");
-		for (NameValuePair param : params) {
+	private Element getParams(List<NameValuePair> params) throws SessionNotExistException {
+	    
+	    Element paramsElem = XMLBuilder.create("params");
+        Set<NameValuePair> nameValuePairs = new HashSet<NameValuePair>();
+        NameValuePair username = new NameValuePair();
+        username.setName("SCHEDULER_JOC_USER_ACCOUNT");
+        username.setValue(getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+        nameValuePairs.add(username);
+        if (params != null) {
+            nameValuePairs.addAll(params);
+        }
+		for (NameValuePair param : nameValuePairs) {
 			paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value",
 					param.getValue());
 		}

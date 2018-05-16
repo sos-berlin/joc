@@ -3,7 +3,9 @@ package com.sos.joc.jobs.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -18,6 +20,7 @@ import com.sos.joc.classes.audit.StartJobAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobs.resource.IJobsResourceStartJob;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
@@ -104,15 +107,8 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
 							startJob.getTimeZone(), dbItemInventoryInstance.getTimeZone()));
 				}
 			}
-			if (startJob.getParams() != null && !startJob.getParams().isEmpty()) {
-				Element params = XMLBuilder.create("params");
-				for (NameValuePair param : startJob.getParams()) {
-					params.addElement("param").addAttribute("name", param.getName()).addAttribute("value",
-							param.getValue());
-				}
-				xml.add(params);
-			}
-			if (startJob.getEnvironment() != null && !startJob.getEnvironment().isEmpty()) {
+            xml.add(getParams(startJob.getParams()));
+            if (startJob.getEnvironment() != null && !startJob.getEnvironment().isEmpty()) {
 				Element envs = XMLBuilder.create("environment");
 				for (NameValuePair param : startJob.getEnvironment()) {
 					envs.addElement("variable").addAttribute("name", param.getName()).addAttribute("value",
@@ -138,4 +134,21 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
 			listOfErrors.add(new BulkError().get(e, getJocError(), startJob));
 		}
 	}
+	
+	private Element getParams(List<NameValuePair> params) throws SessionNotExistException {
+
+        Element paramsElem = XMLBuilder.create("params");
+        Set<NameValuePair> nameValuePairs = new HashSet<NameValuePair>();
+        NameValuePair username = new NameValuePair();
+        username.setName("SCHEDULER_JOC_USER_ACCOUNT");
+        username.setValue(getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+        nameValuePairs.add(username);
+        if (params != null) {
+            nameValuePairs.addAll(params);
+        }
+        for (NameValuePair param : nameValuePairs) {
+            paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+        }
+        return paramsElem;
+    }
 }
