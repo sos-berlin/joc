@@ -173,7 +173,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 					if (dbLayer.transferHasFiles(transferFromDb.getId(), sourceFiles, targetFiles)) {
 					    if(filterBody.getJobschedulerId().isEmpty()) {
 			                if (!getPermissonsJocCockpit(transferFromDb.getJobschedulerId(), getAccessToken())
-			                        .getYADE().getView().isTransfers()) {
+			                        .getYADE().getView().isStatus()) {
 			                    continue;
 			                }
 					    }
@@ -188,7 +188,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                     if(filterBody.getJobschedulerId().isEmpty()) {
                         LOGGER.info(transferFromDb.getJobschedulerId());
                         if (!getPermissonsJocCockpit(transferFromDb.getJobschedulerId(), getAccessToken()).getYADE()
-                                .getView().isTransfers()) {
+                                .getView().isStatus()) {
                             continue;
                         }
                     }
