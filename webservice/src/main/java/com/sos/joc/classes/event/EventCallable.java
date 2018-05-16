@@ -190,7 +190,16 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             try {
                 int delay = Math.min(15000, new Long(getSessionTimeout()).intValue());
                 LOGGER.debug(command.getSchemeAndAuthority() + ": connection refused: retry after " + delay + "ms");
-                Thread.sleep(delay);
+                while (delay > 0) {
+                    Thread.sleep(1000);
+                    delay = delay - 1000;
+                    if (command.isForcedClosingHttpClient()) {
+                        throw new ForcedClosingHttpClientException(command.getSchemeAndAuthority());
+                    }
+                }
+                if (command.isForcedClosingHttpClient()) {
+                    throw new ForcedClosingHttpClientException(command.getSchemeAndAuthority());
+                }
             } catch (InterruptedException e1) {
             }
             eventSnapshots.addAll(getEventSnapshots(eventId));

@@ -95,7 +95,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             // Globals.forceClosingHttpClients(session);
 
             if (eventBody.getClose() != null && eventBody.getClose()) {
-                Globals.forceClosingHttpClients(accessToken);
+                Globals.forceClosingHttpClients(shiroUser, accessToken);
                 entity.setEvents(null);
                 entity.setDeliveryDate(Date.from(Instant.now()));
                 return JOCDefaultResponse.responseStatus200(entity);

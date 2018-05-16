@@ -27,6 +27,7 @@ import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
+import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
@@ -483,7 +484,16 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             try {
                 int delay = Math.min(15000, new Long(getSessionTimeout()).intValue());
                 LOGGER.debug(command.getSchemeAndAuthority() + ": connection refused; retry after " + delay + "ms");
-                Thread.sleep(delay);
+                while (delay > 0) {
+                    Thread.sleep(1000);
+                    delay = delay - 1000;
+                    if (command.isForcedClosingHttpClient()) {
+                        throw new ForcedClosingHttpClientException(command.getSchemeAndAuthority());
+                    }
+                }
+                if (command.isForcedClosingHttpClient()) {
+                    throw new ForcedClosingHttpClientException(command.getSchemeAndAuthority());
+                }
             } catch (InterruptedException e1) {
             }
             eventSnapshots.putAll(getEventSnapshotsMap(eventId));

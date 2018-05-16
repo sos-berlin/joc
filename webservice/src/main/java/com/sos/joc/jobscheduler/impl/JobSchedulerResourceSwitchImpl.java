@@ -46,7 +46,7 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
 			shiroUser.removeSchedulerInstanceDBItem(dbItemInventoryInstance.getSchedulerId());
 
 			try {
-				Globals.forceClosingHttpClients(accessToken);
+				Globals.forceClosingHttpClients(shiroUser, accessToken);
 			} catch (Exception e) {
 			}
 

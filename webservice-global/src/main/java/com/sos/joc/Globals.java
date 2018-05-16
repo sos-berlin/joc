@@ -185,18 +185,14 @@ public class Globals {
         }
     }
 
-    public static void forceClosingHttpClients(String accessToken) {
-        try {
-            SOSShiroCurrentUser sosShiroCurrentUser = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken);
-            if (sosShiroCurrentUser != null) {
-                try {
-                    for (JOCJsonCommand command : sosShiroCurrentUser.getJocJsonCommands()) {
-                        command.forcedClosingHttpClient();
-                    }
-                } catch (Exception e) {
+    public static void forceClosingHttpClients(SOSShiroCurrentUser sosShiroCurrentUser, String accessToken) {
+        if (sosShiroCurrentUser != null) {
+            try {
+                for (JOCJsonCommand command : sosShiroCurrentUser.getJocJsonCommands()) {
+                    command.forcedClosingHttpClient();
                 }
+            } catch (Exception e) {
             }
-        } catch (InvalidSessionException e) {
         }
     }
 
