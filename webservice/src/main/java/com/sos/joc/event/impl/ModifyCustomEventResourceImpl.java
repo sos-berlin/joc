@@ -11,7 +11,6 @@ import javax.ws.rs.Path;
 import org.dom4j.Element;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.jitl.eventing.db.SchedulerEventDBItem;
@@ -28,6 +27,7 @@ import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.event.resource.IModifyCustomEventResource;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.event.custom.EventIdsFilter;
@@ -43,18 +43,21 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 	private static final String API_CALL = "./events/custom/";
 
 	@Override
-	public JOCDefaultResponse addEvent(String accessToken, ModifyOrders modifyEvent) {
+	public JOCDefaultResponse addEvent(String accessToken, ModifyOrders modifyEvent) throws JocException {
 		return executeModifyEvent("add", modifyEvent, accessToken);
 	}
 
 	@Override
-	public JOCDefaultResponse removeEvent(String accessToken, ModifyOrders modifyEvent) {
+	public JOCDefaultResponse removeEvent(String accessToken, ModifyOrders modifyEvent) throws JocException {
 		return executeModifyEvent("remove", modifyEvent, accessToken);
 	}
 
-	private JOCDefaultResponse executeModifyEvent(String request, ModifyOrders modifyEvent, String accessToken) {
+	private JOCDefaultResponse executeModifyEvent(String request, ModifyOrders modifyEvent, String accessToken)
+			throws JocException {
 
 		SOSHibernateSession connection = null;
+		DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser
+				.getSchedulerInstance(modifyEvent.getJobschedulerId());
 
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL + request, modifyEvent, accessToken,
@@ -259,7 +262,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 				schedulerEventFilter.setIds(eventIdsFilter.getIds());
 			}
 			Integer limit = 0;
-
+			schedulerEventDBLayer.getFilter().hasIds();
 			schedulerEventDBLayer.setFilter(schedulerEventFilter);
 			List<SchedulerEventDBItem> listOfEvents = schedulerEventDBLayer.getSchedulerEventList(limit);
 			List<ModifyOrder> listOfOrders = new ArrayList<ModifyOrder>();
@@ -299,11 +302,24 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 			}
 
 			modifyOrders.setOrders(listOfOrders);
-			JOCDefaultResponse response = removeEvent(accessToken, modifyOrders);
-			if (response.getStatus() == 200) {
-				return JOCDefaultResponse.responseStatusJSOk(new Date());
+			if (modifyOrders.getOrders().size() > 0) {
+				JOCDefaultResponse response = removeEvent(accessToken, modifyOrders);
+
+				boolean saveAuto = session.isAutoCommit();
+				session.setAutoCommit(false);
+				schedulerEventDBLayer.beginTransaction();
+				schedulerEventDBLayer.setFilter(schedulerEventFilter);
+				schedulerEventDBLayer.delete();
+				schedulerEventDBLayer.commit();
+				session.setAutoCommit(saveAuto);
+				
+				if (response.getStatus() == 200) {
+					return JOCDefaultResponse.responseStatusJSOk(new Date());
+				} else {
+					return JOCDefaultResponse.responseStatusJSError((String) response.getEntity());
+				}
 			} else {
-				return JOCDefaultResponse.responseStatusJSError((String) response.getEntity());
+				return JOCDefaultResponse.responseStatusJSOk(new Date());
 			}
 
 		} catch (Exception e) {
