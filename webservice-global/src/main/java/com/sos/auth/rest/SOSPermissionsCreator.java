@@ -458,8 +458,6 @@ public class SOSPermissionsCreator {
 			sosPermissionJocCockpit.getYADE().getView()
 					.setStatus(haveRight(masterId, "sos:products:joc_cockpit:yade:view:status"));
 			sosPermissionJocCockpit.getYADE().getView()
-					.setTransfers(haveRight(masterId, "sos:products:joc_cockpit:yade:view:transfers"));
-			sosPermissionJocCockpit.getYADE().getView()
 					.setFiles(haveRight(masterId, "sos:products:joc_cockpit:yade:view:files"));
 			sosPermissionJocCockpit.getYADE().getExecute()
 					.setTransferStart(haveRight(masterId, "sos:products:joc_cockpit:yade:execute:transfer_start"));
