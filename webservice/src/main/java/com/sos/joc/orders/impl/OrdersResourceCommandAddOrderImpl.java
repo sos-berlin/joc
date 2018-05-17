@@ -3,9 +3,7 @@ package com.sos.joc.orders.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -158,19 +156,16 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     }
 
     private Element getParams(List<NameValuePair> params) throws SessionNotExistException {
-
         Element paramsElem = XMLBuilder.create("params");
-        Set<NameValuePair> nameValuePairs = new HashSet<NameValuePair>();
-        NameValuePair username = new NameValuePair();
-        username.setName("SCHEDULER_JOC_USER_ACCOUNT");
-        username.setValue(getJobschedulerUser().getSosShiroCurrentUser().getUsername());
-        nameValuePairs.add(username);
         if (params != null) {
-            nameValuePairs.addAll(params);
+            for (NameValuePair param : params) {
+                if (!"SCHEDULER_JOC_USER_ACCOUNT".equals(param.getName())) {
+                    paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+                }
+            }
         }
-        for (NameValuePair param : nameValuePairs) {
-            paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
-        }
+        paramsElem.addElement("param").addAttribute("name", "SCHEDULER_JOC_USER_ACCOUNT").addAttribute("value", getJobschedulerUser()
+                .getSosShiroCurrentUser().getUsername());
         return paramsElem;
     }
 }
