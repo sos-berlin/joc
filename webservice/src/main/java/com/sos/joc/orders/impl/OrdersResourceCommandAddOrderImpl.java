@@ -159,7 +159,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         Element paramsElem = XMLBuilder.create("params");
         if (params != null) {
             for (NameValuePair param : params) {
-                if (!"SCHEDULER_JOC_USER_ACCOUNT".equals(param.getName())) {
+                if (!"SCHEDULER_JOC_USER_ACCOUNT".equalsIgnoreCase(param.getName())) {
                     paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
                 }
             }
