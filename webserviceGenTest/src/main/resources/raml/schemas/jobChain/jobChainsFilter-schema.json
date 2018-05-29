@@ -49,6 +49,18 @@
     "maxOrders": {
       "description": "limits number of orders for each node if compact=false",
       "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "job": {
+      "javaType": "com.sos.joc.model.jobChain.JobsFilter",
+      "type": "object",
+      "properties": {
+        "regex": {
+          "$ref": "../common/regexFilter-schema.json"
+        },
+        "folders": {
+          "$ref": "../common/folders-schema.json"
+        }
+      }
     }
   }
 }

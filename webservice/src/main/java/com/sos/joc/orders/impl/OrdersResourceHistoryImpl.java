@@ -64,58 +64,63 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 
             ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
-            if (ordersFilter.getDateFrom() != null) {
-                reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter
-                        .getTimeZone()));
-            }
-            if (ordersFilter.getDateTo() != null) {
-                reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
-            }
-
-            if (ordersFilter.getHistoryStates().size() > 0) {
-                for (HistoryStateText historyStateText : ordersFilter.getHistoryStates()) {
-                    reportTriggerDBLayer.getFilter().addState(historyStateText.toString());
+            if (ordersFilter.getHistoryIds() != null && !ordersFilter.getHistoryIds().isEmpty()) {
+                reportTriggerDBLayer.getFilter().setHistoryIds(ordersFilter.getHistoryIds());
+            } else {
+                if (ordersFilter.getDateFrom() != null) {
+                    reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter
+                            .getTimeZone()));
                 }
-            }
-
-            if (ordersFilter.getOrders().size() > 0) {
-                InventoryJobChainsDBLayer jobChainDbLayer = new InventoryJobChainsDBLayer(connection);
-                Long instanceId = null;
-                if (!ordersFilter.getJobschedulerId().isEmpty()) {
-                    instanceId = dbItemInventoryInstance.getId();
+                if (ordersFilter.getDateTo() != null) {
+                    reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
                 }
-                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                for (OrderPath orderPath : ordersFilter.getOrders()) {
-                    if (orderPath != null && canAdd(orderPath.getJobChain(), permittedFolders)) {
-                        String normalizeJobChain = normalizePath(orderPath.getJobChain());
-                        List<String> innerChains = jobChainDbLayer.getInnerJobChains(normalizeJobChain, instanceId);
-                        if (innerChains == null) {
-                            reportTriggerDBLayer.getFilter().addOrderPath(normalizeJobChain, orderPath.getOrderId());
-                        } else {
-                            for (String innerChain : innerChains) {
-                                reportTriggerDBLayer.getFilter().addOrderPath(innerChain, orderPath.getOrderId());
+
+                if (ordersFilter.getHistoryStates().size() > 0) {
+                    for (HistoryStateText historyStateText : ordersFilter.getHistoryStates()) {
+                        reportTriggerDBLayer.getFilter().addState(historyStateText.toString());
+                    }
+                }
+
+                if (ordersFilter.getOrders().size() > 0) {
+                    InventoryJobChainsDBLayer jobChainDbLayer = new InventoryJobChainsDBLayer(connection);
+                    Long instanceId = null;
+                    if (!ordersFilter.getJobschedulerId().isEmpty()) {
+                        instanceId = dbItemInventoryInstance.getId();
+                    }
+                    Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                    for (OrderPath orderPath : ordersFilter.getOrders()) {
+                        if (orderPath != null && canAdd(orderPath.getJobChain(), permittedFolders)) {
+                            String normalizeJobChain = normalizePath(orderPath.getJobChain());
+                            List<String> innerChains = jobChainDbLayer.getInnerJobChains(normalizeJobChain, instanceId);
+                            if (innerChains == null) {
+                                reportTriggerDBLayer.getFilter().addOrderPath(normalizeJobChain, orderPath.getOrderId());
+                            } else {
+                                for (String innerChain : innerChains) {
+                                    reportTriggerDBLayer.getFilter().addOrderPath(innerChain, orderPath.getOrderId());
+                                }
                             }
                         }
                     }
-                }
-                ordersFilter.setRegex("");
-            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                hasPermission = false;
-            } else {
+                    ordersFilter.setRegex("");
+                } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                    hasPermission = false;
+                } else {
 
-                if (ordersFilter.getExcludeOrders().size() > 0) {
-                    for (OrderPath orderPath : ordersFilter.getExcludeOrders()) {
-                        reportTriggerDBLayer.getFilter().addIgnoreItems(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
+                    if (ordersFilter.getExcludeOrders().size() > 0) {
+                        for (OrderPath orderPath : ordersFilter.getExcludeOrders()) {
+                            reportTriggerDBLayer.getFilter().addIgnoreItems(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
+                        }
+                    }
+
+                    if (folders != null && !folders.isEmpty()) {
+                        for (Folder folder : folders) {
+                            folder.setFolder(normalizeFolder(folder.getFolder()));
+                            reportTriggerDBLayer.getFilter().addFolderPath(folder);
+                        }
                     }
                 }
-
-                if (folders != null && !folders.isEmpty()) {
-                    for (Folder folder : folders) {
-					    folder.setFolder(normalizeFolder(folder.getFolder()));
-						reportTriggerDBLayer.getFilter().addFolderPath(folder);
-					}
-				}
-			}
+            }
+            
 
             if (hasPermission) {
 

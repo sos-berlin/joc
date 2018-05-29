@@ -57,48 +57,58 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
             boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
             boolean hasPermission = true;
+            boolean getTaskFromHistoryIdAndNode = false;
             List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
 
             ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(connection);
             reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
-            if (jobsFilter.getDateFrom() != null) {
-                reportTaskExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter
-                        .getTimeZone()));
-            }
-            if (jobsFilter.getDateTo() != null) {
-                reportTaskExecutionsDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
-            }
-
-            if (jobsFilter.getHistoryStates().size() > 0) {
-                for (HistoryStateText historyStateText : jobsFilter.getHistoryStates()) {
-                    reportTaskExecutionsDBLayer.getFilter().addState(historyStateText.toString());
-                }
-            }
-
-            if (jobsFilter.getJobs().size() > 0) {
-                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                for (JobPath jobPath : jobsFilter.getJobs()) {
-                    if (jobPath != null && canAdd(jobPath.getJob(), permittedFolders)) {
-                        reportTaskExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
-                    }
-                }
-                jobsFilter.setRegex("");
+            if (jobsFilter.getTaskIds() != null && !jobsFilter.getTaskIds().isEmpty()) {
+                reportTaskExecutionsDBLayer.getFilter().setTaskIds(jobsFilter.getTaskIds());
             } else {
-                if (jobsFilter.getExcludeJobs().size() > 0) {
-                    for (JobPath jobPath : jobsFilter.getExcludeJobs()) {
-                        reportTaskExecutionsDBLayer.getFilter().addExcludedJob(jobPath.getJob());
+                if (jobsFilter.getHistoryIds() != null && !jobsFilter.getHistoryIds().isEmpty()) {
+                    getTaskFromHistoryIdAndNode = true;
+                } else {
+                    if (jobsFilter.getDateFrom() != null) {
+                        reportTaskExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter
+                                .getTimeZone()));
                     }
-                }
+                    if (jobsFilter.getDateTo() != null) {
+                        reportTaskExecutionsDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
+                    }
 
-                if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                    hasPermission = false;
-                } else if (folders != null && !folders.isEmpty()) {
-                    for (Folder folder : folders) {
-                        folder.setFolder(normalizeFolder(folder.getFolder()));
-                        reportTaskExecutionsDBLayer.getFilter().addFolderPath(folder);
+                    if (jobsFilter.getHistoryStates().size() > 0) {
+                        for (HistoryStateText historyStateText : jobsFilter.getHistoryStates()) {
+                            reportTaskExecutionsDBLayer.getFilter().addState(historyStateText.toString());
+                        }
+                    }
+
+                    if (jobsFilter.getJobs().size() > 0) {
+                        Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                        for (JobPath jobPath : jobsFilter.getJobs()) {
+                            if (jobPath != null && canAdd(jobPath.getJob(), permittedFolders)) {
+                                reportTaskExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
+                            }
+                        }
+                        jobsFilter.setRegex("");
+                    } else {
+                        if (jobsFilter.getExcludeJobs().size() > 0) {
+                            for (JobPath jobPath : jobsFilter.getExcludeJobs()) {
+                                reportTaskExecutionsDBLayer.getFilter().addExcludedJob(jobPath.getJob());
+                            }
+                        }
+
+                        if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                            hasPermission = false;
+                        } else if (folders != null && !folders.isEmpty()) {
+                            for (Folder folder : folders) {
+                                folder.setFolder(normalizeFolder(folder.getFolder()));
+                                reportTaskExecutionsDBLayer.getFilter().addFolderPath(folder);
+                            }
+                        }
                     }
                 }
             }
+            
 
             if (hasPermission) {
 
@@ -107,8 +117,13 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                 }
 
                 reportTaskExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
-
-                List<DBItemReportTask> listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
+                List<DBItemReportTask> listOfDBItemReportTaskDBItems = new ArrayList<DBItemReportTask>();
+                
+                if (getTaskFromHistoryIdAndNode) {
+                    listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromHistoryIdAndNode(jobsFilter.getHistoryIds());
+                } else {
+                    listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
+                }
 
                 Matcher regExMatcher = null;
                 if (jobsFilter.getRegex() != null && !jobsFilter.getRegex().isEmpty()) {

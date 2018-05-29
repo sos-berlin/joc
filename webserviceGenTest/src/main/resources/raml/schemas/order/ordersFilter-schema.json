@@ -67,6 +67,12 @@
         "$ref": "../common/historyStateText-schema.json"
       }
     },
+    "historyIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeLong-schema.json"
+      }
+    },
     "runTimeIsTemporary": {
       "type": "boolean"
     }

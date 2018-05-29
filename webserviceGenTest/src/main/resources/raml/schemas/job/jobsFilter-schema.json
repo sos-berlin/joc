@@ -64,6 +64,18 @@
         "$ref": "../common/historyStateText-schema.json"
       }
     },
+    "taskIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeLong-schema.json"
+      }
+    },
+    "historyIds": {
+      "type": "array",
+      "items": {
+        "$ref": "taskIdOfOrder-schema.json"
+      }
+    },
     "runTimeIsTemporary": {
       "type": "boolean"
     }

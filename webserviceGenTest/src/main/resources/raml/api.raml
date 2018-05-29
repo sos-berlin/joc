@@ -1,6 +1,6 @@
 #%RAML 0.8
 title: JOC API
-version: 1.12.0-SNAPSHOT
+version: 1.12.4-SNAPSHOT
 protocols: [ HTTP, HTTPS ]
 baseUri: http://test.sos-berlin.com:3001/joc/api
 #mediaType: application/json
@@ -555,7 +555,7 @@ traits:
         description7: !include documentation/common/folders.md
         description8: !include documentation/common/limit.md
         description9: !include documentation/common/historyStates.md
-        description10: " "
+        description10: !include documentation/order/historyIds.md
         description11: " "
         description12: " "
         description200: TODO
@@ -1045,8 +1045,8 @@ traits:
         description7: !include documentation/common/folders.md
         description8: !include documentation/common/limit.md
         description9: !include documentation/common/historyStates.md
-        description10: " "
-        description11: " "
+        description10: !include documentation/job/taskIds.md
+        description11: !include documentation/job/taskIdOfOrder.md
         description12: " "
         description200: TODO
         schema: !include schemas/job/jobsFilter-schema.json
