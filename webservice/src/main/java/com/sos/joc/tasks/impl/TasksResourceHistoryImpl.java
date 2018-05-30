@@ -130,56 +130,58 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                     regExMatcher = Pattern.compile(jobsFilter.getRegex()).matcher("");
                 }
 
-                for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
-                    TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
-                    if (!getPermissonsJocCockpit(dbItemReportTask.getSchedulerId(), accessToken).getHistory().getView().isStatus()) {
-                        continue;
-                    }
-                    if (jobsFilter.getJobschedulerId().isEmpty()) {
-                        taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
-                    }
-
-                    taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
-                    taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
-                    taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
-                    taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
-                    if (dbItemReportTask.getError()) {
-                        Err error = new Err();
-                        error.setCode(dbItemReportTask.getErrorCode());
-                        error.setMessage(dbItemReportTask.getErrorText());
-                        taskHistoryItem.setError(error);
-                    }
-
-                    taskHistoryItem.setExitCode(dbItemReportTask.getExitCode());
-                    taskHistoryItem.setJob(dbItemReportTask.getName());
-                    taskHistoryItem.setStartTime(dbItemReportTask.getStartTime());
-
-                    HistoryState state = new HistoryState();
-                    if (dbItemReportTask.isSuccessFull()) {
-                        state.setSeverity(0);
-                        state.set_text(HistoryStateText.SUCCESSFUL);
-                    }
-                    if (dbItemReportTask.isInComplete()) {
-                        state.setSeverity(1);
-                        state.set_text(HistoryStateText.INCOMPLETE);
-                    }
-                    if (dbItemReportTask.isFailed()) {
-                        state.setSeverity(2);
-                        state.set_text(HistoryStateText.FAILED);
-                    }
-                    taskHistoryItem.setState(state);
-                    taskHistoryItem.setSurveyDate(dbItemReportTask.getCreated());
-
-                    // taskHistoryItem.setSteps(dbItemReportExecution.getStep());
-                    taskHistoryItem.setTaskId(dbItemReportTask.getHistoryIdAsString());
-
-                    if (regExMatcher != null) {
-                        regExMatcher.reset(dbItemReportTask.getName());
-                        if (!regExMatcher.find()) {
+                if (listOfDBItemReportTaskDBItems != null) {
+                    for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
+                        TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
+                        if (!getPermissonsJocCockpit(dbItemReportTask.getSchedulerId(), accessToken).getHistory().getView().isStatus()) {
                             continue;
                         }
+                        if (jobsFilter.getJobschedulerId().isEmpty()) {
+                            taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
+                        }
+
+                        taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
+                        taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
+                        taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
+                        taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
+                        if (dbItemReportTask.getError()) {
+                            Err error = new Err();
+                            error.setCode(dbItemReportTask.getErrorCode());
+                            error.setMessage(dbItemReportTask.getErrorText());
+                            taskHistoryItem.setError(error);
+                        }
+
+                        taskHistoryItem.setExitCode(dbItemReportTask.getExitCode());
+                        taskHistoryItem.setJob(dbItemReportTask.getName());
+                        taskHistoryItem.setStartTime(dbItemReportTask.getStartTime());
+
+                        HistoryState state = new HistoryState();
+                        if (dbItemReportTask.isSuccessFull()) {
+                            state.setSeverity(0);
+                            state.set_text(HistoryStateText.SUCCESSFUL);
+                        }
+                        if (dbItemReportTask.isInComplete()) {
+                            state.setSeverity(1);
+                            state.set_text(HistoryStateText.INCOMPLETE);
+                        }
+                        if (dbItemReportTask.isFailed()) {
+                            state.setSeverity(2);
+                            state.set_text(HistoryStateText.FAILED);
+                        }
+                        taskHistoryItem.setState(state);
+                        taskHistoryItem.setSurveyDate(dbItemReportTask.getCreated());
+
+                        // taskHistoryItem.setSteps(dbItemReportExecution.getStep());
+                        taskHistoryItem.setTaskId(dbItemReportTask.getHistoryIdAsString());
+
+                        if (regExMatcher != null) {
+                            regExMatcher.reset(dbItemReportTask.getName());
+                            if (!regExMatcher.find()) {
+                                continue;
+                            }
+                        }
+                        listOfHistory.add(taskHistoryItem);
                     }
-                    listOfHistory.add(taskHistoryItem);
                 }
             }
 
