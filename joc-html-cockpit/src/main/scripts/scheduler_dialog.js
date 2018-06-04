@@ -871,19 +871,24 @@ function add_order( big_chain, order_state, order_end_state, ret )
           return showError( x );
       }
       fields.id        = ( fields.id != "" ) ? ' id="' + fields.id + '"' : '';
-      fields.at        = ' at="' + fields.at + '"';
-      fields.end_state = ' end_state="'+fields.end_state+'"';  
+      fields.end_state = ' end_state="'+fields.end_state+'"';
       
-      if( !parent._confirm.add_order || confirm(parent.getTranslation('Do you really want to add an order?'))) {
-        	Input_dialog.close();
-        	var xml_command  = '<add_order' + fields.at + fields.id + ' job_chain="' + parent.left_frame._job_chain + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '" replace="no">' + params + fields.run_time + '</add_order>';
-        	if( scheduler_exec( xml_command, false ) == 1 ) { 
-          	set_timeout("parent.left_frame.update()",1);
-        	}
+      var msg = mandatory_field( fields.at, parent.getTranslation('Start time') );
+      if( msg == '' ) {
+        if( !parent._confirm.add_order || confirm(parent.getTranslation('Do you really want to add an order?'))) {
+          Input_dialog.close();
+          var xml_command  = '<add_order at="' + fields.at + '"' + fields.id + ' job_chain="' + parent.left_frame._job_chain + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '" replace="no">' + params + fields.run_time + '</add_order>';
+          if( scheduler_exec( xml_command, false ) == 1 ) {
+            set_timeout("parent.left_frame.update()",1);
+          }
+        } else {
+          Input_dialog.close();
+        }
       } else {
-      	Input_dialog.close();
+        alert( msg );
+        parent.left_frame.document.forms.__input_dialog__.elements.at.focus();
       }
-    }   
+    }
 }
 
 
