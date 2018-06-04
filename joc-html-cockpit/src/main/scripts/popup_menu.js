@@ -550,7 +550,7 @@ Input_dialog.prototype.add_checkbox = function( name, label, checked )
     if( typeof checked      != "boolean" ) checked = false;
     checked = ( checked ) ? ' checked="true"' : "";
     this._html_array.push( '<tr>' );
-    this._html_array.push( '<td style="padding-bottom:2px;"><span style="white-space:nowrap;"><input type="checkbox" name="' + name + '" value="1"' + checked + '/>&#160;'+label+'</span></td>' );
+    this._html_array.push( '<td style="padding-bottom:2px;"><input type="checkbox" name="' + name + '" value="1"' + checked + '/>&#160;'+label+'</td>' );
     this._html_array.push( '</tr>' );
 }
 

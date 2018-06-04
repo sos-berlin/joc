@@ -723,7 +723,8 @@ _translations['Max. number of history entries per task']   = 'Макс. коли
 _translations['Termintate within']                         = 'Закончить в пределах';
 _translations['Max. seconds within the JobScheduler terminates'] = 'Макс. период (секунды), в пределах которого заканчивает свою работу JobScheduler';
 _translations['Dialogs']                                   = 'Диалоги';
-_translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'По умолчанию установленное время старта в &quot;<i>Start Task/Ордер в...</i> &quot;-Диалог <i>сейчас</i>';
+_translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'По умолчанию установленное время старта в &quot;<i>Start Task/Ордер в...</i> &quot;-Диалог <i>now</i>';
+_translations['Default start time in the &quot;<i>Add order</i> &quot;-Dialog is <i>never</i>'] = 'По умолчанию установленное время старта в &quot;<i>Добавить Ордер</i> &quot;-Диалог <i>never</i>';
 _translations['Debugging of the operations GUI']           = 'Debugging Operations GUI';
 _translations['Level']                                     = 'Level';
 

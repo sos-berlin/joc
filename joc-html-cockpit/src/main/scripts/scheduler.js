@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2018 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -138,6 +138,7 @@ function Scheduler()
     this._runtime_settings.max_last_activities           = 30;
     this._runtime_settings.terminate_timeout             = 60;
     this._runtime_settings.start_at_default_is_now       = true;
+    this._runtime_settings.add_order_at_default_is_never = false;
     this._runtime_settings.start_next_period_enabled     = false;
     
     this._checkbox_states                                = new Object();
@@ -941,6 +942,7 @@ Scheduler.prototype.readOldCookies = function()
       this._runtime_settings[cookie_entries[i]]      = parseInt(this.getOldCookie( cookie_entries[i], this._runtime_settings[cookie_entries[i]]),10);
     }
     this._runtime_settings.start_at_default_is_now   = (this.getOldCookie( 'start_at_default_is_now', this._runtime_settings.start_at_default_is_now.toString()) == 'true');
+    this._runtime_settings.add_order_at_default_is_never = (this.getOldCookie( 'add_order_at_default_is_never', this._runtime_settings.add_order_at_default_is_never.toString()) == 'true');
     this._runtime_settings.start_next_period_enabled = (this.getOldCookie( 'start_next_period_enabled', this._runtime_settings.start_next_period_enabled.toString()) == 'true');
     
     for( var state in this._checkbox_states ) {                   
@@ -1282,4 +1284,3 @@ SchedulerDate.prototype.getDuration = function( datetime )
    }
    return result;
 }
-

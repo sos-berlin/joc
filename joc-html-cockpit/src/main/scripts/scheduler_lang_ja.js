@@ -724,6 +724,7 @@ _translations['Termintate within']                         = '終了設定';
 _translations['Max. seconds within the JobScheduler terminates'] = 'JobScheduler終了時の最大猶予時間（秒）';
 _translations['Dialogs']                                   = 'ダイアログ設定';
 _translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = '「タスク/オーダー実行」ダイアログの初期値が「即時」';
+_translations['Default start time in the &quot;<i>Add order</i> &quot;-Dialog is <i>never</i>'] = '「オーダー作成」ダイアログの初期値が「決して」';
 _translations['Debugging of the operations GUI']           = 'WEB GUIのデバッグレベル';
 _translations['Level']                                     = 'レベル';
 
