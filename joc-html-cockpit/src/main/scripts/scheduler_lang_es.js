@@ -727,6 +727,7 @@ _translations['Termintate within']                         = 'Terminará dentro 
 _translations['Max. seconds within the JobScheduler terminates'] = 'Max. Tiempo (Segundos) para terminar el JobScheduler';
 _translations['Dialogs']                                   = 'Diálogos';
 _translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'Hora de inicio por defecto en las &quot;<i>Comenzar Tarea/Orden a las...</i> &quot;-Dialog es <i>now</i>';
+_translations['Default start time in the &quot;<i>Add order</i> &quot;-Dialog is <i>never</i>'] = 'Hora de inicio por defecto en las &quot;<i>Añadir orden</i> &quot;-Dialog es <i>never</i>';
 _translations['Debugging of the operations GUI']           = 'Depuración de la GUI de operaciones';
 _translations['Level']                                     = 'Nivel';
 
@@ -857,4 +858,3 @@ _translations['Do you really want to set the run time?']                    = 'D
 _translations['Do you really want to add a substituting schedule?']         = 'Desea usted realmente añadir una sustituto para planificador?';
 _translations['Do you really want to modify this schedule?']                = 'Desea usted realmente modificar esta planificador?';
 _translations['Do you really want to delete this schedule?']                = 'Desea usted realmente eliminar este planificador?';
-

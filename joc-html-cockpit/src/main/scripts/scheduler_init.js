@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2018 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -52,6 +52,7 @@ var _description_lang           = 'en';
 var _terminate_timeout          = 60;
 var _task_terminate_timeout     = 10;
 var _start_at_default_is_now    = true;
+var _add_order_at_default_is_never = false;
 var _start_next_period_enabled  = false;
 var _debug_level                = 0;
 var _extra_items                = new Object();
@@ -73,11 +74,11 @@ var _stdout_end                 = "";
 var _stderr_begin               = "";
 var _stderr_end                 = "";
 var _display_last_activities_tab = false;
-var _timezones									= {};
+var _timezones                  = {};
 var _timezone_preselected       = 'local';
 var _hide                       = {
-	'stop_job_chain':false, 'unstop_job_chain':false, 
-	'stop_job_chain_node':false, 'unstop_job_chain_node':false,
+  'stop_job_chain':false, 'unstop_job_chain':false, 
+  'stop_job_chain_node':false, 'unstop_job_chain_node':false,
   'skip_job_chain_node':false, 'unskip_job_chain_node':false, 
   'stop_job':false, 'unstop_job':false, 'start_job':false, 
   'start_order':false, 'add_order':false, 'reset_order':false, 
@@ -109,7 +110,7 @@ var _confirm                    = {
   'modify_schedule':false
 }
 
- 
+
 
 
 
