@@ -723,6 +723,7 @@ _translations['Termintate within']                         = 'Beenden innerhalb'
 _translations['Max. seconds within the JobScheduler terminates'] = 'Max. Zeitraum (Sekunden) in der sich der JobScheduler beendet';
 _translations['Dialogs']                                   = 'Dialoge';
 _translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'Voreingestellter Startzeitpunkt im &quot;<i>Start Task/Auftrag um...</i> &quot;-Dialog ist <i>now</i>';
+_translations['Default start time in the &quot;<i>Add order</i> &quot;-Dialog is <i>never</i>'] = 'Voreingestellter Startzeitpunkt im &quot;<i>Auftrag hinzufügen</i> &quot;-Dialog ist <i>never</i>';
 _translations['Debugging of the operations GUI']           = 'Debugging der Operations GUI';
 _translations['Level']                                     = 'Level';
 

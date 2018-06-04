@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2015 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2018 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -447,7 +447,7 @@ function scheduler_settings__onclick(ret)
     dialog.add_settings_input( parent.getTranslation('Max. number of history entries per order')+':', 'max_order_history',   parent._scheduler._runtime_settings.max_order_history, 3 );
     dialog.add_settings_input( parent.getTranslation('Max. number of history entries per task')+':',  'max_task_history',    parent._scheduler._runtime_settings.max_task_history, 3 );
     dialog._html_array.push( '</table>' );
-    dialog._html_array.push( '</fieldset>' );  
+    dialog._html_array.push( '</fieldset>' );
     
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Terminate within')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
@@ -458,16 +458,17 @@ function scheduler_settings__onclick(ret)
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Dialogs')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_checkbox( "start_at_default_is_now", parent.getTranslation('Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'), parent._scheduler._runtime_settings.start_at_default_is_now );
+    dialog.add_checkbox( "add_order_at_default_is_never", parent.getTranslation('Default start time in the &quot;<i>Add order</i> &quot;-Dialog is <i>never</i>'), parent._scheduler._runtime_settings.add_order_at_default_is_never );
     dialog._html_array.push( '</table>' );
-    dialog._html_array.push( '</fieldset>' );  
+    dialog._html_array.push( '</fieldset>' );
     
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Debugging of the operations GUI')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_settings_input( parent.getTranslation('Level')+' (0-9):', 'debug_level', parent._scheduler._runtime_settings.debug_level, 3 );
     dialog._html_array.push( '</table>' );
-    dialog._html_array.push( '</fieldset>' );  
+    dialog._html_array.push( '</fieldset>' );
     
-    dialog._html_array.push( '</fieldset>' );  
+    dialog._html_array.push( '</fieldset>' );
     dialog._html_array.push( '</td></tr>' );
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '<table cellspacing="0" cellpadding="0" width="'+dialog.width+'px" style="margin:5px;" border="0">' );
@@ -551,7 +552,7 @@ function start_task_at( ret ) {
       dialog.add_hidden( 'force', 1 );
     }
     dialog.add_prompt( get_start_at_prompt() );
-    dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
+    dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", getStartAtValue() );
     dialog.show();
   } else {
     var fields = input_dialog_submit();
@@ -560,8 +561,7 @@ function start_task_at( ret ) {
     	if( !parent._confirm.start_job || confirm(parent.getTranslation('Do you really want to start this job?'))) {
       	Input_dialog.close();
       	var force = fields.force ? '' : ' force="no"';
-      	var at    = fields.at == 'now' ? '' : ' at="' + fields.at + '"';
-      	var xml_command = '<start_job job="' + parent.left_frame._job_name + '"'+ at + force +'/>';
+      	var xml_command = '<start_job job="' + parent.left_frame._job_name + '"'+ getStartAt(fields.at) + force +'/>';
       	if( fields.at && scheduler_exec( xml_command, false ) == 1 ) { 
           set_timeout("parent.left_frame.update()",1);
       	}
@@ -612,7 +612,7 @@ function start_task( ret ) {
         dialog.add_hidden( 'force', 1 );
       }
       dialog.add_prompt( get_start_at_prompt() );
-      dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
+      dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", getStartAtValue() );
       dialog.add_params( params, param_names.sort() );
       dialog.show();
     
@@ -629,8 +629,7 @@ function start_task( ret ) {
       	if( !parent._confirm.start_job || confirm(parent.getTranslation('Do you really want to start this job?'))) {
         	Input_dialog.close();
         	var force = fields.force ? '' : ' force="no"';
-        	var at    = fields.at == 'now' ? '' : ' at="' + fields.at + '"';
-        	var xml_command = '<start_job job="' + parent.left_frame._job_name + '"'+ at + force +'>' + params + '</start_job>';
+        	var xml_command = '<start_job job="' + parent.left_frame._job_name + '"'+ getStartAt(fields.at) + force +'>' + params + '</start_job>';
         	if( fields.at && scheduler_exec( xml_command, false ) == 1 ) { 
             set_timeout("parent.left_frame.update()",1);
         	}
@@ -657,7 +656,7 @@ function start_order_at( now ) {
               dialog.add_title( "Start order $order", {order:'<br/>'+_obj_name+'<br/>'+_obj_title} );
               dialog.add_prompt( get_start_at_prompt() );
               dialog.add_prompt( "" );
-              dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
+              dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", getStartAtValue() );
               dialog.show();
               break;
       case 1: if( !parent._confirm.start_order || confirm(parent.getTranslation('Do you really want to start this order?'))) {
@@ -673,7 +672,7 @@ function start_order_at( now ) {
               if( msg == '' ) {
               	if( !parent._confirm.start_order || confirm(parent.getTranslation('Do you really want to start this order?'))) {
                 	Input_dialog.close();
-                	var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"/>';
+                	var xml_command = '<modify_order' + getStartAt(fields.at) + ' job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"/>';
                 	exec_modify_order(xml_command);
                 } else {
                 	Input_dialog.close();
@@ -717,7 +716,7 @@ function start_order( ret )
       dialog.submit_fct = "callErrorChecked( 'start_order', true )";
       dialog.add_title( "Start order $order", {order:'<br/>'+_obj_name+'<br/>'+_obj_title} );
       dialog.add_prompt( get_start_at_prompt() );
-      dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
+      dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", getStartAtValue() );
       dialog.add_params( params, param_names.sort() );
       dialog.show();
     
@@ -733,7 +732,7 @@ function start_order( ret )
       if( msg == '' ) {
       	if( !parent._confirm.start_order || confirm(parent.getTranslation('Do you really want to start this order?'))) {
         	Input_dialog.close();
-        	var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id + '">' + params + '</modify_order>';
+        	var xml_command = '<modify_order' + getStartAt(fields.at) + ' job_chain="' + parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id + '">' + params + '</modify_order>';
         	exec_modify_order(xml_command);
         } else {
         	Input_dialog.close();
@@ -844,7 +843,7 @@ function add_order( big_chain, order_state, order_end_state, ret )
       dialog.add_labeled_input( '<b>'+parent.getTranslation("Enter an order id")+'</b>', "id", "" );
       dialog.add_labeled_input( '<b>'+parent.getTranslation("Enter an order title")+'</b>', "title", _obj_title );
       dialog.add_prompt( get_start_at_prompt() );
-      dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
+      dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", getStartAtValue(true) );
       dialog.add_hidden( "run_time", "" );
       if( typeof states[0] == "object" ) {
       	dialog.add_labeled_select( order_state_prompt, "state", states[0], order_state );
@@ -871,19 +870,24 @@ function add_order( big_chain, order_state, order_end_state, ret )
           return showError( x );
       }
       fields.id        = ( fields.id != "" ) ? ' id="' + fields.id + '"' : '';
-      fields.at        = ' at="' + fields.at + '"';
-      fields.end_state = ' end_state="'+fields.end_state+'"';  
+      fields.end_state = ' end_state="'+fields.end_state+'"';
       
-      if( !parent._confirm.add_order || confirm(parent.getTranslation('Do you really want to add an order?'))) {
-        	Input_dialog.close();
-        	var xml_command  = '<add_order' + fields.at + fields.id + ' job_chain="' + parent.left_frame._job_chain + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '" replace="no">' + params + fields.run_time + '</add_order>';
-        	if( scheduler_exec( xml_command, false ) == 1 ) { 
-          	set_timeout("parent.left_frame.update()",1);
-        	}
+      var msg = mandatory_field( fields.at, parent.getTranslation('Start time') );
+      if( msg == '' ) {
+        if( !parent._confirm.add_order || confirm(parent.getTranslation('Do you really want to add an order?'))) {
+          Input_dialog.close();
+          var xml_command  = '<add_order' + getStartAt(fields.at) + fields.id + ' job_chain="' + parent.left_frame._job_chain + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '" replace="no">' + params + fields.run_time + '</add_order>';
+          if( fields.at && scheduler_exec( xml_command, false ) == 1 ) {
+            set_timeout("parent.left_frame.update()",1);
+          }
+        } else {
+          Input_dialog.close();
+        }
       } else {
-      	Input_dialog.close();
+        alert( msg );
+        parent.left_frame.document.forms.__input_dialog__.elements.at.focus();
       }
-    }   
+    }
 }
 
 
@@ -2229,6 +2233,24 @@ function encodeComponent( s )
 function osNewline( s )
 {   
     return s.replace(/\r/g,""); 
-}  
+}
+
+//------------------------------------------------------------------------------getStartAtValue
+function getStartAtValue( isAddOrder )
+{
+    if( typeof isAddOrder != "boolean" ) isAddOrder = false;
+    var startNow = parent._scheduler._runtime_settings.start_at_default_is_now ? "now" : "";
+    if ( !isAddOrder ) {
+        return startNow;
+    }
+    return parent._scheduler._runtime_settings.add_order_at_default_is_never ? "never" : startNow;
+}
+
+//------------------------------------------------------------------------------getStartAt
+function getStartAt( s )
+{
+    if (s == 'never') s = "2038-01-19 15:14:07";
+    return ' at="' + s + '"';
+}
 
 //-------------------------------------------------------------------------------------------------
