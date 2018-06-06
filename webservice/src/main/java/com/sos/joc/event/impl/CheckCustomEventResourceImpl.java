@@ -5,22 +5,21 @@ import java.time.Instant;
 
 import javax.ws.rs.Path;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.xpath.XPathAPI;
+import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.eventing.db.SchedulerEventDBLayer;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.event.resource.ICheckCustomEventResource;
 import com.sos.joc.model.event.custom.CheckEvent;
 import com.sos.joc.model.event.custom.CheckResult;
-
-import sos.xml.SOSXMLXPath;
 
 @Path("events")
 public class CheckCustomEventResourceImpl extends JOCResourceImpl implements ICheckCustomEventResource {
@@ -30,7 +29,7 @@ public class CheckCustomEventResourceImpl extends JOCResourceImpl implements ICh
 
 	@Override
 	public JOCDefaultResponse checkEvent(String accessToken, CheckEvent checkEvent) {
-		SOSHibernateSession connection = null;
+		SOSHibernateSession session = null;
 
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, checkEvent, accessToken,
@@ -41,55 +40,46 @@ public class CheckCustomEventResourceImpl extends JOCResourceImpl implements ICh
 			}
 
 			DBItemInventoryInstance dbItemInventorySupervisorInstance = null;
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			session = Globals.createSosHibernateStatelessConnection(API_CALL);
 			Long supervisorId = dbItemInventoryInstance.getSupervisorId();
 			if (supervisorId != DBLayer.DEFAULT_ID) {
-				InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+				InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
 				dbItemInventorySupervisorInstance = dbLayer.getInventoryInstanceByKey(supervisorId);
 			}
 			if (dbItemInventorySupervisorInstance == null) {
 				dbItemInventorySupervisorInstance = dbItemInventoryInstance;
 			}
 
-			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventorySupervisorInstance);
-			jocXmlCommand.executePost("<param.get name=\"JobSchedulerEventJob.events\"/>", accessToken);
-
 			CheckResult entity = new CheckResult();
 			entity.setCount(0);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 
-			String eventParamValue = jocXmlCommand.getSosxml()
-					.selectSingleNodeValue("//param[@name='JobSchedulerEventJob.events']/@value");
+			SchedulerEventDBLayer schedulerEventDBLayer = new SchedulerEventDBLayer(session);
+			Document eventDocument = schedulerEventDBLayer.getEventsAsXml(checkEvent.getJobschedulerId());
 
-			if (eventParamValue != null) {
-				eventParamValue = eventParamValue.replaceAll("(\\uC3BE|þ|Ã¾)", "<").replaceAll("(\\uC3BF|ÿ|Ã¿)", ">");
-				eventParamValue = StringEscapeUtils.unescapeHtml4(eventParamValue);
-				SOSXMLXPath dom = new SOSXMLXPath(new StringBuffer(eventParamValue));
-
-				if (checkEvent.getXPath() != null && !checkEvent.getXPath().isEmpty()) {
-					NodeList nl = dom.selectNodeList(checkEvent.getXPath());
-					if (nl != null) {
-						entity.setCount(nl.getLength());
-					}
+			if (checkEvent.getxPathValue() != null && !checkEvent.getxPathValue().isEmpty()) {
+				NodeList nl = XPathAPI.selectNodeList(eventDocument, checkEvent.getxPathValue());
+				if (nl != null) {
+					entity.setCount(nl.getLength());
+				}
+			} else {
+				if (checkEvent.getEventClass() != null && !checkEvent.getEventClass().isEmpty()) {
+					buildXPath("event_class", checkEvent.getEventClass());
+				}
+				if (checkEvent.getEventId() != null && !checkEvent.getEventId().isEmpty()) {
+					buildXPath("event_id", checkEvent.getEventId());
+				}
+				if (checkEvent.getExitCode() != null) {
+					buildXPath("exit_code", checkEvent.getExitCode() + "");
+				}
+				if (!xPath.isEmpty()) {
+					xPath = "//events/event[" + xPath + "]";
 				} else {
-					if (checkEvent.getEventClass() != null && !checkEvent.getEventClass().isEmpty()) {
-						buildXPath("event_class", checkEvent.getEventClass());
-					}
-					if (checkEvent.getEventId() != null && !checkEvent.getEventId().isEmpty()) {
-						buildXPath("event_id", checkEvent.getEventId());
-					}
-					if (checkEvent.getExitCode() != null) {
-						buildXPath("exit_code", checkEvent.getExitCode() + "");
-					}
-					if (!xPath.isEmpty()) {
-						xPath = "//events/event[" + xPath + "]";
-					} else {
-						xPath = "//events/event";
-					}
-					NodeList nl = dom.selectNodeList(xPath);
-					if (nl != null) {
-						entity.setCount(nl.getLength());
-					}
+					xPath = "//events/event";
+				}
+				NodeList nl = XPathAPI.selectNodeList(eventDocument, xPath);
+				if (nl != null) {
+					entity.setCount(nl.getLength());
 				}
 			}
 
@@ -99,7 +89,7 @@ public class CheckCustomEventResourceImpl extends JOCResourceImpl implements ICh
 					+ ((e.getCause() != null) ? e.getCause().getMessage() : e.getMessage());
 			return JOCDefaultResponse.responsePlainStatus420(errorOutput);
 		} finally {
-			Globals.disconnect(connection);
+			Globals.disconnect(session);
 		}
 
 	}

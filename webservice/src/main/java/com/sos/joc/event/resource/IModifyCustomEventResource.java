@@ -21,20 +21,20 @@ public interface IModifyCustomEventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse addEvent(            
-            @HeaderParam("X-Access-Token") String accessToken, ModifyOrders modifyEvent) throws Exception;
+            @HeaderParam("X-Access-Token") String accessToken, ModifyOrders modifyOrders) throws Exception;
     
     @POST
     @Path("custom/remove")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse removeEvent(            
-            @HeaderParam("X-Access-Token") String accessToken, ModifyOrders modifyEvent) throws Exception;
+            @HeaderParam("X-Access-Token") String accessToken, ModifyOrders modifyOrders) throws Exception;
     
     @POST
     @Path("custom/delete_events")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse deleteEvent(            
+    public JOCDefaultResponse deleteEvents(            
             @HeaderParam("X-Access-Token") String accessToken, EventIdsFilter eventIdsFilter) throws Exception;
 
     @POST

@@ -1,19 +1,16 @@
 package com.sos.joc.event.impl;
 
-import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Path;
-
 import org.dom4j.Element;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.UtcTimeHelper;
-import com.sos.jitl.eventing.db.SchedulerEventDBItem;
 import com.sos.jitl.eventing.db.SchedulerEventDBLayer;
 import com.sos.jitl.eventing.db.SchedulerEventFilter;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -26,7 +23,6 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.event.resource.IModifyCustomEventResource;
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.NameValuePair;
@@ -38,117 +34,137 @@ import com.sos.joc.model.order.ModifyOrders;
 @Path("events")
 public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IModifyCustomEventResource {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModifyCustomEventResourceImpl.class);
+
+	private static final String JOB_CHAIN_EVENT_SERVICE = "/sos/events/scheduler_event_service";
+	private static final String REMOVE = "remove";
+	private static final String ADD = "add";
+	private static final String PROCESS = "process";
 	private static final String EXPIRES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	private static final String SOS_EVENTS_SCHEDULER_EVENT_SERVICE = "/sos/events/scheduler_event_service";
 	private static final String API_CALL = "./events/custom/";
+	private SchedulerEventDBLayer schedulerEventDBLayer;
 
 	@Override
-	public JOCDefaultResponse addEvent(String accessToken, ModifyOrders modifyEvent) throws JocException {
-		return executeModifyEvent("add", modifyEvent, accessToken);
+	public JOCDefaultResponse addEvent(String accessToken, ModifyOrders modifyOrders) throws JocException {
+		return executeModifyEvent(ADD, modifyOrders, accessToken);
 	}
 
-	@Override
-	public JOCDefaultResponse removeEvent(String accessToken, ModifyOrders modifyEvent) throws JocException {
-		return executeModifyEvent("remove", modifyEvent, accessToken);
-	}
+	private void createProcessOrder(String jobChain) throws JocException {
 
-	private JOCDefaultResponse executeModifyEvent(String request, ModifyOrders modifyEvent, String accessToken)
-			throws JocException {
-
-		SOSHibernateSession connection = null;
-		DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser
-				.getSchedulerInstance(modifyEvent.getJobschedulerId());
-
+		SOSHibernateSession session = null;
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL + request, modifyEvent, accessToken,
-					modifyEvent.getJobschedulerId(),
-					getPermissonsJocCockpit(modifyEvent.getJobschedulerId(), accessToken).getJobChain().getExecute()
-							.isAddOrder());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
 
 			DBItemInventoryInstance dbItemInventorySupervisorInstance = null;
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL + request);
+			session = Globals.createSosHibernateStatelessConnection(API_CALL + PROCESS);
 			Long supervisorId = dbItemInventoryInstance.getSupervisorId();
 			if (supervisorId != DBLayer.DEFAULT_ID) {
-				InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+				InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
 				dbItemInventorySupervisorInstance = dbLayer.getInventoryInstanceByKey(supervisorId);
 			}
 			if (dbItemInventorySupervisorInstance == null) {
 				dbItemInventorySupervisorInstance = dbItemInventoryInstance;
 			}
 
-			if (modifyEvent.getOrders().size() == 0) {
+			XMLBuilder xml = new XMLBuilder("add_order");
+			xml.addAttribute("job_chain", normalizePath(jobChain));
+			Element params = XMLBuilder.create("params");
+			params.addElement("param").addAttribute("name", "action").addAttribute("value", PROCESS);
+			xml.add(params);
+
+			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventorySupervisorInstance);
+			jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+		} finally {
+			Globals.disconnect(session);
+		}
+	}
+
+	@Override
+	public JOCDefaultResponse removeEvent(String accessToken, ModifyOrders modifyOrders) throws JocException {
+		return executeModifyEvent(REMOVE, modifyOrders, accessToken);
+	}
+
+	private JOCDefaultResponse executeModifyEvent(String request, ModifyOrders modifyOrders, String accessToken)
+			throws JocException {
+
+		SOSHibernateSession session = null;
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL + request, modifyOrders, accessToken,
+					modifyOrders.getJobschedulerId(),
+					getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getJobChain().getExecute()
+							.isAddOrder());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+
+			if (modifyOrders.getOrders().size() == 0) {
 				throw new JocMissingRequiredParameterException("undefined 'order'");
 			}
 
-			Map<String, Boolean> requiredParams = new HashMap<String, Boolean>();
-			if ("add".equals(request)) {
-				requiredParams.put("event_class", Boolean.FALSE);
-				requiredParams.put("event_id", Boolean.FALSE);
-				requiredParams.put("exit_code", Boolean.FALSE);
-			}
-			for (ModifyOrder order : modifyEvent.getOrders()) {
+			session = Globals.createSosHibernateStatelessConnection(API_CALL + ADD);
+			session.setAutoCommit(false);
+			schedulerEventDBLayer = new SchedulerEventDBLayer(session);
 
-				checkRequiredParameter("jobChain", order.getJobChain());
-
-				XMLBuilder xml = new XMLBuilder("add_order");
-				xml.addAttribute("job_chain", normalizePath(order.getJobChain()));
-				if (order.getOrderId() != null && !order.getOrderId().isEmpty()) {
-					xml.addAttribute("id", order.getOrderId());
-				}
-				boolean createdFound = false;
+			for (ModifyOrder order : modifyOrders.getOrders()) {
+				schedulerEventDBLayer.beginTransaction();
+				ModifyEvent modifyEvent = new ModifyEvent();
 				if (order.getParams() != null && !order.getParams().isEmpty()) {
-					Element params = XMLBuilder.create("params");
 					for (NameValuePair param : order.getParams()) {
-						if ("add".equals(request) && requiredParams.containsKey(param.getName())
-								&& !param.getValue().isEmpty()) {
-							requiredParams.put(param.getName(), Boolean.TRUE);
-						}
-						if ("created".equals(param.getName()) && !param.getValue().isEmpty()) {
-							createdFound = true;
-						}
-						if (param.getValue() != null && param.getName() != null) {
-							params.addElement("param").addAttribute("name", param.getName()).addAttribute("value",
-									param.getValue());
-						}
-					}
-					params.addElement("param").addAttribute("name", "action").addAttribute("value", request);
-					if (!createdFound) {
-						params.addElement("param").addAttribute("name", "created").addAttribute("value",
-								JobSchedulerDate.getNowInISO());
-					}
-					xml.add(params);
-				}
 
-				for (Map.Entry<String, Boolean> entry : requiredParams.entrySet()) {
-					if (!entry.getValue()) {
-						throw new JocMissingRequiredParameterException("undefined " + entry.getKey());
-					}
-				}
+						if ("event_id".equals(param.getName()) && !param.getValue().isEmpty()) {
+							modifyEvent.setEventId(param.getValue());
+						}
+						if ("event_class".equals(param.getName()) && !param.getValue().isEmpty()) {
+							modifyEvent.setEventClass(param.getValue());
+						}
+						if ("exit_code".equals(param.getName()) && !param.getValue().isEmpty()) {
+							try {
+								modifyEvent.setExitCode(Integer.parseInt(param.getValue()));
+							} catch (NumberFormatException e) {
+								LOGGER.warn("Could not parse exitCode=" + param.getValue() + " to String");
+							}
+						}
+						if ("expires".equals(param.getName()) && !param.getValue().isEmpty()) {
+							modifyEvent.setExpires(param.getValue());
+						}
 
-				JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventorySupervisorInstance);
-				jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+						if ("expiration_cycle".equals(param.getName()) && !param.getValue().isEmpty()) {
+							modifyEvent.setExpirationCycle(param.getValue());
+						}
+
+						if ("expiration_period".equals(param.getName()) && !param.getValue().isEmpty()) {
+							modifyEvent.setExpirationPeriod(param.getValue());
+						}
+						if ("job_chain".equals(param.getName()) && !param.getValue().isEmpty()) {
+							modifyEvent.setEventjobChain(param.getValue());
+						}
+						if ("job_name".equals(param.getName()) && !param.getValue().isEmpty()) {
+							modifyEvent.setJob(param.getValue());
+						}
+						if ("order_id".equals(param.getName()) && !param.getValue().isEmpty()) {
+							modifyEvent.setOrderId(param.getValue());
+						}
+
+						if ("scheduler_id".equals(param.getName()) && !param.getValue().isEmpty()) {
+							modifyEvent.setJobschedulerId(param.getValue());
+						}
+
+					}
+					performEventRequest(request, modifyEvent);
+					schedulerEventDBLayer.commit();
+					createProcessOrder(order.getJobChain());
+				}
 			}
+			notify(schedulerEventDBLayer, accessToken);
+
 			return JOCDefaultResponse.responsePlainStatus200("JobScheduler response: OK");
-		} catch (JobSchedulerBadRequestException e) {
-			String errorOutput = "JobScheduler reports error: " + e.getError().getMessage();
-			return JOCDefaultResponse.responsePlainStatus420(errorOutput);
+
 		} catch (Exception e) {
 			String errorOutput = e.getClass().getSimpleName() + ": "
 					+ ((e.getCause() != null) ? e.getCause().getMessage() : e.getMessage());
 			return JOCDefaultResponse.responsePlainStatus420(errorOutput);
 		} finally {
-			Globals.disconnect(connection);
+			Globals.disconnect(session);
 		}
-	}
-
-	private NameValuePair newParam(String name, String value) {
-		NameValuePair param = new NameValuePair();
-		param.setName(name);
-		param.setValue(value);
-		return param;
 	}
 
 	private String getLocalTimeAsString(String fromTimeZoneString, String dateIso) {
@@ -161,10 +177,62 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 		return expiresLocal;
 	}
 
+	private String getParameterAsString(ModifyEvent modifyEvent) {
+		String s = "<params>";
+		if (modifyEvent.getParams().size() > 0) {
+			for (NameValuePair nameValuePair : modifyEvent.getParams()) {
+				s = s + "<param name=" + nameValuePair.getName() + " value=\"" + nameValuePair.getValue() + "\"/>";
+			}
+			return s + "</params>";
+		} else {
+			return "";
+		}
+	}
+
+	private void performEventRequest(String request, ModifyEvent modifyEvent) throws Exception {
+
+		SchedulerEventFilter schedulerEventFilter = new SchedulerEventFilter();
+
+		schedulerEventFilter.setSchedulerId(modifyEvent.getJobschedulerId());
+		schedulerEventFilter.setJobChain(modifyEvent.getEventjobChain());
+		schedulerEventFilter.setEventId(modifyEvent.getEventId());
+		schedulerEventFilter.setEventClass(modifyEvent.getEventClass());
+
+		if (modifyEvent.getExpirationCycle() != null && !modifyEvent.getExpirationCycle().isEmpty()) {
+			schedulerEventFilter.setExpirationCycle(modifyEvent.getExpirationCycle());
+		}
+
+		if (modifyEvent.getExpirationPeriod() != null && !modifyEvent.getExpirationPeriod().isEmpty()) {
+			schedulerEventFilter.setExpirationPeriod(modifyEvent.getExpirationPeriod());
+		} else {
+			schedulerEventFilter.setExpirationPeriod("24:00:00");
+		}
+
+		if (modifyEvent.getExpires() != null) {
+			String expiresLocal = getLocalTimeAsString("UTC", modifyEvent.getExpires());
+			schedulerEventFilter.setExpires(expiresLocal);
+		}
+
+		schedulerEventFilter.setJobName(modifyEvent.getJob());
+		schedulerEventFilter.setOrderId(modifyEvent.getOrderId());
+		schedulerEventFilter.setExitCode(modifyEvent.getExitCode());
+		schedulerEventFilter.setRemoteSchedulerHost(dbItemInventoryInstance.getHostname());
+		schedulerEventFilter.setRemoteSchedulerPort(dbItemInventoryInstance.getPort());
+		schedulerEventFilter.setParametersAsString(getParameterAsString(modifyEvent));
+
+		if (ADD.equals(request)) {
+			schedulerEventDBLayer.addEvent(schedulerEventFilter);
+		}
+		if (REMOVE.equals(request)) {
+			schedulerEventDBLayer.removeEvent(schedulerEventFilter);
+		}
+	}
+
 	@Override
 	public JOCDefaultResponse addEvent(String accessToken, ModifyEvent modifyEvent) throws Exception {
+
+		String request = ADD;
 		SOSHibernateSession session = null;
-		String request = "add";
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL + request, modifyEvent, accessToken,
 					modifyEvent.getJobschedulerId(),
@@ -174,63 +242,19 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 				return jocDefaultResponse;
 			}
 
-			List<ModifyOrder> listOfOrders = new ArrayList<ModifyOrder>();
+			checkRequiredParameter("event_class", modifyEvent.getEventClass());
+			checkRequiredParameter("event_id", modifyEvent.getEventId());
+			checkRequiredParameter("exit_code", modifyEvent.getExitCode());
 
-			ModifyOrders modifyOrders = new ModifyOrders();
-			modifyOrders.setJobschedulerId(modifyEvent.getJobschedulerId());
+			session = Globals.createSosHibernateStatelessConnection(API_CALL + ADD);
+			session.setAutoCommit(false);
+			schedulerEventDBLayer = new SchedulerEventDBLayer(session);
+			schedulerEventDBLayer.beginTransaction();
+			performEventRequest(request, modifyEvent);
+			schedulerEventDBLayer.commit();
+			notify(schedulerEventDBLayer, accessToken);
 
-			ModifyOrder modifyOrder = new ModifyOrder();
-			if (modifyEvent.getEventjobChain() != null && !modifyEvent.getEventjobChain().isEmpty()) {
-				modifyOrder.setJobChain(modifyEvent.getEventjobChain());
-			} else {
-				modifyOrder.setJobChain(SOS_EVENTS_SCHEDULER_EVENT_SERVICE);
-			}
-			String orderId = request + ":";
-			if (modifyEvent.getExitCode() != null) {
-				orderId = orderId + modifyEvent.getEventClass() + ":" + modifyEvent.getEventId() + ":"
-						+ modifyEvent.getExitCode();
-			} else {
-				orderId = orderId + modifyEvent.getEventClass() + ":" + modifyEvent.getEventId();
-			}
-			modifyOrder.setOrderId(orderId);
-			modifyOrder.setTitle("Add event: " + modifyEvent.getEventClass() + ":" + modifyEvent.getEventId());
-
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(newParam("event_id", modifyEvent.getEventId()));
-			params.add(newParam("event_class", modifyEvent.getEventClass()));
-			params.add(newParam("exit_code", String.valueOf(modifyEvent.getExitCode())));
-
-			if (modifyEvent.getExpires() != null) {
-				String expiresLocal = getLocalTimeAsString("UTC", modifyEvent.getExpires());
-				params.add(newParam("expires", expiresLocal));
-			}
-
-			if (modifyEvent.getExpirationCycle() != null && !modifyEvent.getExpirationCycle().isEmpty()) {
-				params.add(newParam("expiration_cycle", modifyEvent.getExpirationCycle()));
-			}
-			if (modifyEvent.getExpirationPeriod() != null && !modifyEvent.getExpirationPeriod().isEmpty()) {
-				params.add(newParam("expiration_period", modifyEvent.getExpirationPeriod()));
-			} else {
-				params.add(newParam("expiration_period", "24:00:00"));
-			}
-			params.add(newParam("job_chain", modifyEvent.getJobChain()));
-			params.add(newParam("job_name", modifyEvent.getJob()));
-			params.add(newParam("order_id", modifyEvent.getOrderId()));
-			params.add(newParam("scheduler_id", modifyEvent.getJobschedulerId()));
-			params.add(newParam("remote_scheduler_host", dbItemInventoryInstance.getHostname()));
-			params.add(newParam("remote_scheduler_port", String.valueOf(dbItemInventoryInstance.getPort())));
-
-			modifyOrder.setParams(params);
-			listOfOrders.add(modifyOrder);
-
-			modifyOrders.setOrders(listOfOrders);
-
-			JOCDefaultResponse response = addEvent(accessToken, modifyOrders);
-			if (response.getStatus() == 200) {
-				return JOCDefaultResponse.responseStatusJSOk(new Date());
-			} else {
-				return JOCDefaultResponse.responseStatusJSError((String) response.getEntity());
-			}
+			return JOCDefaultResponse.responseStatusJSOk(new Date());
 
 		} catch (Exception e) {
 			String errorOutput = e.getClass().getSimpleName() + ": "
@@ -242,7 +266,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 	}
 
 	@Override
-	public JOCDefaultResponse deleteEvent(String accessToken, EventIdsFilter eventIdsFilter) throws Exception {
+	public JOCDefaultResponse deleteEvents(String accessToken, EventIdsFilter eventIdsFilter) throws Exception {
 		SOSHibernateSession session = null;
 		String request = "delete";
 		try {
@@ -261,66 +285,14 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 			if (eventIdsFilter.getIds().size() > 0) {
 				schedulerEventFilter.setIds(eventIdsFilter.getIds());
 			}
-			Integer limit = 0;
-			schedulerEventDBLayer.getFilter().hasIds();
-			schedulerEventDBLayer.setFilter(schedulerEventFilter);
-			List<SchedulerEventDBItem> listOfEvents = schedulerEventDBLayer.getSchedulerEventList(limit);
-			List<ModifyOrder> listOfOrders = new ArrayList<ModifyOrder>();
+			session.setAutoCommit(false);
+			schedulerEventDBLayer.beginTransaction();
+			schedulerEventDBLayer.removeEvent(schedulerEventFilter);
+			schedulerEventDBLayer.commit();
+			notify(schedulerEventDBLayer, accessToken);
+			createProcessOrder(JOB_CHAIN_EVENT_SERVICE);
 
-			ModifyOrders modifyOrders = new ModifyOrders();
-			modifyOrders.setJobschedulerId(eventIdsFilter.getJobschedulerId());
-
-			for (SchedulerEventDBItem item : listOfEvents) {
-				ModifyOrder modifyOrder = new ModifyOrder();
-				String orderId = request + ":";
-				if (item.getExitCode() != null) {
-					orderId = orderId + item.getEventClass() + ":" + item.getEventId() + ":" + item.getExitCode() + ":"
-							+ item.getId();
-				} else {
-					orderId = orderId + item.getEventClass() + ":" + item.getEventId() + "::" + item.getId();
-				}
-				modifyOrder.setJobChain(SOS_EVENTS_SCHEDULER_EVENT_SERVICE);
-				modifyOrder.setOrderId(orderId);
-				modifyOrder.setTitle("Delete event: " + item.getEventClass() + ":" + item.getEventId());
-
-				List<NameValuePair> params = new ArrayList<NameValuePair>();
-				params.add(newParam("event_id", item.getEventId()));
-				params.add(newParam("event_class", item.getEventClass()));
-				if (!"0".equals(item.getExitCodeAsString())) {
-					params.add(newParam("exit_code", item.getExitCodeAsString()));
-				}
-				params.add(newParam("expires", item.getExpiresAsString()));
-				params.add(newParam("job_chain", item.getJobChain()));
-				params.add(newParam("job_name", item.getJobName()));
-				params.add(newParam("order_id", item.getOrderId()));
-				params.add(newParam("remote_scheduler_host", item.getRemoteSchedulerHost()));
-				params.add(newParam("remote_scheduler_port", item.getRemoteSchedulerPortAsString()));
-				params.add(newParam("scheduler_id", item.getSchedulerId()));
-
-				modifyOrder.setParams(params);
-				listOfOrders.add(modifyOrder);
-			}
-
-			modifyOrders.setOrders(listOfOrders);
-			if (modifyOrders.getOrders().size() > 0) {
-				JOCDefaultResponse response = removeEvent(accessToken, modifyOrders);
-
-				boolean saveAuto = session.isAutoCommit();
-				session.setAutoCommit(false);
-				schedulerEventDBLayer.beginTransaction();
-				schedulerEventDBLayer.setFilter(schedulerEventFilter);
-				schedulerEventDBLayer.delete();
-				schedulerEventDBLayer.commit();
-				session.setAutoCommit(saveAuto);
-				
-				if (response.getStatus() == 200) {
-					return JOCDefaultResponse.responseStatusJSOk(new Date());
-				} else {
-					return JOCDefaultResponse.responseStatusJSError((String) response.getEntity());
-				}
-			} else {
-				return JOCDefaultResponse.responseStatusJSOk(new Date());
-			}
+			return JOCDefaultResponse.responseStatusJSOk(new Date());
 
 		} catch (Exception e) {
 			String errorOutput = e.getClass().getSimpleName() + ": "
@@ -329,5 +301,12 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 		} finally {
 			Globals.disconnect(session);
 		}
+	}
+
+	private void notify(SchedulerEventDBLayer schedulerEventDBLayer, String accessToken) throws JocException {
+		com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(
+				dbItemInventoryInstance);
+		jocXmlCommand.executePost(schedulerEventDBLayer.getNotifyCommand(), accessToken);
+
 	}
 }

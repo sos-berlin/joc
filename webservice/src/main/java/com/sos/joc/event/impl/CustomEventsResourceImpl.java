@@ -102,8 +102,8 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
 			if (eventFilter.getLimit() != null) {
 				limit = eventFilter.getLimit();
 			}
-			schedulerEventDBLayer.setFilter(schedulerEventFilter);
-			List<SchedulerEventDBItem> listOfEvents = schedulerEventDBLayer.getSchedulerEventList(limit);
+			schedulerEventFilter.setLimit(limit);			
+			List<SchedulerEventDBItem> listOfEvents = schedulerEventDBLayer.getSchedulerEventList(schedulerEventFilter);
 			List<Event> events = new ArrayList<Event>();
 
 			for (SchedulerEventDBItem item : listOfEvents) {
