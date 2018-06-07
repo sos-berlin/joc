@@ -34,13 +34,14 @@ import com.sos.joc.model.order.ModifyOrders;
 @Path("events")
 public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IModifyCustomEventResource {
 
+	private static final String UTC = "UTC";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModifyCustomEventResourceImpl.class);
 
 	private static final String JOB_CHAIN_EVENT_SERVICE = "/sos/events/scheduler_event_service";
 	private static final String REMOVE = "remove";
 	private static final String ADD = "add";
 	private static final String PROCESS = "process";
-	private static final String EXPIRES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	private static final String API_CALL = "./events/custom/";
 	private SchedulerEventDBLayer schedulerEventDBLayer;
 
@@ -167,16 +168,6 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 		}
 	}
 
-	private String getLocalTimeAsString(String fromTimeZoneString, String dateIso) {
-		String toTimeZoneString = DateTimeZone.getDefault().getID();
-
-		Date expiresUtc = JobSchedulerDate.getDateFromISO8601String(dateIso);
-		DateTimeZone fromZone = DateTimeZone.forID(fromTimeZoneString);
-		String expiresLocal = UtcTimeHelper.convertTimeZonesToString(EXPIRES_DATE_FORMAT, fromTimeZoneString,
-				toTimeZoneString, new DateTime(expiresUtc).withZone(fromZone));
-		return expiresLocal;
-	}
-
 	private String getParameterAsString(ModifyEvent modifyEvent) {
 		String s = "<params>";
 		if (modifyEvent.getParams().size() > 0) {
@@ -192,6 +183,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 	private void performEventRequest(String request, ModifyEvent modifyEvent) throws Exception {
 
 		SchedulerEventFilter schedulerEventFilter = new SchedulerEventFilter();
+		schedulerEventFilter.setFilterTimezone(UTC);
 
 		schedulerEventFilter.setSchedulerId(modifyEvent.getJobschedulerId());
 		schedulerEventFilter.setJobChain(modifyEvent.getEventjobChain());
@@ -209,8 +201,8 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 		}
 
 		if (modifyEvent.getExpires() != null) {
-			String expiresLocal = getLocalTimeAsString("UTC", modifyEvent.getExpires());
-			schedulerEventFilter.setExpires(expiresLocal);
+			Date expiresUtc = JobSchedulerDate.getDateFromISO8601String(modifyEvent.getExpires());
+			schedulerEventFilter.setExpires(expiresUtc);
 		}
 
 		schedulerEventFilter.setJobName(modifyEvent.getJob());
