@@ -207,7 +207,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
-
+            
+        }catch (DBConnectionRefusedException e) {
+        	LOGGER.info(e.getMessage());
         } catch (ForcedClosingHttpClientException e) {
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));

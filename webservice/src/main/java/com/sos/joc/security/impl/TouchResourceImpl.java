@@ -4,13 +4,16 @@ import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.security.resource.ITouchResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("touch")
 public class TouchResourceImpl extends JOCResourceImpl implements ITouchResource {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(TouchResourceImpl.class);
     private static final String API_CALL = "./touch";
 
     @Override
@@ -25,15 +28,14 @@ public class TouchResourceImpl extends JOCResourceImpl implements ITouchResource
                 return jocDefaultResponse;
             }
             try {
-                if (!jobschedulerUser.resetTimeOut()) {
-                    return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
-                }
+                 jobschedulerUser.resetTimeOut();
             } catch (org.apache.shiro.session.InvalidSessionException e) {
-                JocError err = getJocError();
-                err.setMessage(e.getMessage());
-                return JOCDefaultResponse.responseStatus440(JOCDefaultResponse.getError401Schema(jobschedulerUser, err));
+                LOGGER.info(e.getMessage());
             }
             return JOCDefaultResponse.responseStatusJSOk(null);
+        }catch (DBConnectionRefusedException e) {
+        	LOGGER.info(e.getMessage());
+        	return JOCDefaultResponse.responseStatusJSOk(null);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
