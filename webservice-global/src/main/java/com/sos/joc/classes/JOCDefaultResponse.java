@@ -81,9 +81,9 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static JOCDefaultResponse responseOctetStreamDownloadStatus200(Object entity, String filename) {
-        Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", MediaType.APPLICATION_OCTET_STREAM).header(
+        Response.ResponseBuilder responseBuilder = Response.ok(entity, MediaType.APPLICATION_OCTET_STREAM).header(
                 "Content-Disposition", "attachment; filename=" + filename).cacheControl(setNoCaching());
-        responseBuilder.entity(entity);
+        //responseBuilder.entity(entity);
         return new JOCDefaultResponse(responseBuilder.build());
     }
 
@@ -178,7 +178,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return responseStatusJSError(e, MediaType.TEXT_HTML + "; charset=UTF-8");
     }
     
-    public static JOCDefaultResponse responseStatusJSError(Exception e, JocError err, String mediaType) {
+    public static JOCDefaultResponse responseStatusJSError(Throwable e, JocError err, String mediaType) {
         if (e instanceof JocException) {
             JocException ee = (JocException) e;
             ee.addErrorMetaInfo(err);
@@ -195,7 +195,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return responseStatus420(getErr420(new JocError(getErrorMessage(e))), mediaType);
     }
     
-    public static JOCDefaultResponse responseStatusJSError(Exception e, JocError err) {
+    public static JOCDefaultResponse responseStatusJSError(Throwable e, JocError err) {
         return responseStatusJSError(e, err, MediaType.APPLICATION_JSON);
     }
     
