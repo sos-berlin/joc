@@ -2,28 +2,31 @@ type: error
 get:
   is: [accessToken, jobschedulerMaster]
   queryParameters:
-    host:
-      required: false
+    jobChain:
+      required: true
       type: string
-      description: |
-        host of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b>
-      example: localhost
-    port:
-      required: false
+      description: Path of a job chain
+      example: /sos/reporting/Inventory
+    orderId:
+      required: true
+      type: string
+      description: The id of an order
+      example: Inventory
+    historyId:
+      required: true
       type: integer
-      description: |
-        port of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b>
-      example: 4444
+      description: The history id of an order
+      example: 4711
   description: |
     <h2><<description>></h2>
   responses:
     200:
-      description: Content of main log for download
+      description: Content of order log for download
       headers:
         Content-Disposition:
           type: string
           required: true
-          example: attachment;filename=main.log
+          example: attachment;filename=xxx.order.log
         Content-Type:
           type: string
           required: true
@@ -48,24 +51,28 @@ post:
     <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
     </thead><tbody>
     <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
-    <tr><td>``host``</td><td>optional, string</td><td>host of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>localhost</td><td></td></tr>
-    <tr><td>``port``</td><td>optional, string</td><td>port of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>4444</td><td></td></tr>
+    <tr><td>``jobChain``</td><td>required, string</td><td>Path of a job chain</td><td>/sos/reporting/Inventory</td><td></td></tr>
+    <tr><td>``orderId``</td><td>required; string</td><td>The id of an order</td><td>inventory</td><td></td></tr>
+    <tr><td>``historyId``</td><td>required; integer</td><td>The history id of an order</td><td>4711</td><td></td></tr>
     </tbody></table>
   body:
     application/json:
-      schema: jsFilterWithUrl
+      schema: orderFilterWithHistoryId
       example: |
         {
-          "jobschedulerId": "scheduler"
+            "jobschedulerId":"scheduler",
+            "historyId": 4711,
+            "jobChain": "/test/foo/bar1",
+            "orderId": "order1"
         }
   responses:
     200:
-      description: Content of main log for download
+      description: Content of order log for download
       headers:
         Content-Disposition:
           type: string
           required: true
-          example: attachment;filename=main.log
+          example: attachment;filename=xxx.order.log
         Content-Type:
           type: string
           required: true

@@ -2,28 +2,21 @@ type: error
 get:
   is: [accessToken, jobschedulerMaster]
   queryParameters:
-    host:
-      required: false
-      type: string
-      description: |
-        host of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b>
-      example: localhost
-    port:
-      required: false
+    taskId:
+      required: true
       type: integer
-      description: |
-        port of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b>
-      example: 4444
+      description: Task Id
+      example: 4711
   description: |
     <h2><<description>></h2>
   responses:
     200:
-      description: Content of main log for download
+      description: Content of task log for download
       headers:
         Content-Disposition:
           type: string
           required: true
-          example: attachment;filename=main.log
+          example: attachment;filename=xxx.task.log
         Content-Type:
           type: string
           required: true
@@ -48,24 +41,24 @@ post:
     <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
     </thead><tbody>
     <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
-    <tr><td>``host``</td><td>optional, string</td><td>host of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>localhost</td><td></td></tr>
-    <tr><td>``port``</td><td>optional, string</td><td>port of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>4444</td><td></td></tr>
+    <tr><td>``taskId``</td><td>required, integer</td><td>Task Id</td><td>4711</td><td></td></tr>
     </tbody></table>
   body:
     application/json:
-      schema: jsFilterWithUrl
+      schema: taskFilter
       example: |
         {
-          "jobschedulerId": "scheduler"
+          "jobschedulerId": "scheduler",
+          "taskId": 4711
         }
   responses:
     200:
-      description: Content of main log for download
+      description: Content of task log for download
       headers:
         Content-Disposition:
           type: string
           required: true
-          example: attachment;filename=main.log
+          example: attachment;filename=xxx.task.log
         Content-Type:
           type: string
           required: true

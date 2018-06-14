@@ -25,6 +25,7 @@ schemas:
   - jsFilterWithUrlTimeout: !include schemas/jobscheduler/urlTimeoutParam-schema.json
   #- jsObjectFilter: !include schemas/common/jobSchedulerObjectFilter-schema.json
   - taskFilter: !include schemas/job/taskFilter-schema.json
+  - orderFilterWithHistoryId: !include schemas/order/orderFilterWithHistoryId-schema.json
   - startJobs: !include schemas/job/startJobs-schema.json
   - startedTasks: !include schemas/job/startedTasks-schema.json
   - modifyJobs: !include schemas/job/modifyJobs-schema.json
@@ -67,6 +68,7 @@ resourceTypes:
   - startJob: !include resourceTypes/job/start.raml
   - setRunTimeJob: !include resourceTypes/job/setRunTime.raml
   - resetRunTimeJob: !include resourceTypes/job/resetRunTime.raml
+  - postTaskLogWithPlainResponse: !include resourceTypes/job/postWithPlainResponse.raml
   - modifyTasks: !include resourceTypes/job/modifyTasks.raml
   - modifyOrder: !include resourceTypes/order/modify.raml
   - addOrder: !include resourceTypes/order/add.raml
@@ -75,6 +77,7 @@ resourceTypes:
   - setStateOrder: !include resourceTypes/order/setState.raml
   - setRunTimeOrder: !include resourceTypes/order/setRunTime.raml
   - resetRunTimeOrder: !include resourceTypes/order/resetRunTime.raml
+  - postOrderLogWithPlainResponse: !include resourceTypes/order/postWithPlainResponse.raml
   - modifyJobChain: !include resourceTypes/jobChain/modify.raml
   - modifyJobChainNode: !include resourceTypes/jobChain/modifyNode.raml
   - modifyCalendar: !include resourceTypes/calendar/modify.raml
@@ -668,7 +671,7 @@ traits:
         description9: " "
         description10: " "
         description200: TODO
-        schema: !include schemas/order/orderFilterWithHistoryId-schema.json
+        schema: orderFilterWithHistoryId
         schema200: !include schemas/order/stepHistory-schema.json
         example: !include examples/order/filteredOrderWithHistoryId-example.json
         example200: !include examples/order/orderStepHistory_p-example.json
@@ -687,7 +690,7 @@ traits:
         description9: " "
         description10: " "
         description200: TODO
-        schema: !include schemas/order/orderFilterWithHistoryId-schema.json
+        schema: orderFilterWithHistoryId
         schema200: logContent
         example: !include examples/order/filteredOrderWithHistoryId-example.json
         example200: !include examples/order/log-example.json
@@ -705,6 +708,10 @@ traits:
             body:
               text/html:
                 example: !include examples/order/log-example.html
+    /download:
+      type:
+        postOrderLogWithPlainResponse:
+          description: Provides order log as download
   /configuration:
     type:
       postJSON:
@@ -1093,7 +1100,7 @@ traits:
       description9: " "
       description10: " "
       description200: TODO
-      schema: !include schemas/job/taskFilter-schema.json
+      schema: taskFilter
       schema200: !include schemas/job/task200-schema.json
       example: TODO
       example200: TODO
@@ -1130,7 +1137,7 @@ traits:
         description9: " "
         description10: " "
         description200: TODO
-        schema: !include schemas/job/taskFilter-schema.json
+        schema: taskFilter
         schema200: logContent
         example: TODO
         example200: !include examples/order/log-example.json
@@ -1148,6 +1155,10 @@ traits:
             body:
               text/html:
                 example: !include examples/order/log-example.html
+    /download:
+      type:
+        postTaskLogWithPlainResponse:
+          description: Provides task log as download
 
 /job_chains:
   type:
