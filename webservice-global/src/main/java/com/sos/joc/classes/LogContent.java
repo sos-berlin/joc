@@ -168,15 +168,24 @@ public class LogContent {
     }
     
     public String htmlWithColouredLogContent(String log) {
+        if (log == null) {
+            return null;
+        }
         return colouredLog(new Scanner(log));
     }
     
     public String htmlWithColouredLogContent(Path log) throws IOException {
+        if (log == null) {
+            return null;
+        }
         //return colouredLog(new Scanner(log));
         return colouredLog(log);
     }
     
     public String htmlPageWithColouredLogContent(String log, String title) {
+        if (log == null) {
+            return null;
+        }
         return String.format(HTML, title, colouredLog(new Scanner(log)));
     }
 }
