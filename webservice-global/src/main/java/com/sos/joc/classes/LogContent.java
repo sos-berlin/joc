@@ -1,5 +1,9 @@
 package com.sos.joc.classes;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -141,24 +145,39 @@ public class LogContent {
         }
         return line;
     }
+    //BufferedReader
 
-    private String colouredLog(String log){
-        Scanner scanner = new Scanner(log);
+    private String colouredLog(Scanner scanner) {
         StringBuilder s = new StringBuilder();
         while (scanner.hasNextLine()) {
             s.append(addStyle(scanner.nextLine()));
         }
         scanner.close();
         return s.toString();
-    
     }
     
-    public String htmlWithColouredLogContent(String log){
+    private String colouredLog(Path path) throws IOException {
+        BufferedReader br = Files.newBufferedReader(path);
+        StringBuilder s = new StringBuilder();
+        String thisLine;
+        while ((thisLine = br.readLine()) != null) {
+            s.append(addStyle(thisLine));
+        }
+        br.close();
+        return s.toString();
+    }
+    
+    public String htmlWithColouredLogContent(String log) {
+        return colouredLog(new Scanner(log));
+    }
+    
+    public String htmlWithColouredLogContent(Path log) throws IOException {
+        //return colouredLog(new Scanner(log));
         return colouredLog(log);
     }
     
     public String htmlPageWithColouredLogContent(String log, String title) {
-        return String.format(HTML, title, colouredLog(log));
+        return String.format(HTML, title, colouredLog(new Scanner(log)));
     }
 }
 

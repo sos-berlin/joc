@@ -1,11 +1,10 @@
 package com.sos.joc.task.impl;
  
-import static org.junit.Assert.*;
- 
 import org.junit.Test;
+
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.classes.JOCDefaultResponse;
  
 public class TaskResourceLogHtmlImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -16,7 +15,7 @@ public class TaskResourceLogHtmlImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        TaskLogHtmlResourceImpl taskLogHtmlResourceImpl = new TaskLogHtmlResourceImpl();
+        TaskLogResourceImpl taskLogHtmlResourceImpl = new TaskLogResourceImpl();
         JOCDefaultResponse okResponse = taskLogHtmlResourceImpl.getTaskLogHtml(sosShiroCurrentUserAnswer.getAccessToken(),"","scheduler_id","0");
      }
 
