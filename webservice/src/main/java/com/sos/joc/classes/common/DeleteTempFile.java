@@ -28,7 +28,7 @@ public class DeleteTempFile implements Runnable {
     public void run() {
         try {
             if (delay == null) {
-                Thread.sleep(Globals.TIMEOUT_TO_DELETE_TEMP_FILES); 
+                Thread.sleep(Globals.timeoutToDeleteTempFiles); 
             } else {
                 Thread.sleep(delay);
             }

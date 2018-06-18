@@ -2,6 +2,7 @@ package com.sos.joc.classes;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -167,6 +168,26 @@ public class LogContent {
         return s.toString();
     }
     
+    private Path pathOfColouredLog(Path path, String title) throws IOException {
+        BufferedReader br = Files.newBufferedReader(path);
+        Path targetPath = Files.createTempFile("sos-download-", null);
+        OutputStream out = Files.newOutputStream(targetPath);
+        if (title != null) {
+            out.write(String.format(HTML_START, title).getBytes());
+        }
+        String thisLine;
+        while ((thisLine = br.readLine()) != null) {
+            out.write(addStyle(thisLine).getBytes());
+        }
+        if (title != null) {
+            out.write(String.format(HTML_END).getBytes());
+        }
+        br.close();
+        out.close();
+        Files.deleteIfExists(path);
+        return targetPath;
+    }
+    
     public String getLogContent(Path path) throws IOException {
         if (path == null) {
             return null;
@@ -180,6 +201,7 @@ public class LogContent {
         br.close();
         return s.toString();
     }
+    
     
     public String htmlWithColouredLogContent(String log) {
         if (log == null) {
@@ -196,11 +218,25 @@ public class LogContent {
         return colouredLog(log);
     }
     
+    public Path pathOfHtmlWithColouredLogContent(Path log) throws IOException {
+        if (log == null) {
+            return null;
+        }
+        return pathOfColouredLog(log, null);
+    }
+    
     public String htmlPageWithColouredLogContent(Path log, String title) throws IOException {
         if (log == null) {
             return null;
         }
         return String.format(HTML_START, title) + colouredLog(log) + String.format(HTML_END);
+    }
+    
+    public Path pathOfHtmlPageWithColouredLogContent(Path log, String title) throws IOException {
+        if (log == null) {
+            return null;
+        }
+        return pathOfColouredLog(log, title);
     }
     
     public String htmlPageWithColouredLogContent(String log, String title) {

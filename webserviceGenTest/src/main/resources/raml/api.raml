@@ -706,10 +706,8 @@ traits:
         description2: !include documentation/order/orderIdRequired.md
         description3: !include documentation/order/historyId.md
         objecttype: order
-        description200: TODO
         schema: orderFilterWithHistoryId
         example: !include examples/order/filteredOrderWithHistoryId-example.json
-        example200: !include examples/order/log-example.json
     /html:
       is: [filename, accessToken, jobschedulerMaster]
       type: error
@@ -1164,10 +1162,8 @@ traits:
         description2: " "
         description3: " "
         objecttype: task
-        description200: TODO
         schema: taskFilter
         example: TODO
-        example200: !include examples/order/log-example.json
     /html:
       is: [filename, accessToken, jobschedulerMaster]
       type: error

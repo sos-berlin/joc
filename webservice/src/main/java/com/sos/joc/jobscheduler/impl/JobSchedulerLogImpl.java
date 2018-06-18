@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Date;
 
@@ -159,7 +160,7 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             if (hostPortParamSchema.getFilename() != null && !hostPortParamSchema.getFilename().isEmpty()) {
                 java.nio.file.Path path = Paths.get(System.getProperty("java.io.tmpdir"), hostPortParamSchema.getFilename());
                 if (Files.exists(path)) {
-                    return path;
+                    return Files.move(path, path.getParent().resolve(path.getFileName().toString()+".log"), StandardCopyOption.ATOMIC_MOVE);
                 }
             }
         }

@@ -48,11 +48,11 @@ public class Globals {
     public static int httpSocketTimeout = 2000;
     public static boolean withHostnameVerification = false;
     public static boolean auditLogCommentsAreRequired = false;
-    public static long maxSizeOfLogsToDisplay = 1024 * 1024 * 2; //2MB
+    public static long maxSizeOfLogsToDisplay = 1024 * 1024 * 10L; //10MB
     public static JocWebserviceDataContainer jocWebserviceDataContainer = JocWebserviceDataContainer.getInstance();
     public static JocCockpitProperties jocConfigurationProperties;
     public static IniSecurityManagerFactory factory = null;
-    public static long TIMEOUT_TO_DELETE_TEMP_FILES = 1000 * 60 * 3;
+    public static long timeoutToDeleteTempFiles = 1000 * 60 * 3L;
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null) {
@@ -167,6 +167,7 @@ public class Globals {
         setForceCommentsForAuditLog();
         setTrustStore();
         setMaxSizeOfLogsToDisplay();
+        setTimeoutForTempFiles();
         setConfigurationProperties();
     }
 
@@ -345,10 +346,18 @@ public class Globals {
     }
 
     private static void setMaxSizeOfLogsToDisplay() {
-        long defaultMaxSizeOfLogsToDisplay = 1024 * 1024 * 2L;
+        long defaultMaxSizeOfLogsToDisplay = 1024 * 1024 * 10L;
         if (sosShiroProperties != null) {
             maxSizeOfLogsToDisplay = sosShiroProperties.getFileSizeProperty("max_size_of_logs_for_display", defaultMaxSizeOfLogsToDisplay);
             LOGGER.info("max size of logs to display = " + maxSizeOfLogsToDisplay);
+        }
+    }
+    
+    private static void setTimeoutForTempFiles() {
+        long defaultTimeout = 1000 * 60 * 3L;
+        if (sosShiroProperties != null) {
+            timeoutToDeleteTempFiles = sosShiroProperties.getProperty("timeout_to_delete_temp_files", defaultTimeout);
+            //LOGGER.info("timeout to delete temp files = " + TIMEOUT_TO_DELETE_TEMP_FILES);
         }
     }
 

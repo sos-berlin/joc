@@ -17,13 +17,14 @@ public interface IOrderLogResource {
 
     @POST
     @Path("log")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes("application/json")
+    //@Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postOrderLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             OrderHistoryFilter orderHistoryFilter) throws Exception;
 
     @GET
     @Path("log/html")
-    @Produces({ MediaType.TEXT_HTML })
+    //@Produces({ MediaType.TEXT_HTML })
     public JOCDefaultResponse getOrderLogHtml(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
             @QueryParam("orderId") String orderId, @QueryParam("jobChain") String jobChain, @QueryParam("historyId") String historyId,
@@ -31,7 +32,7 @@ public interface IOrderLogResource {
 
     @GET
     @Path("log/download")
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    //@Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse downloadOrderLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
             @QueryParam("orderId") String orderId, @QueryParam("jobChain") String jobChain, @QueryParam("historyId") String historyId,
@@ -40,14 +41,14 @@ public interface IOrderLogResource {
     @POST
     @Path("log/download")
     @Consumes("application/json")
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    //@Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse downloadOrderLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             OrderHistoryFilter orderHistoryFilter) throws Exception;
 
     @POST
     @Path("log/info")
     @Consumes("application/json")
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getLogInfo(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             OrderHistoryFilter orderHistoryFilter) throws Exception;
 }

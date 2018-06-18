@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Date;
 
@@ -17,8 +18,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.LogOrderContent;
 import com.sos.joc.classes.common.DeleteTempFile;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.LogContent;
-import com.sos.joc.model.common.LogContent200;
 import com.sos.joc.model.common.LogInfo;
 import com.sos.joc.model.common.LogInfo200;
 import com.sos.joc.model.common.LogMime;
@@ -85,120 +84,114 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
     }
 
     public JOCDefaultResponse getLogInfo(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
-        return execute(API_CALL + "/info", accessToken, orderHistoryFilter);
-    }
-
-    private JOCDefaultResponse execute(String apiCall, String accessToken, OrderHistoryFilter orderHistoryFilter) {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(apiCall, orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(orderHistoryFilter.getJobschedulerId(), accessToken).getOrder().getView().isOrderLog());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "/info", orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(orderHistoryFilter.getJobschedulerId(), accessToken).getJob().getView().isTaskLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance, accessToken);
 
+            LogInfo200 logInfo200 = new LogInfo200();
+            logInfo200.setSurveyDate(Date.from(Instant.now()));
+            java.nio.file.Path path = getLogPath(logOrderContent, orderHistoryFilter, false);
+            LogInfo logInfo = new LogInfo();
+            logInfo.setFilename(path.getFileName().toString());
+            logInfo.setSize(null);
+            try {
+                if (Files.exists(path)) {
+                    logInfo.setSize(Files.size(path));
+                }
+            } catch (Exception e) {
+            }
+            logInfo.setDownload(logInfo.getSize() > Globals.maxSizeOfLogsToDisplay);
+            logInfo200.setLog(logInfo);
+            logInfo200.setDeliveryDate(Date.from(Instant.now()));
+
+            DeleteTempFile runnable = new DeleteTempFile(path);
+            new Thread(runnable).start();
+
+            return JOCDefaultResponse.responseStatus200(logInfo200);
+
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }
+    }
+
+    private JOCDefaultResponse execute(String apiCall, String accessToken, OrderHistoryFilter orderHistoryFilter) {
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(apiCall, orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    orderHistoryFilter.getJobschedulerId(), accessToken).getJob().getView().isTaskLog());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance, accessToken);
+            boolean offerredAsDownload = false;
+            java.nio.file.Path path = getLogPath(logOrderContent, orderHistoryFilter, true);
             switch (apiCall) {
-            case API_CALL:
-                LogContent200 log = new LogContent200();
-                log.setSurveyDate(Date.from(Instant.now()));
-                final java.nio.file.Path path = getLogPath(logOrderContent, orderHistoryFilter, true);
+            case API_CALL + "/download":
+                offerredAsDownload = true;
+                break;
+            default:
                 try {
-                    if (Files.exists(path)) {
-                        log.setSurveyDate(Date.from(Files.getLastModifiedTime(path).toInstant()));
+                    if (Files.exists(path) && Files.size(path) > Globals.maxSizeOfLogsToDisplay) {
+                        offerredAsDownload = true;
                     }
                 } catch (Exception e) {
                 }
-                try {
-                    LogContent logContentSchema = new LogContent();
-                    if (orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
-                        logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(path));
-                    } else {
-                        logContentSchema.setPlain(logOrderContent.getLogContent(path));
-                    }
-                    log.setLog(logContentSchema);
-                    log.setDeliveryDate(Date.from(Instant.now()));
-                    return JOCDefaultResponse.responseStatus200(log);
-                } finally {
+                break;
+            }
+
+            if ((API_CALL + "/html").equals(apiCall)) {
+                path = logOrderContent.pathOfHtmlPageWithColouredLogContent(path, "Order " + orderHistoryFilter.getHistoryId());
+            } else if ((API_CALL).equals(apiCall) && orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
+                path = logOrderContent.pathOfHtmlWithColouredLogContent(path);
+            }
+
+            final java.nio.file.Path downPath = path;
+
+            StreamingOutput fileStream = new StreamingOutput() {
+
+                @Override
+                public void write(OutputStream output) throws IOException {
+                    InputStream in = null;
                     try {
-                        if (path != null) {
-                            Files.deleteIfExists(path);
+                        in = Files.newInputStream(downPath);
+                        byte[] buffer = new byte[4096];
+                        int length;
+                        while ((length = in.read(buffer)) > 0) {
+                            output.write(buffer, 0, length);
                         }
-                    } catch (Exception e1) {
-                    }
-                }
-
-            case API_CALL + "/html":
-                java.nio.file.Path path2 = getLogPath(logOrderContent, orderHistoryFilter, true);
-                try {
-                    return JOCDefaultResponse.responseHtmlStatus200(logOrderContent.htmlPageWithColouredLogContent(path2, "Order "
-                            + orderHistoryFilter.getOrderId()));
-                } finally {
-                    try {
-                        if (path2 != null) {
-                            Files.deleteIfExists(path2);
-                        }
-                    } catch (Exception e1) {
-                    }
-                }
-
-            case API_CALL + "/info":
-                LogInfo200 logInfo200 = new LogInfo200();
-                logInfo200.setSurveyDate(Date.from(Instant.now()));
-                final java.nio.file.Path path3 = getLogPath(logOrderContent, orderHistoryFilter, false);
-                logInfo200.setDeliveryDate(Date.from(Instant.now()));
-                LogInfo logInfo = new LogInfo();
-                logInfo.setFilename(path3.getFileName().toString());
-                logInfo.setSize(0L);
-                try {
-                    if (Files.exists(path3)) {
-                        logInfo.setSize(Files.size(path3));
-                    }
-                } catch (Exception e) {
-                }
-                logInfo.setDownload(logInfo.getSize() > Globals.maxSizeOfLogsToDisplay);
-                logInfo200.setLog(logInfo);
-
-                DeleteTempFile runnable = new DeleteTempFile(path3);
-                new Thread(runnable).start();
-
-                return JOCDefaultResponse.responseStatus200(logInfo200);
-
-            default: // case API_CALL + "/download"
-                final java.nio.file.Path path4 = getLogPath(logOrderContent, orderHistoryFilter, true);
-
-                StreamingOutput fileStream = new StreamingOutput() {
-
-                    @Override
-                    public void write(OutputStream output) throws IOException {
-                        InputStream in = null;
+                        output.flush();
+                    } finally {
                         try {
-                            in = Files.newInputStream(path4);
-                            byte[] buffer = new byte[4096];
-                            int length;
-                            while ((length = in.read(buffer)) > 0) {
-                                output.write(buffer, 0, length);
-                            }
-                            output.flush();
-                        } finally {
+                            output.close();
+                        } catch (Exception e) {
+                        }
+                        if (in != null) {
                             try {
-                                output.close();
-                            } catch (Exception e) {
-                            }
-                            if (in != null) {
-                                try {
-                                    in.close();
-                                } catch (Exception e) {
-                                }
-                            }
-                            try {
-                                Files.delete(path4);
+                                in.close();
                             } catch (Exception e) {
                             }
                         }
+                        try {
+                            Files.deleteIfExists(downPath);
+                        } catch (Exception e) {
+                        }
                     }
-                };
-
+                }
+            };
+            if (offerredAsDownload) {
                 return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getLogFilename(orderHistoryFilter));
+            } else {
+                if ((API_CALL + "/html").equals(apiCall)) {
+                    return JOCDefaultResponse.responseHtmlStatus200(fileStream);
+                } else {
+                    return JOCDefaultResponse.responsePlainStatus200(fileStream);
+                }
             }
 
         } catch (JocException e) {
@@ -224,7 +217,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             if (orderHistoryFilter.getFilename() != null && !orderHistoryFilter.getFilename().isEmpty()) {
                 java.nio.file.Path path = Paths.get(System.getProperty("java.io.tmpdir"), orderHistoryFilter.getFilename());
                 if (Files.exists(path)) {
-                    return path;
+                    return Files.move(path, path.getParent().resolve(path.getFileName().toString()+".log"), StandardCopyOption.ATOMIC_MOVE);
                 }
             }
         }

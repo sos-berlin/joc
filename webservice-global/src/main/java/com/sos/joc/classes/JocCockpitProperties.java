@@ -122,6 +122,20 @@ public class JocCockpitProperties {
         }
     }
     
+    public long getProperty(String property, long defaultValue) {
+        String s = getProperty(property);
+        if (s == null){
+            return defaultValue;
+        } else {
+            try{
+                return Long.parseLong(s);
+            } catch (NumberFormatException e){
+                LOGGER.warn(String.format("Property value for %1$s is not a Long. Returning default %2$s: %3$s", property, defaultValue, e.getMessage()));
+                return defaultValue;
+            }
+        }
+    }
+    
     public long getFileSizeProperty(String property, long defaultValue) {
         String s = getProperty(property);
         if (s == null){
