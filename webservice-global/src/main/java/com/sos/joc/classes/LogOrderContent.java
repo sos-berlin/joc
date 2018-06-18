@@ -1,14 +1,20 @@
 package com.sos.joc.classes;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.model.order.OrderHistoryFilter;
 
@@ -29,10 +35,29 @@ public class LogOrderContent extends LogContent {
         if (log == null) {
             log = getOrderLogFromXmlCommand();
         }
+        if (log == null) {
+            String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(),
+                    orderHistoryFilter.getHistoryId());
+            throw new JobSchedulerObjectNotExistException(msg);
+        }
         return log;
     }
 
-    private String getLogFromDB() {
+    public Path writeLogFile() throws Exception {
+
+        Path path = writeLogFileFromDB();
+        if (path == null) {
+            path = writeOrderLogFileFromXmlCommand();
+        }
+        if (path == null) {
+            String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(),
+                    orderHistoryFilter.getHistoryId());
+            throw new JobSchedulerObjectNotExistException(msg);
+        }
+        return path;
+    }
+
+    private String getLogFromDB() throws DBMissingDataException, IOException {
         SOSHibernateSession sosHibernateSession = null;
         try {
             SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
@@ -44,7 +69,27 @@ public class LogOrderContent extends LogContent {
             } finally {
                 Globals.rollback(sosHibernateSession);
             }
-        } catch (JocConfigurationException | SOSHibernateOpenSessionException e) {
+        } catch (JocConfigurationException | SOSHibernateException | NumberFormatException e) {
+            LOGGER.warn(e.toString());
+            return null;
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+        }
+    }
+
+    private Path writeLogFileFromDB() throws DBMissingDataException, IOException {
+        SOSHibernateSession sosHibernateSession = null;
+        try {
+            SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
+            sosHibernateSession = sosHibernateFactory.openStatelessSession("getOrderLog");
+            try {
+                Globals.beginTransaction(sosHibernateSession);
+                JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(sosHibernateSession);
+                return jobSchedulerOrderHistoryDBLayer.writeLogFile(orderHistoryFilter);
+            } finally {
+                Globals.rollback(sosHibernateSession);
+            }
+        } catch (JocConfigurationException | SOSHibernateException | NumberFormatException e) {
             LOGGER.warn(e.toString());
             return null;
         } finally {
@@ -53,10 +98,28 @@ public class LogOrderContent extends LogContent {
     }
 
     private String getOrderLogFromXmlCommand() throws Exception {
-
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
         String xml = jocXmlCommand.getShowOrderCommand(orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(), "log");
         jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
         return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_ORDER_LOG, null);
+    }
+
+    private Path writeOrderLogFileFromXmlCommand() throws Exception {
+        String orderLog = getOrderLogFromXmlCommand();
+        if (orderLog == null) {
+            return null;
+        }
+        Path path = null;
+        try {
+            path = Files.createTempFile("sos-download-", null);
+            Files.write(path, orderLog.getBytes());
+            return path;
+        } catch (IOException e) {
+            try {
+                Files.deleteIfExists(path);
+            } catch (Exception e1) {
+            }
+            throw e;
+        }
     }
 }

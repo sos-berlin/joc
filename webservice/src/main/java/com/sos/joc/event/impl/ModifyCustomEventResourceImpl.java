@@ -1,16 +1,14 @@
 package com.sos.joc.event.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.Date;
-import java.util.List;
 
 import javax.ws.rs.Path;
+
 import org.dom4j.Element;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.jitl.eventing.db.SchedulerEventDBLayer;
 import com.sos.jitl.eventing.db.SchedulerEventFilter;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;

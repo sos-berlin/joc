@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -181,14 +180,18 @@ public class JOCXmlCommand extends SOSXmlCommand {
         }
     }
     
-    public String executePost(String xmlCommand) throws JocException {
-        return executePost(xmlCommand, UUID.randomUUID().toString());
-    }
+//    public String executePost(String xmlCommand) throws JocException {
+//        return executePost(xmlCommand, UUID.randomUUID().toString());
+//    }
     
     public String executePost(String xmlCommand, String accessToken) throws JocException {
+        return executePost(xmlCommand, ResponseStream.TO_SOSXML, accessToken);
+    }
+    
+    public String executePost(String xmlCommand, ResponseStream responseStream, String accessToken) throws JocException {
         this.xmlCommand = xmlCommand;
         try {
-            return executeXMLPost(xmlCommand, accessToken);
+            return executeXMLPost(xmlCommand, responseStream, accessToken);
         } catch (SOSNoResponseException e) {
             JobSchedulerNoResponseException ee = new JobSchedulerNoResponseException(e.getCause());
             ee.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
@@ -201,8 +204,12 @@ public class JOCXmlCommand extends SOSXmlCommand {
     }
     
     public String executePostWithRetry(String xmlCommand, String accessToken) throws JocException {
+        return executePostWithRetry(xmlCommand, ResponseStream.TO_SOSXML, accessToken);
+    }
+    
+    public String executePostWithRetry(String xmlCommand, ResponseStream responseStream, String accessToken) throws JocException {
         try {
-            return executePost(xmlCommand, accessToken);
+            return executePost(xmlCommand, responseStream, accessToken);
         } catch (JobSchedulerConnectionRefusedException e) {
             String url = null;
             if (jocResourceImpl != null) {
@@ -211,7 +218,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
             if (url != null) {
                 setUrl(url + XML_COMMAND_API_PATH);
                 LOGGER.debug("...retry with " + url + XML_COMMAND_API_PATH);
-                return executePost(xmlCommand, accessToken);
+                return executePost(xmlCommand, responseStream, accessToken);
             } else {
                 throw e;
             }
@@ -220,17 +227,19 @@ public class JOCXmlCommand extends SOSXmlCommand {
         }
     }
     
-    public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws JocException {
-        String s = executePost(xmlCommand, accessToken);
+    public void executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws JocException {
+        executePost(xmlCommand, ResponseStream.TO_SOSXML, accessToken);
         throwJobSchedulerError();
-        return s;
     }
     
-    public String executePostWithThrowBadRequestAfterRetry(String xmlCommand, String accessToken) throws JocException {
-        String s = executePostWithRetry(xmlCommand, accessToken);
-        LOGGER.debug(s);
+    public void executePostWithThrowBadRequestAfterRetry(String xmlCommand, String accessToken) throws JocException {
+        if (LOGGER.isDebugEnabled()) {
+            String s = executePostWithRetry(xmlCommand, ResponseStream.TO_STRING_AND_SOSXML, accessToken);
+            LOGGER.debug(s);
+        } else {
+            executePostWithRetry(xmlCommand, accessToken);
+        }
         throwJobSchedulerError();
-        return s;
     }
     
     public String getShowStateCommand(String subsystems, String what, String path) {

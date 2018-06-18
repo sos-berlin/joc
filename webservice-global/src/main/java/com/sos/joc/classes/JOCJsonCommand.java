@@ -1,7 +1,10 @@
 package com.sos.joc.classes;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 import javax.json.Json;
@@ -9,7 +12,6 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.http.HttpEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -284,9 +286,9 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         return getAcceptTypeFromGet(uri, csrfToken, "text/plain");
     }
     
-    public HttpEntity getInCompleteHtmlEntityFromGet(String csrfToken) throws JocException {
+    public byte[] getByteArrayFromGet(String csrfToken, String acceptHeader) throws JocException {
         try {
-            return getInCompleteHtmlEntityFromGet(getURI(), csrfToken);
+            return getByteArrayFromGet(getURI(), csrfToken, acceptHeader);
         } catch (JocException e) {
             throw e;
         } catch (Exception e) {
@@ -294,15 +296,45 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         }
     }
     
-    public HttpEntity getInCompleteHtmlEntityFromGet(URI uri, String csrfToken) throws JocException {
-        addHeader("Accept", "text/html");
+    public byte[] getByteArrayFromGet(URI uri, String csrfToken, String acceptHeader) throws JocException {
+        if (acceptHeader != null && !acceptHeader.isEmpty()) {
+            addHeader("Accept", acceptHeader);
+        }
         addHeader("Accept-Encoding", "gzip");
         addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
         JocError jocError = new JocError();
         jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         try {
-            HttpEntity response = getInCompleteHttpEntityByRestService(uri);
-            return getHtmlFromResponse(response, uri, jocError);
+            return getByteArrayFromResponse(getByteArrayByRestService(uri), uri, jocError);
+        } catch (SOSConnectionRefusedException e) {
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerConnectionRefusedException(jocError, e);
+            }
+        } catch (SOSNoResponseException e) {
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerNoResponseException(jocError, e);
+            }
+        } catch (JocException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(jocError, e);
+        }
+    }
+    
+    public Path getFilePathFromGet(URI uri, String csrfToken, String acceptHeader) throws JocException {
+        if (acceptHeader != null && !acceptHeader.isEmpty()) {
+            addHeader("Accept", acceptHeader);
+        }
+        addHeader("Accept-Encoding", "gzip");
+        addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
+        JocError jocError = new JocError();
+        jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
+        try {
+            return getFilePathFromResponse(getFilePathByRestService(uri), uri, jocError);
         } catch (SOSConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
@@ -479,26 +511,45 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         }
     }
     
-    private HttpEntity getHtmlFromResponse(HttpEntity response, URI uri, JocError jocError) throws JocException {
+    private byte[] getByteArrayFromResponse(byte[] response, URI uri, JocError jocError) throws JocException {
         int httpReplyCode = statusCode();
-        String contentType = getResponseHeader("Content-Type");
         try {
             switch (httpReplyCode) {
             case 200:
-                if (contentType.contains("text/html")) {
-                    if (response == null || response.getContentLength() == 0) {
-                        throw new JobSchedulerNoResponseException("Unexpected empty response");
-                    }
-                    return response;
-                } else {
-                    throw new JobSchedulerInvalidResponseDataException(String.format("Unexpected content type '%1$s'. Response: %2$s", contentType,
-                            response));
+                if (response == null || response.length <= 0) {
+                    throw new JobSchedulerNoResponseException("Unexpected empty response");
                 }
+                return response;
             default:
                 throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase());
             }
         } catch (JocException e) {
             e.addErrorMetaInfo(jocError);
+            throw e;
+        }
+    }
+    
+    private Path getFilePathFromResponse(Path response, URI uri, JocError jocError) throws JocException {
+        int httpReplyCode = statusCode();
+        try {
+            switch (httpReplyCode) {
+            case 200:
+                try {
+                    if (response == null || Files.size(response) <= 0) {
+                        throw new JobSchedulerNoResponseException("Unexpected empty response");
+                    }
+                } catch (IOException e) {
+                    throw new JobSchedulerNoResponseException("Unexpected empty response");
+                }
+                return response;
+            default:
+                throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase());
+            }
+        } catch (JocException e) {
+            e.addErrorMetaInfo(jocError);
+            try {
+                Files.deleteIfExists(response);
+            } catch (IOException e1) {}
             throw e;
         }
     }

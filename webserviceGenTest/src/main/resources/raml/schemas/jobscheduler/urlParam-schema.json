@@ -14,6 +14,9 @@
     "port": {
       "$ref": "../common/port-schema.json"
     },
+    "filename": {
+      "type": "string"
+    },
     "auditLog": {
       "$ref": "../audit/auditParams-schema.json"
     }

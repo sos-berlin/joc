@@ -25,6 +25,7 @@ schemas:
   - jsFilterWithUrlTimeout: !include schemas/jobscheduler/urlTimeoutParam-schema.json
   #- jsObjectFilter: !include schemas/common/jobSchedulerObjectFilter-schema.json
   - taskFilter: !include schemas/job/taskFilter-schema.json
+  - orderFilterWithHistoryId: !include schemas/order/orderFilterWithHistoryId-schema.json
   - startJobs: !include schemas/job/startJobs-schema.json
   - startedTasks: !include schemas/job/startedTasks-schema.json
   - modifyJobs: !include schemas/job/modifyJobs-schema.json
@@ -35,6 +36,7 @@ schemas:
   - modifyNode: !include schemas/jobChain/modifyNode-schema.json
   - modifyCalendars: !include schemas/calendar/calendarsFilter-schema.json
   - logContent: !include schemas/common/logContent200-schema.json
+  - logInfo: !include schemas/common/logInfo200-schema.json
   - security: !include schemas/user/security-schema.json
 
 
@@ -60,6 +62,7 @@ resourceTypes:
   - postJSONWithoutExample: !include resourceTypes/common/postJSONWithoutExample.raml
   - postForDownload: !include resourceTypes/common/postForDownload.raml
   - postForUpload: !include resourceTypes/common/postForUpload.raml
+  - postLog: !include resourceTypes/common/postLog.raml
   - login: !include resourceTypes/user/login.raml
   - logout: !include resourceTypes/user/logout.raml
   - postEvent: !include resourceTypes/common/postEvent.raml
@@ -67,6 +70,7 @@ resourceTypes:
   - startJob: !include resourceTypes/job/start.raml
   - setRunTimeJob: !include resourceTypes/job/setRunTime.raml
   - resetRunTimeJob: !include resourceTypes/job/resetRunTime.raml
+  - postTaskLogWithPlainResponse: !include resourceTypes/job/postWithPlainResponse.raml
   - modifyTasks: !include resourceTypes/job/modifyTasks.raml
   - modifyOrder: !include resourceTypes/order/modify.raml
   - addOrder: !include resourceTypes/order/add.raml
@@ -75,6 +79,7 @@ resourceTypes:
   - setStateOrder: !include resourceTypes/order/setState.raml
   - setRunTimeOrder: !include resourceTypes/order/setRunTime.raml
   - resetRunTimeOrder: !include resourceTypes/order/resetRunTime.raml
+  - postOrderLogWithPlainResponse: !include resourceTypes/order/postWithPlainResponse.raml
   - modifyJobChain: !include resourceTypes/jobChain/modify.raml
   - modifyJobChainNode: !include resourceTypes/jobChain/modifyNode.raml
   - modifyCalendar: !include resourceTypes/calendar/modify.raml
@@ -85,6 +90,7 @@ traits:
   - filteredByJob: !include ./traits/filteredByJob.raml
   - filteredByTransferFileId: !include ./traits/filteredByTransferFileId.raml
   - accessToken: !include ./traits/accessToken.raml
+  - filename: !include ./traits/filename.raml
 
 
 /security/login:
@@ -412,6 +418,27 @@ traits:
     type:
       postURLWithPlainResponse:
         description: Provides JobScheduler main log as download
+    /info:
+      type:
+        postJSON:
+          description: Log info (temp. filename, size)
+          description1: |
+            <tr><td>``host``</td><td>optional, string</td><td>host of the JobScheduler Master<br/><b>This parameter is required for a specific JobScheduler in a cluster</b></td><td>localhost</td><td></td></tr>
+          description2: |
+            <tr><td>``port``</td><td>optional, string</td><td>port of the JobScheduler Master<br/><b>This parameter is required for a specific JobScheduler in a cluster</b></td><td>4444</td><td></td></tr>
+          description3: " "
+          description4: " "
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: !include documentation/jobscheduler/logInfo.md
+          schema: jsFilterWithUrl
+          schema200: logInfo
+          example: !include examples/order/filteredOrderWithHistoryId-example.json
+          example200: !include examples/common/logInfo-example.json
   /cleanup:
     type:
       postURLWithOkResponse:
@@ -668,31 +695,23 @@ traits:
         description9: " "
         description10: " "
         description200: TODO
-        schema: !include schemas/order/orderFilterWithHistoryId-schema.json
+        schema: orderFilterWithHistoryId
         schema200: !include schemas/order/stepHistory-schema.json
         example: !include examples/order/filteredOrderWithHistoryId-example.json
         example200: !include examples/order/orderStepHistory_p-example.json
   /log:
     type:
-      postJSON:
-        description: Log (plain text or html)
+      postLog:
         description1: !include documentation/order/jobChain.md
         description2: !include documentation/order/orderIdRequired.md
         description3: !include documentation/order/historyId.md
-        description4: !include documentation/common/logMimeParam.md
-        description5: " "
-        description6: " "
-        description7: " "
-        description8: " "
-        description9: " "
-        description10: " "
+        objecttype: order
         description200: TODO
-        schema: !include schemas/order/orderFilterWithHistoryId-schema.json
-        schema200: logContent
+        schema: orderFilterWithHistoryId
         example: !include examples/order/filteredOrderWithHistoryId-example.json
         example200: !include examples/order/log-example.json
     /html:
-      is: [accessToken, jobschedulerMaster]
+      is: [filename, accessToken, jobschedulerMaster]
       type: error
       get:
         description: |
@@ -705,6 +724,29 @@ traits:
             body:
               text/html:
                 example: !include examples/order/log-example.html
+    /download:
+      type:
+        postOrderLogWithPlainResponse:
+          description: Provides order log as download
+    /info:
+      type:
+        postJSON:
+          description: Log info (temp. filename, size)
+          description1: !include documentation/order/jobChain.md
+          description2: !include documentation/order/orderIdRequired.md
+          description3: !include documentation/order/historyId.md
+          description4: " "
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: !include documentation/order/logInfo.md
+          schema: orderFilterWithHistoryId
+          schema200: logInfo
+          example: !include examples/order/filteredOrderWithHistoryId-example.json
+          example200: !include examples/common/logInfo-example.json
   /configuration:
     type:
       postJSON:
@@ -1093,7 +1135,7 @@ traits:
       description9: " "
       description10: " "
       description200: TODO
-      schema: !include schemas/job/taskFilter-schema.json
+      schema: taskFilter
       schema200: !include schemas/job/task200-schema.json
       example: TODO
       example200: TODO
@@ -1117,25 +1159,17 @@ traits:
   #      example200: !include examples/job/taskHistoryItem_p-example.json
   /log:
     type:
-      postJSON:
-        description: Log (plain text or html)
+      postLog:
         description1: !include documentation/job/task.md
-        description2: !include documentation/common/logMimeParam.md
+        description2: " "
         description3: " "
-        description4: " "
-        description5: " "
-        description6: " "
-        description7: " "
-        description8: " "
-        description9: " "
-        description10: " "
+        objecttype: task
         description200: TODO
-        schema: !include schemas/job/taskFilter-schema.json
-        schema200: logContent
+        schema: taskFilter
         example: TODO
         example200: !include examples/order/log-example.json
     /html:
-      is: [accessToken, jobschedulerMaster]
+      is: [filename, accessToken, jobschedulerMaster]
       type: error
       get:
         description: |
@@ -1148,6 +1182,29 @@ traits:
             body:
               text/html:
                 example: !include examples/order/log-example.html
+    /download:
+      type:
+        postTaskLogWithPlainResponse:
+          description: Provides task log as download
+    /info:
+      type:
+        postJSON:
+          description: Log info (temp. filename, size)
+          description1: !include documentation/job/task.md
+          description2: " "
+          description3: " "
+          description4: " "
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: !include documentation/job/logInfo.md
+          schema: taskFilter
+          schema200: logInfo
+          example: TODO
+          example200: !include examples/common/logInfo-example.json
 
 /job_chains:
   type:

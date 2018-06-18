@@ -13,6 +13,7 @@ import com.sos.joc.classes.audit.JobSchedulerCommandAudit;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCommand;
 import com.sos.joc.model.commands.JobschedulerCommands;
+import com.sos.xml.SOSXmlCommand.ResponseStream;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements IJobSchedulerResourceCommand {
@@ -72,7 +73,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             logAuditMessage(jobschedulerAudit);
             // String answer = jocXmlCommand.executePostWithThrowBadRequest(xml,
             // getAccessToken());
-            String answer = jocXmlCommand.executePost(xml, getAccessToken());
+            String answer = jocXmlCommand.executePost(xml, ResponseStream.TO_STRING, getAccessToken());
             storeAuditLogEntry(jobschedulerAudit);
 
             return JOCDefaultResponse.responseStatus200(answer, "application/xml");
