@@ -348,7 +348,7 @@ public class Globals {
         long defaultMaxSizeOfLogsToDisplay = 1024 * 1024 * 2L;
         if (sosShiroProperties != null) {
             maxSizeOfLogsToDisplay = sosShiroProperties.getFileSizeProperty("max_size_of_logs_for_display", defaultMaxSizeOfLogsToDisplay);
-            LOGGER.info("force comments for audit log = " + auditLogCommentsAreRequired);
+            LOGGER.info("max size of logs to display = " + maxSizeOfLogsToDisplay);
         }
     }
 
