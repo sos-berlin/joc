@@ -1,6 +1,6 @@
 type: error
 get:
-  is: [accessToken, jobschedulerMaster]
+  is: [filename, accessToken, jobschedulerMaster]
   queryParameters:
     host:
       required: false
@@ -50,6 +50,7 @@ post:
     <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
     <tr><td>``host``</td><td>optional, string</td><td>host of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>localhost</td><td></td></tr>
     <tr><td>``port``</td><td>optional, string</td><td>port of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>4444</td><td></td></tr>
+    <tr><td>``filename``</td><td>optional, string</td><td>name of a temp. file from ./jobscheduler<<resourcePath>>/info<br/>This file will be responsed if exists</td><td>sos-download-5961566003164029224.tmp</td><td></td></tr>
     </tbody></table>
   body:
     application/json:

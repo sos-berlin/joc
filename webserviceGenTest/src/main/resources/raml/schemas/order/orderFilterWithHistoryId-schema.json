@@ -23,6 +23,9 @@
     "historyId": {
       "type": "string"
     },
+    "filename": {
+      "type": "string"
+    },
     "mime": {
       "$ref": "../common/logMimeFilter-schema.json"
     }

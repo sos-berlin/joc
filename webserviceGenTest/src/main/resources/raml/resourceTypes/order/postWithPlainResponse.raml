@@ -1,6 +1,6 @@
 type: error
 get:
-  is: [accessToken, jobschedulerMaster]
+  is: [filename, accessToken, jobschedulerMaster]
   queryParameters:
     jobChain:
       required: true
@@ -54,6 +54,7 @@ post:
     <tr><td>``jobChain``</td><td>required, string</td><td>Path of a job chain</td><td>/sos/reporting/Inventory</td><td></td></tr>
     <tr><td>``orderId``</td><td>required; string</td><td>The id of an order</td><td>inventory</td><td></td></tr>
     <tr><td>``historyId``</td><td>required; integer</td><td>The history id of an order</td><td>4711</td><td></td></tr>
+    <tr><td>``filename``</td><td>optional, string</td><td>name of a temp. file from ./order<<resourcePath>>/info<br/>This file will be responsed if exists</td><td>sos-download-5961566003164029224.tmp</td><td></td></tr>
     </tbody></table>
   body:
     application/json:

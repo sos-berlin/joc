@@ -1,6 +1,6 @@
 type: error
 get:
-  is: [accessToken, jobschedulerMaster]
+  is: [filename, accessToken, jobschedulerMaster]
   queryParameters:
     taskId:
       required: true
@@ -42,6 +42,7 @@ post:
     </thead><tbody>
     <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
     <tr><td>``taskId``</td><td>required, integer</td><td>Task Id</td><td>4711</td><td></td></tr>
+    <tr><td>``filename``</td><td>optional, string</td><td>name of a temp. file from ./task<<resourcePath>>/info<br/>This file will be responsed if exists</td><td>sos-download-5961566003164029224.tmp</td><td></td></tr>
     </tbody></table>
   body:
     application/json:

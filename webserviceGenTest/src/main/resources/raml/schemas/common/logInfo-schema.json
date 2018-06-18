@@ -1,0 +1,21 @@
+{
+  "title": "log info",
+  "id": "schemas/common/logInfo",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.common.LogInfo",
+  "type": "object",
+  "properties": {
+    "filename": {
+      "description": "name of temporary file. Can be used as parameter for ./jobscheduler/log, ./order/log or ./task/log",
+      "type": "string"
+    },
+    "size": {
+      "$ref": "nonNegativeLong-schema.json"
+    },
+    "download": {
+      "description": "if true then ./jobscheduler/log, ./order/log or ./task/log sends log as download (with Content-Disposition 'attachment').",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

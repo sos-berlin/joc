@@ -11,12 +11,16 @@ import java.util.Date;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.LogOrderContent;
+import com.sos.joc.classes.common.DeleteTempFile;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.LogContent;
 import com.sos.joc.model.common.LogContent200;
+import com.sos.joc.model.common.LogInfo;
+import com.sos.joc.model.common.LogInfo200;
 import com.sos.joc.model.common.LogMime;
 import com.sos.joc.model.order.OrderHistoryFilter;
 import com.sos.joc.order.resource.IOrderLogResource;
@@ -37,31 +41,31 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
 
     @Override
     public JOCDefaultResponse getOrderLogHtml(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String orderId,
-            String jobChain, String historyId) throws Exception {
-        return getOrderLogHtml(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, orderId, jobChain, historyId);
+            String jobChain, String historyId, String filename) throws Exception {
+        return getOrderLogHtml(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, orderId, jobChain, historyId, filename);
     }
 
     public JOCDefaultResponse getOrderLogHtml(String accessToken, String queryAccessToken, String jobschedulerId, String orderId, String jobChain,
-            String historyId) throws Exception {
+            String historyId, String filename) throws Exception {
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-        OrderHistoryFilter orderHistoryFilter = setOrderHistoryFilter(jobschedulerId, orderId, jobChain, historyId, LogMime.HTML);
+        OrderHistoryFilter orderHistoryFilter = setOrderHistoryFilter(jobschedulerId, orderId, jobChain, historyId, filename, LogMime.HTML);
         return execute(API_CALL + "/html", accessToken, orderHistoryFilter);
     }
 
     @Override
     public JOCDefaultResponse downloadOrderLog(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId,
-            String orderId, String jobChain, String historyId) throws Exception {
-        return downloadOrderLog(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, orderId, jobChain, historyId);
+            String orderId, String jobChain, String historyId, String filename) throws Exception {
+        return downloadOrderLog(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, orderId, jobChain, historyId, filename);
     }
 
     public JOCDefaultResponse downloadOrderLog(String accessToken, String queryAccessToken, String jobschedulerId, String orderId, String jobChain,
-            String historyId) throws Exception {
+            String historyId, String filename) throws Exception {
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-        OrderHistoryFilter orderHistoryFilter = setOrderHistoryFilter(jobschedulerId, orderId, jobChain, historyId, LogMime.PLAIN);
+        OrderHistoryFilter orderHistoryFilter = setOrderHistoryFilter(jobschedulerId, orderId, jobChain, historyId, filename, LogMime.PLAIN);
         return downloadOrderLog(queryAccessToken, orderHistoryFilter);
     }
 
@@ -75,6 +79,15 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
         return execute(API_CALL + "/download", accessToken, orderHistoryFilter);
     }
 
+    @Override
+    public JOCDefaultResponse getLogInfo(String xAccessToken, String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
+        return getLogInfo(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
+    }
+
+    public JOCDefaultResponse getLogInfo(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
+        return execute(API_CALL + "/info", accessToken, orderHistoryFilter);
+    }
+
     private JOCDefaultResponse execute(String apiCall, String accessToken, OrderHistoryFilter orderHistoryFilter) {
         try {
             JOCDefaultResponse jocDefaultResponse = init(apiCall, orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(),
@@ -82,56 +95,76 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
-            checkRequiredParameter("jobschedulerId", orderHistoryFilter.getJobschedulerId());
-            checkRequiredParameter("jobChain", orderHistoryFilter.getJobChain());
-            checkRequiredParameter("orderId", orderHistoryFilter.getOrderId());
-            checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
-
             LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance, accessToken);
 
             switch (apiCall) {
             case API_CALL:
-                LogContent200 entity = new LogContent200();
-                entity.setSurveyDate(Date.from(Instant.now()));
-                LogContent logContentSchema = new LogContent();
-
-                if (orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
-                    java.nio.file.Path path = null;
-                    try {
-                        path = logOrderContent.writeLogFile();
-                        logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(path));
-                    } finally {
-                        try {
-                            if (path != null) {
-                                Files.deleteIfExists(path);
-                            }
-                        } catch (Exception e2) {
-                        }
+                LogContent200 log = new LogContent200();
+                log.setSurveyDate(Date.from(Instant.now()));
+                final java.nio.file.Path path = getLogPath(logOrderContent, orderHistoryFilter, true);
+                try {
+                    if (Files.exists(path)) {
+                        log.setSurveyDate(Date.from(Files.getLastModifiedTime(path).toInstant()));
                     }
-                } else {
-                    logContentSchema.setPlain(logOrderContent.getLog());
+                } catch (Exception e) {
                 }
-                entity.setLog(logContentSchema);
-                entity.setDeliveryDate(Date.from(Instant.now()));
-                return JOCDefaultResponse.responseStatus200(entity);
+                try {
+                    LogContent logContentSchema = new LogContent();
+                    if (orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
+                        logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(path));
+                    } else {
+                        logContentSchema.setPlain(logOrderContent.getLogContent(path));
+                    }
+                    log.setLog(logContentSchema);
+                    log.setDeliveryDate(Date.from(Instant.now()));
+                    return JOCDefaultResponse.responseStatus200(log);
+                } finally {
+                    try {
+                        if (path != null) {
+                            Files.deleteIfExists(path);
+                        }
+                    } catch (Exception e1) {
+                    }
+                }
 
             case API_CALL + "/html":
-                return JOCDefaultResponse.responseHtmlStatus200(logOrderContent.htmlPageWithColouredLogContent(logOrderContent.getLog(), "Order "
-                        + orderHistoryFilter.getOrderId()));
-
-            default: //case API_CALL + "/download"
-                java.nio.file.Path path = null;
+                java.nio.file.Path path2 = getLogPath(logOrderContent, orderHistoryFilter, true);
                 try {
-                    path = logOrderContent.writeLogFile();
-                } catch (Exception e1) {
+                    return JOCDefaultResponse.responseHtmlStatus200(logOrderContent.htmlPageWithColouredLogContent(path2, "Order "
+                            + orderHistoryFilter.getOrderId()));
+                } finally {
                     try {
-                        Files.deleteIfExists(path);
-                    } catch (Exception e2) {
+                        if (path2 != null) {
+                            Files.deleteIfExists(path2);
+                        }
+                    } catch (Exception e1) {
                     }
-                    throw e1;
                 }
-                final java.nio.file.Path tmpPath = path;
+
+            case API_CALL + "/info":
+                LogInfo200 logInfo200 = new LogInfo200();
+                logInfo200.setSurveyDate(Date.from(Instant.now()));
+                final java.nio.file.Path path3 = getLogPath(logOrderContent, orderHistoryFilter, false);
+                logInfo200.setDeliveryDate(Date.from(Instant.now()));
+                LogInfo logInfo = new LogInfo();
+                logInfo.setFilename(path3.getFileName().toString());
+                logInfo.setSize(0L);
+                try {
+                    if (Files.exists(path3)) {
+                        logInfo.setSize(Files.size(path3));
+                    }
+                } catch (Exception e) {
+                }
+                logInfo.setDownload(logInfo.getSize() > Globals.maxSizeOfLogsToDisplay);
+                logInfo200.setLog(logInfo);
+
+                DeleteTempFile runnable = new DeleteTempFile(path3);
+                new Thread(runnable).start();
+
+                return JOCDefaultResponse.responseStatus200(logInfo200);
+
+            default: // case API_CALL + "/download"
+                final java.nio.file.Path path4 = getLogPath(logOrderContent, orderHistoryFilter, true);
 
                 StreamingOutput fileStream = new StreamingOutput() {
 
@@ -139,7 +172,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
                     public void write(OutputStream output) throws IOException {
                         InputStream in = null;
                         try {
-                            in = Files.newInputStream(tmpPath);
+                            in = Files.newInputStream(path4);
                             byte[] buffer = new byte[4096];
                             int length;
                             while ((length = in.read(buffer)) > 0) {
@@ -158,7 +191,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
                                 }
                             }
                             try {
-                                Files.delete(tmpPath);
+                                Files.delete(path4);
                             } catch (Exception e) {
                             }
                         }
@@ -184,12 +217,44 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
         }
     }
 
-    private OrderHistoryFilter setOrderHistoryFilter(String jobschedulerId, String orderId, String jobChain, String historyId, LogMime mime) {
+    private java.nio.file.Path getLogPath(LogOrderContent logOrderContent, OrderHistoryFilter orderHistoryFilter, boolean withFilenameCheck)
+            throws Exception {
+
+        if (withFilenameCheck) {
+            if (orderHistoryFilter.getFilename() != null && !orderHistoryFilter.getFilename().isEmpty()) {
+                java.nio.file.Path path = Paths.get(System.getProperty("java.io.tmpdir"), orderHistoryFilter.getFilename());
+                if (Files.exists(path)) {
+                    return path;
+                }
+            }
+        }
+        checkRequiredParameter("jobschedulerId", orderHistoryFilter.getJobschedulerId());
+        checkRequiredParameter("jobChain", orderHistoryFilter.getJobChain());
+        checkRequiredParameter("orderId", orderHistoryFilter.getOrderId());
+        checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
+        java.nio.file.Path path = null;
+        try {
+            path = logOrderContent.writeLogFile();
+            return path;
+        } catch (Exception e) {
+            try {
+                if (path != null) {
+                    Files.deleteIfExists(path);
+                }
+            } catch (Exception e1) {
+            }
+            throw e;
+        }
+    }
+
+    private OrderHistoryFilter setOrderHistoryFilter(String jobschedulerId, String orderId, String jobChain, String historyId, String filename,
+            LogMime mime) {
         OrderHistoryFilter orderHistoryFilter = new OrderHistoryFilter();
         orderHistoryFilter.setHistoryId(historyId);
         orderHistoryFilter.setJobChain(normalizePath(jobChain));
         orderHistoryFilter.setOrderId(orderId);
         orderHistoryFilter.setJobschedulerId(jobschedulerId);
+        orderHistoryFilter.setFilename(filename);
         orderHistoryFilter.setMime(mime);
         return orderHistoryFilter;
     }

@@ -16,7 +16,7 @@ public class TaskResourceLogHtmlImplTest {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         TaskLogResourceImpl taskLogHtmlResourceImpl = new TaskLogResourceImpl();
-        JOCDefaultResponse okResponse = taskLogHtmlResourceImpl.getTaskLogHtml(sosShiroCurrentUserAnswer.getAccessToken(),"","scheduler_id","0");
+        JOCDefaultResponse okResponse = taskLogHtmlResourceImpl.getTaskLogHtml(sosShiroCurrentUserAnswer.getAccessToken(),"","scheduler_id","0", null);
      }
 
 }
