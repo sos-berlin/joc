@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,8 @@ public class Globals {
     private static final String HIBERNATE_CONFIGURATION_FILE = "hibernate_configuration_file";
     private static final String HIBERNATE_CONFIGURATION_SCHEDULER_DEFAULT_FILE = "hibernate_configuration_scheduler_default_file";
     private static final Logger LOGGER = LoggerFactory.getLogger(Globals.class);
+    private static String trustStoreLocationDefault = "?????";
+    private static String trustStorePasswordDefault = "?????";
     public static final String SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY = "send_events_immediatly";
     public static final String DEFAULT_SHIRO_INI_PATH = "classpath:shiro.ini";
     public static final String DEFAULT_SHIRO_INI_FILENAME = "shiro.ini";
@@ -166,6 +169,8 @@ public class Globals {
         setHostnameVerification();
         setForceCommentsForAuditLog();
         setTrustStore();
+        setTrustStoreType();
+        setTrustStorePassword();
         setMaxSizeOfLogsToDisplay();
         setTimeoutForTempFiles();
         setConfigurationProperties();
@@ -302,8 +307,11 @@ public class Globals {
     }
 
     private static void setTrustStore() throws JocException {
+        if ("?????".equals(trustStoreLocationDefault)) {
+            trustStoreLocationDefault = System.getProperty("javax.net.ssl.trustStore");
+        }
         if (sosShiroProperties != null) {
-            String truststore = sosShiroProperties.getProperty("truststore_path", "");
+            String truststore = sosShiroProperties.getProperty("truststore_path");
             if (truststore != null && !truststore.trim().isEmpty()) {
                 Path p = sosShiroProperties.resolvePath(truststore.trim());
                 if (p != null) {
@@ -313,6 +321,37 @@ public class Globals {
                         truststore = p.toString();
                         System.setProperty("javax.net.ssl.trustStore", truststore);
                     }
+                }
+            } else {
+                if(trustStoreLocationDefault == null) {
+                    System.clearProperty("javax.net.ssl.trustStore");
+                } else {
+                    System.setProperty("javax.net.ssl.trustStore", trustStoreLocationDefault);
+                }
+            }
+        }
+    }
+    
+    private static void setTrustStoreType() throws JocException {
+        if (sosShiroProperties != null) {
+            String truststoreType = sosShiroProperties.getProperty("truststore_type", KeyStore.getDefaultType());
+            System.setProperty("javax.net.ssl.trustStoreType", truststoreType);
+        }
+    }
+    
+    private static void setTrustStorePassword() throws JocException {
+        if ("?????".equals(trustStorePasswordDefault)) {
+            trustStorePasswordDefault = System.getProperty("javax.net.ssl.trustStorePassword");
+        }
+        if (sosShiroProperties != null) {
+            String truststorePassw = sosShiroProperties.getProperty("truststore_password");
+            if (truststorePassw != null) {
+                System.setProperty("javax.net.ssl.trustStorePassword", truststorePassw);
+            } else {
+                if(trustStorePasswordDefault == null) {
+                    System.clearProperty("javax.net.ssl.trustStorePassword");
+                } else {
+                    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePasswordDefault);
                 }
             }
         }
