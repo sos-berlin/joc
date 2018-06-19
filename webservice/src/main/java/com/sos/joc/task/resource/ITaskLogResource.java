@@ -10,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.sos.joc.annotation.CompressedAlready;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.TaskFilter;
 
@@ -17,6 +18,7 @@ public interface ITaskLogResource {
 
     @POST
     @Path("log")
+    @CompressedAlready
     @Consumes("application/json")
     //@Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postTaskLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
@@ -24,6 +26,7 @@ public interface ITaskLogResource {
 
     @GET
     @Path("log/html")
+    @CompressedAlready
     //@Produces({ MediaType.TEXT_HTML })
     public JOCDefaultResponse getTaskLogHtml(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
@@ -31,6 +34,7 @@ public interface ITaskLogResource {
 
     @GET
     @Path("log/download")
+    @CompressedAlready
     //@Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse downloadTaskLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
@@ -38,6 +42,7 @@ public interface ITaskLogResource {
 
     @POST
     @Path("log/download")
+    @CompressedAlready
     @Consumes("application/json")
     //@Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse downloadTaskLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,

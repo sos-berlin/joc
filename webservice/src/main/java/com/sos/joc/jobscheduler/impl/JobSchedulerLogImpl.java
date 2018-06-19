@@ -182,7 +182,7 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
         jocJsonCommand.setSocketTimeout(socketTimeout);
         jocJsonCommand.setUriBuilderForMainLog(logFilename);
         // final byte[] responseEntity = jocJsonCommand.getByteArrayFromGet(jocJsonCommand.getURI(), accessToken, "text/plain,application/octet-stream");
-        return jocJsonCommand.getFilePathFromGet(jocJsonCommand.getURI(), accessToken, "text/plain,application/octet-stream");
+        return jocJsonCommand.getFilePathFromGet(jocJsonCommand.getURI(), accessToken, "text/plain,application/octet-stream", true);
     }
 
 }

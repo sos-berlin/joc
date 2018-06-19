@@ -19,7 +19,8 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
 
     public byte[] getLogAsByteArray(OrderHistoryFilter orderHistoryFilter) throws NumberFormatException, SOSHibernateException,
             DBMissingDataException, IOException {
-        String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(), orderHistoryFilter.getHistoryId());
+        String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(),
+                orderHistoryFilter.getHistoryId());
         if (this.getSession().getFactory().dbmsIsPostgres()) {
             SchedulerOrderHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerOrderHistoryLogDBItemPostgres) this.getSession().get(
                     SchedulerOrderHistoryLogDBItemPostgres.class, Long.parseLong(orderHistoryFilter.getHistoryId()));
@@ -47,7 +48,8 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
 
     public Path writeLogFile(OrderHistoryFilter orderHistoryFilter) throws NumberFormatException, SOSHibernateException, DBMissingDataException,
             IOException {
-        String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(), orderHistoryFilter.getHistoryId());
+        String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(),
+                orderHistoryFilter.getHistoryId());
         if (this.getSession().getFactory().dbmsIsPostgres()) {
             SchedulerOrderHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerOrderHistoryLogDBItemPostgres) this.getSession().get(
                     SchedulerOrderHistoryLogDBItemPostgres.class, Long.parseLong(orderHistoryFilter.getHistoryId()));
@@ -70,6 +72,35 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
                 throw new DBMissingDataException(msg);
             }
             return schedulerHistoryDBItem.writeLogFile();
+        }
+    }
+
+    public Path writeGzipLogFile(OrderHistoryFilter orderHistoryFilter) throws NumberFormatException, SOSHibernateException, DBMissingDataException,
+            IOException {
+        String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(),
+                orderHistoryFilter.getHistoryId());
+        if (this.getSession().getFactory().dbmsIsPostgres()) {
+            SchedulerOrderHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerOrderHistoryLogDBItemPostgres) this.getSession().get(
+                    SchedulerOrderHistoryLogDBItemPostgres.class, Long.parseLong(orderHistoryFilter.getHistoryId()));
+            if (schedulerHistoryDBItem == null) {
+                throw new DBMissingDataException(msg);
+            }
+            if (orderHistoryFilter.getJobschedulerId() != null && !orderHistoryFilter.getJobschedulerId().equals(schedulerHistoryDBItem
+                    .getSchedulerId())) {
+                throw new DBMissingDataException(msg);
+            }
+            return schedulerHistoryDBItem.writeGzipLogFile();
+        } else {
+            SchedulerOrderHistoryDBItem schedulerHistoryDBItem = (SchedulerOrderHistoryDBItem) this.getSession().get(
+                    SchedulerOrderHistoryDBItem.class, Long.parseLong(orderHistoryFilter.getHistoryId()));
+            if (schedulerHistoryDBItem == null) {
+                throw new DBMissingDataException(msg);
+            }
+            if (orderHistoryFilter.getJobschedulerId() != null && !orderHistoryFilter.getJobschedulerId().equals(schedulerHistoryDBItem
+                    .getSchedulerId())) {
+                throw new DBMissingDataException(msg);
+            }
+            return schedulerHistoryDBItem.writeGzipLogFile();
         }
     }
 

@@ -1,8 +1,10 @@
 package com.sos.joc.classes;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +26,12 @@ public class LogTaskContent extends LogContent {
     private static final String XPATH_TASK_LOG = "/spooler/answer/task/log";
     private TaskFilter taskFilter;
     private String job = null;
-    
+
     public LogTaskContent(TaskFilter taskFilter, DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
         super(dbItemInventoryInstance, accessToken);
         this.taskFilter = taskFilter;
     }
-    
+
     public String getLog() throws Exception {
 
         String log = getLogFromDB();
@@ -48,6 +50,19 @@ public class LogTaskContent extends LogContent {
         Path path = writeLogFileFromDB();
         if (path == null) {
             path = writeTaskLogFileFromXmlCommand();
+        }
+        if (path == null) {
+            String msg = String.format("Task log of %s with id %s is missing", job, taskFilter.getTaskId());
+            throw new JobSchedulerObjectNotExistException(msg);
+        }
+        return path;
+    }
+
+    public Path writeGzipLogFile() throws Exception {
+
+        Path path = writeGzipLogFileFromDB();
+        if (path == null) {
+            path = writeGzipTaskLogFileFromXmlCommand();
         }
         if (path == null) {
             String msg = String.format("Task log of %s with id %s is missing", job, taskFilter.getTaskId());
@@ -76,7 +91,7 @@ public class LogTaskContent extends LogContent {
             Globals.disconnect(sosHibernateSession);
         }
     }
-    
+
     private Path writeLogFileFromDB() throws DBMissingDataException, IOException {
         SOSHibernateSession sosHibernateSession = null;
         try {
@@ -98,6 +113,27 @@ public class LogTaskContent extends LogContent {
         }
     }
 
+    private Path writeGzipLogFileFromDB() throws DBMissingDataException, IOException {
+        SOSHibernateSession sosHibernateSession = null;
+        try {
+            SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(taskFilter.getJobschedulerId());
+            sosHibernateSession = sosHibernateFactory.openStatelessSession("getTaskLog");
+            try {
+                Globals.beginTransaction(sosHibernateSession);
+                JobSchedulerTaskHistoryDBLayer jobSchedulerTaskHistoryDBLayer = new JobSchedulerTaskHistoryDBLayer(sosHibernateSession);
+                job = jobSchedulerTaskHistoryDBLayer.getJob();
+                return jobSchedulerTaskHistoryDBLayer.writeGzipLogFile(taskFilter);
+            } finally {
+                Globals.rollback(sosHibernateSession);
+            }
+        } catch (JocConfigurationException | SOSHibernateException | NumberFormatException e) {
+            LOGGER.warn(e.toString());
+            return null;
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+        }
+    }
+
     private String getTaskLogFromXmlCommand() throws Exception {
 
         String xml = String.format("<show_task id=\"%1$s\" what=\"log\" />", taskFilter.getTaskId());
@@ -105,7 +141,7 @@ public class LogTaskContent extends LogContent {
         jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
         return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_TASK_LOG, null);
     }
-    
+
     private Path writeTaskLogFileFromXmlCommand() throws Exception {
         String taskLog = getTaskLogFromXmlCommand();
         if (taskLog == null) {
@@ -119,8 +155,37 @@ public class LogTaskContent extends LogContent {
         } catch (IOException e) {
             try {
                 Files.deleteIfExists(path);
-            } catch (Exception e1) {}
+            } catch (Exception e1) {
+            }
             throw e;
+        }
+    }
+
+    private Path writeGzipTaskLogFileFromXmlCommand() throws Exception {
+        String taskLog = getTaskLogFromXmlCommand();
+        if (taskLog == null) {
+            return null;
+        }
+        Path path = null;
+        GZIPOutputStream gzip = null;
+        try {
+            path = Files.createTempFile("sos-download-", null);
+            gzip = new GZIPOutputStream(new FileOutputStream(path.toFile()));
+            gzip.write(taskLog.getBytes());
+            return path;
+        } catch (IOException e) {
+            try {
+                Files.deleteIfExists(path);
+            } catch (Exception e1) {
+            }
+            throw e;
+        } finally {
+            try {
+                if (gzip != null) {
+                    gzip.close();
+                }
+            } catch (Exception e1) {
+            }
         }
     }
 

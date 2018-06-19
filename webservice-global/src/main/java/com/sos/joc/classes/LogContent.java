@@ -2,12 +2,15 @@ package com.sos.joc.classes;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -188,6 +191,26 @@ public class LogContent {
         return targetPath;
     }
     
+    private Path pathOfColouredGzipLog(Path path, String title) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(new GZIPInputStream(Files.newInputStream(path))));
+        Path targetPath = Files.createTempFile("sos-download-", null);
+        OutputStream out = new GZIPOutputStream(Files.newOutputStream(targetPath));
+        if (title != null) {
+            out.write(String.format(HTML_START, title).getBytes());
+        }
+        String thisLine;
+        while ((thisLine = br.readLine()) != null) {
+            out.write(addStyle(thisLine).getBytes());
+        }
+        if (title != null) {
+            out.write(String.format(HTML_END).getBytes());
+        }
+        br.close();
+        out.close();
+        Files.deleteIfExists(path);
+        return targetPath;
+    }
+    
     public String getLogContent(Path path) throws IOException {
         if (path == null) {
             return null;
@@ -225,6 +248,13 @@ public class LogContent {
         return pathOfColouredLog(log, null);
     }
     
+    public Path pathOfHtmlWithColouredGzipLogContent(Path log) throws IOException {
+        if (log == null) {
+            return null;
+        }
+        return pathOfColouredGzipLog(log, null);
+    }
+    
     public String htmlPageWithColouredLogContent(Path log, String title) throws IOException {
         if (log == null) {
             return null;
@@ -237,6 +267,13 @@ public class LogContent {
             return null;
         }
         return pathOfColouredLog(log, title);
+    }
+    
+    public Path pathOfHtmlPageWithColouredGzipLogContent(Path log, String title) throws IOException {
+        if (log == null) {
+            return null;
+        }
+        return pathOfColouredGzipLog(log, title);
     }
     
     public String htmlPageWithColouredLogContent(String log, String title) {

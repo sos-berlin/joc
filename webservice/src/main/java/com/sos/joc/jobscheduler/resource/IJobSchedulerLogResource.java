@@ -10,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.sos.joc.annotation.CompressedAlready;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.jobscheduler.HostPortParameter;
 
@@ -17,6 +18,7 @@ public interface IJobSchedulerLogResource {
 
     @GET
     @Path("log")
+    @CompressedAlready
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse getMainLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId, @QueryParam("host") String host,
@@ -24,6 +26,7 @@ public interface IJobSchedulerLogResource {
 
     @POST
     @Path("log")
+    @CompressedAlready
     @Consumes("application/json")
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse getMainLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
@@ -31,6 +34,7 @@ public interface IJobSchedulerLogResource {
 
     @POST
     @Path("log/info")
+    @CompressedAlready
     @Consumes("application/json")
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse getLogInfo(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,

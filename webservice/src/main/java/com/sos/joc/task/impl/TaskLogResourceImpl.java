@@ -3,6 +3,7 @@ package com.sos.joc.task.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -99,7 +100,8 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
             logInfo.setSize(null);
             try {
                 if (Files.exists(path)) {
-                    logInfo.setSize(Files.size(path));
+                    //logInfo.setSize(Files.size(path));
+                    logInfo.setSize(getSize(path));
                 }
             } catch (Exception e) {
             }
@@ -137,7 +139,7 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
                 break;
             default:
                 try {
-                    if (Files.exists(path) && Files.size(path) > Globals.maxSizeOfLogsToDisplay) {
+                    if (Files.exists(path) && getSize(path) > Globals.maxSizeOfLogsToDisplay) {
                         offerredAsDownload = true;
                     }
                 } catch (Exception e) {
@@ -146,9 +148,9 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
             }
 
             if ((API_CALL + "/html").equals(apiCall)) {
-                path = logTaskContent.pathOfHtmlPageWithColouredLogContent(path, "Task " + taskFilter.getTaskId());
+                path = logTaskContent.pathOfHtmlPageWithColouredGzipLogContent(path, "Task " + taskFilter.getTaskId());
             } else if ((API_CALL).equals(apiCall) && taskFilter.getMime() != null && taskFilter.getMime() == LogMime.HTML) {
-                path = logTaskContent.pathOfHtmlWithColouredLogContent(path);
+                path = logTaskContent.pathOfHtmlWithColouredGzipLogContent(path);
             }
 
             final java.nio.file.Path downPath = path;
@@ -225,7 +227,7 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
         checkRequiredParameter("taskId", taskFilter.getTaskId());
         java.nio.file.Path path = null;
         try {
-            path = logTaskContent.writeLogFile();
+            path = logTaskContent.writeGzipLogFile();
             return path;
         } catch (Exception e) {
             try {
@@ -253,6 +255,17 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
             fileName = Paths.get(jobName).getFileName() + "." + fileName;
         }
         return fileName;
+    }
+    
+    private long getSize(java.nio.file.Path path) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(path.toFile(), "r");
+        raf.seek(raf.length() - 4);
+        int b4 = raf.read();
+        int b3 = raf.read();
+        int b2 = raf.read();
+        int b1 = raf.read();
+        raf.close();
+        return ((long)b1 << 24) | ((long)b2 << 16) | ((long)b3 << 8) | (long)b4;
     }
 
 }

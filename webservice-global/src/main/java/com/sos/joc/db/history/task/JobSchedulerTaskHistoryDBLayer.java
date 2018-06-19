@@ -71,6 +71,32 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
             }
     }
     
+    public Path writeGzipLogFile(TaskFilter taskFilter) throws NumberFormatException, SOSHibernateException, DBMissingDataException, IOException {
+        if (this.getSession().getFactory().dbmsIsPostgres()) {
+            SchedulerTaskHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerTaskHistoryLogDBItemPostgres) this.getSession().get(
+                    SchedulerTaskHistoryLogDBItemPostgres.class, Long.parseLong(taskFilter.getTaskId()));
+            if (schedulerHistoryDBItem == null) {
+                throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+            }
+            job = schedulerHistoryDBItem.getJobName();
+            if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
+                throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
+            }
+            return schedulerHistoryDBItem.writeGzipLogFile();
+        } else {
+            SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(
+                    SchedulerTaskHistoryDBItem.class, Long.parseLong(taskFilter.getTaskId()));
+            if (schedulerHistoryDBItem == null) {
+                throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+            }
+            job = schedulerHistoryDBItem.getJobName();
+            if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
+                throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
+            }
+            return schedulerHistoryDBItem.writeGzipLogFile();
+        }
+}
+    
     public String getLogAsString(TaskFilter taskFilter) throws NumberFormatException, SOSHibernateException, DBMissingDataException, IOException {
         byte[] bytes = getLogAsByteArray(taskFilter);
         if (bytes != null) {

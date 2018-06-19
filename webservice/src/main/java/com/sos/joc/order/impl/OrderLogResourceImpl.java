@@ -1,8 +1,10 @@
 package com.sos.joc.order.impl;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -100,7 +102,8 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             logInfo.setSize(null);
             try {
                 if (Files.exists(path)) {
-                    logInfo.setSize(Files.size(path));
+                    //logInfo.setSize(Files.size(path));
+                    logInfo.setSize(getSize(path));
                 }
             } catch (Exception e) {
             }
@@ -137,7 +140,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
                 break;
             default:
                 try {
-                    if (Files.exists(path) && Files.size(path) > Globals.maxSizeOfLogsToDisplay) {
+                    if (Files.exists(path) && getSize(path) > Globals.maxSizeOfLogsToDisplay) {
                         offerredAsDownload = true;
                     }
                 } catch (Exception e) {
@@ -146,9 +149,9 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             }
 
             if ((API_CALL + "/html").equals(apiCall)) {
-                path = logOrderContent.pathOfHtmlPageWithColouredLogContent(path, "Order " + orderHistoryFilter.getHistoryId());
+                path = logOrderContent.pathOfHtmlPageWithColouredGzipLogContent(path, "Order " + orderHistoryFilter.getHistoryId());
             } else if ((API_CALL).equals(apiCall) && orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
-                path = logOrderContent.pathOfHtmlWithColouredLogContent(path);
+                path = logOrderContent.pathOfHtmlWithColouredGzipLogContent(path);
             }
 
             final java.nio.file.Path downPath = path;
@@ -227,7 +230,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
         checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
         java.nio.file.Path path = null;
         try {
-            path = logOrderContent.writeLogFile();
+            path = logOrderContent.writeGzipLogFile();
             return path;
         } catch (Exception e) {
             try {
@@ -255,6 +258,17 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
     private String getLogFilename(OrderHistoryFilter orderHistoryFilter) {
         return String.format("%s,%s.%s.order.log", Paths.get(orderHistoryFilter.getJobChain()).getFileName().toString(), orderHistoryFilter
                 .getOrderId(), orderHistoryFilter.getHistoryId());
+    }
+    
+    private long getSize(java.nio.file.Path path) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(path.toFile(), "r");
+        raf.seek(raf.length() - 4);
+        int b4 = raf.read();
+        int b3 = raf.read();
+        int b2 = raf.read();
+        int b1 = raf.read();
+        raf.close();
+        return ((long)b1 << 24) | ((long)b2 << 16) | ((long)b3 << 8) | (long)b4;
     }
 
 }
