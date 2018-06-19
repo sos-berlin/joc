@@ -34,7 +34,6 @@ public interface IJobSchedulerLogResource {
 
     @POST
     @Path("log/info")
-    @CompressedAlready
     @Consumes("application/json")
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse getLogInfo(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,

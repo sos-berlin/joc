@@ -3,6 +3,7 @@ package com.sos.joc.jobscheduler.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -117,8 +118,9 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
 
     public JOCDefaultResponse getLogInfo(String accessToken, HostPortParameter hostPortParamSchema) throws Exception {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "/html", hostPortParamSchema, accessToken, hostPortParamSchema.getJobschedulerId(),
-                    getPermissonsJocCockpit(hostPortParamSchema.getJobschedulerId(), accessToken).getJobschedulerMaster().getView().isMainlog());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "/html", hostPortParamSchema, accessToken, hostPortParamSchema
+                    .getJobschedulerId(), getPermissonsJocCockpit(hostPortParamSchema.getJobschedulerId(), accessToken).getJobschedulerMaster()
+                            .getView().isMainlog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -134,7 +136,7 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             logInfo.setSize(0L);
             try {
                 if (Files.exists(responseEntity)) {
-                    logInfo.setSize(Files.size(responseEntity));
+                    logInfo.setSize(getSize(responseEntity));
                 }
             } catch (Exception e) {
             }
@@ -160,15 +162,15 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             if (hostPortParamSchema.getFilename() != null && !hostPortParamSchema.getFilename().isEmpty()) {
                 java.nio.file.Path path = Paths.get(System.getProperty("java.io.tmpdir"), hostPortParamSchema.getFilename());
                 if (Files.exists(path)) {
-                    return Files.move(path, path.getParent().resolve(path.getFileName().toString()+".log"), StandardCopyOption.ATOMIC_MOVE);
+                    return Files.move(path, path.getParent().resolve(path.getFileName().toString() + ".log"), StandardCopyOption.ATOMIC_MOVE);
                 }
             }
         }
         checkRequiredParameter("jobschedulerId", hostPortParamSchema.getJobschedulerId());
         getJobSchedulerInstanceByHostPort(hostPortParamSchema.getHost(), hostPortParamSchema.getPort(), hostPortParamSchema.getJobschedulerId());
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-        String xmlCommand = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders", "/does/not/exist");
-        jocXmlCommand.executePostWithThrowBadRequestAfterRetry(xmlCommand, accessToken);
+        jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders",
+                "/does/not/exist"), accessToken);
         String logFilename = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/state/@log_file", null);
         if (logFilename == null) {
             throw new JobSchedulerBadRequestException("could not determine logfile name");
@@ -183,6 +185,17 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
         jocJsonCommand.setUriBuilderForMainLog(logFilename);
         // final byte[] responseEntity = jocJsonCommand.getByteArrayFromGet(jocJsonCommand.getURI(), accessToken, "text/plain,application/octet-stream");
         return jocJsonCommand.getFilePathFromGet(jocJsonCommand.getURI(), accessToken, "text/plain,application/octet-stream", true);
+    }
+    
+    private long getSize(java.nio.file.Path path) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(path.toFile(), "r");
+        raf.seek(raf.length() - 4);
+        int b4 = raf.read();
+        int b3 = raf.read();
+        int b2 = raf.read();
+        int b1 = raf.read();
+        raf.close();
+        return ((long)b1 << 24) | ((long)b2 << 16) | ((long)b3 << 8) | (long)b4;
     }
 
 }
