@@ -138,23 +138,28 @@ public class JocCockpitProperties {
     
     public long getFileSizeProperty(String property, long defaultValue) {
         String s = getProperty(property);
-        if (s == null){
+        if (s == null) {
             return defaultValue;
         } else {
-            try{
+            try {
                 if (!s.trim().toUpperCase().matches("\\d+(K|M|G)?B?")) {
                     throw new NumberFormatException("");
                 }
                 long value = Long.parseLong(s.trim().replaceFirst("\\D*$", ""));
-                String unit = s.toUpperCase().replaceFirst("^\\d+", "").replaceFirst("B$", "");
+                String unit = s.toUpperCase().replaceFirst("^\\d+", "").replaceFirst("B$", "").trim();
                 switch (unit) {
-                case "K": return value*1024;
-                case "M": return value*1024*1024;
-                case "G": return value*1024*1024*1024;
-                default: return value;
+                case "K":
+                    return value * 1024;
+                case "M":
+                    return value * 1024 * 1024;
+                case "G":
+                    return value * 1024 * 1024 * 1024;
+                default:
+                    return value;
                 }
-            } catch (NumberFormatException e){
-                LOGGER.warn(String.format("Property value for %1$s is not of format [0-9]+(K|M|G)?B?. Returning default %2$s", property, defaultValue));
+            } catch (NumberFormatException e) {
+                LOGGER.warn(String.format("Property value for %1$s is not of format [0-9]+(K|M|G)?B?. Returning default %2$s", property,
+                        defaultValue));
                 return defaultValue;
             }
         }

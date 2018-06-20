@@ -325,7 +325,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         }
     }
     
-    public Path getFilePathFromGet(URI uri, String csrfToken, String acceptHeader, boolean withGzipEncoding) throws JocException {
+    public Path getFilePathFromGet(URI uri, String csrfToken, String prefix, String acceptHeader, boolean withGzipEncoding) throws JocException {
         if (acceptHeader != null && !acceptHeader.isEmpty()) {
             addHeader("Accept", acceptHeader);
         }
@@ -334,7 +334,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         JocError jocError = new JocError();
         jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         try {
-            return getFilePathFromResponse(getFilePathByRestService(uri, withGzipEncoding), uri, jocError);
+            return getFilePathFromResponse(getFilePathByRestService(uri, prefix, withGzipEncoding), uri, jocError);
         } catch (SOSConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);

@@ -2,6 +2,7 @@ package com.sos.joc.db.history.task;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -56,7 +57,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                     throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
                 }
-                return schedulerHistoryDBItem.writeLogFile();
+                return schedulerHistoryDBItem.writeLogFile(getPrefix(taskFilter.getTaskId(), job));
             } else {
                 SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(
                         SchedulerTaskHistoryDBItem.class, Long.parseLong(taskFilter.getTaskId()));
@@ -67,7 +68,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                     throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
                 }
-                return schedulerHistoryDBItem.writeLogFile();
+                return schedulerHistoryDBItem.writeLogFile(getPrefix(taskFilter.getTaskId(), job));
             }
     }
     
@@ -82,7 +83,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
             if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                 throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
             }
-            return schedulerHistoryDBItem.writeGzipLogFile();
+            return schedulerHistoryDBItem.writeGzipLogFile(getPrefix(taskFilter.getTaskId(), job));
         } else {
             SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(
                     SchedulerTaskHistoryDBItem.class, Long.parseLong(taskFilter.getTaskId()));
@@ -93,7 +94,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
             if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                 throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
             }
-            return schedulerHistoryDBItem.writeGzipLogFile();
+            return schedulerHistoryDBItem.writeGzipLogFile(getPrefix(taskFilter.getTaskId(), job));
         }
 }
     
@@ -107,6 +108,15 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
 
     public String getJob() {
         return job;
+    }
+    
+    private String getPrefix(String taskId, String jobName) {
+        String prefix = taskId + "";
+        if (jobName != null && !jobName.isEmpty()) {
+            prefix = Paths.get(jobName).getFileName().toString() + "." + prefix;
+        }
+        prefix = "sos-" + prefix + ".task.log-download-";
+        return prefix;
     }
 
 }

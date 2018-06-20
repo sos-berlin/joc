@@ -2,6 +2,7 @@ package com.sos.joc.db.history.order;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -60,7 +61,7 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
                     .getSchedulerId())) {
                 throw new DBMissingDataException(msg);
             }
-            return schedulerHistoryDBItem.writeLogFile();
+            return schedulerHistoryDBItem.writeLogFile(getPrefix(orderHistoryFilter));
         } else {
             SchedulerOrderHistoryDBItem schedulerHistoryDBItem = (SchedulerOrderHistoryDBItem) this.getSession().get(
                     SchedulerOrderHistoryDBItem.class, Long.parseLong(orderHistoryFilter.getHistoryId()));
@@ -71,7 +72,7 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
                     .getSchedulerId())) {
                 throw new DBMissingDataException(msg);
             }
-            return schedulerHistoryDBItem.writeLogFile();
+            return schedulerHistoryDBItem.writeLogFile(getPrefix(orderHistoryFilter));
         }
     }
 
@@ -89,7 +90,7 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
                     .getSchedulerId())) {
                 throw new DBMissingDataException(msg);
             }
-            return schedulerHistoryDBItem.writeGzipLogFile();
+            return schedulerHistoryDBItem.writeGzipLogFile(getPrefix(orderHistoryFilter));
         } else {
             SchedulerOrderHistoryDBItem schedulerHistoryDBItem = (SchedulerOrderHistoryDBItem) this.getSession().get(
                     SchedulerOrderHistoryDBItem.class, Long.parseLong(orderHistoryFilter.getHistoryId()));
@@ -100,7 +101,7 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
                     .getSchedulerId())) {
                 throw new DBMissingDataException(msg);
             }
-            return schedulerHistoryDBItem.writeGzipLogFile();
+            return schedulerHistoryDBItem.writeGzipLogFile(getPrefix(orderHistoryFilter));
         }
     }
 
@@ -111,6 +112,11 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
             return new String(bytes);
         }
         return null;
+    }
+    
+    private String getPrefix(OrderHistoryFilter orderHistoryFilter) {
+        return String.format("sos-%s,%s.%s.order.log-download-", Paths.get(orderHistoryFilter.getJobChain()).getFileName().toString(), orderHistoryFilter
+                .getOrderId(), orderHistoryFilter.getHistoryId());
     }
 
 }

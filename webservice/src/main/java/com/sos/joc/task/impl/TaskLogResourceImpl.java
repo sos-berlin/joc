@@ -187,8 +187,7 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
                 }
             };
             if (offerredAsDownload) {
-                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(logTaskContent.getJob(), taskFilter
-                        .getTaskId()));
+                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(path));
             } else {
                 if ((API_CALL + "/html").equals(apiCall)) {
                     return JOCDefaultResponse.responseHtmlStatus200(fileStream);
@@ -249,12 +248,8 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
         return taskFilter;
     }
 
-    private String getFileName(String jobName, String taskId) {
-        String fileName = taskId + ".task.log";
-        if (jobName != null && !jobName.isEmpty()) {
-            fileName = Paths.get(jobName).getFileName() + "." + fileName;
-        }
-        return fileName;
+    private String getFileName(java.nio.file.Path path) {
+        return path.getFileName().toString().replaceFirst("^sos-(.*)-download-.+\\.tmp(\\.log)*$", "$1");
     }
     
     private long getSize(java.nio.file.Path path) throws IOException {

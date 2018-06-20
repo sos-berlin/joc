@@ -173,7 +173,7 @@ public class LogContent {
     
     private Path pathOfColouredLog(Path path, String title) throws IOException {
         BufferedReader br = Files.newBufferedReader(path);
-        Path targetPath = Files.createTempFile("sos-download-", null);
+        Path targetPath = path.getParent().resolve(path.getFileName().toString()+".log");
         OutputStream out = Files.newOutputStream(targetPath);
         if (title != null) {
             out.write(String.format(HTML_START, title).getBytes());
@@ -193,7 +193,7 @@ public class LogContent {
     
     private Path pathOfColouredGzipLog(Path path, String title) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new GZIPInputStream(Files.newInputStream(path))));
-        Path targetPath = Files.createTempFile("sos-download-", null);
+        Path targetPath = path.getParent().resolve(path.getFileName().toString()+".log");
         OutputStream out = new GZIPOutputStream(Files.newOutputStream(targetPath));
         if (title != null) {
             out.write(String.format(HTML_START, title).getBytes());

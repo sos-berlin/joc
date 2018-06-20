@@ -188,7 +188,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
                 }
             };
             if (offerredAsDownload) {
-                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getLogFilename(orderHistoryFilter));
+                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(path));
             } else {
                 if ((API_CALL + "/html").equals(apiCall)) {
                     return JOCDefaultResponse.responseHtmlStatus200(fileStream);
@@ -255,9 +255,8 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
         return orderHistoryFilter;
     }
 
-    private String getLogFilename(OrderHistoryFilter orderHistoryFilter) {
-        return String.format("%s,%s.%s.order.log", Paths.get(orderHistoryFilter.getJobChain()).getFileName().toString(), orderHistoryFilter
-                .getOrderId(), orderHistoryFilter.getHistoryId());
+    private String getFileName(java.nio.file.Path path) {
+        return path.getFileName().toString().replaceFirst("^sos-(.*)-download-.+\\.tmp(\\.log)*$", "$1");
     }
     
     private long getSize(java.nio.file.Path path) throws IOException {

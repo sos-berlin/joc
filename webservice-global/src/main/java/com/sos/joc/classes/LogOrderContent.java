@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
@@ -147,7 +148,7 @@ public class LogOrderContent extends LogContent {
         }
         Path path = null;
         try {
-            path = Files.createTempFile("sos-download-", null);
+            path = Files.createTempFile(getPrefix(), null);
             Files.write(path, orderLog.getBytes());
             return path;
         } catch (IOException e) {
@@ -167,7 +168,7 @@ public class LogOrderContent extends LogContent {
         Path path = null;
         GZIPOutputStream gzip = null;
         try {
-            path = Files.createTempFile("sos-download-", null);
+            path = Files.createTempFile(getPrefix(), null);
             gzip = new GZIPOutputStream(new FileOutputStream(path.toFile()));
             gzip.write(orderLog.getBytes());
             return path;
@@ -185,5 +186,10 @@ public class LogOrderContent extends LogContent {
             } catch (Exception e1) {
             }
         }
+    }
+    
+    private String getPrefix() {
+        return String.format("sos-%s,%s.%s.order.log-download-", Paths.get(orderHistoryFilter.getJobChain()).getFileName().toString(),
+                orderHistoryFilter.getOrderId(), orderHistoryFilter.getHistoryId());
     }
 }

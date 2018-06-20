@@ -35,7 +35,7 @@ public interface IJobSchedulerLogResource {
     @POST
     @Path("log/info")
     @Consumes("application/json")
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getLogInfo(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             HostPortParameter hostPortParamSchema) throws Exception;
 

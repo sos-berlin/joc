@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
@@ -121,8 +122,9 @@ public class LogTaskContent extends LogContent {
             try {
                 Globals.beginTransaction(sosHibernateSession);
                 JobSchedulerTaskHistoryDBLayer jobSchedulerTaskHistoryDBLayer = new JobSchedulerTaskHistoryDBLayer(sosHibernateSession);
+                Path path = jobSchedulerTaskHistoryDBLayer.writeGzipLogFile(taskFilter);
                 job = jobSchedulerTaskHistoryDBLayer.getJob();
-                return jobSchedulerTaskHistoryDBLayer.writeGzipLogFile(taskFilter);
+                return path;
             } finally {
                 Globals.rollback(sosHibernateSession);
             }
@@ -149,7 +151,7 @@ public class LogTaskContent extends LogContent {
         }
         Path path = null;
         try {
-            path = Files.createTempFile("sos-download-", null);
+            path = Files.createTempFile(getPrefix(), null);
             Files.write(path, taskLog.getBytes());
             return path;
         } catch (IOException e) {
@@ -169,7 +171,7 @@ public class LogTaskContent extends LogContent {
         Path path = null;
         GZIPOutputStream gzip = null;
         try {
-            path = Files.createTempFile("sos-download-", null);
+            path = Files.createTempFile(getPrefix(), null);
             gzip = new GZIPOutputStream(new FileOutputStream(path.toFile()));
             gzip.write(taskLog.getBytes());
             return path;
@@ -187,6 +189,15 @@ public class LogTaskContent extends LogContent {
             } catch (Exception e1) {
             }
         }
+    }
+    
+    private String getPrefix() {
+        String prefix = taskFilter.getTaskId() + "";
+        if (job != null && !job.isEmpty()) {
+            prefix = Paths.get(job).getFileName().toString() + "." + prefix;
+        }
+        prefix = "sos-" + prefix + ".task.log-download-";
+        return prefix;
     }
 
     public String getJob() {

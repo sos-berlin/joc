@@ -100,7 +100,7 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
                 }
             };
 
-            return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, hostPortParamSchema.getFilename());
+            return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(responseEntity));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -176,7 +176,6 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             throw new JobSchedulerBadRequestException("could not determine logfile name");
         }
         logFilename = Paths.get(logFilename).getFileName().toString();
-        hostPortParamSchema.setFilename(logFilename);
 
         // increase timeout for large log files
         int socketTimeout = Math.max(Globals.httpSocketTimeout, 30000);
@@ -184,7 +183,11 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
         jocJsonCommand.setSocketTimeout(socketTimeout);
         jocJsonCommand.setUriBuilderForMainLog(logFilename);
         // final byte[] responseEntity = jocJsonCommand.getByteArrayFromGet(jocJsonCommand.getURI(), accessToken, "text/plain,application/octet-stream");
-        return jocJsonCommand.getFilePathFromGet(jocJsonCommand.getURI(), accessToken, "text/plain,application/octet-stream", true);
+        return jocJsonCommand.getFilePathFromGet(jocJsonCommand.getURI(), accessToken, "sos-" + logFilename + "-download-", "text/plain,application/octet-stream", true);
+    }
+    
+    private String getFileName(java.nio.file.Path path) {
+        return path.getFileName().toString().replaceFirst("^sos-(.*)-download-.+\\.tmp(\\.log)*$", "$1");
     }
     
     private long getSize(java.nio.file.Path path) throws IOException {
