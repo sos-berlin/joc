@@ -38,5 +38,28 @@ public interface IJobSchedulerLogResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getLogInfo(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             HostPortParameter hostPortParamSchema) throws Exception;
+    
+    @GET
+    @Path("debuglog")
+    @CompressedAlready
+    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    public JOCDefaultResponse getDebugLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+            @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId, @QueryParam("host") String host,
+            @QueryParam("port") Integer port, @QueryParam("filename") String filename) throws Exception;
+
+    @POST
+    @Path("debuglog")
+    @CompressedAlready
+    @Consumes("application/json")
+    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    public JOCDefaultResponse getDebugLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+            HostPortParameter hostPortParamSchema) throws Exception;
+
+    @POST
+    @Path("debuglog/info")
+    @Consumes("application/json")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse getDebugLogInfo(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+            HostPortParameter hostPortParamSchema) throws Exception;
 
 }

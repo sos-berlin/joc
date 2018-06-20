@@ -439,6 +439,31 @@ traits:
           schema200: logInfo
           example: !include examples/order/filteredOrderWithHistoryId-example.json
           example200: !include examples/common/logInfo-example.json
+  /debuglog:
+    type:
+      postURLWithPlainResponse:
+        description: Provides JobScheduler debug log as download
+    /info:
+      type:
+        postJSON:
+          description: Log info (temp. filename, size)
+          description1: |
+            <tr><td>``host``</td><td>optional, string</td><td>host of the JobScheduler Master<br/><b>This parameter is required for a specific JobScheduler in a cluster</b></td><td>localhost</td><td></td></tr>
+          description2: |
+            <tr><td>``port``</td><td>optional, string</td><td>port of the JobScheduler Master<br/><b>This parameter is required for a specific JobScheduler in a cluster</b></td><td>4444</td><td></td></tr>
+          description3: " "
+          description4: " "
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: !include documentation/jobscheduler/logInfo.md
+          schema: jsFilterWithUrl
+          schema200: logInfo
+          example: !include examples/order/filteredOrderWithHistoryId-example.json
+          example200: !include examples/common/logInfo-example.json
   /cleanup:
     type:
       postURLWithOkResponse:
