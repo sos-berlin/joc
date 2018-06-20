@@ -116,7 +116,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
             prefix = Paths.get(jobName).getFileName().toString() + "." + prefix;
         }
         prefix = "sos-" + prefix + ".task.log-download-";
-        return prefix;
+        return prefix.replace(',', '.');
     }
 
 }
