@@ -84,6 +84,9 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             if (order.getParams() != null && order.getParams().isEmpty()) {
                 order.setParams(null);
             }
+            if (order.getCalendars() != null && order.getCalendars().isEmpty()) {
+                order.setCalendars(null);
+            }
             ModifyOrderAudit orderAudit = new ModifyOrderAudit(order, modifyOrders);
             logAuditMessage(orderAudit);
 

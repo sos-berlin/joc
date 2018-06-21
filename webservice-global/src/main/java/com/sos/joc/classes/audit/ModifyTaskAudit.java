@@ -17,7 +17,7 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     @JsonIgnore
     private String folder;
     
-    @JsonIgnore
+    //@JsonIgnore
     private String job;
     
     @JsonIgnore
@@ -83,7 +83,7 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     }
 
     @Override
-    @JsonIgnore
+    //@JsonIgnore
     public String getJob() {
         return job;
     }

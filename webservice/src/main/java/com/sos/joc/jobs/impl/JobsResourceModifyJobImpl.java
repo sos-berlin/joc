@@ -157,6 +157,9 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 	private Date executeModifyJobCommand(ModifyJob modifyJob, ModifyJobs modifyJobs, String command) {
 
 		try {
+		    if (modifyJob.getCalendars() != null && modifyJob.getCalendars().isEmpty()) {
+		        modifyJob.setCalendars(null);
+            }
 			ModifyJobAudit jobAudit = new ModifyJobAudit(modifyJob, modifyJobs);
 			logAuditMessage(jobAudit);
 

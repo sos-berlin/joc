@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.SOSPermissionsCreator;
 import com.sos.auth.rest.SOSShiroFolderPermissions;
 import com.sos.auth.rest.SOSShiroSession;
@@ -242,8 +243,15 @@ public class JOCResourceImpl {
 	}
 
 	public String getJsonString(Object body) {
-		return jocAuditLog.getJsonString(body);
-	}
+        if (body != null) {
+            try {
+                return new ObjectMapper().writeValueAsString(body);
+            } catch (Exception e) {
+                return body.toString();
+            }
+        }
+        return "-";
+    }
 
 	public String getUrl() {
 		return dbItemInventoryInstance.getUrl();

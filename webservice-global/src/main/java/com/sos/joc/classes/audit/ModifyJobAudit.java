@@ -14,8 +14,8 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
     @JsonIgnore
     private String folder;
     
-    @JsonIgnore
-    private String job;
+//    //@JsonIgnore
+//    private String job;
     
     @JsonIgnore
     private String comment;
@@ -26,7 +26,7 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
     @JsonIgnore
     private String ticketLink;
     
-    @JsonIgnore
+    //@JsonIgnore
     private String jobschedulerId;
     
     public ModifyJobAudit(ModifyJob modifyJob, ModifyJobs modifyJobs) {
@@ -37,7 +37,7 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
             if (modifyJob.getJob() != null) {
                 Path p = Paths.get(modifyJob.getJob());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                this.job = p.toString().replace('\\', '/');
+                //this.job = p.toString().replace('\\', '/');
             }
         }
         if (modifyJobs != null) {
@@ -66,11 +66,11 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
         return folder;
     }
 
-    @Override
-    @JsonIgnore
-    public String getJob() {
-        return job;
-    }
+//    @Override
+//    //@JsonIgnore
+//    public String getJob() {
+//        return job;
+//    }
 
     @Override
     @JsonIgnore
@@ -103,7 +103,7 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
     }
 
     @Override
-    @JsonIgnore
+    //@JsonIgnore
     public String getJobschedulerId() {
         return jobschedulerId;
     }

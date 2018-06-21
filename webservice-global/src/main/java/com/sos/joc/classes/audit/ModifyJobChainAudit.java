@@ -14,8 +14,8 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
     @JsonIgnore
     private String folder;
     
-    @JsonIgnore
-    private String jobChain;
+//    //@JsonIgnore
+//    private String jobChain;
     
     @JsonIgnore
     private String comment;
@@ -26,7 +26,7 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
     @JsonIgnore
     private String ticketLink;
     
-    @JsonIgnore
+    //@JsonIgnore
     private String jobschedulerId;
     
     public ModifyJobChainAudit(ModifyJobChain modifyJobChain, ModifyJobChains modifyJobChains) {
@@ -35,7 +35,7 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
             if (modifyJobChain.getJobChain() != null) {
                 Path p = Paths.get(modifyJobChain.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                this.jobChain = p.toString().replace('\\', '/');
+                //this.jobChain = p.toString().replace('\\', '/');
             }
         }
         if (modifyJobChains != null) {
@@ -82,11 +82,11 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
         return null;
     }
 
-    @Override
-    @JsonIgnore
-    public String getJobChain() {
-        return jobChain;
-    }
+//    @Override
+//    //@JsonIgnore
+//    public String getJobChain() {
+//        return jobChain;
+//    }
 
     @Override
     @JsonIgnore
@@ -101,7 +101,7 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
     }
 
     @Override
-    @JsonIgnore
+    //@JsonIgnore
     public String getJobschedulerId() {
         return jobschedulerId;
     }

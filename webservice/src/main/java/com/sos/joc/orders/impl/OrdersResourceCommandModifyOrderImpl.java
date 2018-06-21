@@ -176,6 +176,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             if (order.getParams() != null && order.getParams().isEmpty()) {
                 order.setParams(null);
             }
+            if (order.getCalendars() != null && order.getCalendars().isEmpty()) {
+                order.setCalendars(null);
+            }
             ModifyOrderAudit orderAudit = new ModifyOrderAudit(order, modifyOrders);
             logAuditMessage(orderAudit);
 
@@ -305,7 +308,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders)
             throws JocException {
         Date surveyDate = Date.from(Instant.now());
-        ;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyOrders, accessToken, modifyOrders.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {

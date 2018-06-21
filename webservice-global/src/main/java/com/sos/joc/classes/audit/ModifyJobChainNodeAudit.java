@@ -14,8 +14,8 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNode implements IAudi
     @JsonIgnore
     private String folder;
     
-    @JsonIgnore
-    private String jobChain;
+//    //@JsonIgnore
+//    private String jobChain;
     
     @JsonIgnore
     private String comment;
@@ -26,7 +26,7 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNode implements IAudi
     @JsonIgnore
     private String ticketLink;
     
-    @JsonIgnore
+    //@JsonIgnore
     private String jobschedulerId;
     
     public ModifyJobChainNodeAudit(ModifyJobChainNode modifyJobChainNode, ModifyJobChainNodes jobChainNodes) {
@@ -36,7 +36,7 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNode implements IAudi
             if (modifyJobChainNode.getJobChain() != null) {
                 Path p = Paths.get(modifyJobChainNode.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                this.jobChain = p.toString().replace('\\', '/');
+                //this.jobChain = p.toString().replace('\\', '/');
             }
         }
         if (jobChainNodes != null) {
@@ -83,11 +83,11 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNode implements IAudi
         return null;
     }
 
-    @Override
-    @JsonIgnore
-    public String getJobChain() {
-        return jobChain;
-    }
+//    @Override
+//    //@JsonIgnore
+//    public String getJobChain() {
+//        return jobChain;
+//    }
 
     @Override
     @JsonIgnore
@@ -102,7 +102,7 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNode implements IAudi
     }
 
     @Override
-    @JsonIgnore
+    //@JsonIgnore
     public String getJobschedulerId() {
         return jobschedulerId;
     }

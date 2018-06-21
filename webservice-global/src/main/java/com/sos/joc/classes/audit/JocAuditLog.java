@@ -66,43 +66,45 @@ public class JocAuditLog {
     }
 
     public void storeAuditLogEntry(IAuditLog body) {
-        String jobSchedulerId = body.getJobschedulerId();
-        if (jobSchedulerId == null || jobSchedulerId.isEmpty()) {
-            jobSchedulerId = "-";
-        }
-        DBItemAuditLog auditLogToDb = new DBItemAuditLog();
-        auditLogToDb.setSchedulerId(jobSchedulerId);
-        auditLogToDb.setAccount(user);
-        auditLogToDb.setRequest(request);
-        auditLogToDb.setParameters(getJsonString(body));
-        auditLogToDb.setJob(body.getJob());
-        auditLogToDb.setJobChain(body.getJobChain());
-        auditLogToDb.setOrderId(body.getOrderId());
-        auditLogToDb.setFolder(body.getFolder());
-        auditLogToDb.setComment(body.getComment());
-        auditLogToDb.setTicketLink(body.getTicketLink());
-        auditLogToDb.setTimeSpent(body.getTimeSpent());
-        auditLogToDb.setCalendar(body.getCalendar());
-        auditLogToDb.setCreated(Date.from(Instant.now()));
-        SOSHibernateSession connection = null;
-        try {
-            connection = Globals.createSosHibernateStatelessConnection("storeAuditLogEntry");
-            connection.save(auditLogToDb);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        } finally {
-            Globals.disconnect(connection); 
+        if (body != null) {
+            String jobSchedulerId = body.getJobschedulerId();
+            if (jobSchedulerId == null || jobSchedulerId.isEmpty()) {
+                jobSchedulerId = "-";
+            }
+            DBItemAuditLog auditLogToDb = new DBItemAuditLog();
+            auditLogToDb.setSchedulerId(jobSchedulerId);
+            auditLogToDb.setAccount(user);
+            auditLogToDb.setRequest(request);
+            auditLogToDb.setParameters(getJsonString(body));
+            auditLogToDb.setJob(body.getJob());
+            auditLogToDb.setJobChain(body.getJobChain());
+            auditLogToDb.setOrderId(body.getOrderId());
+            auditLogToDb.setFolder(body.getFolder());
+            auditLogToDb.setComment(body.getComment());
+            auditLogToDb.setTicketLink(body.getTicketLink());
+            auditLogToDb.setTimeSpent(body.getTimeSpent());
+            auditLogToDb.setCalendar(body.getCalendar());
+            auditLogToDb.setCreated(Date.from(Instant.now()));
+            SOSHibernateSession connection = null;
+            try {
+                connection = Globals.createSosHibernateStatelessConnection("storeAuditLogEntry");
+                connection.save(auditLogToDb);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            } finally {
+                Globals.disconnect(connection);
+            }
         }
     }
     
-    public String getJsonString(Object body) {
-        if (body != null) {
-            try {
-                return new ObjectMapper().writeValueAsString(body);
-            } catch (Exception e) {
-                return body.toString();
-            }
+    private String getJsonString(IAuditLog body) {
+        if (body == null) {
+            return "-";
         }
-        return "-";
+        try {
+            return new ObjectMapper().writeValueAsString(body);
+        } catch (Exception e) {
+            return body.toString();
+        }
     }
 }
