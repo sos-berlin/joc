@@ -197,7 +197,7 @@ public class LogTaskContent extends LogContent {
             prefix = Paths.get(job).getFileName().toString() + "." + prefix;
         }
         prefix = "sos-" + prefix + ".task.log-download-";
-        return prefix.replace(',', '.');
+        return prefix.replace(',', '.').replaceAll("['\"|:*?<>/\\]", "");
     }
 
     public String getJob() {

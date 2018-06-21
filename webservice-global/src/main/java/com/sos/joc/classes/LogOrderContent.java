@@ -190,6 +190,6 @@ public class LogOrderContent extends LogContent {
     
     private String getPrefix() {
         return String.format("sos-%s.%s.%s.order.log-download-", Paths.get(orderHistoryFilter.getJobChain()).getFileName().toString(),
-                orderHistoryFilter.getOrderId(), orderHistoryFilter.getHistoryId()).replace(',', '.');
+                orderHistoryFilter.getOrderId(), orderHistoryFilter.getHistoryId()).replace(',', '.').replaceAll("['\"|:*?<>/\\]", "");
     }
 }

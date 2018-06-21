@@ -116,7 +116,7 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
     
     private String getPrefix(OrderHistoryFilter orderHistoryFilter) {
         return String.format("sos-%s.%s.%s.order.log-download-", Paths.get(orderHistoryFilter.getJobChain()).getFileName().toString(), orderHistoryFilter
-                .getOrderId(), orderHistoryFilter.getHistoryId()).replace(',', '.');
+                .getOrderId(), orderHistoryFilter.getHistoryId()).replace(',', '.').replaceAll("['\"|:*?<>/\\]", "");
     }
 
 }
