@@ -296,10 +296,9 @@ public class JOCResourceImpl {
 		}
 		if (request == null || request.isEmpty()) {
 			request = "-";
-		} else {
-			LOGGER.debug(request);
 		}
 		jocAuditLog = new JocAuditLog(user, request);
+		LOGGER.debug("REQUEST: " + request + ", PARAMS: " + getJsonString(body));
 		jocError.addMetaInfoOnTop("\nREQUEST: " + request, "PARAMS: " + getJsonString(body), "USER: " + user);
 	}
 

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.Globals;
@@ -53,6 +54,13 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     
     private JOCDefaultResponse(Response delegate) {
         super(delegate);
+        if (LOGGER.isDebugEnabled()) { 
+            try {
+                LOGGER.debug("RESPONSE: " + new ObjectMapper().writeValueAsString(delegate.getEntity()));
+            } catch (Exception e) {
+                LOGGER.debug("RESPONSE: " + delegate.getEntity().toString());
+            }
+        }
     }
     
     public static JOCDefaultResponse responseStatus200(Object entity, String mediaType) {
