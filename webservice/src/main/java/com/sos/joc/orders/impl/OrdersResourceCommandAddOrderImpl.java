@@ -92,7 +92,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             xml.addAttribute("job_chain", normalizePath(order.getJobChain()));
 
             if (order.getOrderId() != null && !order.getOrderId().isEmpty()) {
-                xml.addAttribute("id", normalizePath(order.getOrderId()));
+                xml.addAttribute("id", order.getOrderId());
             }
             if ((order.getAt() == null || "".equals(order.getAt())) && (order.getRunTime() == null || "".equals(order.getRunTime()))) {
                 xml.addAttribute("at", "now");
