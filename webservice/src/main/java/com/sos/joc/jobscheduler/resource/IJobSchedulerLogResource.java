@@ -41,7 +41,7 @@ public interface IJobSchedulerLogResource {
     
     @GET
     @Path("debuglog")
-    @CompressedAlready
+    //@CompressedAlready
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse getDebugLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId, @QueryParam("host") String host,
@@ -49,7 +49,7 @@ public interface IJobSchedulerLogResource {
 
     @POST
     @Path("debuglog")
-    @CompressedAlready
+    //@CompressedAlready
     @Consumes("application/json")
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse getDebugLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,

@@ -417,7 +417,8 @@ traits:
   /log:
     type:
       postURLWithPlainResponse:
-        description: Provides JobScheduler main log as download
+        description: Provides JobScheduler main log (scheduler-[timestamp].[jobschedulerId].log) as download
+        description200: Content of main log (scheduler-[timestamp].[jobschedulerId].log) for download
     /info:
       type:
         postJSON:
@@ -442,7 +443,8 @@ traits:
   /debuglog:
     type:
       postURLWithPlainResponse:
-        description: Provides JobScheduler debug log as download
+        description: Provides JobScheduler debug log (scheduler.log) as download in gzip format
+        description200: Content of debug log (scheduler.log) for download in gzip format
     /info:
       type:
         postJSON:

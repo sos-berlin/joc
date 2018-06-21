@@ -101,7 +101,7 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
                 }
             };
 
-            return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(responseEntity));
+            return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(apiCall, responseEntity));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -224,8 +224,12 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
         return jocJsonCommand.getFilePathFromGet(jocJsonCommand.getURI(), accessToken, "sos-" + logFilename + "-download-", "text/plain,application/octet-stream", true);
     }
     
-    private String getFileName(java.nio.file.Path path) {
-        return path.getFileName().toString().replaceFirst("^sos-(.*)-download-.+\\.tmp(\\.log)*$", "$1");
+    private String getFileName(String apiCall, java.nio.file.Path path) {
+        String targetFilename = path.getFileName().toString().replaceFirst("^sos-(.*)-download-.+\\.tmp(\\.log)*$", "$1");
+        if (DEBUGLOG_API_CALL.equals(apiCall)) {
+            targetFilename += ".gz";
+        }
+        return targetFilename;
     }
     
     private long getSize(java.nio.file.Path path) throws IOException {
