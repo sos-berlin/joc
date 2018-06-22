@@ -1,19 +1,12 @@
 package com.sos.joc.event.impl;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-
 import javax.ws.rs.Path;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.jitl.eventing.db.SchedulerEventDBItem;
@@ -33,7 +26,6 @@ import com.sos.joc.model.event.custom.EventsFilter;
 public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustomEventsResource {
 
 	private static final String API_CALL = "./events/custom/";
-	private static final String EXPIRES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	private Date utc2LocalTime(Date expiresUtc) {
 		String toTimeZoneString = DateTimeZone.getDefault().getID();
@@ -44,19 +36,7 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
 		return expiresLocal;
 	}
 
-	private Date getUtcExpiredTime(Date dateFrom) throws ParseException {
-		SimpleDateFormat isoFormat = new SimpleDateFormat(EXPIRES_DATE_FORMAT);
-		isoFormat.setTimeZone(TimeZone.getTimeZone(DateTimeZone.getDefault().getID()));
-		DateFormat df = new SimpleDateFormat(EXPIRES_DATE_FORMAT);
-		String dateFromAsString = df.format(dateFrom);
-		Date date = isoFormat.parse(dateFromAsString);
-		SimpleDateFormat sdfUtc = new SimpleDateFormat(EXPIRES_DATE_FORMAT);
-		TimeZone tzUtc = TimeZone.getTimeZone("UTC");
-		sdfUtc.setTimeZone(tzUtc);
-		String sDateUtc = sdfUtc.format(date); // Convert to String first
-		return sdfUtc.parse(sDateUtc); // Create a new Date object
-	}
-
+	
 	@Override
 	public JOCDefaultResponse postCustomEvents(String accessToken, EventsFilter eventFilter) {
 

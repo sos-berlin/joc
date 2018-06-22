@@ -29,9 +29,12 @@ import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SOSPermissionsCreator {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(SOSPermissionsCreator.class);
 	private SOSShiroCurrentUser currentUser;
 	private SOSPermissionRoles roles;
 	private Ini ini;
@@ -42,17 +45,22 @@ public class SOSPermissionsCreator {
 	}
 
 	public void loginFromAccessToken(String accessToken) throws JocException {
-
+ 
 		if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null
 				|| Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken) == null) {
+
+			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> hand over session.");
+			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> login with accessToken=" + accessToken);
 			Globals.sosShiroProperties = new JocCockpitProperties();
 			Globals.setProperties();
 
 			SOSHibernateSession sosHibernateSession = Globals
 					.createSosHibernateStatelessConnection("JOC: loginFromAccessToken");
+			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> hibernateSession created");
 			SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
 			try {
 				sosShiroIniShare.provideIniFile();
+				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> ini file provided");
 			} catch (IOException e) {
 				throw new JocException(e);
 			} catch (SOSHibernateException e) {
@@ -63,15 +71,20 @@ public class SOSPermissionsCreator {
 			IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
 			SecurityManager securityManager = factory.getInstance();
 			SecurityUtils.setSecurityManager(securityManager);
+			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> securityManager created");
 
 			Subject subject = new Subject.Builder().sessionId(accessToken).buildSubject();
+			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject created");
 			if (subject.isAuthenticated()) {
+				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject is authenticated");
 				TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 				currentUser = new SOSShiroCurrentUser((String) subject.getPrincipals().getPrimaryPrincipal(), "", "");
 
 				if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
 					Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
 				}
+
+				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> removeTimedOutUser");
 				Globals.jocWebserviceDataContainer.getCurrentUsersList().removeTimedOutUser(currentUser.getUsername());
 
 				currentUser.setCurrentSubject(subject);
@@ -79,8 +92,11 @@ public class SOSPermissionsCreator {
 
 				SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(
 						accessToken);
+				LOGGER.debug(getClass().getName()
+						+ ": loginFromAccessToken --> JocCockpitPermissionMasterObjectList created");
 				currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
 				currentUser.initFolders();
+				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> folders initialized");
 
 				Section section = getIni().getSection("folders");
 				if (section != null) {
@@ -90,6 +106,9 @@ public class SOSPermissionsCreator {
 				}
 				SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(
 						accessToken);
+				LOGGER.debug(
+						getClass().getName() + ": loginFromAccessToken --> CommandsPermissionMasterObjectList created");
+
 				currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
 				Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
 			}
