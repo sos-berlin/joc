@@ -1,6 +1,5 @@
 package com.sos.joc.order.impl;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -132,27 +131,30 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
                 return jocDefaultResponse;
             }
             LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance, accessToken);
-            boolean offerredAsDownload = false;
             java.nio.file.Path path = getLogPath(logOrderContent, orderHistoryFilter, true);
-            switch (apiCall) {
-            case API_CALL + "/download":
-                offerredAsDownload = true;
-                break;
-            default:
-                try {
-                    if (Files.exists(path) && getSize(path) > Globals.maxSizeOfLogsToDisplay) {
-                        offerredAsDownload = true;
-                    }
-                } catch (Exception e) {
-                }
-                break;
-            }
+//            boolean offerredAsDownload = false;
+//            switch (apiCall) {
+//            case API_CALL + "/download":
+//                offerredAsDownload = true;
+//                break;
+//            default:
+//                try {
+//                    if (Files.exists(path) && getSize(path) > Globals.maxSizeOfLogsToDisplay) {
+//                        offerredAsDownload = true;
+//                    }
+//                } catch (Exception e) {
+//                }
+//                break;
+//            }
+            boolean offerredAsDownload = (API_CALL + "/download").equals(apiCall);
 
             if ((API_CALL + "/html").equals(apiCall)) {
                 path = logOrderContent.pathOfHtmlPageWithColouredGzipLogContent(path, "Order " + orderHistoryFilter.getHistoryId());
             } else if ((API_CALL).equals(apiCall) && orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
                 path = logOrderContent.pathOfHtmlWithColouredGzipLogContent(path);
             }
+            
+            long unCompressedLength = getSize(path);
 
             final java.nio.file.Path downPath = path;
 
@@ -191,9 +193,9 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
                 return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(path));
             } else {
                 if ((API_CALL + "/html").equals(apiCall)) {
-                    return JOCDefaultResponse.responseHtmlStatus200(fileStream);
+                    return JOCDefaultResponse.responseHtmlStatus200(fileStream, unCompressedLength);
                 } else {
-                    return JOCDefaultResponse.responsePlainStatus200(fileStream);
+                    return JOCDefaultResponse.responsePlainStatus200(fileStream, unCompressedLength);
                 }
             }
 

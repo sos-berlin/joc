@@ -63,12 +63,19 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         }
     }
     
-    public static JOCDefaultResponse responseStatus200(Object entity, String mediaType) {
+    public static JOCDefaultResponse responseStatus200(Object entity, String mediaType, Long uncompressedLength) {
         Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", mediaType).cacheControl(setNoCaching());
+        if (uncompressedLength != null) {
+            responseBuilder.header("X-Uncompressed-Length", uncompressedLength);
+        }
         responseBuilder.entity(entity);
         return new JOCDefaultResponse(responseBuilder.build());
     }
 
+    public static JOCDefaultResponse responseStatus200(Object entity, String mediaType) {
+        return responseStatus200(entity, mediaType, null);
+    }
+    
     public static JOCDefaultResponse responseStatus200(Object entity) {
         return responseStatus200(entity, MediaType.APPLICATION_JSON);
     }
@@ -77,8 +84,16 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return responseStatus200(entity, MediaType.TEXT_HTML + "; charset=UTF-8");
     }
     
+    public static JOCDefaultResponse responseHtmlStatus200(Object entity, Long uncompressedLength) {
+        return responseStatus200(entity, MediaType.TEXT_HTML + "; charset=UTF-8", uncompressedLength);
+    }
+    
     public static JOCDefaultResponse responsePlainStatus200(Object entity) {
         return responseStatus200(entity, MediaType.TEXT_PLAIN + "; charset=UTF-8");
+    }
+    
+    public static JOCDefaultResponse responsePlainStatus200(Object entity, Long uncompressedLength) {
+        return responseStatus200(entity, MediaType.TEXT_PLAIN + "; charset=UTF-8", uncompressedLength);
     }
     
     public static JOCDefaultResponse responseTxtDownloadStatus200(Object entity, String filename) {

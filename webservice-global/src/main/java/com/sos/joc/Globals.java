@@ -171,7 +171,7 @@ public class Globals {
         setTrustStore();
         setTrustStoreType();
         setTrustStorePassword();
-        setMaxSizeOfLogsToDisplay();
+        //setMaxSizeOfLogsToDisplay();
         setTimeoutForTempFiles();
         setConfigurationProperties();
     }
@@ -384,13 +384,14 @@ public class Globals {
         }
     }
 
-    private static void setMaxSizeOfLogsToDisplay() {
-        long defaultMaxSizeOfLogsToDisplay = 1024 * 1024 * 10L;
-        if (sosShiroProperties != null) {
-            maxSizeOfLogsToDisplay = sosShiroProperties.getFileSizeProperty("max_size_of_logs_for_display", defaultMaxSizeOfLogsToDisplay);
-            LOGGER.info("max size of logs to display = " + maxSizeOfLogsToDisplay);
-        }
-    }
+// for JOC-483 cancelled but should be implement for 2.0
+//    private static void setMaxSizeOfLogsToDisplay() {
+//        long defaultMaxSizeOfLogsToDisplay = 1024 * 1024 * 10L;
+//        if (sosShiroProperties != null) {
+//            maxSizeOfLogsToDisplay = sosShiroProperties.getFileSizeProperty("max_size_of_logs_for_display", defaultMaxSizeOfLogsToDisplay);
+//            LOGGER.info("max size of logs to display = " + maxSizeOfLogsToDisplay);
+//        }
+//    }
     
     private static void setTimeoutForTempFiles() {
         long defaultTimeout = 1000 * 60 * 3L;

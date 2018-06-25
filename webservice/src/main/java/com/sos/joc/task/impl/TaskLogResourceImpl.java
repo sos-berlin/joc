@@ -131,27 +131,30 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
                 return jocDefaultResponse;
             }
             LogTaskContent logTaskContent = new LogTaskContent(taskFilter, dbItemInventoryInstance, accessToken);
-            boolean offerredAsDownload = false;
             java.nio.file.Path path = getLogPath(logTaskContent, taskFilter, true);
-            switch (apiCall) {
-            case API_CALL + "/download":
-                offerredAsDownload = true;
-                break;
-            default:
-                try {
-                    if (Files.exists(path) && getSize(path) > Globals.maxSizeOfLogsToDisplay) {
-                        offerredAsDownload = true;
-                    }
-                } catch (Exception e) {
-                }
-                break;
-            }
+//            boolean offerredAsDownload = false;
+//            switch (apiCall) {
+//            case API_CALL + "/download":
+//                offerredAsDownload = true;
+//                break;
+//            default:
+//                try {
+//                    if (Files.exists(path) && getSize(path) > Globals.maxSizeOfLogsToDisplay) {
+//                        offerredAsDownload = true;
+//                    }
+//                } catch (Exception e) {
+//                }
+//                break;
+//            }
+            boolean offerredAsDownload = (API_CALL + "/download").equals(apiCall);
 
             if ((API_CALL + "/html").equals(apiCall)) {
                 path = logTaskContent.pathOfHtmlPageWithColouredGzipLogContent(path, "Task " + taskFilter.getTaskId());
             } else if ((API_CALL).equals(apiCall) && taskFilter.getMime() != null && taskFilter.getMime() == LogMime.HTML) {
                 path = logTaskContent.pathOfHtmlWithColouredGzipLogContent(path);
             }
+            
+            long unCompressedLength = getSize(path);
 
             final java.nio.file.Path downPath = path;
 
@@ -190,9 +193,9 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
                 return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(path));
             } else {
                 if ((API_CALL + "/html").equals(apiCall)) {
-                    return JOCDefaultResponse.responseHtmlStatus200(fileStream);
+                    return JOCDefaultResponse.responseHtmlStatus200(fileStream, unCompressedLength);
                 } else {
-                    return JOCDefaultResponse.responsePlainStatus200(fileStream);
+                    return JOCDefaultResponse.responsePlainStatus200(fileStream, unCompressedLength);
                 }
             }
 
