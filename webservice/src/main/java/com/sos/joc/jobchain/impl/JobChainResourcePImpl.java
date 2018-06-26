@@ -67,7 +67,7 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
 				throw new DBMissingDataException(errMessage);
 			}
 			JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, inventoryJobChain, processClassJobs,
-					jobChainFilter.getCompact(), instanceId, null);
+					jobChainFilter.getCompact(), instanceId);
 			if (jobChain != null) {
 				entity.setJobChain(jobChain);
 				if (!JobChainPermanent.NESTED_JOB_CHAIN_NAMES.isEmpty()) {
@@ -80,7 +80,7 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
 						nestedJobChain = dbLayer.getJobChainByPath(normalizePath(nestedJobChainName), instanceId);
 						if (nestedJobChain != null) {
 							JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain,
-									processClassJobs, jobChainFilter.getCompact(), instanceId, null);
+									processClassJobs, jobChainFilter.getCompact(), instanceId);
 							if (nestedJobChainP != null) {
 								nestedJobChains.add(nestedJobChainP);
 							}

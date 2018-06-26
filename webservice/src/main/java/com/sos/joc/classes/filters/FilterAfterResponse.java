@@ -1,8 +1,12 @@
 package com.sos.joc.classes.filters;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import com.sos.joc.model.common.Folder;
 
 public class FilterAfterResponse {
     
@@ -28,6 +32,21 @@ public class FilterAfterResponse {
            }
         }
         return filterStatesContainsState;
+    }
+    
+    public static boolean folderContainsObject(Folder folder, Path objectPath) {
+        boolean folderFound = false;
+        Path folderPath = Paths.get(folder.getFolder());
+        if (folder.getRecursive() != null && folder.getRecursive()) {
+            if (objectPath.startsWith(folderPath)) {
+                folderFound = true;
+            }
+        } else {
+            if (objectPath.getParent().toString().equals(folderPath.toString())) {
+                folderFound = true;
+            }
+        }
+        return folderFound;
     }
     
     public static boolean matchRegex(String regex, Set<String> paths) {

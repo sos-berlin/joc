@@ -1,5 +1,6 @@
 package com.sos.joc.jobchains.impl;
 
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,7 +77,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                         if (jobChainFromDb == null) {
                             continue;
                         }
-                        JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId, null);
+                        JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
                         if (jobChain != null) {
                             jobChains.add(jobChain);
                             initNestedJobChainsIfExists(dbLayer, jobChain, processClassJobs, compact);
@@ -96,24 +97,31 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                                 //LOGGER.debug("...processing skipped caused by 'regex=" + jobChainsFilter.getRegex() + "'");
                                 continue; 
                             }
-                            jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId, jobChainsFilter.getJob());
+                            jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
                             if (jobChainsFilter.getJob() != null) {
+                                if (JobChainPermanent.JOB_PATHS == null || JobChainPermanent.JOB_PATHS.isEmpty()) {
+                                    continue;
+                                }
                                 if (!FilterAfterResponse.matchRegex(jobChainsFilter.getJob().getRegex(), JobChainPermanent.JOB_PATHS)) {
                                     //LOGGER.debug("...processing skipped caused by 'jobRegex=" + jobChainsFilter.getJob().getRegex() + "'");
                                     continue; 
                                 }
-                                if (jobChainsFilter.getJob().getFolders() != null) {
-                                    if (JobChainPermanent.JOB_PATHS == null || JobChainPermanent.JOB_PATHS.isEmpty()) {
-                                        continue;
-                                    }
-                                    for(Folder f : jobChainsFilter.getJob().getFolders()) {
-                                        if (f.getRecursive() != null && f.getRecursive()) {
-                                            for (String jobPath : JobChainPermanent.JOB_PATHS) {
-                                                //
+                                if (jobChainsFilter.getJob().getFolders() != null && !jobChainsFilter.getJob().getFolders().isEmpty()) {
+                                    boolean folderFound = false;
+                                    for (String jobPathStr : JobChainPermanent.JOB_PATHS) {
+                                        java.nio.file.Path jobPath = Paths.get(jobPathStr);
+                                        for (Folder f : jobChainsFilter.getJob().getFolders()) {
+                                            folderFound = FilterAfterResponse.folderContainsObject(f, jobPath);
+                                            if (folderFound) {
+                                                break;
                                             }
-                                        } else {
-                                            
                                         }
+                                        if (folderFound) {
+                                           break; 
+                                        } 
+                                    }
+                                    if (!folderFound) {
+                                        continue;
                                     }
                                 }
                             }
@@ -133,11 +141,32 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                             //LOGGER.debug("...processing skipped caused by 'regex=" + jobChainsFilter.getRegex() + "'");
                             continue; 
                         }
-                        jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId, jobChainsFilter.getJob());
+                        jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
                         if (jobChainsFilter.getJob() != null) {
+                            if (JobChainPermanent.JOB_PATHS == null || JobChainPermanent.JOB_PATHS.isEmpty()) {
+                                continue;
+                            }
                             if (!FilterAfterResponse.matchRegex(jobChainsFilter.getJob().getRegex(), JobChainPermanent.JOB_PATHS)) {
                                 //LOGGER.debug("...processing skipped caused by 'jobRegex=" + jobChainsFilter.getJob().getRegex() + "'");
                                 continue; 
+                            }
+                            if (jobChainsFilter.getJob().getFolders() != null && !jobChainsFilter.getJob().getFolders().isEmpty()) {
+                                boolean folderFound = false;
+                                for (String jobPathStr : JobChainPermanent.JOB_PATHS) {
+                                    java.nio.file.Path jobPath = Paths.get(jobPathStr);
+                                    for (Folder f : jobChainsFilter.getJob().getFolders()) {
+                                        folderFound = FilterAfterResponse.folderContainsObject(f, jobPath);
+                                        if (folderFound) {
+                                            break;
+                                        }
+                                    }
+                                    if (folderFound) {
+                                       break; 
+                                    } 
+                                }
+                                if (!folderFound) {
+                                    continue;
+                                }
                             }
                         }
                         if (jobChain != null) {
@@ -183,7 +212,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                 }
                 if (nestedJobChain != null) {
                     JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, processClassJobs, compact,
-                            dbItemInventoryInstance.getId(), null);
+                            dbItemInventoryInstance.getId());
                     if (nestedJobChainP != null) {
                         nestedJobChains.add(nestedJobChainP);
                     }

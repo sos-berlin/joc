@@ -1,5 +1,7 @@
 package com.sos.joc.classes.jobchains;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -167,9 +169,30 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                continue; 
            }
            if (jobChainsFilter.getJob() != null) {
+               if (jobChainV.getJobPaths() == null || jobChainV.getJobPaths().isEmpty()) {
+                   continue;
+               }
                if (!FilterAfterResponse.matchRegex(jobChainsFilter.getJob().getRegex(), jobChainV.getJobPaths())) {
                    LOGGER.debug("...processing skipped caused by 'jobRegex=" + jobChainsFilter.getJob().getRegex() + "'");
                    continue; 
+               }
+               if (jobChainsFilter.getJob().getFolders() != null && !jobChainsFilter.getJob().getFolders().isEmpty()) {
+                   boolean folderFound = false;
+                   for (String jobPathStr : jobChainV.getJobPaths()) {
+                       Path jobPath = Paths.get(jobPathStr);
+                       for (Folder f : jobChainsFilter.getJob().getFolders()) {
+                           folderFound = FilterAfterResponse.folderContainsObject(f, jobPath);
+                           if (folderFound) {
+                               break;
+                           }
+                       }
+                       if (folderFound) {
+                          break; 
+                       } 
+                   }
+                   if (!folderFound) {
+                       continue;
+                   }
                }
            }
            jobChainV.setFields(jobChainsFilter.getCompact());

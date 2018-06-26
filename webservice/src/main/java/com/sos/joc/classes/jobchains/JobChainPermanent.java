@@ -17,7 +17,6 @@ import com.sos.joc.model.jobChain.JobChainNodeJobChainP;
 import com.sos.joc.model.jobChain.JobChainNodeJobP;
 import com.sos.joc.model.jobChain.JobChainNodeP;
 import com.sos.joc.model.jobChain.JobChainP;
-import com.sos.joc.model.jobChain.JobsFilter;
 
 public class JobChainPermanent {
 
@@ -25,7 +24,7 @@ public class JobChainPermanent {
     public static Set<String> JOB_PATHS = new HashSet<String>();
 
     public static JobChainP initJobChainP(InventoryJobChainsDBLayer dbLayer, DBItemInventoryJobChain inventoryJobChain, Map<Long,String> processClassJobs, Boolean compact,
-            Long instanceId, JobsFilter jobsFilter) throws Exception {
+            Long instanceId) throws Exception {
         NESTED_JOB_CHAIN_NAMES = new HashSet<String>();
         JOB_PATHS = new HashSet<String>();
         JobChainP jobChain = new JobChainP();
@@ -66,10 +65,7 @@ public class JobChainPermanent {
                         jobChainNode.setDelay(node.getDelay());
                         jobChainNode.setErrorNode(node.getErrorState());
                         JobChainNodeJobP job = new JobChainNodeJobP();
-                        if (node.getJobName() != null && !node.getJobName().isEmpty()) {
-                            if (jobsFilter != null) {
-                               // 
-                            }
+                        if (node.getJob() != null && !"".equalsIgnoreCase(node.getJob())) {
                             job.setPath(node.getJobName());
                             if (job.getPath() != null) {
                                 JOB_PATHS.add(job.getPath());
