@@ -34,6 +34,9 @@ public class FilterAfterResponse {
         if (regex == null || regex.isEmpty()) {
             return true;
         }
+        if (paths == null || paths.isEmpty()) {
+            return false;
+        }
         Pattern p = Pattern.compile(regex);
         for (String path : paths) {
             if (p.matcher(path).find()) {
