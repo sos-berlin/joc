@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.transform.TransformerException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -35,9 +37,8 @@ import com.sos.joc.model.order.OrderType;
 import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.order.OrdersSummary;
 
-
 public class JobChainVolatile extends JobChainV {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainVolatile.class);
     private Element jobChain;
     private JOCXmlJobChainCommand jocXmlCommand;
@@ -49,13 +50,13 @@ public class JobChainVolatile extends JobChainV {
     public JobChainVolatile() {
         super();
     }
-    
+
     public JobChainVolatile(Element jobChain, JOCXmlJobChainCommand jocXmlCommand) {
         super();
         this.jobChain = jobChain;
         this.jocXmlCommand = jocXmlCommand;
     }
-    
+
     public Set<String> getNestedJobChains() {
         return nestedJobChains;
     }
@@ -79,7 +80,7 @@ public class JobChainVolatile extends JobChainV {
             setSeverity(getState());
         }
     }
-    
+
     public void setFields(boolean compact) throws Exception {
         if (compact) {
             setCompactFields();
@@ -88,21 +89,21 @@ public class JobChainVolatile extends JobChainV {
             setDetailedFields();
         }
     }
-    
+
     public boolean hasJobNodes() {
         return jobNodes.getLength() > 0;
     }
-    
+
     public boolean hasJobChainNodes() {
         return jobChainNodes.getLength() > 0;
     }
-    
+
     public void setOrders(List<OrderV> orders) {
-        Map<String,List<OrderV>> nodeMap = new HashMap<String,List<OrderV>>();
+        Map<String, List<OrderV>> nodeMap = new HashMap<String, List<OrderV>>();
         for (OrderV order : orders) {
             String node = order.getState();
             if (!nodeMap.containsKey(node)) {
-                nodeMap.put(node, new ArrayList<OrderV>()); 
+                nodeMap.put(node, new ArrayList<OrderV>());
             }
             nodeMap.get(node).add(order);
         }
@@ -112,17 +113,17 @@ public class JobChainVolatile extends JobChainV {
             node.setNumOfOrders(o == null ? 0 : o.size());
         }
     }
-    
+
     public void setOrders(Map<String, OrderVolatile> orders, Integer maxOrders) {
-        Map<String,List<OrderV>> nodeMap = new HashMap<String,List<OrderV>>();
-        Map<String,Integer> nodeMapCounter = new HashMap<String,Integer>();
+        Map<String, List<OrderV>> nodeMap = new HashMap<String, List<OrderV>>();
+        Map<String, Integer> nodeMapCounter = new HashMap<String, Integer>();
         for (OrderV order : orders.values()) {
             String node = order.getState();
             if (!nodeMap.containsKey(node)) {
                 nodeMap.put(node, new ArrayList<OrderV>());
                 nodeMapCounter.put(node, 0);
             }
-            int incrementCounter = nodeMapCounter.get(node)+1;
+            int incrementCounter = nodeMapCounter.get(node) + 1;
             nodeMapCounter.put(node, incrementCounter);
             if (maxOrders == null || nodeMap.get(node).size() < maxOrders) {
                 nodeMap.get(node).add(order);
@@ -135,21 +136,21 @@ public class JobChainVolatile extends JobChainV {
             node.setNumOfOrders(num == null ? 0 : num);
         }
     }
-    
+
     public void setOuterOrdersAndSummary(Map<String, OrderVolatile> orders, Integer maxOrders, Boolean compact) {
-        Map<String,List<OrderV>> nodeMap = new HashMap<String,List<OrderV>>();
-        Map<String,Integer> nodeMapCounter = new HashMap<String,Integer>();
+        Map<String, List<OrderV>> nodeMap = new HashMap<String, List<OrderV>>();
+        Map<String, Integer> nodeMapCounter = new HashMap<String, Integer>();
         OrdersSummary summary = setInitialOrdersSummary();
         if (orders == null) {
             setNumOfOrders(0);
         } else {
             setNumOfOrders(orders.size());
             for (OrderV order : orders.values()) {
-                OrderStateText oStateText = null; 
-                if (order.getProcessingState() != null ) {
+                OrderStateText oStateText = null;
+                if (order.getProcessingState() != null) {
                     oStateText = order.getProcessingState().get_text();
                 }
-                if (oStateText == null ) {
+                if (oStateText == null) {
                     continue;
                 }
                 switch (oStateText) {
@@ -188,14 +189,14 @@ public class JobChainVolatile extends JobChainV {
                     nodeMap.put(node, new ArrayList<OrderV>());
                     nodeMapCounter.put(node, 0);
                 }
-                int incrementCounter = nodeMapCounter.get(node)+1;
+                int incrementCounter = nodeMapCounter.get(node) + 1;
                 nodeMapCounter.put(node, incrementCounter);
                 if (maxOrders == null || nodeMap.get(node).size() < maxOrders) {
                     nodeMap.get(node).add(order);
                 }
             }
         }
-        
+
         setOrdersSummary(summary);
         if (compact == null || !compact) {
             for (JobChainNodeV node : getNodes()) {
@@ -206,7 +207,7 @@ public class JobChainVolatile extends JobChainV {
             }
         }
     }
-    
+
     public OrdersSummary setInitialOrdersSummary() {
         OrdersSummary summary = new OrdersSummary();
         summary.setBlacklist(0);
@@ -216,9 +217,9 @@ public class JobChainVolatile extends JobChainV {
         summary.setSuspended(0);
         summary.setWaitingForResource(0);
         setOrdersSummary(summary);
-        return summary;       
+        return summary;
     }
-    
+
     public void getProcessingStateText(OrderV order) {
         switch (order.getProcessingState().get_text()) {
         case BLACKLIST:
@@ -244,6 +245,18 @@ public class JobChainVolatile extends JobChainV {
         }
     }
 
+    public Set<String> getJobPaths() throws TransformerException {
+        NodeList jobPathNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node/@job");
+        Set<String> jobPaths = new HashSet<String>();
+        for (int i = 0; i < jobPathNodes.getLength(); i++) {
+            String job = jobPathNodes.item(i).getNodeValue();
+            if (job != null & !job.isEmpty()) {
+                jobPaths.add(job);
+            }
+        }
+        return jobPaths;
+    }
+
     private void cleanArrays() {
         setNodes(null);
         setFileOrderSources(null);
@@ -257,22 +270,22 @@ public class JobChainVolatile extends JobChainV {
         setFileOrderSources(getFileWatchingNodeVSchema());
         setNodes(new ArrayList<JobChainNodeV>());
         setBlacklist(getBlacklist(blacklist));
-        for (int i=0; i < jobNodes.getLength(); i++) {
+        for (int i = 0; i < jobNodes.getLength(); i++) {
             Element jobNodeElem = (Element) jobNodes.item(i);
             JobChainNodeV node = new JobChainNodeV();
             node.setName(jobNodeElem.getAttribute("state"));
             node.setLevel(jobNodeElem.getAttribute("state").replaceAll("[^:]", "").length());
             NodeList ordersOfCurrentNode = jocXmlCommand.getSosxml().selectNodeList(jobNodeElem, "order_queue/order");
-            
-            //jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "order_queue/order");
-            //node.setOrders(orders);
+
+            // jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "order_queue/order");
+            // node.setOrders(orders);
             Element jobElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "job");
             if (jobElem != null) {
                 JobVolatile jobV = new JobVolatile(jobElem, jocXmlCommand);
                 JobChainNodeJobV job = new JobChainNodeJobV();
                 job.setPath(jobElem.getAttribute(WebserviceConstants.PATH));
                 job.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(jobElem));
-                //JOC-89
+                // JOC-89
                 jobV.setState(hasRunningOrWaitingOrder(ordersOfCurrentNode));
                 job.setState(jobV.getState());
                 node.setJob(job);
@@ -289,7 +302,7 @@ public class JobChainVolatile extends JobChainV {
             node.setState(getNodeState(jobNodeElem));
             getNodes().add(node);
         }
-        for (int i=0; i < jobChainNodes.getLength(); i++) {
+        for (int i = 0; i < jobChainNodes.getLength(); i++) {
             Element jobChainNodeElem = (Element) jobChainNodes.item(i);
             nestedJobChains.add(jobChainNodeElem.getAttribute("job_chain"));
             JobChainNodeV node = new JobChainNodeV();
@@ -302,7 +315,7 @@ public class JobChainVolatile extends JobChainV {
             getNodes().add(node);
         }
     }
-    
+
     private boolean hasRunningOrWaitingOrder(NodeList orders) throws Exception {
 
         // TODO maybe use JsonApi
@@ -335,14 +348,14 @@ public class JobChainVolatile extends JobChainV {
             order.setHistoryId(blacklistedOrder.getAttribute("history_id"));
             order.setJobChain(blacklistedOrder.getAttribute("job_chain"));
             order.setOrderId(blacklistedOrder.getAttribute("id"));
-            order.setPath(order.getJobChain()+","+order.getOrderId());
+            order.setPath(order.getJobChain() + "," + order.getOrderId());
             OrderState orderState = new OrderState();
             orderState.set_text(OrderStateText.BLACKLIST);
             orderState.setSeverity(3);
             order.setProcessingState(orderState);
             order.setStartedAt(JobSchedulerDate.getDateFromISO8601String(blacklistedOrder.getAttribute("start_time")));
             order.setState(blacklistedOrder.getAttribute("state"));
-            order.setParams(null); //TODO set params
+            order.setParams(null); // TODO set params
             orders.add(order);
         }
         if (orders.size() == 0) {
@@ -356,56 +369,59 @@ public class JobChainVolatile extends JobChainV {
         setState();
         setSurveyDate(jocXmlCommand.getSurveyDate());
         setName(jobChain.getAttribute(WebserviceConstants.NAME));
-        //jobNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job and not(@job='/scheduler_file_order_sink')]");
-        jobNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job]");
+        // jobNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job and not(@job='/scheduler_file_order_sink')]");
+        if (jobNodes == null) {
+            jobNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job]");
+        }
         jobChainNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job_chain] | job_chain_node.job_chain[@job_chain]");
         blacklist = jocXmlCommand.getSosxml().selectNodeList(jobChain, "blacklist/order");
         setNumOfNodes(jobNodes.getLength() + jobChainNodes.getLength());
-        //Integer numOfFileOrders = Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(jobChain, "file_order_source/files/@count", "0"));
+        // Integer numOfFileOrders = Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(jobChain, "file_order_source/files/@count", "0"));
         setNumOfOrders(Integer.parseInt(jobChain.getAttribute("orders")) + blacklist.getLength());
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(jobChain));
-        //OrdersSummary is set with OrdersSummaryCallable (look at JOCXmlJobChainCommand.getJobChains)
+        // OrdersSummary is set with OrdersSummaryCallable (look at JOCXmlJobChainCommand.getJobChains)
     }
-    
+
     private List<FileWatchingNodeV> getFileWatchingNodeVSchema() throws Exception {
         NodeList fileOrderSources = jocXmlCommand.getSosxml().selectNodeList(jobChain, "file_order_source");
         if (fileOrderSources.getLength() == 0) {
             return null;
         }
         List<FileWatchingNodeV> fileWatchingNodes = new ArrayList<FileWatchingNodeV>();
-        for (int i=0; i < fileOrderSources.getLength(); i++) {
-           Element fileOrderSourceElement = (Element) fileOrderSources.item(i);
-           FileWatchingNodeV fileOrderSource = new FileWatchingNodeV();
-           fileOrderSource.setAlertWhenDirectoryMissing(jocXmlCommand.getBoolValue(fileOrderSourceElement.getAttribute("alert_when_directory_missing"), null));
-           fileOrderSource.setDirectory(fileOrderSourceElement.getAttribute("directory"));
-           fileOrderSource.setRegex(jocXmlCommand.getAttributeValue(fileOrderSourceElement, "regex", null));
-           String repeat = jocXmlCommand.getAttributeValue(fileOrderSourceElement, "repeat", null);
-           if (repeat != null) {
-               fileOrderSource.setRepeat(Integer.parseInt(repeat));
-           }
-           String delay = jocXmlCommand.getAttributeValue(fileOrderSourceElement, "delay_after_error", null);
-           if (delay != null) {
-               fileOrderSource.setDelayAfterError(Integer.parseInt(delay));
-           }
-           NodeList fileOrders = jocXmlCommand.getSosxml().selectNodeList(fileOrderSourceElement, "files/file");
-           if (fileOrders.getLength() > 0) {
-               List<FileWatchingNodeFile> files = new ArrayList<FileWatchingNodeFile>();
-               for (int j=0; j < fileOrders.getLength(); j++) {
-                   Element fileOrder = (Element) fileOrders.item(j);
-                   FileWatchingNodeFile file = new FileWatchingNodeFile();
-                   file.setPath(fileOrder.getAttribute(WebserviceConstants.PATH));
-                   file.setModified(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(fileOrder, "last_write_time", null)));
-                   files.add(file);
-               }
-               fileOrderSource.setFiles(files);
-           } else {
-               fileOrderSource.setFiles(null);
-           }
-           fileWatchingNodes.add(fileOrderSource);
+        for (int i = 0; i < fileOrderSources.getLength(); i++) {
+            Element fileOrderSourceElement = (Element) fileOrderSources.item(i);
+            FileWatchingNodeV fileOrderSource = new FileWatchingNodeV();
+            fileOrderSource.setAlertWhenDirectoryMissing(jocXmlCommand.getBoolValue(fileOrderSourceElement.getAttribute(
+                    "alert_when_directory_missing"), null));
+            fileOrderSource.setDirectory(fileOrderSourceElement.getAttribute("directory"));
+            fileOrderSource.setRegex(jocXmlCommand.getAttributeValue(fileOrderSourceElement, "regex", null));
+            String repeat = jocXmlCommand.getAttributeValue(fileOrderSourceElement, "repeat", null);
+            if (repeat != null) {
+                fileOrderSource.setRepeat(Integer.parseInt(repeat));
+            }
+            String delay = jocXmlCommand.getAttributeValue(fileOrderSourceElement, "delay_after_error", null);
+            if (delay != null) {
+                fileOrderSource.setDelayAfterError(Integer.parseInt(delay));
+            }
+            NodeList fileOrders = jocXmlCommand.getSosxml().selectNodeList(fileOrderSourceElement, "files/file");
+            if (fileOrders.getLength() > 0) {
+                List<FileWatchingNodeFile> files = new ArrayList<FileWatchingNodeFile>();
+                for (int j = 0; j < fileOrders.getLength(); j++) {
+                    Element fileOrder = (Element) fileOrders.item(j);
+                    FileWatchingNodeFile file = new FileWatchingNodeFile();
+                    file.setPath(fileOrder.getAttribute(WebserviceConstants.PATH));
+                    file.setModified(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(fileOrder, "last_write_time", null)));
+                    files.add(file);
+                }
+                fileOrderSource.setFiles(files);
+            } else {
+                fileOrderSource.setFiles(null);
+            }
+            fileWatchingNodes.add(fileOrderSource);
         }
         return fileWatchingNodes;
     }
-    
+
     private void setSeverity(JobChainState state) {
         switch (state.get_text()) {
         case ACTIVE:
@@ -421,10 +437,10 @@ public class JobChainVolatile extends JobChainV {
             break;
         }
     }
-    
+
     private JobChainNodeState getNodeState(Element elem) {
         JobChainNodeState state = new JobChainNodeState();
-        switch(elem.getAttribute("action")) {
+        switch (elem.getAttribute("action")) {
         case "stop":
             state.setSeverity(2);
             state.set_text(JobChainNodeStateText.STOPPED);

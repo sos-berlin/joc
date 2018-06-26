@@ -1,6 +1,7 @@
 package com.sos.joc.classes.filters;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class FilterAfterResponse {
@@ -27,5 +28,18 @@ public class FilterAfterResponse {
            }
         }
         return filterStatesContainsState;
+    }
+    
+    public static boolean matchRegex(String regex, Set<String> paths) {
+        if (regex == null || regex.isEmpty()) {
+            return true;
+        }
+        Pattern p = Pattern.compile(regex);
+        for (String path : paths) {
+            if (p.matcher(path).find()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

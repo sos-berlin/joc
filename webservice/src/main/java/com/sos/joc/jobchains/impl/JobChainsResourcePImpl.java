@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
@@ -17,6 +15,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.jobchains.JobChainPermanent;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
@@ -54,7 +53,6 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             Boolean compact = jobChainsFilter.getCompact();
 
             List<JobChainPath> jobChainPaths = jobChainsFilter.getJobChains();
-            String regex = jobChainsFilter.getRegex();
             boolean withFolderFilter = jobChainsFilter.getFolders() != null && !jobChainsFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
             Long instanceId = dbItemInventoryInstance.getId();
@@ -94,13 +92,14 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                     if (jobChainsFromDb != null) {
                         for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
                             JobChainP jobChain = null;
-                            if (regex != null && !regex.isEmpty()) {
-                                Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
-                                if (regExMatcher.find()) {
-                                    jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
-                                }
-                            } else {
-                                jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
+                            if (!FilterAfterResponse.matchRegex(jobChainsFilter.getRegex(), jobChainFromDb.getName())) {
+                                //LOGGER.debug("...processing skipped caused by 'regex=" + jobChainsFilter.getRegex() + "'");
+                                continue; 
+                            }
+                            jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
+                            if (!FilterAfterResponse.matchRegex(jobChainsFilter.getJobRegex(), JobChainPermanent.JOB_PATHS)) {
+                                //LOGGER.debug("...processing skipped caused by 'jobRegex=" + jobChainsFilter.getJobRegex() + "'");
+                                continue; 
                             }
                             if (jobChain != null) {
                                 jobChains.add(jobChain);
@@ -114,13 +113,14 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                 if (jobChainsFromDb != null) {
                     for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
                         JobChainP jobChain = null;
-                        if (regex != null && !regex.isEmpty()) {
-                            Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
-                            if (regExMatcher.find()) {
-                                jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
-                            }
-                        } else {
-                            jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
+                        if (!FilterAfterResponse.matchRegex(jobChainsFilter.getRegex(), jobChainFromDb.getName())) {
+                            //LOGGER.debug("...processing skipped caused by 'regex=" + jobChainsFilter.getRegex() + "'");
+                            continue; 
+                        }
+                        jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
+                        if (!FilterAfterResponse.matchRegex(jobChainsFilter.getJobRegex(), JobChainPermanent.JOB_PATHS)) {
+                            //LOGGER.debug("...processing skipped caused by 'jobRegex=" + jobChainsFilter.getJobRegex() + "'");
+                            continue; 
                         }
                         if (jobChain != null) {
                             jobChains.add(jobChain);

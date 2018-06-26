@@ -20,10 +20,13 @@ import com.sos.joc.model.jobChain.JobChainP;
 
 public class JobChainPermanent {
 
-    public static final Set<String> NESTED_JOB_CHAIN_NAMES = new HashSet<String>();
+    public static Set<String> NESTED_JOB_CHAIN_NAMES = new HashSet<String>();
+    public static Set<String> JOB_PATHS = new HashSet<String>();
 
     public static JobChainP initJobChainP(InventoryJobChainsDBLayer dbLayer, DBItemInventoryJobChain inventoryJobChain, Map<Long,String> processClassJobs, Boolean compact,
             Long instanceId) throws Exception {
+        NESTED_JOB_CHAIN_NAMES = new HashSet<String>();
+        JOB_PATHS = new HashSet<String>();
         JobChainP jobChain = new JobChainP();
         jobChain.setSurveyDate(inventoryJobChain.getModified());
         jobChain.setPath(inventoryJobChain.getName());
@@ -64,6 +67,9 @@ public class JobChainPermanent {
                         JobChainNodeJobP job = new JobChainNodeJobP();
                         if (node.getJob() != null && !"".equalsIgnoreCase(node.getJob())) {
                             job.setPath(node.getJobName());
+                            if (job.getPath() != null) {
+                                JOB_PATHS.add(job.getPath());
+                            }
                             job.setProcessClass(processClassJobs.get(node.getJobId()));
                             jobChainNode.setJob(job);
                         } else {
@@ -162,7 +168,10 @@ public class JobChainPermanent {
                 int numOfNodes = 0;
                 for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
                     if (node.getNodeType() < 3) { //JobNode and JobChainNode
-                        numOfNodes += 1;  
+                        numOfNodes += 1;
+                        if (node.getNodeType() == 1 && node.getJobName() != null && !node.getJobName().isEmpty()) {
+                            JOB_PATHS.add(node.getJobName());
+                        }
                     }
                 }
                 jobChain.setNumOfNodes(numOfNodes);
