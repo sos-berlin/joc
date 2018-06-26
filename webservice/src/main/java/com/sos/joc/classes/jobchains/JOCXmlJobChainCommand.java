@@ -166,9 +166,11 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                LOGGER.debug(String.format("...processing skipped because jobChain's state '%1$s' doesn't contain in state filter '%2$s'", jobChainV.getState().get_text().name(),jobChainsFilter.getStates().toString()));
                continue; 
            }
-           if (!FilterAfterResponse.matchRegex(jobChainsFilter.getJobRegex(), jobChainV.getJobPaths())) {
-               LOGGER.debug("...processing skipped caused by 'jobRegex=" + jobChainsFilter.getJobRegex() + "'");
-               continue; 
+           if (jobChainsFilter.getJob() != null) {
+               if (!FilterAfterResponse.matchRegex(jobChainsFilter.getJob().getRegex(), jobChainV.getJobPaths())) {
+                   LOGGER.debug("...processing skipped caused by 'jobRegex=" + jobChainsFilter.getJob().getRegex() + "'");
+                   continue; 
+               }
            }
            jobChainV.setFields(jobChainsFilter.getCompact());
            nestedJobChains.addAll(jobChainV.getNestedJobChains());
