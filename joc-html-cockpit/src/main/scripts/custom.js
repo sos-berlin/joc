@@ -133,6 +133,13 @@ _start_at_default_is_now = true;
 
 
 /*****************************************************************
+*  In 'add order'-Dialogs are set the start time equals
+*  'never' per default
+*/
+_add_order_at_default_is_never = false;
+
+
+/*****************************************************************
 *  Enables job menu item 'Start task unforced now'. 
 */
 _start_next_period_enabled  = false;
