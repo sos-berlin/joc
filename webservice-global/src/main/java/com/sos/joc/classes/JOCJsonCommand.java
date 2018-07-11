@@ -474,6 +474,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                     }
                     JsonReader rdr = Json.createReader(new StringReader(response));
                     JsonObject json = rdr.readObject();
+                    rdr.close();
                     LOGGER.debug(json.toString());
                     return json;
                 } else {
@@ -487,6 +488,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                 if (contentType.contains("application/json") && !response.isEmpty()) {
                     JsonReader rdr = Json.createReader(new StringReader(response));
                     JsonObject json = rdr.readObject();
+                    rdr.close();
                     String msg = json.getString("message", response);
                     if (msg.contains("SCHEDULER-161") || msg.contains("SCHEDULER-162")) {
                         throw new JobSchedulerObjectNotExistException(msg);

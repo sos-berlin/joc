@@ -102,10 +102,10 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
                 if (Files.exists(path)) {
                     //logInfo.setSize(Files.size(path));
                     logInfo.setSize(getSize(path));
+                    logInfo.setDownload(logInfo.getSize() > Globals.maxSizeOfLogsToDisplay);
                 }
             } catch (Exception e) {
             }
-            logInfo.setDownload(logInfo.getSize() > Globals.maxSizeOfLogsToDisplay);
             logInfo200.setLog(logInfo);
             logInfo200.setDeliveryDate(Date.from(Instant.now()));
             

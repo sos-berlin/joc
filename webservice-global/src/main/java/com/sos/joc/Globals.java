@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.json.Json;
+import javax.json.JsonReader;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
@@ -264,7 +265,9 @@ public class Globals {
         try {
             stream = Globals.class.getClassLoader().getResourceAsStream(versionFile);
             if (stream != null) {
-                LOGGER.info("JOC Cockpit version = " + Json.createReader(stream).readObject().getString("version", "unknown"));
+                JsonReader reader = Json.createReader(stream);
+                LOGGER.info("JOC Cockpit version = " + reader.readObject().getString("version", "unknown"));
+                reader.close();
             } else {
                 LOGGER.warn(String.format("Version file %1$s not found in classpath", versionFile));
             }
