@@ -166,17 +166,17 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 		}
 	}
 
-	private String getParameterAsString(ModifyEvent modifyEvent) {
-		String s = "<params>";
-		if (modifyEvent.getParams().size() > 0) {
-			for (NameValuePair nameValuePair : modifyEvent.getParams()) {
-				s = s + "<param name=" + nameValuePair.getName() + " value=\"" + nameValuePair.getValue() + "\"/>";
-			}
-			return s + "</params>";
-		} else {
-			return "";
-		}
-	}
+    private String getParameterAsString(ModifyEvent modifyEvent) {
+        if (modifyEvent.getParams() != null && !modifyEvent.getParams().isEmpty()) {
+            Element params = XMLBuilder.create("params");
+            for (NameValuePair param : modifyEvent.getParams()) {
+                params.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+            }
+            return params.asXML();
+        } else {
+            return "";
+        }
+    }
 
 	private void performEventRequest(String request, ModifyEvent modifyEvent) throws Exception {
 
