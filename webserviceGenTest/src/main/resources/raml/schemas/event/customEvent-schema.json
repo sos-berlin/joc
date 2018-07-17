@@ -43,6 +43,9 @@
     },
     "remoteJobSchedulerPort": {
       "$ref": "../common/port-schema.json"
+    },
+    "params": {
+      "$ref": "../common/nameValuePairs-schema.json"
     }
   }
 }
