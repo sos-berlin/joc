@@ -116,7 +116,7 @@ public class JocConfigurationDbLayer extends DBLayer {
             query.setParameter("account", filter.getAccount());
         }
         if (filter.isShared() != null) {
-            query.setBoolean("shared", filter.isShared());
+            query.setParameter("shared", filter.isShared());
         }
     }
 
