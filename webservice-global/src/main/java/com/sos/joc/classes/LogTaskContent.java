@@ -1,11 +1,8 @@
 package com.sos.joc.classes;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,50 +142,15 @@ public class LogTaskContent extends LogContent {
     }
 
     private Path writeTaskLogFileFromXmlCommand() throws Exception {
-        String taskLog = getTaskLogFromXmlCommand();
-        if (taskLog == null) {
-            return null;
-        }
-        Path path = null;
-        try {
-            path = Files.createTempFile(getPrefix(), null);
-            Files.write(path, taskLog.getBytes());
-            return path;
-        } catch (IOException e) {
-            try {
-                Files.deleteIfExists(path);
-            } catch (Exception e1) {
-            }
-            throw e;
-        }
+        String xml = String.format("<show_task id=\"%1$s\" what=\"log\" />", taskFilter.getTaskId());
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+        return jocXmlCommand.getLogPath(xml, getAccessToken(), getPrefix(), false);
     }
 
     private Path writeGzipTaskLogFileFromXmlCommand() throws Exception {
-        String taskLog = getTaskLogFromXmlCommand();
-        if (taskLog == null) {
-            return null;
-        }
-        Path path = null;
-        GZIPOutputStream gzip = null;
-        try {
-            path = Files.createTempFile(getPrefix(), null);
-            gzip = new GZIPOutputStream(new FileOutputStream(path.toFile()));
-            gzip.write(taskLog.getBytes());
-            return path;
-        } catch (IOException e) {
-            try {
-                Files.deleteIfExists(path);
-            } catch (Exception e1) {
-            }
-            throw e;
-        } finally {
-            try {
-                if (gzip != null) {
-                    gzip.close();
-                }
-            } catch (Exception e1) {
-            }
-        }
+        String xml = String.format("<show_task id=\"%1$s\" what=\"log\" />", taskFilter.getTaskId());
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+        return jocXmlCommand.getLogPath(xml, getAccessToken(), getPrefix(), true);
     }
     
     private String getPrefix() {

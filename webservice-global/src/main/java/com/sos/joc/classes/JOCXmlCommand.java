@@ -1,7 +1,12 @@
 package com.sos.joc.classes;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -9,6 +14,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPOutputStream;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -36,6 +44,8 @@ import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.xml.SOSXmlCommand;
+
+import sos.xml.SOSXMLXPath;
 
 public class JOCXmlCommand extends SOSXmlCommand {
 
@@ -160,10 +170,15 @@ public class JOCXmlCommand extends SOSXmlCommand {
         return default_;
     }
     
-    public void throwJobSchedulerError() throws JobSchedulerBadRequestException {
+    public void throwJobSchedulerError(SOSXMLXPath response) throws JobSchedulerBadRequestException {
         String xPath = "/spooler/answer/ERROR";
         try {
-            Element errorElem = (Element) getSosxml().selectSingleNode(xPath);
+            Element errorElem = null;
+            if (response == null) {
+                errorElem = (Element) getSosxml().selectSingleNode(xPath);
+            } else {
+                errorElem = (Element) response.selectSingleNode(xPath);
+            }
             if (errorElem != null) {
                 JocError err = new JocError(errorElem.getAttribute("code"), errorElem.getAttribute("text"));
                 JobSchedulerBadRequestException badRequestException = new JobSchedulerBadRequestException(err);
@@ -178,6 +193,10 @@ public class JOCXmlCommand extends SOSXmlCommand {
         } catch (Exception e) {
             throw new JobSchedulerBadRequestException(e);
         }
+    }
+    
+    public void throwJobSchedulerError() throws JobSchedulerBadRequestException {
+        throwJobSchedulerError(null);
     }
     
 //    public String executePost(String xmlCommand) throws JocException {
@@ -240,6 +259,136 @@ public class JOCXmlCommand extends SOSXmlCommand {
             executePostWithRetry(xmlCommand, accessToken);
         }
         throwJobSchedulerError();
+    }
+    
+    public Path getLogPath(String xmlCommand, String accessToken, String prefix, boolean withGzipEncoding) throws JocException {
+        try {
+            return getFilePathResponseFromLog(requestXMLPost(xmlCommand, accessToken),prefix, withGzipEncoding);
+        } catch (JobSchedulerNoResponseException e) {
+            e.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
+            throw e;
+        } catch (Exception e) {
+            JobSchedulerConnectionRefusedException ee = new JobSchedulerConnectionRefusedException(e.getCause());
+            ee.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
+            throw ee;
+        }
+    }
+    
+    private Path getFilePathResponseFromLog(HttpURLConnection connection, String prefix, boolean withGzipEncoding) throws JobSchedulerNoResponseException, JobSchedulerBadRequestException {
+        Path path = null;
+        try {
+            if (connection != null) {
+                LOGGER.info(Instant.now().getEpochSecond()+"");
+                InputStream instream = connection.getInputStream();
+                LOGGER.info(Instant.now().getEpochSecond()+"");
+                OutputStream out = null;
+                if (instream != null) {
+                    try {
+                        if (prefix == null) {
+                            prefix = "sos-download-"; 
+                        }
+                        path = Files.createTempFile(prefix, null);
+                        if (withGzipEncoding) {
+                            out = new GZIPOutputStream(Files.newOutputStream(path));
+                        } else {
+                            out = Files.newOutputStream(path);
+                        }
+                        LOGGER.info(Instant.now().getEpochSecond()+"");
+                        int bufferSize = 4096;
+                        boolean logBeginIsFound = false;
+                        Pattern logStartPattern = Pattern.compile(".*>\\s*<log [^>]*level\\s*=[^>]*/?>(.*)", Pattern.DOTALL + Pattern.MULTILINE);
+                        String logEndPattern = "(\\s*)(?:</log>)?(?:\\s*<[^>]+/?>)*\\s*</(?:order|task)>\\s*</answer>\\s*</spooler>\\s*$";
+                        Matcher m = null;
+                        byte[] buffer1 = new byte[bufferSize];
+                        byte[] buffer2 = new byte[bufferSize];
+                        int length1;
+                        int length2;
+                        StringBuilder str = new StringBuilder();
+                        String str1 = null;
+                        String str2 = null;
+                        while ((length1 = instream.read(buffer1)) > 0) {
+                            if (logBeginIsFound) {
+                                if (instream.available() < bufferSize) {
+                                    length2 = instream.read(buffer2);
+                                    str1 = new String(buffer1, 0, length1, "UTF-8");
+                                    if (length2 > 0) {
+                                        str2 = new String(buffer2, 0, length2, "UTF-8");
+                                    } else {
+                                        str2 = "";
+                                    }
+                                    out.write((str1+str2).replaceFirst(logEndPattern, "$1").getBytes("UTF-8"));
+                                } else {
+                                    out.write(buffer1, 0, length1);
+                                }
+                            } else {
+                                str1 = new String(buffer1, 0, length1, "UTF-8");
+                                str.append(str1);
+                                m = logStartPattern.matcher(str);
+                                if (m.find()) {
+                                    if (instream.available() < bufferSize) {
+                                        length2 = instream.read(buffer2);
+                                        if (length2 > 0) {
+                                            str2 = new String(buffer2, 0, length2, "UTF-8");
+                                        } else {
+                                            str2 = "";
+                                        }
+                                        out.write((m.group(1)+str2).replaceFirst(logEndPattern, "$1").getBytes("UTF-8"));
+                                    } else {
+                                        out.write(m.group(1).replaceFirst(logEndPattern, "$1").getBytes("UTF-8"));
+                                    }
+                                    logBeginIsFound = true;
+                                }
+                            }
+                        }
+                        out.flush();
+                        LOGGER.info(Instant.now().getEpochSecond()+"");
+                        if (!logBeginIsFound) {
+                            throwJobSchedulerError(new SOSXMLXPath(new StringBuffer(str))); 
+                        }
+                    } finally {
+                        try {
+                            instream.close();
+                            instream = null;
+                        } catch (Exception e) {}
+                        try {
+                            if (out != null) {
+                                out.close(); 
+                            }
+                        } catch (Exception e) {}
+                    }
+                }
+            }
+            return path;
+        } catch (JobSchedulerBadRequestException e) {
+            if (path != null) {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException e1) {}
+            }
+            throw e;
+        } catch (Exception e) {
+            if (path != null) {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException e1) {}
+            }
+            if (e.getCause() != null) {
+                throw new JobSchedulerNoResponseException(e.getCause());
+            } else {
+                throw new JobSchedulerNoResponseException(e);
+            }
+        } catch (Throwable e) {
+            if (path != null) {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException e1) {}
+            }
+            throw e;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
     
     public String getShowStateCommand(String subsystems, String what, String path) {
