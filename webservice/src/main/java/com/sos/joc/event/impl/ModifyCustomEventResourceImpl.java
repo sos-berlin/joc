@@ -275,6 +275,10 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            if (eventIdsFilter.getIds() == null || eventIdsFilter.getIds().isEmpty()) {
+                throw new JocMissingRequiredParameterException("'ids' are undefined or not convertible to a collection of number");
+            }
 
             DeleteEventsAudit modifyEventAudit = new DeleteEventsAudit(eventIdsFilter);
             logAuditMessage(modifyEventAudit);
