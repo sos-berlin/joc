@@ -185,7 +185,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 try {
                     JobSchedulerEvent evt = executorService.invokeAny(tasks);
                     eventList.put(evt.getJobschedulerId(), evt);
-                } catch (ExecutionException | InterruptedException e) {
+                } catch (ExecutionException e) {
                     if (e.getCause() instanceof JocException) {
                         throw (JocException) e.getCause();
                     } else {
@@ -208,7 +208,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
             
-        }catch (DBConnectionRefusedException e) {
+        } catch (DBConnectionRefusedException e) {
         	LOGGER.info(e.getMessage());
         } catch (ForcedClosingHttpClientException e) {
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));

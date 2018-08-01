@@ -65,7 +65,7 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
             }
             LOGGER.debug("EventIdOfCluster: "+shiroSession.getAttribute(jobSchedulerId + "#eventIdOfClusterMembers"));
             return evt;
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (ExecutionException e) {
             if (e.getCause() instanceof JocException) {
                 throw (JocException) e.getCause();
             } else {
