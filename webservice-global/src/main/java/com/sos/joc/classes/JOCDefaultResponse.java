@@ -104,9 +104,15 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static JOCDefaultResponse responseOctetStreamDownloadStatus200(Object entity, String filename) {
+        return responseOctetStreamDownloadStatus200(entity, filename, null);
+    }
+    
+    public static JOCDefaultResponse responseOctetStreamDownloadStatus200(Object entity, String filename, Long uncompressedLength) {
         Response.ResponseBuilder responseBuilder = Response.ok(entity, MediaType.APPLICATION_OCTET_STREAM).header(
                 "Content-Disposition", "attachment; filename=" + filename).cacheControl(setNoCaching());
-        //responseBuilder.entity(entity);
+        if (uncompressedLength != null) {
+            responseBuilder.header("X-Uncompressed-Length", uncompressedLength);
+        }
         return new JOCDefaultResponse(responseBuilder.build());
     }
 

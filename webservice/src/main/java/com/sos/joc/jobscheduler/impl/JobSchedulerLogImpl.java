@@ -101,7 +101,7 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
                 }
             };
 
-            return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(apiCall, responseEntity));
+            return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(apiCall, responseEntity), getSize(responseEntity));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

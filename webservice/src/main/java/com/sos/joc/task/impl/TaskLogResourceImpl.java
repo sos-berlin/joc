@@ -190,7 +190,7 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
                 }
             };
             if (offerredAsDownload) {
-                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(path));
+                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, getFileName(path), unCompressedLength);
             } else {
                 if ((API_CALL + "/html").equals(apiCall)) {
                     return JOCDefaultResponse.responseHtmlStatus200(fileStream, unCompressedLength);
