@@ -10,7 +10,6 @@ import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
 import com.sos.joc.annotation.CompressedAlready;
-import com.sos.joc.model.common.Err420;
 
 @Provider
 @CompressedAlready
@@ -18,13 +17,11 @@ public class GZIPContentEncoding implements WriterInterceptor {
     
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
-
-        if (context.getEntity() instanceof Err420) {
-            //
-        } else {
-            MultivaluedMap<String, Object> headers = context.getHeaders();
+        
+        MultivaluedMap<String, Object> headers = context.getHeaders();
+        if (headers.containsKey("X-Uncompressed-Length")) {
             headers.add(HttpHeaders.CONTENT_ENCODING, "gzip");
-        }   
+        }  
         context.proceed();
     }
 
