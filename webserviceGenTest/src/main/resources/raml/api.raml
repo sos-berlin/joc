@@ -1,6 +1,6 @@
 #%RAML 0.8
 title: JOC API
-version: 1.12.4-SNAPSHOT
+version: 1.12.5
 protocols: [ HTTP, HTTPS ]
 baseUri: http://test.sos-berlin.com:3001/joc/api
 #mediaType: application/json
@@ -38,6 +38,7 @@ schemas:
   - logContent: !include schemas/common/logContent200-schema.json
   - logInfo: !include schemas/common/logInfo200-schema.json
   - security: !include schemas/user/security-schema.json
+  - logo: !include schemas/configuration/loginLogo-schema.json
 
 
 resourceTypes:
@@ -83,6 +84,7 @@ resourceTypes:
   - modifyJobChain: !include resourceTypes/jobChain/modify.raml
   - modifyJobChainNode: !include resourceTypes/jobChain/modifyNode.raml
   - modifyCalendar: !include resourceTypes/calendar/modify.raml
+  - logo: !include resourceTypes/configuration/logo.raml
   
 
 traits:
@@ -94,7 +96,7 @@ traits:
 
 
 /security/login:
-  type: login
+  type: login 
 
 /security/joc_cockpit_permissions:
   type:
@@ -1880,6 +1882,9 @@ traits:
              "deliveryDate":"2016-05-05T21:13:35Z",
              "id":4711
            }
+  /logo:
+    type: logo
+
 /configurations:
   type:
      postJSON:

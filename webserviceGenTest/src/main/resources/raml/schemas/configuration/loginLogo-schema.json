@@ -1,0 +1,22 @@
+{
+	"title": "security_configuration",
+	"id": "schemas/user/loginLogo",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.configuration.LoginLogo",
+	"type": "object",
+	"required": ["name"],
+	"properties": {
+		"name": {
+			"type": "string"
+		},
+		"width": {
+			"type": "string"
+		},
+		"height": {
+			"type": "string"
+		},
+		"position": {
+			"type": "string"
+		}
+	}
+}
