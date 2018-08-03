@@ -38,11 +38,12 @@ schemas:
   - logContent: !include schemas/common/logContent200-schema.json
   - logInfo: !include schemas/common/logInfo200-schema.json
   - security: !include schemas/user/security-schema.json
-  - logo: !include schemas/configuration/loginLogo-schema.json
+  - loginConfiguration: !include schemas/configuration/login-schema.json
 
 
 resourceTypes:
   - error: !include resourceTypes/common/error.raml
+  - postWithPlainResponse: !include resourceTypes/joc/postWithPlainResponse.raml
   - postCalendarWithOkResponse: !include resourceTypes/calendar/postJSONWithOkResponse.raml
   - postTaskWithOkResponse: !include resourceTypes/job/postWithOkResponse.raml
   - postTaskAndTimeoutWithOkResponse: !include resourceTypes/job/postTimeoutWithOkResponse.raml
@@ -84,7 +85,7 @@ resourceTypes:
   - modifyJobChain: !include resourceTypes/jobChain/modify.raml
   - modifyJobChainNode: !include resourceTypes/jobChain/modifyNode.raml
   - modifyCalendar: !include resourceTypes/calendar/modify.raml
-  - logo: !include resourceTypes/configuration/logo.raml
+  - loginConfiguration: !include resourceTypes/configuration/login.raml
   
 
 traits:
@@ -94,6 +95,12 @@ traits:
   - accessToken: !include ./traits/accessToken.raml
   - filename: !include ./traits/filename.raml
 
+
+/log:
+  type:
+    postWithPlainResponse:
+      description: Provides JOC Cockpit log ([date].stderrout.log) as download
+      description200: Content of JOC Cockpit log ([date].stderrout.log) for download
 
 /security/login:
   type: login 
@@ -1882,8 +1889,8 @@ traits:
              "deliveryDate":"2016-05-05T21:13:35Z",
              "id":4711
            }
-  /logo:
-    type: logo
+  /login:
+    type: loginConfiguration
 
 /configurations:
   type:

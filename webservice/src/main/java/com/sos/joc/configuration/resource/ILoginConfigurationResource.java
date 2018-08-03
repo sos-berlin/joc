@@ -9,15 +9,15 @@ import javax.ws.rs.core.MediaType;
 import com.sos.joc.classes.JOCDefaultResponse;
 
  
-public interface ICustomLogoConfigurationResource{
+public interface ILoginConfigurationResource{
 
     @POST
-    @Path("logo")
+    @Path("login")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postCustomLogo();
+    public JOCDefaultResponse postLoginConfiguration();
 
     @GET
-    @Path("logo")
+    @Path("login")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse getCustomLogo();
+    public JOCDefaultResponse getLoginConfiguration();
 }

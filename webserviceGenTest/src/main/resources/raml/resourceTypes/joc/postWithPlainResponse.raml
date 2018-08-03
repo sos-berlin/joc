@@ -1,0 +1,40 @@
+type: error
+get:
+  is: [accessToken]
+  description: |
+    <h2><<description>></h2>
+  responses:
+    200:
+      description: <<description200>>
+      headers:
+        Content-Disposition:
+          type: string
+          required: true
+          example: attachment;filename=joc.log
+        Content-Type:
+          type: string
+          required: true
+          default: application/octet-stream
+      body:
+        application/octet-stream:
+        text/plain:
+post:
+  description: |
+    <h2><<description>></h2>
+  body:
+    application/json:
+  responses:
+    200:
+      description: <<description200>>
+      headers:
+        Content-Disposition:
+          type: string
+          required: true
+          example: attachment;filename=main.log
+        Content-Type:
+          type: string
+          required: true
+          default: application/octet-stream
+      body:
+        application/octet-stream:
+        text/plain:

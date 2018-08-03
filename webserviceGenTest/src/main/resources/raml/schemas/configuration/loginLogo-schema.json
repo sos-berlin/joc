@@ -9,14 +9,16 @@
 		"name": {
 			"type": "string"
 		},
-		"width": {
-			"type": "string"
-		},
 		"height": {
 			"type": "string"
 		},
 		"position": {
-			"type": "string"
+		    "javaType": "com.sos.joc.model.configuration.LoginLogoPosition",
+			"type": "string",
+			"enum": [
+                "TOP",
+                "BOTTOM"
+            ]
 		}
 	}
 }
