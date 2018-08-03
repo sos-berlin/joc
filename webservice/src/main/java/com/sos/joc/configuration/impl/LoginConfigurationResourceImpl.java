@@ -31,9 +31,9 @@ public class LoginConfigurationResourceImpl extends JOCResourceImpl implements I
     public JOCDefaultResponse getLoginConfiguration() {
         Login login = new Login();
         try {
-            if (Globals.sosShiroProperties == null) {
+            //if (Globals.sosShiroProperties == null) {
                 Globals.sosShiroProperties = new JocCockpitProperties();
-            }
+            //}
             String logoName = Globals.sosShiroProperties.getProperty("custom_logo_name", "").trim();
             if (!logoName.isEmpty()) {
                 java.nio.file.Path p = Globals.sosShiroProperties.resolvePath(LOGO_LOCATION + logoName);
