@@ -46,9 +46,12 @@ public class LoginConfigurationResourceImpl extends JOCResourceImpl implements I
                 LoginLogo loginLogo = new LoginLogo();
                 loginLogo.setName(logoName);
                 
-                String regEx = "(\\d+(cm|mm|in|px|pt|pc|em|ex|ch|rem|vw|vh|vmin|vmax|%)?|auto)";
+                
+                String regEx = "(\\d+(cm|mm|in|px|pt|pc|em|ex|ch|rem|vw|vh|vmin|vmax|%)|auto)";
                 String logoHeight = Globals.sosShiroProperties.getProperty("custom_logo_height", "").trim();
-                if (logoHeight.matches(regEx)) {
+                if (logoHeight.matches("\\d+")) {
+                    loginLogo.setHeight(logoHeight + "px");
+                } else if (logoHeight.matches(regEx)) {
                     loginLogo.setHeight(logoHeight);
                 } else {
                     LOGGER.warn("logo height '" + logoHeight + "' doesn't match " + regEx);
@@ -58,7 +61,7 @@ public class LoginConfigurationResourceImpl extends JOCResourceImpl implements I
                 try {
                     loginLogo.setPosition(LoginLogoPosition.fromValue(logoPosition.toUpperCase()));
                 } catch (Exception e) {
-                    LOGGER.warn("logo position '" + logoPosition + "' doesn't match (top|bottom)");
+                    loginLogo.setPosition(LoginLogoPosition.BOTTOM);
                 }
                 login.setCustomLogo(loginLogo);
             }
