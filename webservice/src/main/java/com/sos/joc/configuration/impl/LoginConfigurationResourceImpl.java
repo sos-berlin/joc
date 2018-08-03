@@ -73,6 +73,7 @@ public class LoginConfigurationResourceImpl extends JOCResourceImpl implements I
             
             return JOCDefaultResponse.responseStatus200(login);
         } catch (Exception e) {
+            LOGGER.error("", e);
             return JOCDefaultResponse.responseStatus200(login);
         }
     }
