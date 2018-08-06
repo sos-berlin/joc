@@ -1,0 +1,12 @@
+{
+  "title": "JOClog's filename",
+  "id": "schemas/joc/filename",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.JOClog",
+  "type": "object",
+  "properties": {
+    "filename": {
+      "type": "string"
+    }
+  }
+}

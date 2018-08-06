@@ -19,7 +19,7 @@ public interface IJobSchedulerLogResource {
     @GET
     @Path("log")
     @CompressedAlready
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    //@Produces({ MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getMainLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId, @QueryParam("host") String host,
             @QueryParam("port") Integer port, @QueryParam("filename") String filename) throws Exception;
@@ -28,7 +28,7 @@ public interface IJobSchedulerLogResource {
     @Path("log")
     @CompressedAlready
     @Consumes("application/json")
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    //@Produces({ MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getMainLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             HostPortParameter hostPortParamSchema) throws Exception;
 
@@ -42,7 +42,7 @@ public interface IJobSchedulerLogResource {
     @GET
     @Path("debuglog")
     //@CompressedAlready
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    //@Produces({ MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getDebugLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId, @QueryParam("host") String host,
             @QueryParam("port") Integer port, @QueryParam("filename") String filename) throws Exception;
@@ -51,7 +51,7 @@ public interface IJobSchedulerLogResource {
     @Path("debuglog")
     //@CompressedAlready
     @Consumes("application/json")
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    //@Produces({ MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getDebugLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
             HostPortParameter hostPortParamSchema) throws Exception;
 

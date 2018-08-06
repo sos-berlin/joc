@@ -1,6 +1,7 @@
 package com.sos.joc.configuration.impl;
 
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.ws.rs.Path;
 
@@ -20,7 +21,7 @@ import com.sos.joc.model.configuration.LoginLogoPosition;
 public class LoginConfigurationResourceImpl extends JOCResourceImpl implements ILoginConfigurationResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginConfigurationResourceImpl.class);
-    private static final String LOGO_LOCATION = "../../webapps/root/ext/images/";
+    private static final String LOGO_LOCATION = "webapps/root/ext/images/";
 
     @Override
     public JOCDefaultResponse postLoginConfiguration() {
@@ -36,7 +37,7 @@ public class LoginConfigurationResourceImpl extends JOCResourceImpl implements I
             //}
             String logoName = Globals.sosShiroProperties.getProperty("custom_logo_name", "").trim();
             if (!logoName.isEmpty()) {
-                java.nio.file.Path p = Globals.sosShiroProperties.resolvePath(LOGO_LOCATION + logoName);
+                java.nio.file.Path p = Paths.get(LOGO_LOCATION + logoName);
                 if (!Files.exists(p)) {
                     LOGGER.warn("logo image '" + p.toString() + "' doesn't exist but configured.");
                     logoName = "";

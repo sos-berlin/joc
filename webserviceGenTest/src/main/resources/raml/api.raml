@@ -100,7 +100,20 @@ traits:
   type:
     postWithPlainResponse:
       description: Provides JOC Cockpit log ([date].stderrout.log) as download
+      description1: !include documentation/joc/filename.md
       description200: Content of JOC Cockpit log ([date].stderrout.log) for download
+      schema: !include schemas/joc/filename-schema.json
+
+/logs:
+  type: error
+  post:
+    description: <h2>Returns a list of JOC Cockpit logs ([date].stderrout.log)</h2>
+    responses:
+      200:
+        description: " "
+        body:
+          application/json:
+            schema: !include schemas/joc/filenames-schema.json
 
 /security/login:
   type: login 
@@ -1123,7 +1136,7 @@ traits:
         description9: !include documentation/common/historyStates.md
         description10: !include documentation/job/taskIds.md
         description11: !include documentation/job/taskIdOfOrder.md
-        description12: " "
+        description12: !include documentation/job/filteredByOrders.md
         description200: TODO
         schema: !include schemas/job/jobsFilter-schema.json
         schema200: !include schemas/job/history-schema.json

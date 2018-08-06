@@ -1,0 +1,15 @@
+{
+  "title": "List of JOC logs",
+  "id": "schemas/joc/filenames",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.JOClogs",
+  "type": "object",
+  "properties": {
+    "filenames": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

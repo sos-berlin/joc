@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.json.Json;
 import javax.json.JsonReader;
@@ -57,6 +58,7 @@ public class Globals {
     public static JocCockpitProperties jocConfigurationProperties;
     public static IniSecurityManagerFactory factory = null;
     public static long timeoutToDeleteTempFiles = 1000 * 60 * 3L;
+    public static TimeZone jocTimeZone = TimeZone.getDefault();
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null) {
