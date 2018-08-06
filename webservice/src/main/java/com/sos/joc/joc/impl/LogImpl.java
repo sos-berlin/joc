@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
@@ -21,7 +21,7 @@ import com.sos.joc.joc.resource.ILogResource;
 public class LogImpl extends JOCResourceImpl implements ILogResource {
 
     private static final String API_CALL = "./log";
-    
+
     @Override
     public JOCDefaultResponse postLog(String accessToken) {
         try {
@@ -34,12 +34,12 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
                 Globals.sosShiroProperties = new JocCockpitProperties();
             }
             SimpleDateFormat format = new SimpleDateFormat("yyyy_MM_dd");
-            final java.nio.file.Path jocLog = Globals.sosShiroProperties.resolvePath("../../logs/" + format.format(Date.from(Instant.now()))
-                    + ".stderrout.log");
+            final java.nio.file.Path jocLog = Globals.sosShiroProperties.resolvePath("../../logs/" + format.format(ZonedDateTime.of(LocalDateTime
+                    .now(), Globals.jocTimeZone.toZoneId())) + ".stderrout.log");
 
-             if (!Files.isReadable(jocLog)) {
-                 throw new IOException("JOC Cockpit log " + jocLog.toString() + " is not readable.");
-             }
+            if (!Files.isReadable(jocLog)) {
+                throw new IOException("JOC Cockpit log " + jocLog.toString() + " is not readable.");
+            }
 
             StreamingOutput fileStream = new StreamingOutput() {
 
