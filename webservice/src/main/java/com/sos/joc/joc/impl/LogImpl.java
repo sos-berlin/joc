@@ -9,19 +9,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.StreamingOutput;
 
-import com.sos.joc.Globals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JocCockpitProperties;
+import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joc.resource.ILogResource;
 import com.sos.joc.model.JOClog;
@@ -31,6 +35,9 @@ import com.sos.joc.model.JOClogs;
 public class LogImpl extends JOCResourceImpl implements ILogResource {
 
     private static final String API_CALL = "./log";
+    private static Logger LOGGER = LoggerFactory.getLogger(LogImpl.class);
+    private String logDirectory = "logs";
+    private String logTimezone = "GMT";
 
     @Override
     public JOCDefaultResponse postLog(String accessToken, JOClog jocLog) {
@@ -40,10 +47,16 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
                 return jocDefaultResponse;
             }
 
-            if (Globals.sosShiroProperties == null) {
-                Globals.sosShiroProperties = new JocCockpitProperties();
+            if (!System.getProperties().containsKey("jetty.base")) {
+                throw new JocConfigurationException("This function is only available with Jetty.");
             }
-            Path logDir = Paths.get("logs");
+
+            readJettyLoggingProperties();
+
+            Path logDir = Paths.get(logDirectory);
+            if (!Files.exists(logDir)) {
+                throw new FileNotFoundException("JOC Cockpit logs directory doesn't exist."); 
+            }
             Path latestLogFile = null;
             String pattern = "^\\d{4}_\\d{2}_\\d{2}\\.stderrout\\.log$";
             if (jocLog.getFilename() != null) {
@@ -51,9 +64,9 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
                     latestLogFile = logDir.resolve(jocLog.getFilename());
                 }
             } else {
-                latestLogFile = logDir.resolve(DateTimeFormatter.ofPattern("yyyy_MM_dd").format(ZonedDateTime.of(LocalDateTime.now(),
-                        Globals.jocTimeZone.toZoneId())) + ".stderrout.log");
-                if (!Files.isReadable(latestLogFile)) {
+                latestLogFile = logDir.resolve(DateTimeFormatter.ofPattern("yyyy_MM_dd").format(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of(
+                        logTimezone))) + ".stderrout.log");
+                if (!Files.isReadable(latestLogFile) || Files.size(latestLogFile) == 0) {
                     latestLogFile = null;
                     List<Path> filenames = new ArrayList<Path>();
                     for (Path logFile : getFileListStream(logDir, pattern)) {
@@ -64,9 +77,13 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
                         latestLogFile = filenames.get(0);
                     }
                 }
-                if (latestLogFile == null) {
-                    throw new FileNotFoundException("JOC Cockpit log not found.");
-                }
+            }
+            
+            if (latestLogFile == null) {
+                throw new FileNotFoundException("JOC Cockpit log not found.");
+            }
+            if (!Files.isReadable(latestLogFile)) {
+                throw new FileNotFoundException("JOC Cockpit log is not readable.");
             }
 
             final Path log = latestLogFile;
@@ -113,7 +130,13 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
                 return jocDefaultResponse;
             }
 
-            Path logDir = Paths.get("logs");
+            if (!System.getProperties().containsKey("jetty.base")) {
+                throw new JocConfigurationException("This function is only available with Jetty.");
+            }
+
+            readJettyLoggingProperties();
+
+            Path logDir = Paths.get(logDirectory);
             String pattern = "^\\d{4}_\\d{2}_\\d{2}\\.stderrout\\.log$";
             List<String> filenames = new ArrayList<String>();
             for (Path logFile : getFileListStream(logDir, pattern)) {
@@ -145,14 +168,17 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
     private static DirectoryStream<Path> getFileListStream(final Path folder, final String regexp) throws IOException {
 
         if (folder == null) {
-            throw new FileNotFoundException("directory not specified!!");
+            throw new FileNotFoundException("JOC Cockpit logs directory not specified!!");
         }
         if (!Files.isDirectory(folder)) {
-            throw new FileNotFoundException("directory does not exist: " + folder);
+            throw new FileNotFoundException("JOC Cockpit logs directory does not exist: " + folder);
         }
         final Pattern pattern = Pattern.compile(regexp);
         return Files.newDirectoryStream(folder, path -> {
             if (Files.isDirectory(path)) {
+                return false;
+            }
+            if (Files.size(path) == 0) {
                 return false;
             }
             if (!Files.isReadable(path)) {
@@ -160,6 +186,38 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
             }
             return pattern.matcher(path.getFileName().toString()).find();
         });
+    }
+
+    private void readJettyLoggingProperties() {
+        InputStream stream = null;
+        Properties properties = new Properties();
+        Path jettyLoggingConf = Paths.get("start.d/logging.ini");
+        if (!Files.exists(jettyLoggingConf)) {
+            jettyLoggingConf = Paths.get("start.ini");
+        }
+        if (Files.exists(jettyLoggingConf)) {
+            try {
+                stream = Files.newInputStream(jettyLoggingConf);
+                if (stream != null) {
+                    properties.load(stream);
+                }
+                if (properties.containsKey("jetty.logging.dir")) {
+                    logDirectory = properties.getProperty("jetty.logging.dir");
+                }
+                if (properties.containsKey("jetty.logging.timezone")) {
+                    logTimezone = properties.getProperty("jetty.logging.timezone");
+                }
+            } catch (Exception e) {
+                LOGGER.warn(String.format("Error while reading %1$s:", jettyLoggingConf.toString()), e);
+            } finally {
+                try {
+                    if (stream != null) {
+                        stream.close();
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
     }
 
 }
