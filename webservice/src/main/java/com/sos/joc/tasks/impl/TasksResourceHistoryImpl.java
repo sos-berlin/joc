@@ -2,7 +2,6 @@ package com.sos.joc.tasks.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -19,16 +18,15 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
 import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
+import com.sos.joc.model.job.OrderPath;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
-import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.tasks.resource.ITasksResourceHistory;
 
 @Path("tasks")

@@ -1,0 +1,23 @@
+{
+  "title": "orderPath",
+  "id": "schemas/job/orderPath",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.OrderPath",
+  "type": "object",
+  "required": [
+    "jobChain"
+  ],
+  "properties": {
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "description": "if orderId undefined or empty then all orders of specified job chain are requested",
+      "type": "string"
+    },
+    "state": {
+      "description": "name of job chain node.",
+      "type": "string"
+    }
+  }
+}
