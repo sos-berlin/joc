@@ -2,6 +2,7 @@ package com.sos.joc.tasks.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -18,6 +19,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
@@ -26,6 +28,7 @@ import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
+import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.tasks.resource.ITasksResourceHistory;
 
 @Path("tasks")
@@ -58,6 +61,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
             boolean hasPermission = true;
             boolean getTaskFromHistoryIdAndNode = false;
+            boolean getTaskFromOrderHistory = false;
             List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
 
             ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(connection);
@@ -67,13 +71,16 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             } else {
                 if (jobsFilter.getHistoryIds() != null && !jobsFilter.getHistoryIds().isEmpty()) {
                     getTaskFromHistoryIdAndNode = true;
+                } else if (jobsFilter.getOrders() != null && !jobsFilter.getOrders().isEmpty()) {
+                    getTaskFromOrderHistory = true;
                 } else {
                     if (jobsFilter.getDateFrom() != null) {
                         reportTaskExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter
                                 .getTimeZone()));
                     }
                     if (jobsFilter.getDateTo() != null) {
-                        reportTaskExecutionsDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
+                        reportTaskExecutionsDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(jobsFilter.getDateTo(), jobsFilter
+                                .getTimeZone()));
                     }
 
                     if (jobsFilter.getHistoryStates().size() > 0) {
@@ -108,7 +115,6 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                     }
                 }
             }
-            
 
             if (hasPermission) {
 
@@ -118,9 +124,16 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
                 reportTaskExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
                 List<DBItemReportTask> listOfDBItemReportTaskDBItems = new ArrayList<DBItemReportTask>();
-                
+
                 if (getTaskFromHistoryIdAndNode) {
-                    listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromHistoryIdAndNode(jobsFilter.getHistoryIds());
+                    listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromHistoryIdAndNode(jobsFilter
+                            .getHistoryIds());
+                } else if (getTaskFromOrderHistory) {
+                    for (OrderPath orderPath : jobsFilter.getOrders()) {
+                        checkRequiredParameter("jobChain", orderPath.getJobChain());
+                        orderPath.setJobChain(normalizePath(orderPath.getJobChain()));
+                    }
+                    listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromOrder(jobsFilter.getOrders());
                 } else {
                     listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
                 }

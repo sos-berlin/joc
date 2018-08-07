@@ -23,6 +23,12 @@
         "$ref": "jobPath-schema.json"
       }
     },
+    "orders": {
+      "type": "array",
+      "items": {
+        "$ref": "../order/orderPath-schema.json"
+      }
+    },
     "compact": {
       "$ref": "../common/compactParam-schema.json"
     },
