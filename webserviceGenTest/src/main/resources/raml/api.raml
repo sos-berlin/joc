@@ -393,6 +393,12 @@ traits:
         postTimeoutWithOkResponse:
           description: Restart JobScheduler Cluster with optional timeout
           audit: !include documentation/audit/auditLog.md
+    /reactivate:
+      # TODO ok response is not enough in case of still running task
+      type:
+        postTimeoutWithOkResponse:
+          description: Reactivate with optional timeout the primary JobScheduler after a fail-over 
+          audit: !include documentation/audit/auditLog.md
 #  /command:
 #    type:
 #      postXMLWithOkResponse:
