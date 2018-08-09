@@ -44,6 +44,12 @@
     },
     "historyId": {
       "type": "string"
+    },
+    "children": {
+      "type": "array",
+      "items": {
+        "$ref": "historyItem-schema.json"
+      }
     }
   }
 }

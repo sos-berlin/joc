@@ -2,7 +2,9 @@ package com.sos.joc.orders.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +35,7 @@ import com.sos.joc.orders.resource.IOrdersResourceHistory;
 public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrdersResourceHistory {
 
     private static final String API_CALL = "./orders/history";
+    private static final String CHILD_ORDER_PATTERN = "-\\+(\\d+)\\+-";
 
     @Override
     public JOCDefaultResponse postOrdersHistory(String xAccessToken, String accessToken, OrdersFilter ordersFilter) throws Exception {
@@ -58,6 +61,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             Globals.beginTransaction(connection);
 
             List<OrderHistoryItem> listHistory = new ArrayList<OrderHistoryItem>();
+            Map<String, List<OrderHistoryItem>> historyChildren = new HashMap<String, List<OrderHistoryItem>>();
             boolean withFolderFilter = ordersFilter.getFolders() != null && !ordersFilter.getFolders().isEmpty();
             boolean hasPermission = true;
             List<Folder> folders = addPermittedFolder(ordersFilter.getFolders());
@@ -134,18 +138,18 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 if (ordersFilter.getRegex() != null && !ordersFilter.getRegex().isEmpty()) {
                     regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher("");
                 }
+                
+                Matcher childOrderMatcher = Pattern.compile(CHILD_ORDER_PATTERN).matcher("");
+                List<OrderHistoryItem> children = null;
 
                 for (DBItemReportTrigger dbItemReportTrigger : listOfDBItemReportTrigger) {
-
-                    boolean add = true;
 
                     OrderHistoryItem history = new OrderHistoryItem();
                     if (ordersFilter.getJobschedulerId().isEmpty()) {
                         history.setJobschedulerId(dbItemReportTrigger.getSchedulerId());
-					if (!getPermissonsJocCockpit(dbItemReportTrigger.getSchedulerId(), accessToken).getHistory()
-							.getView().isStatus()) {
-					    continue;
-					}
+                        if (!getPermissonsJocCockpit(dbItemReportTrigger.getSchedulerId(), accessToken).getHistory().getView().isStatus()) {
+                            continue;
+                        }
                     }
 
                     history.setEndTime(dbItemReportTrigger.getEndTime());
@@ -174,16 +178,36 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                     }
                     history.setState(state);
                     history.setSurveyDate(dbItemReportTrigger.getCreated());
-
-                    if (regExMatcher != null) {
-                        regExMatcher.reset(dbItemReportTrigger.getParentName() + "," + dbItemReportTrigger.getName());
-                        add = regExMatcher.find();
+                    
+                    if (regExMatcher != null && !regExMatcher.reset(dbItemReportTrigger.getParentName() + "," + dbItemReportTrigger.getName()).find()) {
+                        continue;
                     }
 
-                    if (add && FilterAfterResponse.filterStateHasState(ordersFilter.getHistoryStates(), history.getState().get_text())) {
+                    if (!FilterAfterResponse.filterStateHasState(ordersFilter.getHistoryStates(), history.getState().get_text())) {
+                        continue;
+                    }
+                    
+                    children = historyChildren.remove(history.getHistoryId());
+                    if (children != null) {
+                        history.setChildren(children); 
+                    } else {
+                        history.setChildren(null);
+                    }
+                    
+                    childOrderMatcher = childOrderMatcher.reset(dbItemReportTrigger.getName());
+                    String parentHistoryId = null;
+                    while (childOrderMatcher.find()) {
+                        parentHistoryId = childOrderMatcher.group(1);
+                    }
+                    if (parentHistoryId != null) {
+                        if (!historyChildren.containsKey(parentHistoryId)) {
+                            historyChildren.put(parentHistoryId, new ArrayList<OrderHistoryItem>());
+                        }
+                        historyChildren.get(parentHistoryId).add(history);
+                    } else {
                         listHistory.add(history);
                     }
-
+                    
                 }
             }
 
