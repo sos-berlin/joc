@@ -172,7 +172,7 @@ public class TransferFileUtils {
             throw new YADERequestException("The original transfer order cannot be determined.");
         }
         OrderV order = OrderVolatile.getOrder(dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), false, jocResourceImpl);
-        if (order == null) {
+        if (order == null || order.getState() == null) {
             throw new YADERequestException(String.format("The original transfer order %1$s,%2$s was not found on node %3$s!",
                     dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), dbTransferItem.getJobChainNode()));
         } else {
