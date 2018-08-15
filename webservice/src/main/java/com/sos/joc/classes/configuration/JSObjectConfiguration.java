@@ -11,6 +11,7 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.order.ModifyOrder;
 
 import sos.xml.SOSXMLXPath;
 
@@ -43,7 +44,7 @@ public class JSObjectConfiguration {
         return entity;
     }
 
-    public String modifyOrderRuntime(String newRunTime, JOCResourceImpl jocResourceImpl, String jobChain, String orderId) throws JocException {
+    public ModifyOrder modifyOrderRuntime(String newRunTime, JOCResourceImpl jocResourceImpl, String jobChain, String orderId) throws JocException {
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
         String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(orderCommand, jocResourceImpl.getAccessToken());
@@ -55,7 +56,17 @@ public class JSObjectConfiguration {
             if (newRunTime != null && !newRunTime.trim().isEmpty()) {
                 orderNode = modifyOrderRuntimeNode(jocXmlCommand.getSosxml(), cleanEmptyCalendarDates(new SOSXMLXPath(new StringBuffer(newRunTime))));
             }
-            return jocXmlCommand.getXmlString(orderNode);
+            String nestedChain = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/order/@path", null);
+            if (nestedChain != null && nestedChain.contains(",")) {
+                nestedChain = nestedChain.split(",", 2)[0]; 
+            } else {
+                nestedChain = jobChain;
+            }
+            ModifyOrder o = new ModifyOrder();
+            o.setJobChain(nestedChain);
+            o.setOrderId(orderId);
+            o.setRunTime(jocXmlCommand.getXmlString(orderNode));
+            return o;
         } catch (JocException e) {
             throw e;
         } catch (Exception e) {

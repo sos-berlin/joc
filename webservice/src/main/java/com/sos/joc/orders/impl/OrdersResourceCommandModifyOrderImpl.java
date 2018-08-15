@@ -253,7 +253,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             case "set_run_time":
                 try {
                     JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
-                    String configuration = jocConfiguration.modifyOrderRuntime(order.getRunTime(), this, jobChainPath, order.getOrderId());
+                    ModifyOrder configuration = jocConfiguration.modifyOrderRuntime(order.getRunTime(), this, jobChainPath, order.getOrderId());
 
                     if (configuration == null) { // adhoc order
                         ValidateXML.validateAgainstJobSchedulerSchema(order.getRunTime());
@@ -267,10 +267,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
                         updateDailyPlan(dailyPlanCalender2DBFilter);
                     } else {
-                        ValidateXML.validateAgainstJobSchedulerSchema(configuration);
+                        ValidateXML.validateAgainstJobSchedulerSchema(configuration.getRunTime());
                         XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                        Element orderElement = XMLBuilder.parse(configuration);
-                        orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());
+                        Element orderElement = XMLBuilder.parse(configuration.getRunTime());
+                        orderElement.addAttribute("job_chain", Paths.get(configuration.getJobChain()).getFileName().toString());
                         orderElement.addAttribute("id", order.getOrderId());
 
                         xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
@@ -280,7 +280,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                             session = Globals.createSosHibernateStatelessConnection(API_CALL);
                         }
                         CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(),
-                                CalendarObjectType.ORDER, jobChainPath + "," + order.getOrderId(), order.getRunTime(), order.getCalendars());
+                                CalendarObjectType.ORDER, configuration.getJobChain() + "," + order.getOrderId(), order.getRunTime(), order
+                                        .getCalendars());
                         calendarUsedByWriter.updateUsedBy();
                         jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
                     }
