@@ -69,6 +69,16 @@ public class JobSchedulerDateTest {
         
         System.out.println(JobSchedulerDate.getDateFrom("0y+3M", null));
         System.out.println(JobSchedulerDate.getDateTo("0y-6M", null));
+        System.out.println(JobSchedulerDate.getDateFrom("-1M", null));
+        System.out.println(JobSchedulerDate.getDateTo("-1M", null));
+        System.out.println(JobSchedulerDate.getDateFrom("-1w", null));
+        System.out.println(JobSchedulerDate.getDateTo("-1w", null));
+        System.out.println(JobSchedulerDate.getDateFrom("-1d", null));
+        System.out.println(JobSchedulerDate.getDateTo("-1d", null));
+        System.out.println(JobSchedulerDate.getDateFrom("-1h", null));
+        System.out.println(JobSchedulerDate.getDateTo("-1h", null));
+        System.out.println(JobSchedulerDate.getDateFrom("-10s", null));
+        System.out.println(JobSchedulerDate.getDateTo("-10s", null));
         
     }
 

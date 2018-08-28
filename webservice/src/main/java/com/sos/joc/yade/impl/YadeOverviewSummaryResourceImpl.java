@@ -47,8 +47,8 @@ public class YadeOverviewSummaryResourceImpl extends JOCResourceImpl implements 
             }
             JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
             TransferFilesSummary entity = new TransferFilesSummary();
-            entity.setSuccessful(dbLayer.getSuccessfulTransfersCount(from, to));
-            entity.setFailed(dbLayer.getFailedTransfersCount(from, to));
+            entity.setSuccessful(dbLayer.getSuccessFulTransfersCount(filterBody.getJobschedulerId(), from, to));
+            entity.setFailed(dbLayer.getFailedTransfersCount(filterBody.getJobschedulerId(), from, to));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
