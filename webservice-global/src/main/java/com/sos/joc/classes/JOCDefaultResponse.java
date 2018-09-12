@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.Globals;
+import com.sos.joc.exceptions.JocAuthenticationException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.SessionNotExistException;
@@ -317,11 +318,13 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
     public static JOCDefaultResponse responseStatus401(SOSShiroCurrentUserAnswer entity) {
         Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", MediaType.APPLICATION_JSON).cacheControl(setNoCaching());
-        LOGGER.error(entity.getMessage());
+        if (entity.getMessage() != null) {
+            LOGGER.error(entity.getMessage());
+        }
         responseBuilder.entity(entity);
         return new JOCDefaultResponse(responseBuilder.build());
     }
-
+    
     public static JOCDefaultResponse responseStatus403(SOSShiroCurrentUserAnswer entity, String mediaType) {
         Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", mediaType).cacheControl(setNoCaching());
         LOGGER.error(entity.getMessage());
