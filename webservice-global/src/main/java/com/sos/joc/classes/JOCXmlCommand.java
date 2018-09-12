@@ -52,7 +52,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
     public static final String XML_COMMAND_API_PATH = "/jobscheduler/master/api/command";
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlCommand.class);
     private Date surveyDate;
-    private Map<String, NodeList> listOfNodeLists = new HashMap<String, NodeList>();;
+    private Map<String, NodeList> listOfNodeLists = new HashMap<String, NodeList>();
     private URI uriForJsonCommand;
     private String xmlCommand = null;
     private JOCResourceImpl jocResourceImpl;
@@ -136,7 +136,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
             Node n = nodeList.item(i);
             if (n != null && n.getNodeType() == Node.ELEMENT_NODE) {
                 element = (Element) n;
-                HashMap<String, String> attrs = new HashMap<String, String>();
+                Map<String, String> attrs = new HashMap<String, String>();
                 if (element != null) {
                     NamedNodeMap map = n.getAttributes();
                     for (int j = 0; j < map.getLength(); j++) {

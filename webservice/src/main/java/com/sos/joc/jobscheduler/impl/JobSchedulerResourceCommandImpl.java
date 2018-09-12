@@ -42,39 +42,47 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                 jobSchedulerCommands.setUrl(dbItemInventoryInstance.getUrl());
             }
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jobSchedulerCommands.getUrl());
-            jocXmlCommand.setBasicAuthorization(getBasicAuthorization());
-
             JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
-          
+
             if (!jobschedulerUser.resetTimeOut()) {
                 return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
             }
 
-            String xml = "";
-            for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
-
-                xml = xml + jobSchedulerCommandFactory.getXml(jobschedulerCommand);
-                if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(jobSchedulerCommands.getJobschedulerId(), accessToken),
-                        folderPermissions)) {
-                    if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
-                        return accessDeniedResponse();
-                    } else {
-                        LOGGER.warn("Command: Access denied");
-                    }
+            if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(jobSchedulerCommands.getJobschedulerId(), accessToken),
+                    folderPermissions)) {
+                if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
+                    return accessDeniedResponse();
+                } else {
+                    LOGGER.warn("Command: Access denied");
                 }
+            }
 
+            String xml = "";
+            boolean withAudit = false;
+            for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
+                String xmlCommand = jobSchedulerCommandFactory.getXml(jobschedulerCommand);
+                xml = xml + xmlCommand;
+                if (!withAudit && !xmlCommand.matches("^<(show_|params?\\.get|job\\.why|scheduler_log).*")) {
+                    withAudit = true;
+                }
             }
             if (!xml.startsWith("<params.get") && !xml.contains("param.get")) {
                 xml = "<commands>" + xml + "</commands>";
             }
+            JobSchedulerCommandAudit jobschedulerAudit = null;
+            if (withAudit) {
+                jobschedulerAudit = new JobSchedulerCommandAudit(xml, jobSchedulerCommands);
+            }
+            if (jobschedulerAudit != null) {
+                logAuditMessage(jobschedulerAudit);
+            }
 
-            JobSchedulerCommandAudit jobschedulerAudit = new JobSchedulerCommandAudit(xml, jobSchedulerCommands);
-            logAuditMessage(jobschedulerAudit);
-            // String answer = jocXmlCommand.executePostWithThrowBadRequest(xml,
-            // getAccessToken());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jobSchedulerCommands.getUrl());
+            jocXmlCommand.setBasicAuthorization(getBasicAuthorization());
             String answer = jocXmlCommand.executePost(xml, ResponseStream.TO_STRING, getAccessToken());
-            storeAuditLogEntry(jobschedulerAudit);
+            if (jobschedulerAudit != null) {
+                storeAuditLogEntry(jobschedulerAudit);
+            }
 
             return JOCDefaultResponse.responseStatus200(answer, "application/xml");
         } catch (JocException e) {
