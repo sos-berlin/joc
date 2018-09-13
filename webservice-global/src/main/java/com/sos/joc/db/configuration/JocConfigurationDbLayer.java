@@ -10,11 +10,15 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.configuration.Profile;
 
 /** @author Uwe Risse */
 public class JocConfigurationDbLayer extends DBLayer {
 
     private static final String JOC_CONFIGURATION_DB_ITEM = JocConfigurationDbItem.class.getName();
+    private static final String CONFIGURATION_PROFILE = ConfigurationProfile.class.getName();
     private JocConfigurationFilter filter = null;
 
     public JocConfigurationDbLayer(SOSHibernateSession sosHibernateSession) {
@@ -132,6 +136,15 @@ public class JocConfigurationDbLayer extends DBLayer {
 
     }
 
+    public List<Profile> getJocConfigurationProfiles() throws SOSHibernateException {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select new ").append(CONFIGURATION_PROFILE);
+        sql.append("(jc.account, max(al.created)) from ").append(JOC_CONFIGURATION_DB_ITEM).append(" jc, ").append(DBITEM_AUDIT_LOG).append(" al ");
+        sql.append("where jc.account=al.account and jc.configurationType='PROFILE' and al.request='./login' group by jc.account");
+        Query<Profile> query = this.getSession().createQuery(sql.toString());
+        return this.getSession().getResultList(query);
+    }
+
     public JocConfigurationDbItem getJocConfiguration(Long id) throws SOSHibernateException {
         StringBuilder sql = new StringBuilder();
         sql.append("from ").append(JOC_CONFIGURATION_DB_ITEM).append(" where id = :id");
@@ -173,6 +186,19 @@ public class JocConfigurationDbLayer extends DBLayer {
 
     public void deleteConfiguration(JocConfigurationDbItem dbItem) throws SOSHibernateException {
         this.getSession().delete(dbItem);
+    }
+    
+    public int deleteConfigurations(List<String> accounts) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            String hql = "delete from " + JOC_CONFIGURATION_DB_ITEM + " where account in (:accounts)";
+            Query<Integer> query = this.getSession().createQuery(hql);
+            query.setParameterList("accounts", accounts);
+            return this.getSession().executeUpdate(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
     }
 
     public JocConfigurationFilter getFilter() {

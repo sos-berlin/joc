@@ -206,6 +206,13 @@ public class JOCResourceImpl {
 		}
 		return true;
 	}
+	
+	public boolean checkRequiredParameter(String paramKey, List<?> paramVal) throws JocMissingRequiredParameterException {
+	    if (paramVal == null || paramVal.isEmpty()) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+        }
+        return true;
+    }
 
 	public boolean checkRequiredParameter(String paramKey, Integer paramVal)
 			throws JocMissingRequiredParameterException {

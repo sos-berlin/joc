@@ -20,7 +20,6 @@ public interface ISecurityConfigurationResourceRead
     
     @POST
     @Path("write")
-  
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postSecurityConfigurationWrite(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, SecurityConfiguration securityConfiguration) throws Exception;
 

@@ -1930,6 +1930,25 @@ traits:
        schema200: !include schemas/configuration/configurations-schema.json
        example: " "
        example200: " "
+  /delete:
+    type:
+      postJSONWithoutJSId:
+        description: Deletes all configuration items (profile, settings, customizations, ignore lists) of specified accounts 
+        description1: !include documentation/configuration/usersParam.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/configuration/configurationsDeleteFilter-schema.json
+        schema200: ok
+        example: " "
+        example200: " "
 #  /shared:
 #    type:
 #       postOnlyId:

@@ -1,5 +1,6 @@
 package com.sos.joc.configurations.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -22,17 +23,25 @@ import com.sos.joc.model.configuration.Configuration;
 import com.sos.joc.model.configuration.ConfigurationObjectType;
 import com.sos.joc.model.configuration.ConfigurationType;
 import com.sos.joc.model.configuration.Configurations;
+import com.sos.joc.model.configuration.ConfigurationsDeleteFilter;
 import com.sos.joc.model.configuration.ConfigurationsFilter;
 
 @Path("configurations")
 public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJocConfigurationsResource {
 
     private static final String API_CALL = "./configurations";
+    private static final String API_CALL_DELETE = "./configurations/delete";
 
     @Override
     public JOCDefaultResponse postConfigurations(String xAccessToken, String accessToken, ConfigurationsFilter configurationsFilter)
             throws Exception {
         return postConfigurations(getAccessToken(xAccessToken, accessToken), configurationsFilter);
+    }
+    
+    @Override
+    public JOCDefaultResponse postConfigurationsDelete(String xAccessToken, String accessToken, ConfigurationsDeleteFilter configurationsFilter)
+            throws Exception {
+        return postConfigurationsDelete(getAccessToken(xAccessToken, accessToken), configurationsFilter);
     }
 
     public JOCDefaultResponse postConfigurations(String accessToken, ConfigurationsFilter configurationsFilter) throws Exception {
@@ -127,9 +136,35 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
             configurations.setConfigurations(listOfConfigurations);
 
             return JOCDefaultResponse.responseStatus200(configurations);
-        } catch (
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
+        }
+    }
+    
+    public JOCDefaultResponse postConfigurationsDelete(String accessToken, ConfigurationsDeleteFilter configurationsFilter) throws Exception {
+        SOSHibernateSession connection = null;
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE, configurationsFilter, accessToken, "", getPermissonsJocCockpit("",
+                    accessToken).getJobschedulerMaster().getAdministration().isEditPermissions());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
-        JocException e) {
+            checkRequiredParameter("accounts", configurationsFilter.getAccounts());
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL_DELETE);
+            JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
+            connection.setAutoCommit(false);
+            Globals.beginTransaction(connection);
+            jocConfigurationDBLayer.deleteConfigurations(configurationsFilter.getAccounts());
+            Globals.commit(connection);
+
+            return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
+        } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {

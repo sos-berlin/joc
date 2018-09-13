@@ -12,7 +12,7 @@
 		},
 		
 		"main":{
-		"type": "array",
+			"type": "array",
 			"items": {
 				"type": "object",
 				"javaType": "com.sos.joc.model.security.SecurityConfigurationMainEntry",
@@ -55,6 +55,24 @@
 						"items": {
 							"type": "string"
 						}
+					}
+				}
+			}
+		},
+		
+		"profiles": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"javaType": "com.sos.joc.model.configuration.Profile",
+				"properties": {
+					"account": {
+						"type": "string"
+					},
+
+					"lastLogin": {
+						"type": "string",
+						"format": "date-time"
 					}
 				}
 			}
