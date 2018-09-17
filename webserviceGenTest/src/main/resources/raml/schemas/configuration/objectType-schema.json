@@ -19,6 +19,7 @@
     "ORDER_HISTORY",
     "YADE", 
     "YADE_HISTORY",
-    "EVENT"
+    "EVENT",
+    "AUDITLOG"
   ]
 }
