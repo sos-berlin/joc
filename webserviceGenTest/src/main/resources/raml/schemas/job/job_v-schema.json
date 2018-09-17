@@ -112,6 +112,9 @@
     "nextStartTime": {
       "$ref": "../common/timestamp-schema.json"
     },
+    "nextStartNever": {
+      "type": "boolean"
+    },
     "delayUntil": {
       "description": "Only relevant for standalone jobs with a delay_after_error configuration.",
       "$ref": "../common/timestamp-schema.json"

@@ -104,6 +104,9 @@
       "description": "ONLY for pending order or (waitingForResource order if processingState = job_not_in_period or node_delay)",
       "$ref": "../common/timestamp-schema.json"
     },
+    "nextStartNever": {
+      "type": "boolean"
+    },
     "historyId": {
       "description": "for all orders except pending orders",
       "type": "string"

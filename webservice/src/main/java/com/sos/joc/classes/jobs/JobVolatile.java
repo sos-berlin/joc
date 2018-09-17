@@ -169,6 +169,9 @@ public class JobVolatile extends JobV {
         setStateText(job.getAttribute("state_text"));
         //setNumOfRunningTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "tasks/@count", "0")));
         setNextStartTime(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, WebserviceConstants.NEXT_START_TIME, null)));
+        if (!isOrderJob() && getNextStartTime() == null) {
+            setNextStartNever(true);
+        }
         //setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(job));
         setErr((Element) jocXmlCommand.getSosxml().selectSingleNode(job, "ERROR"));
         setSummary();

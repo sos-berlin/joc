@@ -94,7 +94,12 @@ public class OrderVolatile extends OrderV {
         } else {
             set_type(getType(overview.getString("sourceType", "")));
         }
-        setNextStartTime(JobSchedulerDate.getDateFromISO8601String(pState.getString("at", Instant.EPOCH.toString())));
+        String processingType = pState.getString("TYPE", "");
+        if ("NotPlanned".equals(processingType) || "Due".equals(processingType)) {
+            setNextStartNever(true);
+        } else {
+            setNextStartTime(JobSchedulerDate.getDateFromISO8601String(pState.getString("at", Instant.EPOCH.toString())));
+        }
         setSetback(JobSchedulerDate.getDateFromISO8601String(pState.getString("until", Instant.EPOCH.toString())));
         setTaskId(pState.getString("taskId", null));
         setInProcessSince(JobSchedulerDate.getDateFromISO8601String(pState.getString("since", Instant.EPOCH.toString())));
@@ -105,7 +110,7 @@ public class OrderVolatile extends OrderV {
         } else {
             setProcessedBy(pState.getString("clusterMemberId", null));
         }
-        setProcessingState(pState, obstacles, usedNodes, usedTasks);
+        setProcessingState(processingType, obstacles, usedNodes, usedTasks);
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(obstacles));
         setJob(usedNodes.getJob(getJobChain(), getState()));
     }
@@ -119,14 +124,14 @@ public class OrderVolatile extends OrderV {
         setParams(Parameters.getParameters(order));
     }
     
-    public void setProcessingState(JsonObject processingState, JsonArray obstacles, UsedNodes usedNodes, UsedTasks usedTasks) {
+    public void setProcessingState(String processingType, JsonArray obstacles, UsedNodes usedNodes, UsedTasks usedTasks) {
         for (JsonObject obstacle : obstacles.getValuesAs(JsonObject.class)) {
             if ("Suspended".equals(obstacle.getString("TYPE", null))) {
                 setSeverity(OrderStateText.SUSPENDED);
             }
         }
         if (!processingStateIsSet()) {
-            switch (processingState.getString("TYPE", "")) {
+            switch (processingType) {
             case "NotPlanned":
                 setSeverity(OrderStateText.PENDING);
                 break;
