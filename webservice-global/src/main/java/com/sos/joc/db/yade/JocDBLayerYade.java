@@ -457,18 +457,19 @@ public class JocDBLayerYade extends DBLayer {
 	public boolean transferHasFiles(Long transferId, List<String> sourceFiles, List<String> targetFiles)
 			throws DBInvalidDataException, DBConnectionRefusedException {
 		try {
-			StringBuilder sql = new StringBuilder();
+		    boolean withSourceFiles = (sourceFiles != null && !sourceFiles.isEmpty());
+		    boolean withTargetFiles = (targetFiles != null && !targetFiles.isEmpty());
+            StringBuilder sql = new StringBuilder();
 			sql.append("from ");
 			sql.append(DBITEM_YADE_FILES);
 			sql.append(" where transferId = :transferId");
-			if (sourceFiles != null && !sourceFiles.isEmpty() && (targetFiles == null || targetFiles.isEmpty())) {
+			if (withSourceFiles && !withTargetFiles) {
 				sql.append(" and");
 				sql.append(" sourcePath in (:sourceFiles)");
-			} else if (targetFiles != null && !targetFiles.isEmpty()
-					&& (sourceFiles == null || sourceFiles.isEmpty())) {
+			} else if (withTargetFiles && !withSourceFiles) {
 				sql.append(" and");
 				sql.append(" targetPath in (:targetFiles)");
-			} else if (sourceFiles != null && !sourceFiles.isEmpty() && targetFiles != null && !targetFiles.isEmpty()) {
+			} else if (withSourceFiles && withTargetFiles) {
 				sql.append(" and");
 				sql.append(" (sourcePath in (:sourceFiles)");
 				sql.append(" or");
@@ -476,10 +477,10 @@ public class JocDBLayerYade extends DBLayer {
 			}
 			Query<DBItemYadeFiles> query = getSession().createQuery(sql.toString());
 			query.setParameter("transferId", transferId);
-			if (sourceFiles != null && !sourceFiles.isEmpty()) {
+			if (withSourceFiles) {
 				query.setParameterList("sourceFiles", sourceFiles);
 			}
-			if (targetFiles != null && !targetFiles.isEmpty()) {
+			if (withTargetFiles) {
 				query.setParameter("targetFiles", targetFiles);
 			}
 			List<DBItemYadeFiles> foundFiles = getSession().getResultList(query);
@@ -490,6 +491,40 @@ public class JocDBLayerYade extends DBLayer {
 			throw new DBInvalidDataException(ex);
 		}
 	}
+	
+	public List<Long> transferIdsFilteredBySourceTargetPath(List<String> sourceFiles, List<String> targetFiles)
+            throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            boolean withSourceFiles = (sourceFiles != null && !sourceFiles.isEmpty());
+            boolean withTargetFiles = (targetFiles != null && !targetFiles.isEmpty());
+            StringBuilder sql = new StringBuilder();
+            sql.append("select transferId from ");
+            sql.append(DBITEM_YADE_FILES);
+            sql.append(" where");
+            if (withSourceFiles) {
+                sql.append(" sourcePath in (:sourceFiles)"); 
+            }
+            if (withSourceFiles && withTargetFiles) {
+                sql.append(" or"); 
+            }
+            if (withTargetFiles) {
+                sql.append(" targetPath in (:targetFiles)"); 
+            }
+            sql.append(" group by transferId"); 
+            Query<Long> query = getSession().createQuery(sql.toString());
+            if (withSourceFiles) {
+                query.setParameterList("sourceFiles", sourceFiles);
+            }
+            if (withTargetFiles) {
+                query.setParameter("targetFiles", targetFiles);
+            }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
 
 	private Integer getTransfersCount(String jobschedulerId, boolean successFull, Date from, Date to)
 			throws SOSHibernateException, DBInvalidDataException, DBConnectionRefusedException {

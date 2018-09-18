@@ -9,9 +9,6 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jade.db.DBItemYadeProtocols;
 import com.sos.jade.db.DBItemYadeTransfers;
@@ -37,7 +34,6 @@ import com.sos.joc.yade.resource.IYadeTransfersResource;
 public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeTransfersResource {
 
 	private static final String API_CALL = "./yade/transfers";
-	private static final Logger LOGGER = LoggerFactory.getLogger(YadeTransfersResourceImpl.class);
 
 	@Override
 	public JOCDefaultResponse postYadeTransfers(String accessToken, TransferFilter filterBody) throws Exception {
@@ -166,35 +162,24 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 			filter.setDateTo(dateTo);
 			List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(filter);
 			Transfers entity = new Transfers();
-			List<DBItemYadeTransfers> filteredTransfersByFiles = new ArrayList<DBItemYadeTransfers>();
 			List<Transfer> transfers = new ArrayList<Transfer>();
-			if ((sourceFiles != null && !sourceFiles.isEmpty()) || (targetFiles != null && !targetFiles.isEmpty())) {
-				for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
-					if (dbLayer.transferHasFiles(transferFromDb.getId(), sourceFiles, targetFiles)) {
-					    if(filterBody.getJobschedulerId().isEmpty()) {
-			                if (!getPermissonsJocCockpit(transferFromDb.getJobschedulerId(), getAccessToken())
-			                        .getYADE().getView().isStatus()) {
-			                    continue;
-			                }
-					    }
-						filteredTransfersByFiles.add(transferFromDb);
-					}
-				}
-				for (DBItemYadeTransfers transferFromDb : filteredTransfersByFiles) {
-					transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
-				}
-			} else {
-				for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
-                    if(filterBody.getJobschedulerId().isEmpty()) {
-                        LOGGER.info(transferFromDb.getJobschedulerId());
-                        if (!getPermissonsJocCockpit(transferFromDb.getJobschedulerId(), getAccessToken()).getYADE()
-                                .getView().isStatus()) {
-                            continue;
-                        }
+			List<Long> filteredTransferIds = new ArrayList<Long>();
+            boolean withSourceFiles = (sourceFiles != null && !sourceFiles.isEmpty());
+			boolean withTargetFiles = (targetFiles != null && !targetFiles.isEmpty());
+			if (withSourceFiles || withTargetFiles) {
+			    filteredTransferIds = dbLayer.transferIdsFilteredBySourceTargetPath(sourceFiles, targetFiles);
+            }
+            for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
+                if ((withSourceFiles || withTargetFiles) && !filteredTransferIds.contains(transferFromDb.getId())) {
+                    continue;
+                }
+                if (filterBody.getJobschedulerId().isEmpty()) {
+                    if (!getPermissonsJocCockpit(transferFromDb.getJobschedulerId(), getAccessToken()).getYADE().getView().isStatus()) {
+                        continue;
                     }
-					transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
-				}
-			}
+                }
+                transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
+            }
 			entity.setTransfers(transfers);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);

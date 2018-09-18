@@ -1,6 +1,6 @@
 #%RAML 0.8
 title: JOC API
-version: 1.12.5
+version: 1.12.6
 protocols: [ HTTP, HTTPS ]
 baseUri: http://test.sos-berlin.com:3001/joc/api
 #mediaType: application/json
@@ -56,7 +56,7 @@ resourceTypes:
   - postJSON: !include resourceTypes/common/postJSON.raml
   - postJSONWithOptionalJSId: !include resourceTypes/common/postJSONWithOptionalJSId.raml
   - postJSONWithoutJSId: !include resourceTypes/common/postJSONWithoutJSId.raml
-  - postJSON16: !include resourceTypes/common/postJSON16.raml
+  - postJSON18: !include resourceTypes/common/postJSON18.raml
   - postYADEJSONWithOkResponse: !include resourceTypes/yade/postJSONWithOkResponse.raml
   - postOnlyAccessToken: !include resourceTypes/common/postOnlyAccessToken.raml
   - postOnlyId: !include resourceTypes/common/postOnlyId.raml
@@ -2057,7 +2057,7 @@ traits:
 
   /transfers:
     type:
-      postJSON16:
+      postJSON18:
         description: Responds YADE transfers
         description1: !include documentation/yade/transferIds.md
         description2: !include documentation/common/compact.md
@@ -2072,9 +2072,11 @@ traits:
         description11: !include documentation/yade/hasIntervention.md
         description12: !include documentation/yade/isIntervention.md
         description13: !include documentation/yade/profile.md
-        description14: !include documentation/yade/sourcePath.md
-        description15: !include documentation/yade/targetPath.md
-        description16: !include documentation/common/limit.md
+        description14: !include documentation/yade/sourcePathRegex.md
+        description15: !include documentation/yade/targetPathRegex.md
+        description16: !include documentation/yade/sourcePath.md
+        description17: !include documentation/yade/targetPath.md
+        description18: !include documentation/common/limit.md
         description200: !include documentation/yade/transfers.md
         schema: !include schemas/yade/transferFilter-schema.json
         schema200: !include schemas/yade/transfers-schema.json

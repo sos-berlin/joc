@@ -76,6 +76,12 @@
         "$ref": "protocolFragment-schema.json"
       }
     },
+    "sourceFilesRegex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "targetFilesRegex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
     "sourceFiles": {
       "type": "array",
       "items": {
