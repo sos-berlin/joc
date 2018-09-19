@@ -20,6 +20,16 @@ public class FilterAfterResponse {
         return Pattern.compile(regex).matcher(path).find();
     }
     
+    public static boolean matchRegex(Pattern pattern, String path) {
+        if (pattern == null) {
+            return true;
+        }
+        if (path == null) {
+            return false;
+        }
+        return pattern.matcher(path).find();
+    }
+    
     public static boolean filterStateHasState(List<? extends Enum<?>> filterStates, Enum<?> state) {
         if (filterStates == null || filterStates.isEmpty()) {
             return true;

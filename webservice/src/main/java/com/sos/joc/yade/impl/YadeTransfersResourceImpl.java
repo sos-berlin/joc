@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
@@ -16,8 +17,10 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.db.yade.JocDBLayerYade;
 import com.sos.joc.db.yade.JocYadeFilter;
+import com.sos.joc.db.yade.YadeSourceTargetFiles;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.yade.Operation;
@@ -85,6 +88,8 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 					break;
 				}
 			}
+			//TODO source and target are wrong
+			//If works now only if the array has only one item
 			Set<String> sourceHosts = null;
 			Set<Integer> sourceProtocols = null;
 			if (filterBody.getSources() != null && !filterBody.getSources().isEmpty()) {
@@ -163,22 +168,59 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 			List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(filter);
 			Transfers entity = new Transfers();
 			List<Transfer> transfers = new ArrayList<Transfer>();
-			List<Long> filteredTransferIds = new ArrayList<Long>();
-            boolean withSourceFiles = (sourceFiles != null && !sourceFiles.isEmpty());
-			boolean withTargetFiles = (targetFiles != null && !targetFiles.isEmpty());
-			if (withSourceFiles || withTargetFiles) {
-			    filteredTransferIds = dbLayer.transferIdsFilteredBySourceTargetPath(sourceFiles, targetFiles);
-            }
-            for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
-                if ((withSourceFiles || withTargetFiles) && !filteredTransferIds.contains(transferFromDb.getId())) {
-                    continue;
+			List<Long> filteredTransferIds = null;
+			List<YadeSourceTargetFiles> yadeFiles = new ArrayList<YadeSourceTargetFiles>();
+			Pattern sourceFilesPattern = null;
+			Pattern targetFilesPattern = null;
+            
+            if (transfersFromDb != null && !transfersFromDb.isEmpty()) {
+                boolean withSourceFiles = (sourceFiles != null && !sourceFiles.isEmpty());
+                boolean withTargetFiles = (targetFiles != null && !targetFiles.isEmpty());
+                boolean withSourceFilesRegex = (!withSourceFiles && filterBody.getSourceFilesRegex() != null && !filterBody.getSourceFilesRegex()
+                        .isEmpty());
+                boolean withTargetFilesRegex = (!withTargetFiles && filterBody.getTargetFilesRegex() != null && !filterBody.getTargetFilesRegex()
+                        .isEmpty());
+                boolean withSourceTargetFilter = (withSourceFiles || withTargetFiles || withSourceFilesRegex || withTargetFilesRegex);
+                
+                if (withSourceTargetFilter) {
+                    filteredTransferIds = dbLayer.getFilteredTransferIds(filter);
                 }
-                if (filterBody.getJobschedulerId().isEmpty()) {
-                    if (!getPermissonsJocCockpit(transferFromDb.getJobschedulerId(), getAccessToken()).getYADE().getView().isStatus()) {
-                        continue;
+                if ((withSourceFiles || withTargetFiles) && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
+                    filteredTransferIds = dbLayer.transferIdsFilteredBySourceTargetPath(filteredTransferIds, sourceFiles, targetFiles);
+                }
+                if (withSourceFilesRegex && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
+                    sourceFilesPattern = Pattern.compile(filterBody.getSourceFilesRegex());
+                }
+                if (withTargetFilesRegex && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
+                    targetFilesPattern = Pattern.compile(filterBody.getTargetFilesRegex());
+                }
+                if ((withSourceFilesRegex || withTargetFilesRegex) && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
+                    yadeFiles = dbLayer.SourceTargetFilePaths(filteredTransferIds);
+                    if (yadeFiles != null) {
+                        Set<Long> transferIdSet = new HashSet<Long>();
+                        for (YadeSourceTargetFiles f : yadeFiles) {
+                            if (FilterAfterResponse.matchRegex(sourceFilesPattern, f.getSourcePath()) && FilterAfterResponse.matchRegex(
+                                    targetFilesPattern, f.getTargetPath())) {
+                                transferIdSet.add(f.getTransferId());
+                            }
+                        }
+                        filteredTransferIds = new ArrayList<Long>(transferIdSet);
                     }
                 }
-                transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
+                if (filteredTransferIds == null) {
+                    filteredTransferIds = new ArrayList<Long>();
+                }
+                for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
+                    if (withSourceTargetFilter && !filteredTransferIds.contains(transferFromDb.getId())) {
+                        continue;
+                    }
+                    if (filterBody.getJobschedulerId().isEmpty()) {
+                        if (!getPermissonsJocCockpit(transferFromDb.getJobschedulerId(), getAccessToken()).getYADE().getView().isStatus()) {
+                            continue;
+                        }
+                    }
+                    transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
+                }
             }
 			entity.setTransfers(transfers);
 			entity.setDeliveryDate(Date.from(Instant.now()));

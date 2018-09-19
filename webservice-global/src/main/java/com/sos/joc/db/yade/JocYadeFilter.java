@@ -6,21 +6,21 @@ import java.util.Set;
 
 public class JocYadeFilter {
 
-    String jobschedulerId;
-    List<Long> transferIds; 
-    Set<Integer> operations; 
-    Set<Integer> states;
-    String mandator; 
-    Set<String> sourceHosts; 
-    Set<Integer> sourceProtocols; 
-    Set<String> targetHosts; 
-    Set<Integer> targetProtocols; 
-    Boolean isIntervention; 
-    Boolean hasInterventions; 
-    List<String> profiles; 
-    Integer limit; 
-    Date dateFrom; 
-    Date dateTo;
+    private String jobschedulerId;
+    private List<Long> transferIds; 
+    private Set<Integer> operations; 
+    private Set<Integer> states;
+    private String mandator; 
+    private Set<String> sourceHosts; 
+    private Set<Integer> sourceProtocols; 
+    private Set<String> targetHosts; 
+    private Set<Integer> targetProtocols; 
+    private Boolean isIntervention; 
+    private Boolean hasInterventions; 
+    private List<String> profiles; 
+    private Integer limit; 
+    private Date dateFrom; 
+    private Date dateTo;
     
     public String getJobschedulerId() {
         return jobschedulerId;

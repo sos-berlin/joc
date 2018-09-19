@@ -23,6 +23,7 @@ public class JocDBLayerYade extends DBLayer {
 	private static final String DBITEM_YADE_TRANSFERS = DBItemYadeTransfers.class.getSimpleName();
 	private static final String DBITEM_YADE_PROTOCOLS = DBItemYadeProtocols.class.getSimpleName();
 	private static final String DBITEM_YADE_FILES = DBItemYadeFiles.class.getSimpleName();
+	private static final String YADE_SOURCE_TARGET_FILES = YadeSourceTargetFiles.class.getName();
 
 	public JocDBLayerYade(SOSHibernateSession session) {
 		super(session);
@@ -180,141 +181,160 @@ public class JocDBLayerYade extends DBLayer {
 		}
 	}
 
-	public List<DBItemYadeTransfers> getFilteredTransfers(JocYadeFilter filter)
-			throws DBInvalidDataException, DBConnectionRefusedException {
-		try {
-			boolean hasFilter = ((filter.getJobschedulerId() != null && !filter.getJobschedulerId().isEmpty())
-					|| (filter.getTransferIds() != null && !filter.getTransferIds().isEmpty())
-					|| (filter.getOperations() != null && !filter.getOperations().isEmpty())
-					|| (filter.getStates() != null && !filter.getStates().isEmpty()) || filter.getMandator() != null
-					|| (filter.getSourceHosts() != null && !filter.getSourceHosts().isEmpty())
-					|| (filter.getSourceProtocols() != null && !filter.getSourceProtocols().isEmpty())
-					|| (filter.getTargetHosts() != null && !filter.getTargetHosts().isEmpty())
-					|| (filter.getTargetProtocols() != null && !filter.getTargetProtocols().isEmpty())
-					|| filter.getIsIntervention() != null || filter.getHasInterventions() != null
-					|| (filter.getProfiles() != null && !filter.getProfiles().isEmpty()) || filter.getDateFrom() != null
-					|| filter.getDateTo() != null);
-			StringBuilder sql = new StringBuilder();
-			sql.append("select yt from ");
-			sql.append(DBITEM_YADE_TRANSFERS).append(" yt,");
-			sql.append(DBITEM_YADE_PROTOCOLS).append(" yps,");
-			sql.append(DBITEM_YADE_PROTOCOLS).append(" ypt");
-			sql.append(" where");
-			sql.append(" yt.sourceProtocolId = yps.id");
-			sql.append(" and");
-			sql.append(" yt.targetProtocolId is not null and yt.targetProtocolId = ypt.id");
-			if (hasFilter) {
-				if (filter.getJobschedulerId() != null && !filter.getJobschedulerId().isEmpty()) {
-					sql.append(" and");
-					sql.append(" yt.jobschedulerId = :jobschedulerId");
-				}
-				if (filter.getTransferIds() != null && !filter.getTransferIds().isEmpty()) {
-					sql.append(" and");
-					sql.append(" yt.id in ( :transferIds)");
-				}
-				if (filter.getOperations() != null && !filter.getOperations().isEmpty()) {
-					sql.append(" and");
-					sql.append(" yt.operation in ( :operations)");
-				}
-				if (filter.getStates() != null && !filter.getStates().isEmpty()) {
-					sql.append(" and");
-					sql.append(" yt.state in ( :states)");
-				}
-				if (filter.getMandator() != null && !filter.getMandator().isEmpty()) {
-					sql.append(" and");
-					sql.append(" yt.mandator = :mandator");
-				}
-				if (filter.getSourceHosts() != null && !filter.getSourceHosts().isEmpty()) {
-					sql.append(" and");
-					sql.append(" yps.hostname in ( :sourceHosts)");
-				}
-				if (filter.getSourceProtocols() != null && !filter.getSourceProtocols().isEmpty()) {
-					sql.append(" and");
-					sql.append(" yps.protocol in ( :sourceProtocols)");
-				}
-				if (filter.getTargetHosts() != null && !filter.getTargetHosts().isEmpty()) {
-					sql.append(" and");
-					sql.append(" ypt.hostname in ( :targetHosts)");
-				}
-				if (filter.getTargetProtocols() != null && !filter.getTargetProtocols().isEmpty()) {
-					sql.append(" and");
-					sql.append(" ypt.protocol in ( :targetProtocols)");
-				}
-				if (filter.getIsIntervention() != null) {
-					sql.append(" and");
-					if (filter.getIsIntervention()) {
-						sql.append(" yt.parentTransferId != null");
-					} else {
-						sql.append(" yt.parentTransferId == null");
-					}
-				}
-				if (filter.getHasInterventions() != null) {
-					sql.append(" and");
-					sql.append(" yt.hasIntervention = :hasInterventions");
-				}
-				if (filter.getProfiles() != null && !filter.getProfiles().isEmpty()) {
-					sql.append(" and");
-					sql.append(" yt.profileName in ( :profiles)");
-				}
-				if (filter.getDateFrom() != null) {
-					sql.append(" and");
-					sql.append(" yt.start >= :dateFrom");
-				}
-				if (filter.getDateTo() != null) {
-					sql.append(" and");
-					sql.append(" yt.start < :dateTo");
-				}
-			}
-			Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
-			if (filter.getJobschedulerId() != null && !filter.getJobschedulerId().isEmpty()) {
-				query.setParameter("jobschedulerId", filter.getJobschedulerId());
-			}
-			if (filter.getTransferIds() != null && !filter.getTransferIds().isEmpty()) {
-				query.setParameter("transferIds", filter.getTransferIds());
-			}
-			if (filter.getOperations() != null && !filter.getOperations().isEmpty()) {
-				query.setParameterList("operations", filter.getOperations());
-			}
-			if (filter.getStates() != null && !filter.getStates().isEmpty()) {
-				query.setParameterList("states", filter.getStates());
-			}
-			if (filter.getMandator() != null && !filter.getMandator().isEmpty()) {
-				query.setParameter("mandator", filter.getMandator());
-			}
-			if (filter.getSourceHosts() != null && !filter.getSourceHosts().isEmpty()) {
-				query.setParameter("sourceHosts", filter.getSourceHosts());
-			}
-			if (filter.getSourceProtocols() != null && !filter.getSourceProtocols().isEmpty()) {
-				query.setParameter("sourceProtocols", filter.getSourceProtocols());
-			}
-			if (filter.getTargetHosts() != null && !filter.getTargetHosts().isEmpty()) {
-				query.setParameter("targetHosts", filter.getTargetHosts());
-			}
-			if (filter.getTargetProtocols() != null && !filter.getTargetProtocols().isEmpty()) {
-				query.setParameter("targetProtocols", filter.getTargetProtocols());
-			}
-			if (filter.getHasInterventions() != null) {
-				query.setParameter("hasInterventions", filter.getHasInterventions());
-			}
-			if (filter.getProfiles() != null && !filter.getProfiles().isEmpty()) {
-				query.setParameterList("profiles", filter.getProfiles());
-			}
-			if (filter.getDateFrom() != null) {
-				query.setParameter("dateFrom", filter.getDateFrom(), TemporalType.TIMESTAMP);
-			}
-			if (filter.getDateTo() != null) {
-				query.setParameter("dateTo", filter.getDateTo(), TemporalType.TIMESTAMP);
-			}
-			if (filter.getLimit() != null) {
-				query.setMaxResults(filter.getLimit());
-			}
-			return getSession().getResultList(query);
-		} catch (SOSHibernateInvalidSessionException ex) {
-			throw new DBConnectionRefusedException(ex);
-		} catch (Exception ex) {
-			throw new DBInvalidDataException(ex);
-		}
-	}
+    public List<DBItemYadeTransfers> getFilteredTransfers(JocYadeFilter filter) throws DBInvalidDataException, DBConnectionRefusedException {
+        return getTransfers(filter, false);
+    }
+    
+    public List<Long> getFilteredTransferIds(JocYadeFilter filter) throws DBInvalidDataException, DBConnectionRefusedException {
+        return getTransfers(filter, true);
+    }
+    
+    private <T> List<T> getTransfers(JocYadeFilter filter, boolean onlyTransferIds) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            boolean withJobschedulerId = filter.getJobschedulerId() != null && !filter.getJobschedulerId().isEmpty();
+            boolean withTransferIds = filter.getTransferIds() != null && !filter.getTransferIds().isEmpty();
+            boolean withOperations = filter.getOperations() != null && !filter.getOperations().isEmpty();
+            boolean withStates = filter.getStates() != null && !filter.getStates().isEmpty();
+            boolean withMandator = filter.getMandator() != null && !filter.getMandator().isEmpty();
+            boolean withSourceHosts = filter.getSourceHosts() != null && !filter.getSourceHosts().isEmpty();
+            boolean withSourceProtocols = filter.getSourceProtocols() != null && !filter.getSourceProtocols().isEmpty();
+            boolean withTargetHosts = filter.getTargetHosts() != null && !filter.getTargetHosts().isEmpty();
+            boolean withTargetProtocols = filter.getTargetProtocols() != null && !filter.getTargetProtocols().isEmpty();
+            boolean withProfiles = filter.getProfiles() != null && !filter.getProfiles().isEmpty();
+            String and = " where";
+            StringBuilder sql = new StringBuilder();
+            sql.append("select yt");
+            if (onlyTransferIds) {
+                sql.append(".id");
+            } 
+            sql.append(" from ").append(DBITEM_YADE_TRANSFERS).append(" yt");
+            if (withSourceHosts || withSourceProtocols) {
+                sql.append(", ").append(DBITEM_YADE_PROTOCOLS).append(" yps");
+            }
+            if (withTargetHosts || withTargetProtocols) {
+                sql.append(", ").append(DBITEM_YADE_PROTOCOLS).append(" ypt");
+            }
+            if (withSourceHosts || withSourceProtocols) {
+                sql.append(and).append(" yt.sourceProtocolId = yps.id");
+                and = " and";
+            }
+            if (withTargetHosts || withTargetProtocols) {
+                sql.append(and).append(" yt.targetProtocolId is not null and yt.targetProtocolId = ypt.id");
+                and = " and";
+            }
+            if (withJobschedulerId) {
+                sql.append(and).append(" yt.jobschedulerId = :jobschedulerId");
+                and = " and";
+            }
+            if (withTransferIds) {
+                sql.append(and).append(" yt.id in (:transferIds)");
+                and = " and";
+            }
+            if (withOperations) {
+                sql.append(and).append(" yt.operation in (:operations)");
+                and = " and";
+            }
+            if (withStates) {
+                sql.append(and).append(" yt.state in (:states)");
+                and = " and";
+            }
+            if (withMandator) {
+                sql.append(and).append(" yt.mandator = :mandator");
+                and = " and";
+            }
+            if (withSourceHosts) {
+                sql.append(and).append(" yps.hostname in (:sourceHosts)");
+                and = " and";
+            }
+            if (withSourceProtocols) {
+                sql.append(and).append(" yps.protocol in (:sourceProtocols)");
+                and = " and";
+            }
+            if (withTargetHosts) {
+                sql.append(and).append(" ypt.hostname in (:targetHosts)");
+                and = " and";
+            }
+            if (withTargetProtocols) {
+                sql.append(and).append(" ypt.protocol in (:targetProtocols)");
+                and = " and";
+            }
+            if (filter.getIsIntervention() != null) {
+                sql.append(and);
+                and = " and";
+                if (filter.getIsIntervention()) {
+                    sql.append(" yt.parentTransferId != null");
+                } else {
+                    sql.append(" yt.parentTransferId == null");
+                }
+            }
+            if (filter.getHasInterventions() != null) {
+                sql.append(and).append(" yt.hasIntervention = :hasInterventions");
+                and = " and";
+            }
+            if (withProfiles) {
+                sql.append(and).append(" yt.profileName in (:profiles)");
+                and = " and";
+            }
+            if (filter.getDateFrom() != null) {
+                sql.append(and).append(" yt.start >= :dateFrom");
+                and = " and";
+            }
+            if (filter.getDateTo() != null) {
+                sql.append(and).append(" yt.start < :dateTo");
+            }
+            if (onlyTransferIds) {
+                sql.append(" group by yt.id");
+            }
+            Query<T> query = getSession().createQuery(sql.toString());
+            if (withJobschedulerId) {
+                query.setParameter("jobschedulerId", filter.getJobschedulerId());
+            }
+            if (withTransferIds) {
+                query.setParameter("transferIds", filter.getTransferIds());
+            }
+            if (withOperations) {
+                query.setParameterList("operations", filter.getOperations());
+            }
+            if (withStates) {
+                query.setParameterList("states", filter.getStates());
+            }
+            if (withMandator) {
+                query.setParameter("mandator", filter.getMandator());
+            }
+            if (withSourceHosts) {
+                query.setParameter("sourceHosts", filter.getSourceHosts());
+            }
+            if (withSourceProtocols) {
+                query.setParameter("sourceProtocols", filter.getSourceProtocols());
+            }
+            if (withTargetHosts) {
+                query.setParameter("targetHosts", filter.getTargetHosts());
+            }
+            if (withTargetProtocols) {
+                query.setParameter("targetProtocols", filter.getTargetProtocols());
+            }
+            if (filter.getHasInterventions() != null) {
+                query.setParameter("hasInterventions", filter.getHasInterventions());
+            }
+            if (withProfiles) {
+                query.setParameterList("profiles", filter.getProfiles());
+            }
+            if (filter.getDateFrom() != null) {
+                query.setParameter("dateFrom", filter.getDateFrom(), TemporalType.TIMESTAMP);
+            }
+            if (filter.getDateTo() != null) {
+                query.setParameter("dateTo", filter.getDateTo(), TemporalType.TIMESTAMP);
+            }
+            if (!onlyTransferIds && filter.getLimit() != null) {
+                query.setMaxResults(filter.getLimit());
+            }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
 
 	public DBItemYadeProtocols getProtocolById(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
 		try {
@@ -492,31 +512,59 @@ public class JocDBLayerYade extends DBLayer {
 		}
 	}
 	
-	public List<Long> transferIdsFilteredBySourceTargetPath(List<String> sourceFiles, List<String> targetFiles)
+	public List<Long> transferIdsFilteredBySourceTargetPath(List<Long> transferIds, List<String> sourceFiles, List<String> targetFiles)
             throws DBInvalidDataException, DBConnectionRefusedException {
         try {
+            boolean withTransferIds = (transferIds != null && !transferIds.isEmpty());
             boolean withSourceFiles = (sourceFiles != null && !sourceFiles.isEmpty());
             boolean withTargetFiles = (targetFiles != null && !targetFiles.isEmpty());
+            String and = " where";
             StringBuilder sql = new StringBuilder();
             sql.append("select transferId from ");
             sql.append(DBITEM_YADE_FILES);
-            sql.append(" where");
-            if (withSourceFiles) {
-                sql.append(" sourcePath in (:sourceFiles)"); 
+            if (withTransferIds) {
+                sql.append(and).append(" transferId in (:transferIds)");
+                and = " and";
             }
-            if (withSourceFiles && withTargetFiles) {
-                sql.append(" or"); 
+            if (withSourceFiles) {
+                sql.append(and).append(" sourcePath in (:sourceFiles)");
+                and = " and"; 
             }
             if (withTargetFiles) {
-                sql.append(" targetPath in (:targetFiles)"); 
+                sql.append(and).append(" targetPath in (:targetFiles)");
             }
             sql.append(" group by transferId"); 
             Query<Long> query = getSession().createQuery(sql.toString());
+            if (withTransferIds) {
+                query.setParameterList("transferIds", transferIds);
+            }
             if (withSourceFiles) {
                 query.setParameterList("sourceFiles", sourceFiles);
             }
             if (withTargetFiles) {
                 query.setParameter("targetFiles", targetFiles);
+            }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+	
+	public List<YadeSourceTargetFiles> SourceTargetFilePaths(List<Long> transferIds)
+            throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            boolean withTransferIds = (transferIds != null && !transferIds.isEmpty());
+            StringBuilder sql = new StringBuilder();
+            sql.append("select new ").append(YADE_SOURCE_TARGET_FILES).append("(transferId, sourcePath, targetPath) from ");
+            sql.append(DBITEM_YADE_FILES).append(" where");
+            if (withTransferIds) {
+                sql.append(" transferId in (:transferIds)"); 
+            } 
+            Query<YadeSourceTargetFiles> query = getSession().createQuery(sql.toString());
+            if (withTransferIds) {
+                query.setParameterList("transferIds", transferIds);
             }
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
