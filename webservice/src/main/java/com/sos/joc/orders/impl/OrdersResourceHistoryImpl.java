@@ -181,11 +181,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                     
                     if (regExMatcher != null && !regExMatcher.reset(dbItemReportTrigger.getParentName() + "," + dbItemReportTrigger.getName()).find()) {
                         continue;
-                    }
-
-                    if (!FilterAfterResponse.filterStateHasState(ordersFilter.getHistoryStates(), history.getState().get_text())) {
-                        continue;
-                    }
+                    }           
                     
                     children = historyChildren.remove(history.getHistoryId());
                     if (children != null) {
