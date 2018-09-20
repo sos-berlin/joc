@@ -5,6 +5,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -42,25 +43,26 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                 jobSchedulerCommands.setUrl(dbItemInventoryInstance.getUrl());
             }
 
-            JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
-
             if (!jobschedulerUser.resetTimeOut()) {
                 return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
             }
-
-            if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(jobSchedulerCommands.getJobschedulerId(), accessToken),
-                    folderPermissions)) {
-                if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
-                    return accessDeniedResponse();
-                } else {
-                    LOGGER.warn("Command: Access denied");
-                }
-            }
+            
+            JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
+            SOSPermissionCommands permissionCommands = getPermissonsCommands(jobSchedulerCommands.getJobschedulerId(), accessToken);
 
             String xml = "";
             boolean withAudit = false;
             for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
                 String xmlCommand = jobSchedulerCommandFactory.getXml(jobschedulerCommand);
+                
+                if (!jobSchedulerCommandFactory.isPermitted(permissionCommands, folderPermissions)) {
+                    if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
+                        return accessDeniedResponse();
+                    } else {
+                        LOGGER.warn("Command: Access denied");
+                    }
+                }
+                
                 xml = xml + xmlCommand;
                 if (!withAudit && !xmlCommand.matches("^<(show_|params?\\.get|job\\.why|scheduler_log).*")) {
                     withAudit = true;
