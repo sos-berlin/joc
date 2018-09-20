@@ -53,9 +53,8 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             String xml = "";
             boolean withAudit = false;
             for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
-                String xmlCommand = jobSchedulerCommandFactory.getXml(jobschedulerCommand);
                 
-                if (!jobSchedulerCommandFactory.isPermitted(permissionCommands, folderPermissions)) {
+                if (!jobSchedulerCommandFactory.isPermitted(jobschedulerCommand, permissionCommands, folderPermissions)) {
                     if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
                         return accessDeniedResponse();
                     } else {
@@ -63,6 +62,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                     }
                 }
                 
+                String xmlCommand = jobSchedulerCommandFactory.getXml(jobschedulerCommand);
                 xml = xml + xmlCommand;
                 if (!withAudit && !xmlCommand.matches("^<(show_|params?\\.get|job\\.why|scheduler_log).*")) {
                     withAudit = true;

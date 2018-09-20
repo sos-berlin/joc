@@ -44,306 +44,255 @@ import com.sos.joc.model.commands.StartJob;
 import com.sos.joc.model.commands.Terminate;
 
 public class JobSchedulerCommandFactory {
+
     private ObjectFactory objectFactory;
-    private JAXBElement<?> jaxbElement;
-    private Object command;
 
     public JobSchedulerCommandFactory() {
-        super();
         objectFactory = new ObjectFactory();
-        jaxbElement = null;
     }
 
-    public boolean isPermitted(SOSPermissionCommands permissions, SOSShiroFolderPermissions sosShiroFolderPermissions) {
-        if (this.command == null){
+    public boolean isPermitted(Object command, SOSPermissionCommands permissions, SOSShiroFolderPermissions sosShiroFolderPermissions) {
+        if (command == null) {
             return false;
         }
-        
+
         String folder = "";
         boolean returnValue = false;
-        
-        
-        if (command instanceof Order){
-            Order c = (Order)command;
+
+        if (command instanceof Order) {
+            Order c = (Order) command;
             folder = c.getJobChain();
             returnValue = permissions.getJobChain().getExecute().isAddOrder();
-        }
-        
-        if (command instanceof ShowJob){
-            ShowJob c = (ShowJob)command;
+
+        } else if (command instanceof ShowJob) {
+            ShowJob c = (ShowJob) command;
             folder = c.getJob();
             returnValue = permissions.getJob().getView().isStatus();
-        }
-        
-        if (command instanceof JobChainNodeModify){
-            JobChainNodeModify jobchainNodeModify = (JobChainNodeModify)command;
+
+        } else if (command instanceof JobChainNodeModify) {
+            JobChainNodeModify jobchainNodeModify = (JobChainNodeModify) command;
             folder = jobchainNodeModify.getJobChain();
-            
-            if ("stop".equalsIgnoreCase(jobchainNodeModify.getAction().value())){
-                returnValue = permissions.getJobChain().getExecute().isStopJobChainNode();
-            }
-            if ("next_state".equalsIgnoreCase(jobchainNodeModify.getAction().value())){
-                returnValue = permissions.getJobChain().getExecute().isSkipJobChainNode();
-            }
-            if ("process".equalsIgnoreCase(jobchainNodeModify.getAction().value())){
-                returnValue = permissions.getJobChain().getExecute().isProcessJobChainNode();
-            }
-        }
 
-        if (command instanceof JobChainModify){
-            JobChainModify jobchainModify = (JobChainModify)command;
+            switch (jobchainNodeModify.getAction().value().toLowerCase()) {
+            case "stop":
+                returnValue = permissions.getJobChain().getExecute().isStopJobChainNode();
+                break;
+            case "next_state":
+                returnValue = permissions.getJobChain().getExecute().isSkipJobChainNode();
+                break;
+            case "process":
+                returnValue = permissions.getJobChain().getExecute().isProcessJobChainNode();
+                break;
+            }
+
+        } else if (command instanceof JobChainModify) {
+            JobChainModify jobchainModify = (JobChainModify) command;
             folder = jobchainModify.getJobChain();
-           
-            if ("stopped".equalsIgnoreCase(jobchainModify.getState())){
+
+            switch (jobchainModify.getState().toLowerCase()) {
+            case "stopped":
                 returnValue = permissions.getJobChain().getExecute().isStop();
-            }
-            if ("running".equalsIgnoreCase(jobchainModify.getState())){
+                break;
+            case "running":
                 returnValue = permissions.getJobChain().getExecute().isUnstop();
+                break;
             }
-        }
-            
-        if (command instanceof JobWhy){
-            JobWhy c = (JobWhy)command;
+
+        } else if (command instanceof JobWhy) {
+            JobWhy c = (JobWhy) command;
             folder = c.getJob();
             returnValue = permissions.getJob().getView().isStatus();
-        }
-        
-        if (command instanceof KillTask){
-            KillTask c = (KillTask)command;
-            folder = c.getJob();
 
+        } else if (command instanceof KillTask) {
+            KillTask c = (KillTask) command;
+            folder = c.getJob();
             returnValue = permissions.getJob().getExecute().isKill();
-        }
-        
-        if (command instanceof LockRemove){
-            LockRemove c = (LockRemove)command;
+            
+        } else if (command instanceof LockRemove) {
+            LockRemove c = (LockRemove) command;
             folder = c.getLock();
-            
             returnValue = permissions.getLock().isRemove();
-        }
-        
-        if (command instanceof ModifyHotFolder){
-            ModifyHotFolder modifyHotFolder = (ModifyHotFolder)command;
-            folder = modifyHotFolder.getFolder();
             
-            if (modifyHotFolder.getJob() != null){
+        } else if (command instanceof ModifyHotFolder) {
+            ModifyHotFolder modifyHotFolder = (ModifyHotFolder) command;
+            folder = modifyHotFolder.getFolder();
+
+            if (modifyHotFolder.getJob() != null) {
                 returnValue = permissions.getJob().getChange().isHotFolder();
-            }
-            if (modifyHotFolder.getJobChain() != null){
+            } else if (modifyHotFolder.getJobChain() != null) {
                 returnValue = permissions.getJobChain().getChange().isHotFolder();
-            }
-            if (modifyHotFolder.getLock() != null){
+            } else if (modifyHotFolder.getLock() != null) {
                 returnValue = permissions.getLock().getChange().isHotFolder();
-            }
-            if (modifyHotFolder.getOrder() != null){
+            } else if (modifyHotFolder.getOrder() != null) {
                 returnValue = permissions.getOrder().getChange().isHotFolder();
-            }
-            if (modifyHotFolder.getProcessClass() != null){
+            } else if (modifyHotFolder.getProcessClass() != null) {
                 returnValue = permissions.getProcessClass().getChange().isHotFolder();
-            }
-            if (modifyHotFolder.getSchedule() != null){
+            } else if (modifyHotFolder.getSchedule() != null) {
                 returnValue = permissions.getSchedule().getChange().isHotFolder();
             }
-        }
-        
-        if (command instanceof ModifyJob){
-            ModifyJob modifyJob = (ModifyJob)command;
+            
+        } else if (command instanceof ModifyJob) {
+            ModifyJob modifyJob = (ModifyJob) command;
             folder = modifyJob.getJob();
 
-            if ("start".equalsIgnoreCase(modifyJob.getCmd())){
+            switch (modifyJob.getCmd().toLowerCase()) {
+            case "start":
+            case "wake":
                 returnValue = permissions.getJob().getExecute().isStart();
-            }
-            if ("wake".equalsIgnoreCase(modifyJob.getCmd())){
-                returnValue = permissions.getJob().getExecute().isStart();
-            }
-            if ("stop".equalsIgnoreCase(modifyJob.getCmd())){
+                break;
+            case "stop":
                 returnValue = permissions.getJob().getExecute().isStop();
-            }
-            if ("unstop".equalsIgnoreCase(modifyJob.getCmd())){
+                break;
+            case "unstop":
                 returnValue = permissions.getJob().getExecute().isUnstop();
-            }
-            if ("suspend".equalsIgnoreCase(modifyJob.getCmd())){
+                break;
+            case "suspend":
                 returnValue = permissions.getJob().getExecute().isSuspendAllTasks();
-            }
-            if ("continue".equalsIgnoreCase(modifyJob.getCmd())){
+                break;
+            case "continue":
                 returnValue = permissions.getJob().getExecute().isContinueAllTasks();
-            }
-            if ("end".equalsIgnoreCase(modifyJob.getCmd())){
+                break;
+            case "end":
                 returnValue = permissions.getJob().getExecute().isEndAllTasks();
+                break;
             }
-        }
+            
+        } else if (command instanceof ModifyOrder) {
+            ModifyOrder modifyOrder = (ModifyOrder) command;
+            folder = modifyOrder.getJobChain();
 
-        if (command instanceof ModifyOrder){
-           ModifyOrder modifyOrder = (ModifyOrder)command;
-           folder = modifyOrder.getJobChain();
-
-           if (modifyOrder.getEndState() != null){
-               returnValue = permissions.getOrder().getChange().isStartAndEndNode();
-           }
-           if (modifyOrder.getAt() != null){
-               returnValue = permissions.getOrder().getChange().isTimeForAdhocOrder();
-           }
-           if (modifyOrder.getParams() != null){
-               returnValue = permissions.getOrder().getChange().isParameter();
-           }
-           returnValue = permissions.getOrder().getChange().isOther();
-        }
-        
-        if (command instanceof ModifySpooler){
-            ModifySpooler modifySpooler = (ModifySpooler)command;
-            if ("pause".equalsIgnoreCase(modifySpooler.getCmd())){
+            if (modifyOrder.getEndState() != null) {
+                returnValue = permissions.getOrder().getChange().isStartAndEndNode();
+            } else if (modifyOrder.getAt() != null) {
+                returnValue = permissions.getOrder().getChange().isTimeForAdhocOrder();
+            } else if (modifyOrder.getParams() != null) {
+                returnValue = permissions.getOrder().getChange().isParameter();
+            } else {
+                returnValue = permissions.getOrder().getChange().isOther();
+            }
+            
+        } else if (command instanceof ModifySpooler) {
+            ModifySpooler modifySpooler = (ModifySpooler) command;
+            switch (modifySpooler.getCmd().toLowerCase()) {
+            case "pause":
                 returnValue = permissions.getJobschedulerMaster().getExecute().isPause();
-            }
-            if ("continue".equalsIgnoreCase(modifySpooler.getCmd())){
+                break;
+            case "continue":
                 returnValue = permissions.getJobschedulerMaster().getExecute().isContinue();
-            }
-            if ("stop".equalsIgnoreCase(modifySpooler.getCmd())){
+                break;
+            case "stop":
                 returnValue = permissions.getJobschedulerMaster().getExecute().isStop();
-            }
-            if ("reload".equalsIgnoreCase(modifySpooler.getCmd())){
+                break;
+            case "reload":
                 returnValue = permissions.getJobschedulerMaster().getExecute().isReload();
-            }
-            if ("terminate".equalsIgnoreCase(modifySpooler.getCmd())){
+                break;
+            case "terminate":
                 returnValue = permissions.getJobschedulerMaster().getExecute().isTerminate();
-            }
-            if ("terminate_and_restart".equalsIgnoreCase(modifySpooler.getCmd())){
+                break;
+            case "terminate_and_restart":
+            case "let_run_terminate":
                 returnValue = permissions.getJobschedulerMaster().getExecute().getRestart().isTerminate();
-            }
-            if ("let_run_terminate".equalsIgnoreCase(modifySpooler.getCmd())){
-                returnValue = permissions.getJobschedulerMaster().getExecute().getRestart().isTerminate();
-            }
-            if ("abort_immediately".equalsIgnoreCase(modifySpooler.getCmd())){
+                break;
+            case "abort_immediately":
                 returnValue = permissions.getJobschedulerMaster().getExecute().isAbort();
-            }
-            if ("abort_immediately_and_restart".equalsIgnoreCase(modifySpooler.getCmd())){
+                break;
+            case "abort_immediately_and_restart":
                 returnValue = permissions.getJobschedulerMaster().getExecute().getRestart().isAbort();
+                break;
             }
-        }
-
-        if (command instanceof ParamGet){
+            
+        } else if (command instanceof ParamGet) {
             returnValue = permissions.getJobschedulerMaster().getView().isParameter();
-        }
-
-        if (command instanceof ParamsGet){
-        	returnValue = permissions.getJobschedulerMaster().getView().isParameter();
-        }
-        
-        if (command instanceof Params){
+            
+        } else if (command instanceof ParamsGet) {
             returnValue = permissions.getJobschedulerMaster().getView().isParameter();
-        }
-
-        if (command instanceof ProcessClassRemove){
-            ProcessClassRemove c = (ProcessClassRemove)command;
+            
+        } else if (command instanceof Params) {
+            returnValue = permissions.getJobschedulerMaster().getView().isParameter();
+            
+        } else if (command instanceof ProcessClassRemove) {
+            ProcessClassRemove c = (ProcessClassRemove) command;
             folder = c.getProcessClass();
-
             returnValue = permissions.getProcessClass().isRemove();
-        }
-
-        if (command instanceof ProcessClass){
-            ProcessClass c = (ProcessClass)command;
+            
+        } else if (command instanceof ProcessClass) {
+            ProcessClass c = (ProcessClass) command;
             folder = c.getName();
-
             returnValue = permissions.getProcessClass().getView().isStatus();
-        }
-
-        if (command instanceof RemoveJobChain){
-            RemoveJobChain c = (RemoveJobChain)command;
+            
+        } else if (command instanceof RemoveJobChain) {
+            RemoveJobChain c = (RemoveJobChain) command;
             folder = c.getJobChain();
-
             returnValue = permissions.getJobChain().getExecute().isRemove();
-        }
-
-        if (command instanceof RemoveOrder){
-            RemoveOrder c = (RemoveOrder)command;
+            
+        } else if (command instanceof RemoveOrder) {
+            RemoveOrder c = (RemoveOrder) command;
             folder = c.getJobChain();
-
             returnValue = permissions.getOrder().isDelete();
-        }
-        
-        if (command instanceof ScheduleRemove){
-            ScheduleRemove c = (ScheduleRemove)command;
+            
+        } else if (command instanceof ScheduleRemove) {
+            ScheduleRemove c = (ScheduleRemove) command;
             folder = c.getSchedule();
-
             returnValue = permissions.getSchedule().isRemove();
-        }
-        
-        if (command instanceof SchedulerLogLogCategoriesReset){
+            
+        } else if (command instanceof SchedulerLogLogCategoriesReset) {
             returnValue = permissions.getJobschedulerMaster().getAdministration().isManageCategories();
-        }
-        
-        if (command instanceof SchedulerLogLogCategoriesSet){
+            
+        } else if (command instanceof SchedulerLogLogCategoriesSet) {
             returnValue = permissions.getJobschedulerMaster().getAdministration().isManageCategories();
-        }
-
-        if (command instanceof SchedulerLogLogCategoriesShow){
+            
+        } else if (command instanceof SchedulerLogLogCategoriesShow) {
             returnValue = permissions.getJobschedulerMaster().getAdministration().isManageCategories();
-        }
-        
-        if (command instanceof ShowCalendar){
+            
+        } else if (command instanceof ShowCalendar) {
             returnValue = permissions.getDailyPlan().getView().isStatus();
-        }
-
-        if (command instanceof ShowHistory){
-            ShowHistory c = (ShowHistory)command;
-            folder = c.getJob();
             
+        } else if (command instanceof ShowHistory) {
+            ShowHistory c = (ShowHistory) command;
+            folder = c.getJob();
             returnValue = permissions.getHistory().isView();
-        }
-        
-        if (command instanceof ShowJob){
-            ShowJob c = (ShowJob)command;
+            
+        } else if (command instanceof ShowJob) {
+            ShowJob c = (ShowJob) command;
             folder = c.getJob();
-            
             returnValue = permissions.getJob().getView().isStatus();
-        }
-
-        if (command instanceof ShowJobs){
+            
+        } else if (command instanceof ShowJobs) {
             returnValue = permissions.getJob().getView().isStatus();
-        }
-        
-        if (command instanceof ShowJobChain){
-            ShowJobChain c = (ShowJobChain)command;
-            folder = c.getJobChain();
             
-            returnValue = permissions.getJobChain().getView().isStatus();
-        }
-        
-        if (command instanceof ShowJobChains){
-            returnValue = permissions.getJobChain().getView().isStatus();
-        }
-        
-        if (command instanceof ShowOrder){
-            ShowOrder c = (ShowOrder)command;
+        } else if (command instanceof ShowJobChain) {
+            ShowJobChain c = (ShowJobChain) command;
             folder = c.getJobChain();
+            returnValue = permissions.getJobChain().getView().isStatus();
             
+        } else if (command instanceof ShowJobChains) {
+            returnValue = permissions.getJobChain().getView().isStatus();
+            
+        } else if (command instanceof ShowOrder) {
+            ShowOrder c = (ShowOrder) command;
+            folder = c.getJobChain();
             returnValue = permissions.getOrder().getView().isStatus();
-        }
-        
-        if (command instanceof ShowState){
+            
+        } else if (command instanceof ShowState) {
             returnValue = permissions.getJobschedulerMaster().getView().isStatus();
-        }
-        
-        if (command instanceof ShowTask){          
+            
+        } else if (command instanceof ShowTask) {
             returnValue = permissions.getJob().getView().isStatus();
-        }
-        
-        if (command instanceof StartJob){
-            StartJob c = (StartJob)command;
+            
+        } else if (command instanceof StartJob) {
+            StartJob c = (StartJob) command;
             folder = c.getJob();
-
             returnValue = permissions.getJob().getExecute().isStart();
-        }
-        
-        if (command instanceof Terminate){
+            
+        } else if (command instanceof Terminate) {
             returnValue = permissions.getJobschedulerMaster().getExecute().isTerminate();
         }
-        
+
         return ("".equals(folder) || sosShiroFolderPermissions.isPermittedForFolder(folder)) && returnValue;
 
     }
 
     private String asXml(Object command, JAXBElement<?> j) throws JAXBException {
-        this.command = command;
         String xml = "";
         JAXBContext jaxbContext = JAXBContext.newInstance(command.getClass());
         Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
@@ -361,47 +310,37 @@ public class JobSchedulerCommandFactory {
     }
 
     public String getXml(Object command) throws JAXBException {
-        jaxbElement = null;
+        JAXBElement<?> jaxbElement = null;
         if (command instanceof JAXBElement) {
             jaxbElement = (JAXBElement<?>) command;
 
             if ("show_state".equals(jaxbElement.getName().toString())) {
                 jaxbElement = objectFactory.createShowState((ShowState) jaxbElement.getValue());
                 command = (ShowState) jaxbElement.getValue();
-            }
-            if ("add_order".equals(jaxbElement.getName().getLocalPart().toString())) {
+            } else if ("add_order".equals(jaxbElement.getName().getLocalPart().toString())) {
                 jaxbElement = objectFactory.createAddOrder((Order) jaxbElement.getValue());
                 command = (Order) jaxbElement.getValue();
-            }
-            if ("process_class".equals(jaxbElement.getName().getLocalPart().toString())) {
+            } else if ("process_class".equals(jaxbElement.getName().getLocalPart().toString())) {
                 jaxbElement = objectFactory.createProcessClass((ProcessClass) jaxbElement.getValue());
                 command = (ProcessClass) jaxbElement.getValue();
-            }
-            if ("lock.remove".equals(jaxbElement.getName().getLocalPart().toString())) {
+            } else if ("lock.remove".equals(jaxbElement.getName().getLocalPart().toString())) {
                 jaxbElement = objectFactory.createLockRemove((LockRemove) jaxbElement.getValue());
                 command = (LockRemove) jaxbElement.getValue();
-            }
-            if ("modify_hot_folder".equals(jaxbElement.getName().getLocalPart().toString())) {
+            } else if ("modify_hot_folder".equals(jaxbElement.getName().getLocalPart().toString())) {
                 jaxbElement = objectFactory.createModifyHotFolder((ModifyHotFolder) jaxbElement.getValue());
                 command = (ModifyHotFolder) jaxbElement.getValue();
-            }
-            if ("process_class.remove".equals(jaxbElement.getName().getLocalPart().toString())) {
+            } else if ("process_class.remove".equals(jaxbElement.getName().getLocalPart().toString())) {
                 jaxbElement = objectFactory.createProcessClassRemove((ProcessClassRemove) jaxbElement.getValue());
                 command = (ProcessClassRemove) jaxbElement.getValue();
-            }
-            if ("s".equals(jaxbElement.getName().getLocalPart().toString())) {
+            } else if ("s".equals(jaxbElement.getName().getLocalPart().toString())) {
                 jaxbElement = objectFactory.createS((ShowState) jaxbElement.getValue());
                 command = (ShowState) jaxbElement.getValue();
-            }
-            if ("schedule.remove".equals(jaxbElement.getName().getLocalPart().toString())) {
+            } else if ("schedule.remove".equals(jaxbElement.getName().getLocalPart().toString())) {
                 jaxbElement = objectFactory.createScheduleRemove((ScheduleRemove) jaxbElement.getValue());
                 command = (ScheduleRemove) jaxbElement.getValue();
-            }
-            if ("params.get".equals(jaxbElement.getName().getLocalPart().toString())) {
+            } else if ("params.get".equals(jaxbElement.getName().getLocalPart().toString())) {
                 command = (ParamsGet) objectFactory.createParamsGet();
             }
-        
-            
         }
 
         return asXml(command, jaxbElement);
