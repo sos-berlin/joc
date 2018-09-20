@@ -46,12 +46,19 @@ import com.sos.joc.model.commands.Terminate;
 public class JobSchedulerCommandFactory {
 
     private ObjectFactory objectFactory;
+    private JAXBElement<?> jaxbElement;
+    private Object command;
 
     public JobSchedulerCommandFactory() {
         objectFactory = new ObjectFactory();
     }
+    
+    public JobSchedulerCommandFactory(Object command) throws JAXBException {
+        objectFactory = new ObjectFactory();
+        init(command);
+    }
 
-    public boolean isPermitted(Object command, SOSPermissionCommands permissions, SOSShiroFolderPermissions sosShiroFolderPermissions) {
+    public boolean isPermitted(SOSPermissionCommands permissions, SOSShiroFolderPermissions sosShiroFolderPermissions) {
         if (command == null) {
             return false;
         }
@@ -292,7 +299,7 @@ public class JobSchedulerCommandFactory {
 
     }
 
-    private String asXml(Object command, JAXBElement<?> j) throws JAXBException {
+    public String asXml() throws JAXBException {
         String xml = "";
         JAXBContext jaxbContext = JAXBContext.newInstance(command.getClass());
         Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
@@ -300,16 +307,16 @@ public class JobSchedulerCommandFactory {
         jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
         jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
-        if (j == null) {
+        if (jaxbElement == null) {
             jaxbMarshaller.marshal(command, s);
         } else {
-            jaxbMarshaller.marshal(j, s);
+            jaxbMarshaller.marshal(jaxbElement, s);
         }
         xml = s.toString();
         return xml;
     }
 
-    public String getXml(Object command) throws JAXBException {
+    public void init(Object command) throws JAXBException {
         JAXBElement<?> jaxbElement = null;
         if (command instanceof JAXBElement) {
             jaxbElement = (JAXBElement<?>) command;
@@ -342,8 +349,8 @@ public class JobSchedulerCommandFactory {
                 command = (ParamsGet) objectFactory.createParamsGet();
             }
         }
-
-        return asXml(command, jaxbElement);
+        this.jaxbElement = jaxbElement;
+        this. command = command;
     }
 
 }

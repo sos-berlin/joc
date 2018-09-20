@@ -47,14 +47,15 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                 return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
             }
             
-            JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
+            JobSchedulerCommandFactory jobSchedulerCommandFactory = null;
             SOSPermissionCommands permissionCommands = getPermissonsCommands(jobSchedulerCommands.getJobschedulerId(), accessToken);
 
             String xml = "";
             boolean withAudit = false;
             for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
                 
-                if (!jobSchedulerCommandFactory.isPermitted(jobschedulerCommand, permissionCommands, folderPermissions)) {
+                jobSchedulerCommandFactory = new JobSchedulerCommandFactory(jobschedulerCommand);
+                if (!jobSchedulerCommandFactory.isPermitted(permissionCommands, folderPermissions)) {
                     if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
                         return accessDeniedResponse();
                     } else {
@@ -62,7 +63,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                     }
                 }
                 
-                String xmlCommand = jobSchedulerCommandFactory.getXml(jobschedulerCommand);
+                String xmlCommand = jobSchedulerCommandFactory.asXml();
                 xml = xml + xmlCommand;
                 if (!withAudit && !xmlCommand.matches("^<(show_|params?\\.get|job\\.why|scheduler_log).*")) {
                     withAudit = true;
