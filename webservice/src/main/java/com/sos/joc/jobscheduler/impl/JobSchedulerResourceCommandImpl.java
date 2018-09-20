@@ -59,7 +59,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                     if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
                         return accessDeniedResponse();
                     } else {
-                        LOGGER.warn("Command: Access denied");
+                        LOGGER.warn("Command: Access denied for " + jobSchedulerCommandFactory.getCommandName());
                     }
                 }
                 
