@@ -6,12 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerCommandFactory;
 import com.sos.joc.classes.audit.JobSchedulerCommandAudit;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingCommentException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCommand;
 import com.sos.joc.model.commands.JobschedulerCommands;
 import com.sos.xml.SOSXmlCommand.ResponseStream;
@@ -38,7 +40,12 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             }
 
             checkRequiredParameter("jobschedulerId", jobSchedulerCommands.getJobschedulerId());
-            checkRequiredComment(jobSchedulerCommands.getComment());
+            boolean missingAuditLogComment = false;
+            if (Globals.auditLogCommentsAreRequired) {
+                if (jobSchedulerCommands.getComment() == null || jobSchedulerCommands.getComment().isEmpty()) {
+                    missingAuditLogComment = true;
+                }
+            }
             if (jobSchedulerCommands.getUrl() == null || jobSchedulerCommands.getUrl().isEmpty()) {
                 jobSchedulerCommands.setUrl(dbItemInventoryInstance.getUrl());
             }
@@ -63,11 +70,15 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                     }
                 }
                 
+                if (!withAudit) {
+                    withAudit = jobSchedulerCommandFactory.withAuditLog();
+                }
+                if (withAudit && missingAuditLogComment) {
+                    throw new JocMissingCommentException();
+                }
+                
                 String xmlCommand = jobSchedulerCommandFactory.asXml();
                 xml = xml + xmlCommand;
-                if (!withAudit && !xmlCommand.matches("^<(show_|params?\\.get|job\\.why|scheduler_log).*")) {
-                    withAudit = true;
-                }
             }
             if (!xml.startsWith("<params.get") && !xml.contains("param.get")) {
                 xml = "<commands>" + xml + "</commands>";

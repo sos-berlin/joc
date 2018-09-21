@@ -1,6 +1,7 @@
 package com.sos.joc.classes;
 
 import java.io.StringWriter;
+import java.nio.file.Paths;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -112,7 +113,7 @@ public class JobSchedulerCommandFactory {
             break;
         case "ModifyHotFolder":
             ModifyHotFolder modifyHotFolder = (ModifyHotFolder) command;
-            folder = modifyHotFolder.getFolder();
+            folder = modifyHotFolder.getFolder() + "/dummy";
 
             if (modifyHotFolder.getJob() != null) {
                 returnValue = permissions.getJob().getChange().isHotFolder();
@@ -263,8 +264,42 @@ public class JobSchedulerCommandFactory {
             returnValue = permissions.getJobschedulerMaster().getExecute().isTerminate();
             break;
         }
+        
+        if (folder != null && !folder.isEmpty()) {
+            folder = Paths.get(folder).getParent().toString().replace('\\', '/');
+        } else {
+            folder = "";
+        }
 
-        return ("".equals(folder) || sosShiroFolderPermissions.isPermittedForFolder(folder)) && returnValue;
+        return (folder.isEmpty() || sosShiroFolderPermissions.isPermittedForFolder(folder)) && returnValue;
+
+    }
+    
+    public boolean withAuditLog() {
+        if (command == null) {
+            return false;
+        }
+        switch (command.getClass().getSimpleName()) {
+        case "Order":
+        case "StartJob":
+        case "JobChainNodeModify":
+        case "JobChainModify":
+        case "KillTask":
+        case "LockRemove":
+        case "ModifyHotFolder":
+        case "ModifyJob":
+        case "ModifyOrder":
+        case "ModifySpooler":
+        case "ProcessClassRemove":
+        case "ProcessClass":
+        case "RemoveJobChain":
+        case "RemoveOrder":
+        case "ScheduleRemove":
+        case "Terminate":
+            return true;
+        default:
+            return false;
+        }
 
     }
 
