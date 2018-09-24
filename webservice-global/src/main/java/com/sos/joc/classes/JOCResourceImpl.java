@@ -219,15 +219,7 @@ public class JOCResourceImpl {
 		return checkRequiredParameter(paramKey, String.valueOf(paramVal));
 	}
 
-	protected String getParent(String path) {
-		Path p = Paths.get(path).getParent();
-		if (p == null) {
-			return null;
-		} else {
-			return p.toString().replace('\\', '/');
-		}
-	}
-
+	 
 	protected boolean matchesRegex(Pattern p, String path) {
 		if (p != null) {
 			return p.matcher(path).find();
@@ -419,6 +411,10 @@ public class JOCResourceImpl {
 		}
 	}
 
+	protected String getParent(String path) {
+		return Globals.getParent(path);
+	}
+	
     protected boolean canAdd(String path, Set<Folder> listOfFolders) {
         return folderPermissions.isPermittedForFolder(getParent(path), listOfFolders);
     }
