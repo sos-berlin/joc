@@ -8,6 +8,8 @@ import java.util.Date;
  
 import org.junit.Test;
 
+import com.sos.joc.Globals;
+
 public class JOCResourceImplTest {
 
     
@@ -46,9 +48,9 @@ public class JOCResourceImplTest {
    @Test
    public void getParentTest(){
        JOCResourceImpl jocResourceImpl  = new JOCResourceImpl();
-       assertEquals("normalizePathTest", "/1/2",jocResourceImpl.getParent("/1/2//3") );
-       assertEquals("normalizePathTest", "/1/2",jocResourceImpl.getParent("/1/2/3/") );
-       assertEquals("normalizePathTest", null,jocResourceImpl.getParent("/") );
-       assertEquals("normalizePathTest", "/",jocResourceImpl.getParent("/1") );
+       assertEquals("normalizePathTest", "/1/2",Globals.getParent("/1/2//3") );
+       assertEquals("normalizePathTest", "/1/2",Globals.getParent("/1/2/3/") );
+       assertEquals("normalizePathTest", null,Globals.getParent("/") );
+       assertEquals("normalizePathTest", "/",Globals.getParent("/1") );
    }   
 }

@@ -10,6 +10,7 @@ import javax.xml.bind.Marshaller;
 
 import com.sos.auth.rest.SOSShiroFolderPermissions;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
+import com.sos.joc.Globals;
 import com.sos.joc.model.commands.JobChainModify;
 import com.sos.joc.model.commands.JobChainNodeModify;
 import com.sos.joc.model.commands.JobWhy;
@@ -264,15 +265,9 @@ public class JobSchedulerCommandFactory {
             returnValue = permissions.getJobschedulerMaster().getExecute().isTerminate();
             break;
         }
-        
-        if (folder != null && !folder.isEmpty()) {
-            folder = Paths.get(folder).getParent().toString().replace('\\', '/');
-        } else {
-            folder = "";
-        }
 
+        folder = Globals.getParent(folder);
         return (folder.isEmpty() || sosShiroFolderPermissions.isPermittedForFolder(folder)) && returnValue;
-
     }
     
     public boolean withAuditLog() {

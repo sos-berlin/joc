@@ -421,4 +421,18 @@ public class Globals {
         }
         return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
+
+     public static String getParent(String path) {
+		Path p = Paths.get(path).getParent();
+		if (p == null) {
+			return null;
+		} else {
+			return p.toString().replace('\\', '/');
+		}
+	}
+
+
+
+	
+
 }
