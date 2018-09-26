@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
@@ -51,7 +52,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 			if (jocDefaultResponse != null) {
 				return jocDefaultResponse;
 			}
-
+			ordersBody.setRegex(SearchStringHelper.getRegexValue(ordersBody.getRegex()));
+			
             // TODO date post body parameters are not yet considered
             JOCJsonCommand command = new JOCJsonCommand(this);
             command.setUriBuilderForOrders();

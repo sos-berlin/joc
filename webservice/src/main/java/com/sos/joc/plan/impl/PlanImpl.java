@@ -160,7 +160,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             }
 
             Matcher regExMatcher = null;
-            if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+            if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty() && !planFilter.getRegex().contains("%")) {
                 regExMatcher = Pattern.compile(planFilter.getRegex()).matcher("");
             }
 

@@ -2,12 +2,14 @@ package com.sos.joc.db.yade;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.TemporalType;
 
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jade.db.DBItemYadeFiles;
@@ -218,6 +220,8 @@ public class JocDBLayerYade extends DBLayer {
                 sql.append(and).append(" yt.sourceProtocolId = yps.id");
                 and = " and";
             }
+          
+            
             if (withTargetHosts || withTargetProtocols) {
                 sql.append(and).append(" yt.targetProtocolId is not null and yt.targetProtocolId = ypt.id");
                 and = " and";
@@ -243,19 +247,19 @@ public class JocDBLayerYade extends DBLayer {
                 and = " and";
             }
             if (withSourceHosts) {
-                sql.append(and).append(" yps.hostname in (:sourceHosts)");
+      	        sql.append(and).append(SearchStringHelper.getStringSetSql(filter.getSourceHosts(), "yps.hostname"));
                 and = " and";
             }
             if (withSourceProtocols) {
-                sql.append(and).append(" yps.protocol in (:sourceProtocols)");
+      	        sql.append(and).append(SearchStringHelper.getIntegerSetSql(filter.getSourceProtocols(), "yps.protocol"));
                 and = " and";
             }
             if (withTargetHosts) {
-                sql.append(and).append(" ypt.hostname in (:targetHosts)");
+      	        sql.append(and).append(SearchStringHelper.getStringSetSql(filter.getTargetHosts(), "yps.hostname"));
                 and = " and";
             }
             if (withTargetProtocols) {
-                sql.append(and).append(" ypt.protocol in (:targetProtocols)");
+      	        sql.append(and).append(SearchStringHelper.getIntegerSetSql(filter.getTargetProtocols(), "yps.protocol"));
                 and = " and";
             }
             if (filter.getIsIntervention() != null) {
@@ -300,18 +304,6 @@ public class JocDBLayerYade extends DBLayer {
             }
             if (withMandator) {
                 query.setParameter("mandator", filter.getMandator());
-            }
-            if (withSourceHosts) {
-                query.setParameter("sourceHosts", filter.getSourceHosts());
-            }
-            if (withSourceProtocols) {
-                query.setParameter("sourceProtocols", filter.getSourceProtocols());
-            }
-            if (withTargetHosts) {
-                query.setParameter("targetHosts", filter.getTargetHosts());
-            }
-            if (withTargetProtocols) {
-                query.setParameter("targetProtocols", filter.getTargetProtocols());
             }
             if (filter.getHasInterventions() != null) {
                 query.setParameter("hasInterventions", filter.getHasInterventions());
@@ -527,23 +519,18 @@ public class JocDBLayerYade extends DBLayer {
                 and = " and";
             }
             if (withSourceFiles) {
-                sql.append(and).append(" sourcePath in (:sourceFiles)");
+      	        sql.append(and).append(SearchStringHelper.getStringListPathSql(sourceFiles, "sourcePath"));
                 and = " and"; 
             }
             if (withTargetFiles) {
-                sql.append(and).append(" targetPath in (:targetFiles)");
+      	        sql.append(and).append(SearchStringHelper.getStringListPathSql(targetFiles, "targetPath"));
             }
             sql.append(" group by transferId"); 
             Query<Long> query = getSession().createQuery(sql.toString());
             if (withTransferIds) {
                 query.setParameterList("transferIds", transferIds);
             }
-            if (withSourceFiles) {
-                query.setParameterList("sourceFiles", sourceFiles);
-            }
-            if (withTargetFiles) {
-                query.setParameter("targetFiles", targetFiles);
-            }
+            
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

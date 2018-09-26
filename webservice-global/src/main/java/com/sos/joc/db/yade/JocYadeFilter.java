@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-public class JocYadeFilter {
+public class JocYadeFilter{
 
     private String jobschedulerId;
     private List<Long> transferIds; 

@@ -23,6 +23,7 @@ import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventType;
 import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventTypeValue;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
+import com.sos.joc.db.audit.AuditLogDBFilter;
 import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
@@ -531,11 +532,12 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             if (connection == null) {
                 connection = Globals.createSosHibernateStatelessConnection("eventCallable-" + jobSchedulerEvent.getJobschedulerId());
             }
-            Date from = new Date();
-            from.setTime(Long.parseLong(eventId) / 1000);
+           
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
             Globals.beginTransaction(connection);
-            List<DBItemAuditLog> auditLogs = dbLayer.getAllAuditLogs(jobSchedulerEvent.getJobschedulerId(), null, from, null, null, null);
+            AuditLogDBFilter auditLogDBFilter = new AuditLogDBFilter();
+            auditLogDBFilter.setSchedulerId(jobSchedulerEvent.getJobschedulerId());
+            List<DBItemAuditLog> auditLogs = dbLayer.getAuditLogs(auditLogDBFilter);
             Globals.rollback(connection);
             if (auditLogs != null && !auditLogs.isEmpty()) {
                 for (DBItemAuditLog auditLogItem : auditLogs) {

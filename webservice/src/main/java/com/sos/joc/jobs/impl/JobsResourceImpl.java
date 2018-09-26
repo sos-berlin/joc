@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -39,6 +40,8 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            jobsFilter.setRegex(SearchStringHelper.getRegexValue(jobsFilter.getRegex()));
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);

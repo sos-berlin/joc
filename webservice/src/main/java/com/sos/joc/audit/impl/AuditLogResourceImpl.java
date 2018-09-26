@@ -2,29 +2,23 @@ package com.sos.joc.audit.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.ws.rs.Path;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.joc.Globals;
 import com.sos.joc.audit.resource.IAuditLogResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.db.audit.AuditLogDBFilter;
 import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.audit.AuditLog;
 import com.sos.joc.model.audit.AuditLogFilter;
 import com.sos.joc.model.audit.AuditLogItem;
-import com.sos.joc.model.common.Folder;
-import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.order.OrderPath;
 
 @Path("audit_log")
@@ -43,47 +37,24 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
-            String schedulerId = auditLogFilter.getJobschedulerId();
-            List<DBItemAuditLog> auditLogs = new ArrayList<DBItemAuditLog>();
-            // filters
-            List<Folder> filterFolders = auditLogFilter.getFolders();
-            List<JobPath> filterJobs = auditLogFilter.getJobs();
-            Integer filterLimit = auditLogFilter.getLimit();
-            List<OrderPath> filterOrders = auditLogFilter.getOrders();
-            String filterTicketLink = auditLogFilter.getTicketLink();
-            String filterAccount = auditLogFilter.getAccount();
-            List<String> filterCalendars = auditLogFilter.getCalendars();
-            if (filterOrders != null && !filterOrders.isEmpty()) {
-                for (OrderPath order : filterOrders) {
+            
+            AuditLogDBFilter auditLogDBFilter = new AuditLogDBFilter(auditLogFilter);
+             
+            if (auditLogFilter.getOrders() != null && !auditLogFilter.getOrders().isEmpty()) {
+                for (OrderPath order : auditLogFilter.getOrders()) {
                     checkRequiredParameter("jobChain", order.getJobChain());
                 }
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
-            Date filterFrom = JobSchedulerDate.getDateFrom(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone());
-            Date filterTo = JobSchedulerDate.getDateTo(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone());
             String filterRegex = auditLogFilter.getRegex();
-            // processing
-            if (filterOrders != null && !filterOrders.isEmpty()) {
-                auditLogs = dbLayer.getAuditLogByOrders(schedulerId, filterOrders, filterLimit, filterFrom, filterTo, filterTicketLink,
-                        filterAccount);
-            } else if (filterJobs != null && !filterJobs.isEmpty()) {
-                auditLogs = dbLayer.getAuditLogByJobs(schedulerId, filterJobs, filterLimit, filterFrom, filterTo, filterTicketLink, filterAccount);
-            } else if (filterCalendars != null && !filterCalendars.isEmpty()) {
-                auditLogs = dbLayer.getAuditLogByCalendars(schedulerId, filterCalendars, filterLimit, filterFrom, filterTo, filterTicketLink,
-                        filterAccount);
-            } else if (filterFolders != null && !filterFolders.isEmpty()) {
-                Set<String> folders = new HashSet<String>();
-                for (Folder folder : filterFolders) {
-                    folders.add(normalizeFolder(folder.getFolder()));
-                }
-                auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders, filterLimit, filterFrom, filterTo, filterTicketLink, filterAccount);
-            } else {
-                auditLogs = dbLayer.getAllAuditLogs(schedulerId, filterLimit, filterFrom, filterTo, filterTicketLink, filterAccount);
+            if (SearchStringHelper.isDBWildcardSearch(filterRegex)) {
+            	auditLogDBFilter.setReason(filterRegex);
+            	filterRegex = "";
             }
-            if (filterRegex != null && !filterRegex.isEmpty() && (filterOrders == null || filterOrders.isEmpty()) && (filterJobs == null || filterJobs
-                    .isEmpty())) {
+            List<DBItemAuditLog> auditLogs = dbLayer.getAuditLogs(auditLogDBFilter,auditLogFilter.getLimit());
+
+            if (filterRegex != null && !filterRegex.isEmpty()) {
                 auditLogs = filterComment(auditLogs, filterRegex);
             }
             AuditLog entity = new AuditLog();

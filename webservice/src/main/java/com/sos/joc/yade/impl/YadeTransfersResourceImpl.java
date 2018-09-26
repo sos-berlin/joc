@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.jade.db.DBItemYadeProtocols;
 import com.sos.jade.db.DBItemYadeTransfers;
 import com.sos.joc.Globals;
@@ -42,15 +43,18 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 	public JOCDefaultResponse postYadeTransfers(String accessToken, TransferFilter filterBody) throws Exception {
 		SOSHibernateSession connection = null;
 		if (filterBody.getJobschedulerId() == null) {
-		    filterBody.setJobschedulerId("");
+			filterBody.setJobschedulerId("");
 		}
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
-					filterBody.getJobschedulerId(), getPermissonsJocCockpit(filterBody.getJobschedulerId(),
-					        accessToken).getYADE().getView().isStatus());
+					filterBody.getJobschedulerId(), getPermissonsJocCockpit(filterBody.getJobschedulerId(), accessToken)
+							.getYADE().getView().isStatus());
 			if (jocDefaultResponse != null) {
 				return jocDefaultResponse;
 			}
+
+				filterBody.setSourceFilesRegex(SearchStringHelper.getRegexValue(filterBody.getSourceFilesRegex()));
+				filterBody.setTargetFilesRegex(SearchStringHelper.getRegexValue(filterBody.getTargetFilesRegex()));
 
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
@@ -88,8 +92,8 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 					break;
 				}
 			}
-			//TODO source and target are wrong
-			//If works now only if the array has only one item
+			// TODO source and target are wrong
+			// If works now only if the array has only one item
 			Set<String> sourceHosts = null;
 			Set<Integer> sourceProtocols = null;
 			if (filterBody.getSources() != null && !filterBody.getSources().isEmpty()) {
@@ -172,56 +176,61 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 			List<YadeSourceTargetFiles> yadeFiles = new ArrayList<YadeSourceTargetFiles>();
 			Pattern sourceFilesPattern = null;
 			Pattern targetFilesPattern = null;
-            
-            if (transfersFromDb != null && !transfersFromDb.isEmpty()) {
-                boolean withSourceFiles = (sourceFiles != null && !sourceFiles.isEmpty());
-                boolean withTargetFiles = (targetFiles != null && !targetFiles.isEmpty());
-                boolean withSourceFilesRegex = (!withSourceFiles && filterBody.getSourceFilesRegex() != null && !filterBody.getSourceFilesRegex()
-                        .isEmpty());
-                boolean withTargetFilesRegex = (!withTargetFiles && filterBody.getTargetFilesRegex() != null && !filterBody.getTargetFilesRegex()
-                        .isEmpty());
-                boolean withSourceTargetFilter = (withSourceFiles || withTargetFiles || withSourceFilesRegex || withTargetFilesRegex);
-                
-                if (withSourceTargetFilter) {
-                    filteredTransferIds = dbLayer.getFilteredTransferIds(filter);
-                }
-                if ((withSourceFiles || withTargetFiles) && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
-                    filteredTransferIds = dbLayer.transferIdsFilteredBySourceTargetPath(filteredTransferIds, sourceFiles, targetFiles);
-                }
-                if (withSourceFilesRegex && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
-                    sourceFilesPattern = Pattern.compile(filterBody.getSourceFilesRegex());
-                }
-                if (withTargetFilesRegex && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
-                    targetFilesPattern = Pattern.compile(filterBody.getTargetFilesRegex());
-                }
-                if ((withSourceFilesRegex || withTargetFilesRegex) && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
-                    yadeFiles = dbLayer.SourceTargetFilePaths(filteredTransferIds);
-                    if (yadeFiles != null) {
-                        Set<Long> transferIdSet = new HashSet<Long>();
-                        for (YadeSourceTargetFiles f : yadeFiles) {
-                            if (FilterAfterResponse.matchRegex(sourceFilesPattern, f.getSourcePath()) && FilterAfterResponse.matchRegex(
-                                    targetFilesPattern, f.getTargetPath())) {
-                                transferIdSet.add(f.getTransferId());
-                            }
-                        }
-                        filteredTransferIds = new ArrayList<Long>(transferIdSet);
-                    }
-                }
-                if (filteredTransferIds == null) {
-                    filteredTransferIds = new ArrayList<Long>();
-                }
-                for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
-                    if (withSourceTargetFilter && !filteredTransferIds.contains(transferFromDb.getId())) {
-                        continue;
-                    }
-                    if (filterBody.getJobschedulerId().isEmpty()) {
-                        if (!getPermissonsJocCockpit(transferFromDb.getJobschedulerId(), getAccessToken()).getYADE().getView().isStatus()) {
-                            continue;
-                        }
-                    }
-                    transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
-                }
-            }
+
+			if (transfersFromDb != null && !transfersFromDb.isEmpty()) {
+				boolean withSourceFiles = (sourceFiles != null && !sourceFiles.isEmpty());
+				boolean withTargetFiles = (targetFiles != null && !targetFiles.isEmpty());
+				boolean withSourceFilesRegex = (!withSourceFiles && filterBody.getSourceFilesRegex() != null
+						&& !filterBody.getSourceFilesRegex().isEmpty());
+				boolean withTargetFilesRegex = (!withTargetFiles && filterBody.getTargetFilesRegex() != null
+						&& !filterBody.getTargetFilesRegex().isEmpty());
+				boolean withSourceTargetFilter = (withSourceFiles || withTargetFiles || withSourceFilesRegex
+						|| withTargetFilesRegex);
+
+				if (withSourceTargetFilter) {
+					filteredTransferIds = dbLayer.getFilteredTransferIds(filter);
+				}
+				if ((withSourceFiles || withTargetFiles) && filteredTransferIds != null
+						&& !filteredTransferIds.isEmpty()) {
+					filteredTransferIds = dbLayer.transferIdsFilteredBySourceTargetPath(filteredTransferIds,
+							sourceFiles, targetFiles);
+				}
+				if (withSourceFilesRegex && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
+					sourceFilesPattern = Pattern.compile(filterBody.getSourceFilesRegex());
+				}
+				if (withTargetFilesRegex && filteredTransferIds != null && !filteredTransferIds.isEmpty()) {
+					targetFilesPattern = Pattern.compile(filterBody.getTargetFilesRegex());
+				}
+				if ((withSourceFilesRegex || withTargetFilesRegex) && filteredTransferIds != null
+						&& !filteredTransferIds.isEmpty()) {
+					yadeFiles = dbLayer.SourceTargetFilePaths(filteredTransferIds);
+					if (yadeFiles != null) {
+						Set<Long> transferIdSet = new HashSet<Long>();
+						for (YadeSourceTargetFiles f : yadeFiles) {
+							if (FilterAfterResponse.matchRegex(sourceFilesPattern, f.getSourcePath())
+									&& FilterAfterResponse.matchRegex(targetFilesPattern, f.getTargetPath())) {
+								transferIdSet.add(f.getTransferId());
+							}
+						}
+						filteredTransferIds = new ArrayList<Long>(transferIdSet);
+					}
+				}
+				if (filteredTransferIds == null) {
+					filteredTransferIds = new ArrayList<Long>();
+				}
+				for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
+					if (withSourceTargetFilter && !filteredTransferIds.contains(transferFromDb.getId())) {
+						continue;
+					}
+					if (filterBody.getJobschedulerId().isEmpty()) {
+						if (!getPermissonsJocCockpit(transferFromDb.getJobschedulerId(), getAccessToken()).getYADE()
+								.getView().isStatus()) {
+							continue;
+						}
+					}
+					transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
+				}
+			}
 			entity.setTransfers(transfers);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);

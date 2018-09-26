@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JOCXmlJobChainCommand;
@@ -17,6 +18,7 @@ import com.sos.joc.model.jobChain.JobChainPath;
 import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.jobChain.JobChainsV;
+import com.sos.joc.model.jobChain.JobsFilter;
 
 @Path("job_chains")
 public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChainsResource {
@@ -37,7 +39,10 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
             }
 
             JobChainsV entity = new JobChainsV();
-
+           
+            jobChainsFilter.getJob().setRegex(SearchStringHelper.getRegexValue(jobChainsFilter.getJob().getRegex()));
+            jobChainsFilter.setRegex(SearchStringHelper.getRegexValue(jobChainsFilter.getRegex()));
+            
             JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
             List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
             boolean withFolderFilter = jobChainsFilter.getFolders() != null && !jobChainsFilter.getFolders().isEmpty();
