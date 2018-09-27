@@ -35,15 +35,15 @@ public class AuditLogDBLayer extends DBLayer {
 			and = " and ";
 		}
 		if (filter.getTicketLink() != null && !filter.getTicketLink().isEmpty()) {
-			where += and + " ticketLink = :ticketLink";
+			where += and + String.format(" ticketLink %s :ticketLink", SearchStringHelper.getSearchOperator(filter.getTicketLink()));
 			and = " and ";
 		}
 		if (filter.getAccount() != null && !filter.getAccount().isEmpty()) {
-			where += and + " account = :account";
+			where += and + String.format(" account %s :account", SearchStringHelper.getSearchOperator(filter.getAccount()));
 			and = " and ";
 		}
 		if (filter.getReason() != null && !filter.getReason().isEmpty()) {
-			where += and + " comment = :comment";
+			where += and + String.format(" comment %s :comment", SearchStringHelper.getSearchOperator(filter.getReason()));
 			and = " and ";
 		}
 
@@ -70,13 +70,17 @@ public class AuditLogDBLayer extends DBLayer {
 				} else if (i != 0 && i != filter.getListOfOrders().size()) {
 					where += " or";
 				}
+				String jobChain = filter.getListOfOrders().get(i).getJobChain();
+				String orderId = filter.getListOfOrders().get(i).getOrderId();
 				where += String.format(" (jobChain %s '%s'",
-						SearchStringHelper.getSearchPathOperator(filter.getListOfOrders().get(i).getJobChain()),
-						SearchStringHelper.getSearchPathValue(filter.getListOfOrders().get(i).getJobChain()));
+						SearchStringHelper.getSearchPathOperator(jobChain),
+						SearchStringHelper.getSearchPathValue(jobChain));
 
 				if (filter.getListOfOrders().get(i).getOrderId() != null
 						&& !filter.getListOfOrders().get(i).getOrderId().isEmpty()) {
-					where += " and orderId = " + filter.getListOfOrders().get(i).getOrderId();
+					where += String.format(" and orderId %s '%s'",
+							SearchStringHelper.getSearchPathOperator(orderId),
+							SearchStringHelper.getSearchPathValue(orderId));
 				}
 				where += ")";
 				if (i == filter.getListOfOrders().size() - 1) {
@@ -110,6 +114,9 @@ public class AuditLogDBLayer extends DBLayer {
 		}
 		if (filter.getAccount() != null && !filter.getAccount().isEmpty()) {
 			query.setParameter("account", filter.getAccount());
+		}
+		if (filter.getReason() != null && !filter.getReason().isEmpty()) {
+			query.setParameter("comment", filter.getReason());
 		}
 	}
 

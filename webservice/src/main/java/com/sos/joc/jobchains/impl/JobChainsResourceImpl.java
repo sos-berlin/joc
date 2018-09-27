@@ -46,8 +46,8 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
 			if (jobChainsFilter.getJob() != null) {
 				jobChainsFilter.getJob()
 						.setRegex(SearchStringHelper.getRegexValue(jobChainsFilter.getJob().getRegex()));
-				jobChainsFilter.setRegex(SearchStringHelper.getRegexValue(jobChainsFilter.getRegex()));
 			}
+			jobChainsFilter.setRegex(SearchStringHelper.getRegexValue(jobChainsFilter.getRegex()));
 
 			JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
 			List<JobChainPath> jobChains = jobChainsFilter.getJobChains();

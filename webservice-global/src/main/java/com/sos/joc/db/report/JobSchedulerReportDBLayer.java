@@ -9,6 +9,7 @@ import javax.persistence.TemporalType;
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -43,9 +44,9 @@ public class JobSchedulerReportDBLayer extends DBLayer {
             }
             if (agentList != null && !agentList.isEmpty()) {
                if (agentList.size() == 1) {
-                   sql.append(" and agentUrl = :agent");  
+                   sql.append(String.format(" and agentUrl %s :agent",SearchStringHelper.getSearchOperator(agentList.get(0))));  
                } else {
-                   sql.append(" and agentUrl in (:agents)");
+                   sql.append(" and " + SearchStringHelper.getStringListSql(agentList, "agents"));
                }
             }
             sql.append(" group by schedulerId, agentUrl, cause");
@@ -62,8 +63,6 @@ public class JobSchedulerReportDBLayer extends DBLayer {
             if (agentList != null && !agentList.isEmpty()) {
                 if (agentList.size() == 1) {
                     query.setParameter("agent", agentList.get(0));
-                } else {
-                    query.setParameterList("agents", agentList);
                 }
             }
             Agents agents = new Agents();
