@@ -115,11 +115,18 @@ public class ConfigurationStatus {
             StringBuilder s = new StringBuilder();
             for (JsonObject fileBasedObstacle : fileBasedObstacles.getValuesAs(JsonObject.class)) {
                 switch (fileBasedObstacle.getString("TYPE", "").toLowerCase()) {
+                case "not_initialized":
                 case "notinitialized": // not yet in JSON response
                     errorInConfFileStatus = new ConfigurationState();
                     setSeverity(errorInConfFileStatus, ConfigurationStateText.ERROR_IN_CONFIGURATION_FILE);
                     setMessage(errorInConfFileStatus, fileBasedObstacle);
                     break;
+                case "badstate":
+                    if ("not_initialized".equals(fileBasedObstacle.getString("state", ""))) {
+                        errorInConfFileStatus = new ConfigurationState();
+                        setSeverity(errorInConfFileStatus, ConfigurationStateText.ERROR_IN_CONFIGURATION_FILE);
+                        setMessage(errorInConfFileStatus, fileBasedObstacle); 
+                    }
                 case "removed":
                     removingDelayedStatus = new ConfigurationState();
                     setSeverity(removingDelayedStatus, ConfigurationStateText.REMOVING_DELAYED);

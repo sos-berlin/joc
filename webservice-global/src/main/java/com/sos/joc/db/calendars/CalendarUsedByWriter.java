@@ -39,8 +39,8 @@ public class CalendarUsedByWriter {
         this.command = command;
     }
 
-    public CalendarUsedByWriter(SOSHibernateSession sosHibernateSession, Long instanceId, CalendarObjectType objectType, String path, 
-            String command, List<Calendar> calendars) {
+    public CalendarUsedByWriter(SOSHibernateSession sosHibernateSession, Long instanceId, CalendarObjectType objectType, String path, String command,
+            List<Calendar> calendars) {
         super();
         this.sosHibernateSession = sosHibernateSession;
         this.instanceId = instanceId;
@@ -60,6 +60,7 @@ public class CalendarUsedByWriter {
         SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(command));
         Set<String> calendarPaths = new HashSet<String>();
         NodeList calendarNodes = sosxml.selectNodeList("//date/@calendar|//holiday/@calendar");
+        ObjectMapper om = new ObjectMapper();
 
         try {
             sosHibernateSession.beginTransaction();
@@ -82,7 +83,10 @@ public class CalendarUsedByWriter {
                         calendarUsageDbItem.setCalendarId(calendarDbItem.getId());
                         Calendar calendar = calendars.get(calendarPath);
                         if (calendar != null) {
-                            calendarUsageDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
+                            calendar.setBasedOn(null);
+                            calendar.setType(null);
+                            //check if periods exist for working day caöendar
+                            calendarUsageDbItem.setConfiguration(om.writeValueAsString(calendar));
                         }
                         int index = dbCalendarUsage.indexOf(calendarUsageDbItem);
                         if (index == -1) {

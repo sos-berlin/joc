@@ -1,6 +1,6 @@
 package com.sos.joc.classes.calendar;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,15 +14,14 @@ import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JocException;
 
-
 public abstract class SendCalendarEventsUtil {
 
     private static ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
-    public static void sendEvent(List<String> xmlCommands, DBItemInventoryInstance dbItemInventoryInstance, String accessToken)
-            throws JocException, JsonProcessingException {
+    public static void sendEvent(Collection<String> xmlCommands, DBItemInventoryInstance dbItemInventoryInstance, String accessToken)
+            throws JocException {
         try {
-            if (!xmlCommands.isEmpty()) {
+            if (xmlCommands!= null && !xmlCommands.isEmpty()) {
                 String xmlCommand = "";
                 if (xmlCommands.size() > 1) {
                     xmlCommand += "<commands>";
@@ -40,7 +39,7 @@ public abstract class SendCalendarEventsUtil {
         } catch (JobSchedulerConnectionResetException e) {
         }
     }
-    
+
     public static String addCalUsageEvent(String path, String objectType, String key) throws JsonProcessingException, JocException {
         CalendarEvent calEvt = new CalendarEvent();
         calEvt.setKey(key);
@@ -55,9 +54,9 @@ public abstract class SendCalendarEventsUtil {
         String xmlCommand = objectMapper.writeValueAsString(calEvt);
         return "<publish_event>" + xmlCommand + "</publish_event>";
     }
-    
-    public static  void sendEvent(CalendarEvent calEvt, DBItemInventoryInstance dbItemInventoryInstance, String accessToken)
-            throws JocException, JsonProcessingException {
+
+    public static void sendEvent(CalendarEvent calEvt, DBItemInventoryInstance dbItemInventoryInstance, String accessToken) throws JocException,
+            JsonProcessingException {
         try {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithRetry(addEvent(calEvt), accessToken);

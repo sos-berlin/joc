@@ -106,6 +106,7 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
                                 }
                                 if (usage != null) {
                                     usage.setPath(dbUsage.getPath());
+                                    usage.setBasedOn(dbCalendar.getName());
                                     calendarList.add(usage);
                                 }
                             }

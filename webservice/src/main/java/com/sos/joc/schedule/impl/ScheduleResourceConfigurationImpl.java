@@ -7,19 +7,18 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
+import com.sos.joc.db.configuration.CalendarUsageConfiguration;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.schedule.Configuration200;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.schedule.Configuration200;
 import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
 
@@ -63,15 +62,12 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
 			if (!responseInHtml) {
 				connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 				CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
-				List<DBItemInventoryCalendarUsage> dbCalendars = calendarUsageDBLayer
-						.getCalendarUsagesOfAnObject(dbItemInventoryInstance.getId(), "SCHEDULE", schedulePath);
+				List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer
+						.getConfigurationsOfAnObject(dbItemInventoryInstance.getId(), "SCHEDULE", schedulePath);
 				if (dbCalendars != null && !dbCalendars.isEmpty()) {
 					List<Calendar> calendars = new ArrayList<Calendar>();
-					ObjectMapper objMapper = new ObjectMapper();
-					for (DBItemInventoryCalendarUsage dbCalendar : dbCalendars) {
-						if (dbCalendar.getConfiguration() != null && !dbCalendar.getConfiguration().isEmpty()) {
-							calendars.add(objMapper.readValue(dbCalendar.getConfiguration(), Calendar.class));
-						}
+					for (CalendarUsageConfiguration dbCalendar : dbCalendars) {
+						calendars.add(dbCalendar.getCalendar());
 					}
 					entity.setCalendars(calendars);
 				}

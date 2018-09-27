@@ -6,6 +6,7 @@ public class CalendarUsageFilter {
     private Long instanceId;
     private String objectType;
     private String path;
+    private Boolean edited;
 
     public CalendarUsageFilter() {
         super();
@@ -41,6 +42,14 @@ public class CalendarUsageFilter {
 
     public void setCalendarId(Long calendarId) {
         this.calendarId = calendarId;
+    }
+
+    public Boolean getEdited() {
+        return edited;
+    }
+
+    public void setEdited(Boolean edited) {
+        this.edited = edited;
     }
 
 

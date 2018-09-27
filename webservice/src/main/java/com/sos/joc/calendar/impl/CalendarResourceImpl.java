@@ -2,7 +2,6 @@ package com.sos.joc.calendar.impl;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -20,7 +19,6 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendar200;
 import com.sos.joc.model.calendar.CalendarId;
-import com.sos.joc.model.common.Folder;
 
 @Path("calendar")
 public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarResource {

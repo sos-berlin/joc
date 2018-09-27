@@ -3,12 +3,15 @@ package com.sos.joc.calendar.impl;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ws.rs.Path;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.exception.SOSInvalidDataException;
@@ -25,12 +28,10 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
 import com.sos.joc.classes.calendar.FrequencyResolver;
-import com.sos.joc.classes.calendar.JobSchedulerCalendarCallable;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
-import com.sos.joc.db.calendars.CalendarUsagesAndInstance;
+import com.sos.joc.db.calendars.CalendarUsageFilter;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
-import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
@@ -42,12 +43,12 @@ import com.sos.joc.model.calendar.CalendarObjectFilter;
 import com.sos.joc.model.calendar.CalendarRenameFilter;
 import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.Dates;
-import com.sos.joc.model.common.Err419;
 
 @Path("calendar")
 public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalendarEditResource {
 
-	private static final String API_CALL_STORE = "./calendar/store";
+    private static final Logger LOGGER = LoggerFactory.getLogger(CalendarEditResourceImpl.class);
+    private static final String API_CALL_STORE = "./calendar/store";
 	private static final String API_CALL_SAVE_AS = "./calendar/save_as";
 	private static final String API_CALL_MOVE = "./calendar/rename";
 
@@ -55,6 +56,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 	public JOCDefaultResponse postStoreCalendar(String accessToken, CalendarObjectFilter calendarFilter)
 			throws Exception {
 		SOSHibernateSession connection = null;
+		Set<String> eventCommands = new HashSet<String>();
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL_STORE, calendarFilter, accessToken,
 					calendarFilter.getJobschedulerId(), true);
@@ -92,35 +94,29 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 			CalendarEvent calEvt = new CalendarEvent();
 			CalendarVariables calEvtVars = new CalendarVariables();
 			calEvtVars.setPath(calendar.getPath());
+			if (CalendarType.NON_WORKING_DAYS == calendar.getType()) {
+                calEvtVars.setObjectType(CalendarObjectType.NONWORKINGDAYSCALENDAR);
+            } else {
+                calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
+            }
+			calEvt.setVariables(calEvtVars);
 
 			boolean updateJobOrderScheduleIsNecessary = false;
-			boolean updateCalendarUsageIsNecessary = false;
 			boolean newCalendar = (calendarDbItem == null);
 			Dates newDates = null;
 			Dates oldDates = null;
-			String oldCalendarPath = calendar.getPath();
 			Calendar oldCalendar = null;
 
 			CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(connection);
-			CalendarUsagesAndInstance calendarUsageInstance = new CalendarUsagesAndInstance(dbItemInventoryInstance,
-					false);
 			List<DBItemInventoryCalendarUsage> calendarUsages = null;
-			ObjectMapper objMapper = new ObjectMapper();
 
 			if (!newCalendar) {
 				calEvt.setKey("CalendarUpdated");
 				try {
-					oldCalendar = objMapper.readValue(calendarDbItem.getConfiguration(), Calendar.class);
-					oldCalendarPath = calendarDbItem.getName();
+					oldCalendar = new ObjectMapper().readValue(calendarDbItem.getConfiguration(), Calendar.class);
 					newDates = new FrequencyResolver().resolveFromToday(calendar);
-					if (!calendar.getPath().equals(oldCalendarPath)) {
-						calEvtVars.setOldPath(calendarDbItem.getName());
-						updateJobOrderScheduleIsNecessary = true;
-						updateCalendarUsageIsNecessary = true; // calendar.getType() == CalendarType.WORKING_DAYS;
-					} else {
-						oldDates = new FrequencyResolver().resolveFromToday(oldCalendar);
-						updateJobOrderScheduleIsNecessary = (!newDates.getDates().equals(oldDates.getDates()));
-					}
+					oldDates = new FrequencyResolver().resolveFromToday(oldCalendar);
+                    updateJobOrderScheduleIsNecessary = (!newDates.getDates().equals(oldDates.getDates()));
 					if ((calendar.getType() != null && !calendar.getType().name().equals(calendarDbItem.getType()))) {
 						calendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
 						if (!calendarUsages.isEmpty()) {
@@ -143,88 +139,32 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 				}
 			}
 
-			calendarDbItem = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem,
-					calendar);
-			if (CalendarObjectType.NONWORKINGDAYSCALENDAR.name().equals(calendarDbItem.getType())) {
-				calEvtVars.setObjectType(CalendarObjectType.NONWORKINGDAYSCALENDAR);
-			} else {
-				calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
-			}
-			calEvt.setVariables(calEvtVars);
+			calendarDbItem = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem, calendar);
+			
 			Date surveyDate = calendarDbItem.getModified();
-			List<Err419> listOfErrors = new ArrayList<Err419>();
-			List<String> eventCommands = new ArrayList<String>();
 
 			if (newCalendar) {
 				eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt));
 			} else {
-				Calendar curCalendar = objMapper.readValue(calendarDbItem.getConfiguration(), Calendar.class);
-				if (!curCalendar.equals(oldCalendar)) {
+//				Calendar curCalendar = objMapper.readValue(calendarDbItem.getConfiguration(), Calendar.class);
+//				if (!curCalendar.equals(oldCalendar)) {
+			    if (updateJobOrderScheduleIsNecessary) {    
 					eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt));
-				}
-			}
-
-			if (updateCalendarUsageIsNecessary) {
-				if (calendarUsages == null) {
-					calendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
-				}
-				if (!calendarUsages.isEmpty()) {
-					try {
-						connection.beginTransaction();
-						for (DBItemInventoryCalendarUsage item : calendarUsages) {
-							if (item.getConfiguration() != null) {
-								Calendar c = objMapper.readValue(item.getConfiguration(), Calendar.class);
-								c.setBasedOn(calendar.getPath());
-								item.setConfiguration(objMapper.writeValueAsString(c));
-								calendarUsageDbLayer.updateCalendarUsage(item);
-								eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(item.getPath(),
-										item.getObjectType(), "CalendarUsageUpdated"));
-							}
-						}
-						connection.commit();
-					} catch (JocException e) {
-						connection.rollback();
-						throw e;
-					} catch (Exception e) {
-						connection.rollback();
-						throw e;
+					if (calendarUsages == null) {
+					    calendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
 					}
-				}
-			}
-			SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, getAccessToken());
-
-			if (updateJobOrderScheduleIsNecessary) {
-				// update calendar in jobs, orders and schedules
-				if (calendarUsages == null) {
-					calendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
-				}
-				if (!calendarUsages.isEmpty()) {
-					calendarUsageInstance.setCalendarUsages(calendarUsages);
-					calendarUsageInstance.setCalendarPath(calendar.getPath());
-					calendarUsageInstance.setOldCalendarPath(oldCalendarPath);
-					calendarUsageInstance.setBaseCalendar(calendar);
-					calendarUsageInstance.setDates(newDates.getDates());
-					JobSchedulerCalendarCallable callable = new JobSchedulerCalendarCallable(calendarUsageInstance,
-							accessToken);
-					CalendarUsagesAndInstance c = callable.call();
-					calendarUsageDbLayer.updateEditFlag(c.getCalendarUsages(), true);
-
-					for (Entry<String, Exception> exception : c.getExceptions().entrySet()) {
-						if (exception.getValue() instanceof JocException) {
-							listOfErrors.add(new BulkError().get((JocException) exception.getValue(), getJocError(),
-									exception.getKey()));
-						} else {
-							listOfErrors
-									.add(new BulkError().get(exception.getValue(), getJocError(), exception.getKey()));
-						}
-					}
+					if (calendarUsages != null) {
+					    for (DBItemInventoryCalendarUsage usage : calendarUsages) {
+	                        eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(usage.getPath(), usage.getObjectType(), "CalendarUsageUpdated"));
+	                    }
+                    }
 				}
 			}
 
-			if (listOfErrors.size() > 0) {
-				return JOCDefaultResponse.responseStatus419(listOfErrors);
-			}
 			storeAuditLogEntry(calendarAudit);
+			SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, getAccessToken());
+			eventCommands = null;
+			
 			return JOCDefaultResponse.responseStatusJSOk(surveyDate);
 		} catch (JocException e) {
 			e.addErrorMetaInfo(getJocError());
@@ -233,6 +173,11 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
 		} finally {
 			Globals.disconnect(connection);
+			try {
+			    SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, getAccessToken());
+			} catch(Exception e) {
+			    LOGGER.error("Couldn't send calendar events", e);
+			}
 		}
 	}
 
@@ -277,7 +222,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 			calEvt.setKey("CalendarCreated");
 			CalendarVariables calEvtVars = new CalendarVariables();
 			calEvtVars.setPath(calendar.getPath());
-			if (CalendarObjectType.NONWORKINGDAYSCALENDAR.name().equals(dbItemCalendar.getType())) {
+			if (CalendarType.NON_WORKING_DAYS.name().equals(dbItemCalendar.getType())) {
 				calEvtVars.setObjectType(CalendarObjectType.NONWORKINGDAYSCALENDAR);
 			} else {
 				calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
@@ -300,6 +245,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 	public JOCDefaultResponse postRenameCalendar(String accessToken, CalendarRenameFilter calendarFilter)
 			throws Exception {
 		SOSHibernateSession connection = null;
+		Set<String> eventCommands = new HashSet<String>();
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL_MOVE, calendarFilter, accessToken,
 					calendarFilter.getJobschedulerId(),
@@ -338,13 +284,24 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 			CalendarVariables calEvtVars = new CalendarVariables();
 			calEvtVars.setPath(calendarNewPath);
 			calEvtVars.setOldPath(calendarPath);
-			if (CalendarObjectType.NONWORKINGDAYSCALENDAR.name().equals(calendarDbItem.getType())) {
+			if (CalendarType.NON_WORKING_DAYS.name().equals(calendarDbItem.getType())) {
 				calEvtVars.setObjectType(CalendarObjectType.NONWORKINGDAYSCALENDAR);
 			} else {
 				calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
 			}
 			calEvt.setVariables(calEvtVars);
-			SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
+			eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt));
+			
+			CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(connection);
+            List<DBItemInventoryCalendarUsage> usages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
+			if (usages != null) {
+                for (DBItemInventoryCalendarUsage usage : usages) {
+                    eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(usage.getPath(), usage.getObjectType(), "CalendarUsageUpdated"));
+                }
+            }
+			
+			SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, getAccessToken());
+			eventCommands = null;
 
 			return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
 		} catch (JocException e) {
@@ -354,6 +311,11 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
 		} finally {
 			Globals.disconnect(connection);
+			try {
+                SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, getAccessToken());
+            } catch(Exception e) {
+                LOGGER.error("Couldn't send calendar events", e);
+            }
 		}
 	}
 

@@ -10,12 +10,14 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.db.configuration.CalendarUsageConfiguration;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 
 public class CalendarUsageDBLayer extends DBLayer {
 
     private static final String CALENDAR_USAGES_INSTANCE = CalendarUsagesAndInstance.class.getName();
+    private static final String CALENDAR_USAGE_CONFIGURATION = CalendarUsageConfiguration.class.getName();
     private Query<DBItemInventoryCalendarUsage> query;
 
     public CalendarUsageDBLayer(SOSHibernateSession connection) {
@@ -29,19 +31,20 @@ public class CalendarUsageDBLayer extends DBLayer {
             where += and + " objectType = :objectType";
             and = " and ";
         }
-
         if (filter.getInstanceId() != null) {
             where += and + " instanceId = :instanceId";
             and = " and ";
         }
-
         if (filter.getPath() != null && !filter.getPath().isEmpty()) {
             where += and + " path = :path";
             and = " and ";
         }
-
         if (filter.getCalendarId() != null) {
             where += and + " calendarId = :calendarId";
+            and = " and ";
+        }
+        if (filter.getEdited() != null) {
+            where += and + " edited = :edited";
             and = " and ";
         }
         if (!where.trim().isEmpty()) {
@@ -90,13 +93,16 @@ public class CalendarUsageDBLayer extends DBLayer {
         if (filter.getPath() != null && !filter.getPath().isEmpty()) {
             query.setParameter("path", filter.getPath());
         }
+        if (filter.getEdited() != null) {
+            query.setParameter("edited", filter.getEdited());
+        }
     }
 
     public int deleteCalendarUsage(CalendarUsageFilter calendarUsageFilter) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             String hql = "delete from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(calendarUsageFilter);
             int row = 0;
-            query = getSession().createQuery(hql);
+            Query<Integer> query = getSession().createQuery(hql);
             bindParameters(calendarUsageFilter);
             row = getSession().executeUpdate(query);
             return row;
@@ -118,6 +124,23 @@ public class CalendarUsageDBLayer extends DBLayer {
     public void deleteCalendarUsage(DBItemInventoryCalendarUsage calendarUsage) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             getSession().delete(calendarUsage);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public int updateEditFlag(DBItemInventoryCalendarUsage calendarUsage) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            String hql = "update " + DBITEM_INVENTORY_CALENDAR_USAGE + " set edited = :edited where id = :id";
+            int row = 0;
+            Query<Integer> query = getSession().createQuery(hql);
+            query.setParameter("id", calendarUsage.getId());
+            query.setParameter("edited", calendarUsage.getEdited());
+            row = getSession().executeUpdate(query);
+            return row;
+
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -197,6 +220,31 @@ public class CalendarUsageDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+    
+    public List<CalendarUsageConfiguration> getConfigurationsOfAnObject(Long instanceId, String objectType, String path)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select new ").append(CALENDAR_USAGE_CONFIGURATION);
+            sql.append("(ic.name, ic.type, icu.configuration) from ");
+            sql.append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu, ");
+            sql.append(DBITEM_CALENDARS).append(" ic ");
+            sql.append(" where ic.id = icu.calendarId");
+            sql.append(" and icu.instanceId = :instanceId");
+            sql.append(" and icu.objectType = :objectType");
+            sql.append(" and icu.path = :path");
+            Query<CalendarUsageConfiguration> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("objectType", objectType);
+            query.setParameter("path", path);
+            return getSession().getResultList(query);
+
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
 
     public List<String> getWorkingDaysCalendarUsagesOfAnObject(Long instanceId, String objectType, String path) throws DBConnectionRefusedException,
             DBInvalidDataException {
@@ -222,11 +270,16 @@ public class CalendarUsageDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-
+    
     public List<DBItemInventoryCalendarUsage> getCalendarUsages(Long calendarId) throws DBInvalidDataException, DBConnectionRefusedException {
+        CalendarUsageFilter filter = new CalendarUsageFilter();
+        filter.setCalendarId(calendarId);
+        filter.setEdited(false);
+        return getCalendarUsages(filter);
+    }
+
+    public List<DBItemInventoryCalendarUsage> getCalendarUsages(CalendarUsageFilter filter) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
-            CalendarUsageFilter filter = new CalendarUsageFilter();
-            filter.setCalendarId(calendarId);
             String sql = "from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(filter);
             query = getSession().createQuery(sql);
             bindParameters(filter);
@@ -241,20 +294,11 @@ public class CalendarUsageDBLayer extends DBLayer {
 
     public List<DBItemInventoryCalendarUsage> getCalendarUsages(Long instanceId, String calendarPath) throws DBInvalidDataException,
             DBConnectionRefusedException {
-        try {
-            CalendarUsageFilter filter = new CalendarUsageFilter();
-            filter.setInstanceId(instanceId);
-            filter.setPath(calendarPath);
-            String sql = "from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(filter);
-            query = getSession().createQuery(sql);
-            bindParameters(filter);
-            return getSession().getResultList(query);
-
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
-        }
+        CalendarUsageFilter filter = new CalendarUsageFilter();
+        filter.setInstanceId(instanceId);
+        filter.setPath(calendarPath);
+        filter.setEdited(false);
+        return getCalendarUsages(filter);
     }
 
     public DBItemInventoryCalendarUsage getCalendarUsageByConstraint(Long instanceId, Long calendarId, String objectType, String calendarPath)
