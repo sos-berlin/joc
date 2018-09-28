@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.jitl.dailyplan.db.Calendar2DB;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
@@ -160,7 +161,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             }
 
             Matcher regExMatcher = null;
-            if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty() && !planFilter.getRegex().contains("%")) {
+            if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+            	planFilter.setRegex(SearchStringHelper.getRegexValue(planFilter.getRegex()));
                 regExMatcher = Pattern.compile(planFilter.getRegex()).matcher("");
             }
 
