@@ -59,7 +59,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private Set<String> eventCommands = new HashSet<String>();
     private ObjectMapper mapper = new ObjectMapper();
-    private boolean updateIsNecessary = false;
+    private boolean updateUsageIsNecessary = false;
 
     @Override
     public JOCDefaultResponse importCalendars(String accessToken, CalendarImportFilter calendarImportFilter) throws Exception {
@@ -279,10 +279,11 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 oldCalendar = mapper.readValue(calendarDbItem.getConfiguration(), Calendar.class);
                 newDates = new FrequencyResolver().resolveFromToday(calendar);
                 oldDates = new FrequencyResolver().resolveFromToday(oldCalendar);
-                updateIsNecessary = (!newDates.getDates().equals(oldDates.getDates()));
-                if (updateIsNecessary) {
-                    calendarDbItem = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem, calendar);
-                    eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt));
+                updateUsageIsNecessary = (!newDates.getDates().equals(oldDates.getDates()));
+                //TODO check if update necessary
+                calendarDbItem = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem, calendar);
+                eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt));
+                if (updateUsageIsNecessary) {
                     if (dbCalendarUsages == null) {
                         dbCalendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
                     }
