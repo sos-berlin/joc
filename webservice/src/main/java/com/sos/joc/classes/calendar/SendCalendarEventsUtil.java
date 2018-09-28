@@ -20,24 +20,31 @@ public abstract class SendCalendarEventsUtil {
 
     public static void sendEvent(Collection<String> xmlCommands, DBItemInventoryInstance dbItemInventoryInstance, String accessToken)
             throws JocException {
-        try {
-            if (xmlCommands!= null && !xmlCommands.isEmpty()) {
-                String xmlCommand = "";
-                if (xmlCommands.size() > 1) {
-                    xmlCommand += "<commands>";
-                }
-                for (String command : xmlCommands) {
-                    xmlCommand += command;
-                }
-                if (xmlCommands.size() > 1) {
-                    xmlCommand += "</commands>";
-                }
-                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-                jocXmlCommand.executePostWithRetry(xmlCommand, accessToken);
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+        for (String command : xmlCommands) {
+            try {
+                jocXmlCommand.executePostWithRetry(command, accessToken);
+            } catch (JobSchedulerConnectionRefusedException | JobSchedulerConnectionResetException e) {
             }
-        } catch (JobSchedulerConnectionRefusedException e) {
-        } catch (JobSchedulerConnectionResetException e) {
         }
+//        try {
+//            if (xmlCommands!= null && !xmlCommands.isEmpty()) {
+//                String xmlCommand = "";
+//                if (xmlCommands.size() > 1) {
+//                    xmlCommand += "<commands>";
+//                }
+//                for (String command : xmlCommands) {
+//                    xmlCommand += command;
+//                }
+//                if (xmlCommands.size() > 1) {
+//                    xmlCommand += "</commands>";
+//                }
+//                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+//                jocXmlCommand.executePostWithRetry(xmlCommand, accessToken);
+//            }
+//        } catch (JobSchedulerConnectionRefusedException e) {
+//        } catch (JobSchedulerConnectionResetException e) {
+//        }
     }
 
     public static String addCalUsageEvent(String path, String objectType, String key) throws JsonProcessingException, JocException {
