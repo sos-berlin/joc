@@ -532,11 +532,15 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             if (connection == null) {
                 connection = Globals.createSosHibernateStatelessConnection("eventCallable-" + jobSchedulerEvent.getJobschedulerId());
             }
+            
+            Date from = new Date();
+            from.setTime(Long.parseLong(eventId) / 1000);
            
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
             Globals.beginTransaction(connection);
             AuditLogDBFilter auditLogDBFilter = new AuditLogDBFilter();
             auditLogDBFilter.setSchedulerId(jobSchedulerEvent.getJobschedulerId());
+            auditLogDBFilter.setCreatedFrom(from);
             List<DBItemAuditLog> auditLogs = dbLayer.getAuditLogs(auditLogDBFilter);
             Globals.rollback(connection);
             if (auditLogs != null && !auditLogs.isEmpty()) {
