@@ -153,9 +153,21 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         String returnQuery = "OrdersComplemented/OrderDetailed";
         uriBuilder.queryParam("return", returnQuery);
     }
+    
+    public void addJobCompactQuery(boolean compact) {
+        String returnQuery = (compact) ? "JobOverview" : "JobDetailed";
+        uriBuilder.queryParam("return", returnQuery);
+    }
 
     public void addOrderStatisticsQuery() {
+        addOrderStatisticsQuery(null);
+    }
+    
+    public void addOrderStatisticsQuery(Boolean isDistributed) {
         uriBuilder.queryParam("return", "JocOrderStatistics");
+        if (isDistributed != null) {
+            uriBuilder.queryParam("isDistributed", isDistributed);
+        }
     }
     
     public void addEventTimeout(Integer timeout) {

@@ -1,7 +1,5 @@
 package com.sos.joc.classes;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -255,6 +253,31 @@ public class JOCResourceImpl {
 	public String getUrl() {
 		return dbItemInventoryInstance.getUrl();
 	}
+	
+	public String getVersion() {
+        return dbItemInventoryInstance.getVersion();
+    }
+	
+	public boolean versionIsOlderThan(String version) {
+	    return true;
+	    //TODO deactivated until JS-1793 is ready
+//	    boolean hasSnapshot = dbItemInventoryInstance.getVersion().contains("-SNAPSHOT");
+//	    String[] curVersions = dbItemInventoryInstance.getVersion().replaceFirst("-SNAPSHOT", "").split("\\.");
+//	    String[] versions = version.split("\\.");
+//	    String curVersionsStr = curVersions[0];
+//	    String versionsStr = versions[0];
+//	    for (int i=1; i < curVersions.length; i++) {
+//            curVersionsStr += curVersions[i].replaceFirst("^(\\d)$", "0$1");
+//        }
+//        for (int i=1; i < versions.length; i++) {
+//            versionsStr += versions[i].replaceFirst("^(\\d)$", "0$1");
+//        }
+//        Integer curI = Integer.valueOf(curVersionsStr);
+//        if (hasSnapshot) {
+//            curI++;
+//        }
+//        return (curI < Integer.valueOf(versionsStr));
+    }
 
 	public String getBasicAuthorization() {
 		try {

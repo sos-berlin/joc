@@ -24,7 +24,7 @@ import com.sos.joc.model.job.TaskHistoryItem;
 public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResourceHistory {
 
 	private static final Integer DEFAULT_MAX_HISTORY_ITEMS = 25;
-	private static final String API_CALL = "./job/configuration";
+	private static final String API_CALL = "./job/history";
 
 	@Override
 	public JOCDefaultResponse postJobHistory(String xAccessToken, String accessToken,

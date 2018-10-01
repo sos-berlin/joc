@@ -5,8 +5,10 @@ import java.util.Date;
 import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
+import com.sos.joc.classes.jobs.JobsVCallable;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceOrderQueue;
 import com.sos.joc.model.job.JobFilter;
@@ -35,8 +37,17 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
 			checkRequiredParameter("job", jobFilter.getJob());
 			String jobPath = normalizePath(jobFilter.getJob());
 			JobV200 entity = new JobV200();
-			JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
-			entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobPath, jobFilter.getCompact()));
+			if (versionIsOlderThan("1.12.6")) {
+			    JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
+			    entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobPath, jobFilter.getCompact()));
+			} else {
+			    JOCJsonCommand command = new JOCJsonCommand(this);
+                command.setUriBuilderForJobs();
+                command.addJobCompactQuery(jobFilter.getCompact());
+                jobFilter.setJob(jobPath);
+                JobsVCallable j = new JobsVCallable(jobFilter, command, accessToken, true);
+                entity.setJob(j.getJob());
+			}
 			entity.setDeliveryDate(new Date());
 			return JOCDefaultResponse.responseStatus200(entity);
 		} catch (JocException e) {

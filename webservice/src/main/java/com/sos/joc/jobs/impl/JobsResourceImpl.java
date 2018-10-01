@@ -2,18 +2,24 @@ package com.sos.joc.jobs.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SearchStringHelper;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
-import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
+import com.sos.joc.classes.jobs.JobVolatileJson;
+import com.sos.joc.classes.jobs.JobsVCallable;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.Folder;
@@ -33,7 +39,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
     }
 
     public JOCDefaultResponse postJobs(String accessToken, JobsFilter jobsFilter) throws Exception {
-        SOSHibernateSession connection = null;
+        //SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     jobsFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
@@ -43,34 +49,86 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
             jobsFilter.setRegex(SearchStringHelper.getRegexValue(jobsFilter.getRegex()));
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
-            List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
+            //connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            //InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
+            //List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
             JobsV entity = new JobsV();
             List<JobV> listOfJobs = null;
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
+            //JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
             List<JobPath> jobs = jobsFilter.getJobs();
             boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+            
+            if (versionIsOlderThan("1.12.6")) {
+                JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
 
-            if (jobs != null && !jobs.isEmpty()) {
-                List<JobPath> permittedJobs = new ArrayList<JobPath>();
-                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                for (JobPath job : jobs) {
-                    if (job != null && canAdd(job.getJob(), permittedFolders)) {
-                        permittedJobs.add(job);
+                if (jobs != null && !jobs.isEmpty()) {
+                    List<JobPath> permittedJobs = new ArrayList<JobPath>();
+                    Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                    for (JobPath job : jobs) {
+                        if (job != null && canAdd(job.getJob(), permittedFolders)) {
+                            permittedJobs.add(job);
+                        }
+                    }
+                    if (!permittedJobs.isEmpty()) {
+                        listOfJobs = jocXmlCommand.getJobsFromShowJob(permittedJobs, jobsFilter);
+                    }
+                } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                    // no permission
+                } else if (folders != null && !folders.isEmpty()) {
+                    listOfJobs = jocXmlCommand.getJobsFromShowState(folders, jobsFilter);
+                } else {
+                    listOfJobs = jocXmlCommand.getJobsFromShowState(jobsFilter);
+                }
+                
+            } else {
+                JOCJsonCommand command = new JOCJsonCommand(this);
+                command.setUriBuilderForJobs();
+                command.addJobCompactQuery(jobsFilter.getCompact());
+                Map<String, JobVolatileJson> listJobs = new HashMap<String, JobVolatileJson>();
+                List<JobsVCallable> tasks = new ArrayList<JobsVCallable>();
+                
+                if (jobs != null && !jobs.isEmpty()) {
+                    for (JobPath job : jobs) {
+                        tasks.add(new JobsVCallable(job, jobsFilter, new JOCJsonCommand(command), accessToken));
+                    }
+                } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                    // no permission
+                } else if (folders != null && !folders.isEmpty()) {
+                    for (Folder folder : folders) {
+                        folder.setFolder(normalizeFolder(folder.getFolder()));
+                        tasks.add(new JobsVCallable(folder, jobsFilter, new JOCJsonCommand(command), accessToken));
+                    }
+                } else {
+                    Folder rootFolder = new Folder();
+                    rootFolder.setFolder("/");
+                    rootFolder.setRecursive(true);
+                    JobsVCallable callable = new JobsVCallable(rootFolder, jobsFilter, command, accessToken);
+                    listJobs.putAll(callable.call());
+                }
+                
+                if (tasks != null && !tasks.isEmpty()) {
+                    ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                    try {
+                        for (Future<Map<String, JobVolatileJson>> result : executorService.invokeAll(tasks)) {
+                            try {
+                                listJobs.putAll(result.get());
+                            } catch (ExecutionException e) {
+                                if (e.getCause() instanceof JocException) {
+                                    throw (JocException) e.getCause();
+                                } else {
+                                    throw (Exception) e.getCause();
+                                }
+                            }
+                        }
+                    } finally {
+                        executorService.shutdown();
                     }
                 }
-                if (!permittedJobs.isEmpty()) {
-                    listOfJobs = jocXmlCommand.getJobsFromShowJob(permittedJobs, jobsFilter);
-                }
-            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
-            } else if (folders != null && !folders.isEmpty()) {
-                listOfJobs = jocXmlCommand.getJobsFromShowState(folders, jobsFilter);
-            } else {
-                listOfJobs = jocXmlCommand.getJobsFromShowState(jobsFilter);
+                
+                listOfJobs = new ArrayList<JobV>(listJobs.values());
             }
+            
             entity.setJobs(listOfJobs);
             entity.setDeliveryDate(new Date());
 
@@ -81,8 +139,8 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
+        //} finally {
+            //Globals.disconnect(connection);
         }
     }
 }

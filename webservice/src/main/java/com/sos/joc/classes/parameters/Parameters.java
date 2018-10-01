@@ -48,7 +48,11 @@ public class Parameters {
     }
     
     public static List<NameValuePair> getParameters(JsonObject elem) {
-        JsonObject paramList = elem.getJsonObject("variables");
+        return getParameters(elem, "variables");
+    }
+    
+    public static List<NameValuePair> getParameters(JsonObject elem, String elemName) {
+        JsonObject paramList = elem.getJsonObject(elemName);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         if (paramList != null && !paramList.isEmpty()) {
             for (String key : paramList.keySet()) {

@@ -46,7 +46,7 @@ public class JobsResourceImplTest {
         jobsFilterSchema.setCompact(true);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
-        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
+//        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
 //        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
      }
@@ -75,7 +75,7 @@ public class JobsResourceImplTest {
         jobsFilterSchema.setFolders(folders);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
-        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
+//        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
 //        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         Date end = new Date();
         long duration = end.getTime() - start.getTime();
@@ -98,7 +98,7 @@ public class JobsResourceImplTest {
         jobsFilterSchema.setFolders(folders);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
-        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
+//        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
 //        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
      }

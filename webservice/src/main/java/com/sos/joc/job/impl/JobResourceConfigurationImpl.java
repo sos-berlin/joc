@@ -33,7 +33,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
 			}
 
 			Configuration200 entity = new Configuration200();
-			if (checkRequiredParameter("orderId", jobBody.getJob())) {
+			if (checkRequiredParameter("job", jobBody.getJob())) {
 				JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(accessToken);
 				boolean responseInHtml = jobBody.getMime() == ConfigurationMime.HTML;
 				entity = jocConfiguration.getJobConfiguration(this, jobBody.getJob(), responseInHtml);
