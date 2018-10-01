@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2018.05.15 um 11:57:31 AM CEST 
+// Generiert: 2018.10.01 um 04:45:58 PM CEST 
 //
 
 
@@ -736,6 +736,27 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
+ *         &lt;element name="Joc">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="view">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element name="log" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                           &lt;/sequence>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="isAuthenticated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="user" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -770,7 +791,8 @@ import javax.xml.bind.annotation.XmlType;
     "sosPermissionRoles",
     "yade",
     "calendar",
-    "runtime"
+    "runtime",
+    "joc"
 })
 @XmlRootElement(name = "SOSPermissionJocCockpit")
 public class SOSPermissionJocCockpit {
@@ -815,6 +837,8 @@ public class SOSPermissionJocCockpit {
     protected SOSPermissionJocCockpit.Calendar calendar;
     @XmlElement(name = "Runtime", required = true)
     protected SOSPermissionJocCockpit.Runtime runtime;
+    @XmlElement(name = "Joc", required = true)
+    protected SOSPermissionJocCockpit.Joc joc;
     @XmlAttribute(name = "isAuthenticated")
     protected Boolean isAuthenticated;
     @XmlAttribute(name = "user")
@@ -1304,6 +1328,30 @@ public class SOSPermissionJocCockpit {
      */
     public void setRuntime(SOSPermissionJocCockpit.Runtime value) {
         this.runtime = value;
+    }
+
+    /**
+     * Ruft den Wert der joc-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link SOSPermissionJocCockpit.Joc }
+     *     
+     */
+    public SOSPermissionJocCockpit.Joc getJoc() {
+        return joc;
+    }
+
+    /**
+     * Legt den Wert der joc-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link SOSPermissionJocCockpit.Joc }
+     *     
+     */
+    public void setJoc(SOSPermissionJocCockpit.Joc value) {
+        this.joc = value;
     }
 
     /**
@@ -4930,6 +4978,117 @@ public class SOSPermissionJocCockpit {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+        }
+
+    }
+
+
+    /**
+     * <p>Java-Klasse für anonymous complex type.
+     * 
+     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="view">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="log" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "view"
+    })
+    public static class Joc {
+
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.Joc.View view;
+
+        /**
+         * Ruft den Wert der view-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.Joc.View }
+         *     
+         */
+        public SOSPermissionJocCockpit.Joc.View getView() {
+            return view;
+        }
+
+        /**
+         * Legt den Wert der view-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.Joc.View }
+         *     
+         */
+        public void setView(SOSPermissionJocCockpit.Joc.View value) {
+            this.view = value;
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="log" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "log"
+        })
+        public static class View {
+
+            protected boolean log;
+
+            /**
+             * Ruft den Wert der log-Eigenschaft ab.
+             * 
+             */
+            public boolean isLog() {
+                return log;
+            }
+
+            /**
+             * Legt den Wert der log-Eigenschaft fest.
+             * 
+             */
+            public void setLog(boolean value) {
+                this.log = value;
             }
 
         }
