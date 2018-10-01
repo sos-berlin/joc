@@ -374,6 +374,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 					sourceFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
 				}
 				transfer.setSource(sourceFragment);
+				
 			}
 		}
 		transfer.setStart(dbTransfer.getStart());
@@ -387,6 +388,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 				if (!compact) {
 					targetFragment.setAccount(protocol.getAccount());
 					targetFragment.setPort(protocol.getPort());
+					targetFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
 				}
 				transfer.setTarget(targetFragment);
 			}
