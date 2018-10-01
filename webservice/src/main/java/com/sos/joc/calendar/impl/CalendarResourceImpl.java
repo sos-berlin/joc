@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemCalendar;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
 import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarResource;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -43,10 +43,10 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
 			// TODO only check path, id will be removed
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
-			DBItemCalendar calendarItem = null;
+			DBItemInventoryClusterCalendar calendarItem = null;
 			if (calendarFilter.getPath() != null) {
 				String calendarPath = normalizePath(calendarFilter.getPath());
-				calendarItem = dbLayer.getCalendar(dbItemInventoryInstance.getId(), calendarPath);
+				calendarItem = dbLayer.getCalendar(dbItemInventoryInstance.getSchedulerId(), calendarPath);
 				if (calendarItem == null) {
 					throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));
 				}

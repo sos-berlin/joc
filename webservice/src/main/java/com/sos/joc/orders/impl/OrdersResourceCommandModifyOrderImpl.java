@@ -279,7 +279,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         if (session == null) {
                             session = Globals.createSosHibernateStatelessConnection(API_CALL);
                         }
-                        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(),
+                        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getSchedulerId(),
                                 CalendarObjectType.ORDER, configuration.getJobChain() + "," + order.getOrderId(), order.getRunTime(), order
                                         .getCalendars());
                         calendarUsedByWriter.updateUsedBy();

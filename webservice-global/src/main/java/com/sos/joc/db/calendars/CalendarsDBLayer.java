@@ -13,7 +13,7 @@ import org.hibernate.query.Query;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
-import com.sos.jitl.reporting.db.DBItemCalendar;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -28,12 +28,12 @@ public class CalendarsDBLayer extends DBLayer {
         super(connection);
     }
 
-    public DBItemCalendar getCalendar(Long id) throws DBConnectionRefusedException, DBInvalidDataException {
+    public DBItemInventoryClusterCalendar getCalendar(Long id) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_CALENDARS);
+            sql.append("from ").append(DBITEM_CLUSTER_CALENDARS);
             sql.append(" where id = :id");
-            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryClusterCalendar> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             return getSession().getSingleResult(query);
         } catch (SOSHibernateInvalidSessionException ex) {
@@ -43,14 +43,14 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public DBItemCalendar getCalendar(Long instanceId, String path) throws DBConnectionRefusedException, DBInvalidDataException {
+    public DBItemInventoryClusterCalendar getCalendar(String schedulerId, String path) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_CALENDARS);
-            sql.append(" where instanceId = :instanceId");
+            sql.append("from ").append(DBITEM_CLUSTER_CALENDARS);
+            sql.append(" where schedulerId = :schedulerId");
             sql.append(" and name = :name");
-            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
+            Query<DBItemInventoryClusterCalendar> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
             query.setParameter("name", path);
             return getSession().getSingleResult(query);
         } catch (SOSHibernateInvalidSessionException ex) {
@@ -60,9 +60,9 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public DBItemCalendar renameCalendar(Long instanceId, String path, String newPath) throws JocException {
+    public DBItemInventoryClusterCalendar renameCalendar(String schedulerId, String path, String newPath) throws JocException {
         try {
-            DBItemCalendar calendarDbItem = getCalendar(instanceId, path);
+            DBItemInventoryClusterCalendar calendarDbItem = getCalendar(schedulerId, path);
             if (calendarDbItem == null) {
                 throw new DBMissingDataException(String.format("calendar '%1$s' not found", path));
             }
@@ -82,13 +82,13 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public List<String> getCategories(Long instanceId) throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<String> getCategories(String schedulerId) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select category from ").append(DBITEM_CALENDARS);
-            sql.append(" where instanceId = :instanceId").append(" group by category order by category");
+            sql.append("select category from ").append(DBITEM_CLUSTER_CALENDARS);
+            sql.append(" where schedulerId = :schedulerId").append(" group by category order by category");
             Query<String> query = getSession().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
+            query.setParameter("schedulerId", schedulerId);
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
@@ -97,14 +97,14 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public DBItemCalendar saveOrUpdateCalendar(Long instanceId, DBItemCalendar calendarDbItem, Calendar calendar) throws DBConnectionRefusedException,
+    public DBItemInventoryClusterCalendar saveOrUpdateCalendar(String schedulerId, DBItemInventoryClusterCalendar calendarDbItem, Calendar calendar) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             Date now = Date.from(Instant.now());
             boolean newCalendar = (calendarDbItem == null);
             if (newCalendar) {
-                calendarDbItem = new DBItemCalendar();
-                calendarDbItem.setInstanceId(instanceId);
+                calendarDbItem = new DBItemInventoryClusterCalendar();
+                calendarDbItem.setSchedulerId(schedulerId);
                 calendarDbItem.setCreated(now);
             }
             if (calendar.getCategory() != null) {
@@ -142,9 +142,9 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public void deleteCalendars(Long instanceId, Set<String> paths) throws DBConnectionRefusedException, DBInvalidDataException {
+    public void deleteCalendars(String schedulerId, Set<String> paths) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            for (DBItemCalendar calendarDbItem : getCalendarsFromPaths(instanceId, paths)) {
+            for (DBItemInventoryClusterCalendar calendarDbItem : getCalendarsFromPaths(schedulerId, paths)) {
                 getSession().delete(calendarDbItem);
             }
         } catch (SOSHibernateInvalidSessionException ex) {
@@ -154,7 +154,7 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public void deleteCalendar(DBItemCalendar dbCalendar) throws DBConnectionRefusedException, DBInvalidDataException {
+    public void deleteCalendar(DBItemInventoryClusterCalendar dbCalendar) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             if (dbCalendar != null) {
                 getSession().delete(dbCalendar);
@@ -166,10 +166,10 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemCalendar> getCalendarsFromIds(Set<Long> ids) throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<DBItemInventoryClusterCalendar> getCalendarsFromIds(Set<Long> ids) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_CALENDARS);
+            sql.append("from ").append(DBITEM_CLUSTER_CALENDARS);
             if (ids != null && !ids.isEmpty()) {
                 if (ids.size() == 1) {
                     sql.append(" where id = :id");
@@ -177,7 +177,7 @@ public class CalendarsDBLayer extends DBLayer {
                     sql.append(" where id in (:id)");
                 }
             }
-            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryClusterCalendar> query = getSession().createQuery(sql.toString());
             if (ids != null && !ids.isEmpty()) {
                 if (ids.size() == 1) {
                     query.setParameter("id", ids.iterator().next());
@@ -193,12 +193,12 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemCalendar> getCalendarsFromPaths(Long instanceId, Set<String> paths) throws DBConnectionRefusedException,
+    public List<DBItemInventoryClusterCalendar> getCalendarsFromPaths(String schedulerId, Set<String> paths) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_CALENDARS);
-            sql.append(" where instanceId = :instanceId");
+            sql.append("from ").append(DBITEM_CLUSTER_CALENDARS);
+            sql.append(" where schedulerId = :schedulerId");
             if (paths != null && !paths.isEmpty()) {
                 if (paths.size() == 1) {
                     sql.append(" and name = :name");
@@ -206,8 +206,8 @@ public class CalendarsDBLayer extends DBLayer {
                     sql.append(" and name in (:name)");
                 }
             }
-            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
+            Query<DBItemInventoryClusterCalendar> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
             if (paths != null && !paths.isEmpty()) {
                 if (paths.size() == 1) {
                     query.setParameter("name", paths.iterator().next());
@@ -223,13 +223,13 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemCalendar> getCalendars(Long instanceId, String type, Set<String> categories, Set<String> folders, Set<String> recursiveFolders)
+    public List<DBItemInventoryClusterCalendar> getCalendars(String schedulerId, String type, Set<String> categories, Set<String> folders, Set<String> recursiveFolders)
             throws DBConnectionRefusedException, DBInvalidDataException {
         // all recursiveFolders are included in folders too
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_CALENDARS);
-            sql.append(" where instanceId = :instanceId");
+            sql.append("from ").append(DBITEM_CLUSTER_CALENDARS);
+            sql.append(" where schedulerId = :schedulerId");
             if (type != null && !type.isEmpty()) {
                 sql.append(" and type = :type");
             } else {
@@ -263,8 +263,8 @@ public class CalendarsDBLayer extends DBLayer {
                     }
                 }
             }
-            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
+            Query<DBItemInventoryClusterCalendar> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
             if (type != null && !type.isEmpty()) {
                 query.setParameter("type", type.toUpperCase());
             }
@@ -308,7 +308,7 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public List<String> getFoldersByFolder(Long instanceId, String folderName, Set<String> types) throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<String> getFoldersByFolder(String schedulerId, String folderName, Set<String> types) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             if (types == null) {
                 types = new HashSet<String>();
@@ -318,8 +318,8 @@ public class CalendarsDBLayer extends DBLayer {
                 types.add("NON_WORKING_DAYS");
             }
             StringBuilder sql = new StringBuilder();
-            sql.append("select directory from ").append(DBITEM_CALENDARS);
-            sql.append(" where instanceId = :instanceId");
+            sql.append("select directory from ").append(DBITEM_CLUSTER_CALENDARS);
+            sql.append(" where schedulerId = :schedulerId");
             if (types.size() == 1) {
                 sql.append(" and type = :type");
             } else {
@@ -330,7 +330,7 @@ public class CalendarsDBLayer extends DBLayer {
             }
             sql.append(" group by directory");
             Query<String> query = getSession().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
+            query.setParameter("schedulerId", schedulerId);
             if (types.size() == 1) {
                 query.setParameter("type", types.iterator().next());
             } else {
@@ -348,18 +348,18 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemCalendar> getCalendarsOfAnObject(Long instanceId, String objectType, String path) throws DBConnectionRefusedException,
+    public List<DBItemInventoryClusterCalendar> getCalendarsOfAnObject(String schedulerId, String objectType, String path) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select c from ").append(DBITEM_CALENDARS).append(" c, ");
-            sql.append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu ");
+            sql.append("select c from ").append(DBITEM_CLUSTER_CALENDARS).append(" c, ");
+            sql.append(DBITEM_INVENTORY_CLUSTER_CALENDAR_USAGE).append(" icu ");
             sql.append("where c.id = icu.calendarId ");
-            sql.append("and icu.instanceId = :instanceId ");
+            sql.append("and icu.schedulerId = :schedulerId ");
             sql.append("and icu.objectType = :objectType ");
             sql.append("and icu.path = :path");
-            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
+            Query<DBItemInventoryClusterCalendar> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
             query.setParameter("objectType", objectType);
             query.setParameter("path", path);
             return getSession().getResultList(query);

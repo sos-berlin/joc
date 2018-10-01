@@ -32,7 +32,7 @@ public class OrderCalendarsResourceImpl extends JOCResourceImpl implements IOrde
             checkRequiredParameter("jobChain", orderFilter.getJobChain());
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getId(), CalendarType.ORDER, normalizePath(orderFilter
+            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getSchedulerId(), CalendarType.ORDER, normalizePath(orderFilter
                     .getJobChain()) + "," + orderFilter.getOrderId(), orderFilter.getCompact());
 
             return JOCDefaultResponse.responseStatus200(entity);

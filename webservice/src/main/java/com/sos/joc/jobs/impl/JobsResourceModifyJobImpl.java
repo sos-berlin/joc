@@ -189,7 +189,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 							.createSosHibernateStatelessConnection(API_CALL + SET_RUN_TIME);
 					try {
 						CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session,
-								dbItemInventoryInstance.getId(), CalendarObjectType.JOB, jobPath,
+								dbItemInventoryInstance.getSchedulerId(), CalendarObjectType.JOB, jobPath,
 								modifyJob.getRunTime(), modifyJob.getCalendars());
 						calendarUsedByWriter.updateUsedBy();
 						jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());

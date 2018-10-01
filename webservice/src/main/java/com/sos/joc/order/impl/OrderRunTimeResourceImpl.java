@@ -52,7 +52,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
 
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
-            List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getId(), "ORDER",
+            List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(), "ORDER",
                     jobChainPath + "," + orderFilter.getOrderId());
             if (dbCalendars != null && !dbCalendars.isEmpty()) {
                 List<Calendar> calendars = new ArrayList<Calendar>();

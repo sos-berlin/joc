@@ -63,7 +63,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
 				connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 				CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
 				List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer
-						.getConfigurationsOfAnObject(dbItemInventoryInstance.getId(), "SCHEDULE", schedulePath);
+						.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(), "SCHEDULE", schedulePath);
 				if (dbCalendars != null && !dbCalendars.isEmpty()) {
 					List<Calendar> calendars = new ArrayList<Calendar>();
 					for (CalendarUsageConfiguration dbCalendar : dbCalendars) {

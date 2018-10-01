@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsExportResource;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -58,11 +60,11 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
             objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'"));
 
             List<Calendar> calendarList = new ArrayList<Calendar>();
-            List<DBItemCalendar> calendarsFromDb = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getId(), new HashSet<String>(calendarsFilter
+            List<DBItemInventoryClusterCalendar> calendarsFromDb = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getSchedulerId(), new HashSet<String>(calendarsFilter
                     .getCalendars()));
             Set<Folder> folders = folderPermissions.getListOfFolders();
             if (calendarsFromDb != null && !calendarsFromDb.isEmpty()) {
-                for (DBItemCalendar dbCalendar : calendarsFromDb) {
+                for (DBItemInventoryClusterCalendar dbCalendar : calendarsFromDb) {
                     if (dbCalendar.getConfiguration() != null) {
                         if (!canAdd(dbCalendar.getName(), folders)) {
                             continue;
@@ -73,10 +75,10 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
                         SortedSet<String> orders = new TreeSet<String>();
                         SortedSet<String> jobs = new TreeSet<String>();
                         SortedSet<String> schedules = new TreeSet<String>();
-                        List<DBItemInventoryCalendarUsage> dbUsages = usageDBLayer.getCalendarUsages(dbCalendar.getId());
+                        List<DBItemInventoryClusterCalendarUsage> dbUsages = usageDBLayer.getCalendarUsages(dbCalendar.getId());
                         UsedBy usedBy = new UsedBy();
                         if (dbUsages != null && !dbUsages.isEmpty()) {
-                            for (DBItemInventoryCalendarUsage dbUsage : dbUsages) {
+                            for (DBItemInventoryClusterCalendarUsage dbUsage : dbUsages) {
                                 if (dbUsage.getObjectType() == null) {
                                     continue;
                                 }

@@ -3,7 +3,7 @@ package com.sos.joc.db.calendars;
 public class CalendarUsageFilter {
 
     private Long calendarId;
-    private Long instanceId;
+    private String schedulerId;
     private String objectType;
     private String path;
     private Boolean edited;
@@ -12,12 +12,12 @@ public class CalendarUsageFilter {
         super();
     }
 
-    public Long getInstanceId() {
-        return instanceId;
+    public String getSchedulerId() {
+        return schedulerId;
     }
 
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
+    public void setSchedulerId(String schedulerId) {
+        this.schedulerId = schedulerId;
     }
 
     public String getObjectType() {

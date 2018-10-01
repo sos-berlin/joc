@@ -33,7 +33,7 @@ public class CategoriesResourceImpl extends JOCResourceImpl implements ICategori
 			}
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			Categories entity = new Categories();
-			entity.setCategories(new CalendarsDBLayer(connection).getCategories(dbItemInventoryInstance.getId()));
+			entity.setCategories(new CalendarsDBLayer(connection).getCategories(dbItemInventoryInstance.getSchedulerId()));
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);
 		} catch (JocException e) {

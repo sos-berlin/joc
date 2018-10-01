@@ -8,7 +8,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarUsedByResource;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -42,11 +42,11 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			CalendarUsageDBLayer dbCalendarLayer = new CalendarUsageDBLayer(connection);
 
-			List<DBItemInventoryCalendarUsage> calendarUsages = null;
+			List<DBItemInventoryClusterCalendarUsage> calendarUsages = null;
 			if (calendarFilter.getId() != null) {
 				calendarUsages = dbCalendarLayer.getCalendarUsages(calendarFilter.getId());
 			} else {
-				calendarUsages = dbCalendarLayer.getCalendarUsages(dbItemInventoryInstance.getId(),
+				calendarUsages = dbCalendarLayer.getCalendarUsages(dbItemInventoryInstance.getSchedulerId(),
 						normalizePath(calendarFilter.getPath()));
 			}
 
@@ -54,7 +54,7 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
 			List<String> jobs = new ArrayList<String>();
 			List<String> schedules = new ArrayList<String>();
 			if (calendarUsages != null) {
-				for (DBItemInventoryCalendarUsage item : calendarUsages) {
+				for (DBItemInventoryClusterCalendarUsage item : calendarUsages) {
 					if (item.getObjectType() == null) {
 						continue;
 					}

@@ -48,7 +48,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
-            List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getId(), "JOB",
+            List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(), "JOB",
                     jobPath);
             if (dbCalendars != null && !dbCalendars.isEmpty()) {
                 List<Calendar> calendars = new ArrayList<Calendar>();

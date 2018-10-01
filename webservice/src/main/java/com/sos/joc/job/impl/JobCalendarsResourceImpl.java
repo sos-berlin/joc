@@ -31,7 +31,7 @@ public class JobCalendarsResourceImpl extends JOCResourceImpl implements IJobCal
             checkRequiredParameter("job", jobFilter.getJob());
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getId(), CalendarType.JOB, normalizePath(jobFilter
+            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getSchedulerId(), CalendarType.JOB, normalizePath(jobFilter
                     .getJob()), jobFilter.getCompact());
 
             return JOCDefaultResponse.responseStatus200(entity);

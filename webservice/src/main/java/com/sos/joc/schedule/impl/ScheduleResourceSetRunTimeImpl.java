@@ -66,7 +66,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
 			session = Globals.createSosHibernateStatelessConnection(API_CALL);
 			CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session,
-					dbItemInventoryInstance.getId(), CalendarObjectType.SCHEDULE, schedulePath,
+					dbItemInventoryInstance.getSchedulerId(), CalendarObjectType.SCHEDULE, schedulePath,
 					modifyRuntime.getRunTime(), modifyRuntime.getCalendars());
 			calendarUsedByWriter.updateUsedBy();
 			jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());

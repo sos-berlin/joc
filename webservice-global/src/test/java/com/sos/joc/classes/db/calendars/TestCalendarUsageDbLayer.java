@@ -6,13 +6,18 @@ import org.junit.Test;
 
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
+import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
+import com.sos.joc.db.calendars.RepairCalendarTables;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JocConfigurationException;
 
 public class TestCalendarUsageDbLayer {
 
-    private static final String HIBERNATE_CONFIG_FILE = "C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_joc_cockpit/config/hibernate.cfg.xml";
+    private static final String HIBERNATE_CONFIG_FILE = "C:/Program Files/sos-berlin.com/joc/jetty_base/resources/joc/reporting.hibernate.cfg.xml";
     private SOSHibernateFactory sosHibernateFactory;
     private SOSHibernateSession sosHibernateSession;
     CalendarUsageDBLayer calendarUsageDBLayer;
@@ -23,7 +28,7 @@ public class TestCalendarUsageDbLayer {
 
     @Before
     public void setUp() throws Exception {
-        initConnection();
+//        initConnection();
     }
 
     public void initConnection() throws Exception {
@@ -43,18 +48,18 @@ public class TestCalendarUsageDbLayer {
 
         calendarUsageDBLayer.deleteCalendarUsage(2L);
 
-        DBItemInventoryCalendarUsage dbItemCalendarUsage = new DBItemInventoryCalendarUsage();
+        DBItemInventoryClusterCalendarUsage dbItemCalendarUsage = new DBItemInventoryClusterCalendarUsage();
         dbItemCalendarUsage.setCalendarId(2L);
         dbItemCalendarUsage.setObjectType("JOB");
         dbItemCalendarUsage.setPath("/job4");
-        dbItemCalendarUsage.setInstanceId(164L);
+        dbItemCalendarUsage.setSchedulerId("scheduler");
         calendarUsageDBLayer.saveCalendarUsage(dbItemCalendarUsage);
 
-        dbItemCalendarUsage = new DBItemInventoryCalendarUsage();
+        dbItemCalendarUsage = new DBItemInventoryClusterCalendarUsage();
         dbItemCalendarUsage.setCalendarId(2L);
         dbItemCalendarUsage.setObjectType("JOB");
         dbItemCalendarUsage.setPath("/job5");
-        dbItemCalendarUsage.setInstanceId(164L);
+        dbItemCalendarUsage.setSchedulerId("scheduler");
         calendarUsageDBLayer.saveCalendarUsage(dbItemCalendarUsage);
         sosHibernateSession.commit();
         sosHibernateFactory.close();
@@ -69,6 +74,16 @@ public class TestCalendarUsageDbLayer {
         sosHibernateFactory.close();
     }
 
-    
+    @Test
+    public void test() throws JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException {
+        sosHibernateFactory = new SOSHibernateFactory(HIBERNATE_CONFIG_FILE);
+        sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
+        sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
+        sosHibernateFactory.setAutoCommit(true);
+        sosHibernateFactory.build();
+        sosHibernateSession = sosHibernateFactory.openStatelessSession();
+        RepairCalendarTables.exec(sosHibernateSession);
+        sosHibernateSession.close();
+    }
 
 }

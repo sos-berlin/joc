@@ -32,7 +32,7 @@ public class ScheduleResourceCalendarsImpl extends JOCResourceImpl implements IS
             checkRequiredParameter("schedule", scheduleFilter.getSchedule());
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getId(), CalendarType.SCHEDULE, normalizePath(
+            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getSchedulerId(), CalendarType.SCHEDULE, normalizePath(
                     scheduleFilter.getSchedule()), scheduleFilter.getCompact());
 
             return JOCDefaultResponse.responseStatus200(entity);

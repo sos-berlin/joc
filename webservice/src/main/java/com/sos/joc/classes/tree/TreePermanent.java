@@ -87,7 +87,7 @@ public class TreePermanent {
 		return types;
 	}
 
-	public static SortedSet<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId)
+	public static SortedSet<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId, String schedulerId)
 			throws JocException {
 		SortedSet<String> folders = new TreeSet<String>(new Comparator<String>() {
 
@@ -145,7 +145,7 @@ public class TreePermanent {
 					String normalizedFolder = ("/" + folder.getFolder()).replaceAll("//+", "/");
 					results = dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes);
 					if (!calendarTypes.isEmpty()) {
-					    calendarResults = dbCalendarLayer.getFoldersByFolder(instanceId, normalizedFolder, calendarTypes);
+					    calendarResults = dbCalendarLayer.getFoldersByFolder(schedulerId, normalizedFolder, calendarTypes);
 					    if (calendarResults != null && !calendarResults.isEmpty()) {
 					        if (results == null) {
 					            results = new ArrayList<String>();
@@ -169,7 +169,7 @@ public class TreePermanent {
 			} else {
 				results = dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes);
 				if (!calendarTypes.isEmpty()) {
-                    calendarResults = dbCalendarLayer.getFoldersByFolder(instanceId, "/", calendarTypes);
+                    calendarResults = dbCalendarLayer.getFoldersByFolder(schedulerId, "/", calendarTypes);
                     if (calendarResults != null && !calendarResults.isEmpty()) {
                         if (results == null) {
                             results = new ArrayList<String>();

@@ -13,8 +13,8 @@ import javax.ws.rs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemCalendar;
-import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsResource;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -58,7 +58,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
             CalendarUsageDBLayer dbCalendarLayer = new CalendarUsageDBLayer(connection);
-            List<DBItemCalendar> dbCalendars = null;
+            List<DBItemInventoryClusterCalendar> dbCalendars = null;
 
             boolean withFolderFilter = calendarsFilter.getFolders() != null && !calendarsFilter.getFolders().isEmpty();
             boolean hasPermission = true;
@@ -66,7 +66,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
 
             if (calendarsFilter.getCalendars() != null && !calendarsFilter.getCalendars().isEmpty()) {
                 calendarsFilter.setRegex(null);
-                dbCalendars = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getId(), new HashSet<String>(calendarsFilter.getCalendars()));
+                dbCalendars = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getSchedulerId(), new HashSet<String>(calendarsFilter.getCalendars()));
 
             } else if (calendarsFilter.getCalendarIds() != null && !calendarsFilter.getCalendarIds().isEmpty()) {
                 calendarsFilter.setRegex(null);
@@ -100,7 +100,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                     }
                 }
                 if (hasPermission) {
-                    dbCalendars = dbLayer.getCalendars(dbItemInventoryInstance.getId(), calendarsFilter.getType(), categories, allFolders,
+                    dbCalendars = dbLayer.getCalendars(dbItemInventoryInstance.getSchedulerId(), calendarsFilter.getType(), categories, allFolders,
                             recursiveFolders);
                 }
             }
@@ -112,7 +112,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                 if (withUsedBy) {
                     compact = false;
                 }
-                for (DBItemCalendar dbCalendar : dbCalendars) {
+                for (DBItemInventoryClusterCalendar dbCalendar : dbCalendars) {
                     if (FilterAfterResponse.matchRegex(calendarsFilter.getRegex(), dbCalendar.getName())) {
                         Calendar calendar = om.readValue(dbCalendar.getConfiguration(), Calendar.class);
                         calendar.setId(dbCalendar.getId());
@@ -143,13 +143,13 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
         }
     }
 
-    private UsedBy getUsedBy(List<DBItemInventoryCalendarUsage> calendarUsages) {
+    private UsedBy getUsedBy(List<DBItemInventoryClusterCalendarUsage> calendarUsages) {
         SortedSet<String> orders = new TreeSet<String>();
         SortedSet<String> jobs = new TreeSet<String>();
         SortedSet<String> schedules = new TreeSet<String>();
         boolean usedByExist = false;
         if (calendarUsages != null) {
-            for (DBItemInventoryCalendarUsage item : calendarUsages) {
+            for (DBItemInventoryClusterCalendarUsage item : calendarUsages) {
                 if (item.getObjectType() == null) {
                     continue;
                 }
