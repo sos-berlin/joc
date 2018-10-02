@@ -42,7 +42,7 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
     @Override
     public JOCDefaultResponse postLog(String accessToken, JOClog jocLog) {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jocLog, accessToken, "", true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jocLog, accessToken, "", getPermissonsJocCockpit("", accessToken).getJoc().getView().isLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -125,7 +125,7 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
     @Override
     public JOCDefaultResponse postLogs(String accessToken) {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "s", null, accessToken, "", true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "s", null, accessToken, "", getPermissonsJocCockpit("", accessToken).getJoc().getView().isLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
