@@ -14,7 +14,9 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.jobscheduler.model.event.CalendarEvent;
 import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -23,9 +25,11 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
+import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.classes.configuration.JSObjectConfiguration;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
@@ -170,7 +174,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
     }
 
-    private Date executeModifyOrderCommand(ModifyOrder order, ModifyOrders modifyOrders, String command) {
+    private Date executeModifyOrderCommand(ModifyOrder order, ModifyOrders modifyOrders, String command, List<DBItemInventoryInstance> clusterMembers) {
 
         try {
             if (order.getParams() != null && order.getParams().isEmpty()) {
@@ -283,7 +287,14 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                                 CalendarObjectType.ORDER, configuration.getJobChain() + "," + order.getOrderId(), order.getRunTime(), order
                                         .getCalendars());
                         calendarUsedByWriter.updateUsedBy();
-                        jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
+                        CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
+                        if (calEvt != null) {
+                            if (clusterMembers != null) {
+                                SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
+                            } else {
+                                SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
+                            }
+                        }
                     }
                 } catch (JocException e) {
                     throw e;
@@ -318,8 +329,19 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             if (modifyOrders.getOrders().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'orders'");
             }
+            
+            List<DBItemInventoryInstance> clusterMembers = null;
+            if ("set_run_time".equals(command) && session == null) {
+                session = Globals.createSosHibernateStatelessConnection(API_CALL);
+
+                if ("active".equals(dbItemInventoryInstance.getClusterType())) {
+                    InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(session);
+                    clusterMembers = instanceLayer.getInventoryInstancesBySchedulerId(modifyOrders.getJobschedulerId());
+                }
+            }
+            
             for (ModifyOrder order : modifyOrders.getOrders()) {
-                surveyDate = executeModifyOrderCommand(order, modifyOrders, command);
+                surveyDate = executeModifyOrderCommand(order, modifyOrders, command, clusterMembers);
             }
         } finally {
             Globals.disconnect(session);

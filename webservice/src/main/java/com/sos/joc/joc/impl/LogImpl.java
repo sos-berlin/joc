@@ -42,7 +42,8 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
     @Override
     public JOCDefaultResponse postLog(String accessToken, JOClog jocLog) {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jocLog, accessToken, "", getPermissonsJocCockpit("", accessToken).getJoc().getView().isLog());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jocLog, accessToken, "", getPermissonsJocCockpit("", accessToken).getJoc()
+                    .getView().isLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -55,7 +56,7 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
 
             Path logDir = Paths.get(logDirectory);
             if (!Files.exists(logDir)) {
-                throw new FileNotFoundException("JOC Cockpit logs directory doesn't exist."); 
+                throw new FileNotFoundException("JOC Cockpit logs directory doesn't exist.");
             }
             Path latestLogFile = null;
             String pattern = "^\\d{4}_\\d{2}_\\d{2}\\.stderrout\\.log$";
@@ -78,7 +79,7 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
                     }
                 }
             }
-            
+
             if (latestLogFile == null) {
                 throw new FileNotFoundException("JOC Cockpit log not found.");
             }
@@ -125,7 +126,8 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
     @Override
     public JOCDefaultResponse postLogs(String accessToken) {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "s", null, accessToken, "", getPermissonsJocCockpit("", accessToken).getJoc().getView().isLog());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "s", null, accessToken, "", getPermissonsJocCockpit("", accessToken).getJoc()
+                    .getView().isLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
