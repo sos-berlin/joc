@@ -6,14 +6,9 @@ import org.junit.Test;
 
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
-import com.sos.joc.db.calendars.RepairCalendarTables;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
-import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.JocConfigurationException;
 
 public class TestCalendarUsageDbLayer {
 
