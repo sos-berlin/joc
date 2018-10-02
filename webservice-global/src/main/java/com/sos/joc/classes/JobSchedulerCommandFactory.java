@@ -267,7 +267,7 @@ public class JobSchedulerCommandFactory {
         }
 
         folder = Globals.getParent(folder);
-        return (folder.isEmpty() || sosShiroFolderPermissions.isPermittedForFolder(folder)) && returnValue;
+        return (folder == null || folder.isEmpty() || sosShiroFolderPermissions.isPermittedForFolder(folder)) && returnValue;
     }
     
     public boolean withAuditLog() {

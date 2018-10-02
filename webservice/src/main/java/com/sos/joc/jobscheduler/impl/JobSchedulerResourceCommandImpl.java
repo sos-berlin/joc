@@ -56,6 +56,9 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             
             JobSchedulerCommandFactory jobSchedulerCommandFactory = null;
             SOSPermissionCommands permissionCommands = getPermissonsCommands(jobSchedulerCommands.getJobschedulerId(), accessToken);
+            if (permissionCommands == null) {
+			    return accessDeniedResponse();
+            }
 
             String xml = "";
             boolean withAudit = false;
