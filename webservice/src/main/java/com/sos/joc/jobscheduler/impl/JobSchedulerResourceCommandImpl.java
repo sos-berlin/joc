@@ -57,7 +57,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             JobSchedulerCommandFactory jobSchedulerCommandFactory = null;
             SOSPermissionCommands permissionCommands = getPermissonsCommands(jobSchedulerCommands.getJobschedulerId(), accessToken);
             if (permissionCommands == null) {
-			    return accessDeniedResponse();
+			    return accessDeniedResponse(String.format("Access denied. Possible reason: jobschedulerId=%s is an unknown JobScheduler id (case sensitive)",jobSchedulerCommands.getJobschedulerId()));
             }
 
             String xml = "";
