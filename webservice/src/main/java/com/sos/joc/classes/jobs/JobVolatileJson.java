@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import javax.json.JsonValue.ValueType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +97,7 @@ public class JobVolatileJson extends JobV {
                     } else if (obstacleWaitingType.equals("WaitingForProcessClass")) {
                         getState().set_text(JobStateText.WAITING_FOR_PROCESS);
                     }
-                } else if (false) { //TODO condition for WAITING_FOR_AGENT
+                } else if (isWaitingForAgent()) {
                     getState().set_text(JobStateText.WAITING_FOR_AGENT);
                 //} else if (false) { //TODO condition for WAITING_FOR_TASK
                     // TODO: WaitingForTask has to be improved
@@ -110,6 +111,22 @@ public class JobVolatileJson extends JobV {
             }
             setSeverity(getState());
         }
+    }
+    
+    private boolean isWaitingForAgent() {
+        JsonObject taskObstacles = overview.getJsonObject("taskObstacles");
+        if (taskObstacles != null) {
+            for (JsonValue j : taskObstacles.values()) {
+                if (j.getValueType() == ValueType.ARRAY) {
+                    if (((JsonArray) j).stream().filter(p -> ((JsonObject) p).getString("TYPE", "").equals("WaitingForAgent")).findFirst().isPresent()) {
+                        return true;
+                    }
+                } else {
+                    continue;
+                }
+            }
+        }
+        return false;
     }
     
     //JOC-89, order job is pending for some states if node doesn't have a running order
@@ -261,12 +278,12 @@ public class JobVolatileJson extends JobV {
                 task.setIdleSince(null); //not displayed in JOC, missing in JSON answer
                 task.setStartedAt(JobSchedulerDate.getDateFromISO8601String(runningTask.getString("startedAt", Instant.EPOCH.toString())));
                 task.setEnqueued(JobSchedulerDate.getDateFromISO8601String(runningTask.getString("enqueuedAt", Instant.EPOCH.toString()))); 
-                //TODO missing in JSON answer
+                //task.setPlannedStart(JobSchedulerDate.getDateFromISO8601String(runningTask.getString("startAt", Instant.EPOCH.toString())));
                 if (task.getEnqueued() == null) {
                     task.setEnqueued(task.getStartedAt()); 
                 }
                 task.setPid(runningTask.getInt("pid", 0));
-                task.setSteps(0); //not displayed in JOC, missing in JSON answer
+                task.setSteps(0); //TODO missing in JSON answer
                 task.setTaskId(runningTask.getString("taskId", null));
                 JsonObject jsonOrder = runningTask.getJsonObject("order");
                 if (jsonOrder != null) {
