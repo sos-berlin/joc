@@ -116,8 +116,8 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 				calEvt.setKey("CalendarUpdated");
 				try {
 					oldCalendar = new ObjectMapper().readValue(calendarDbItem.getConfiguration(), Calendar.class);
-					newDates = new FrequencyResolver().resolveFromToday(calendar);
-					oldDates = new FrequencyResolver().resolveFromToday(oldCalendar);
+					newDates = new FrequencyResolver().resolveFromUTCYesterday(calendar);
+					oldDates = new FrequencyResolver().resolveFromUTCYesterday(oldCalendar);
                     updateJobOrderScheduleIsNecessary = (!newDates.getDates().equals(oldDates.getDates()));
 					if ((calendar.getType() != null && !calendar.getType().name().equals(calendarDbItem.getType()))) {
 						calendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
