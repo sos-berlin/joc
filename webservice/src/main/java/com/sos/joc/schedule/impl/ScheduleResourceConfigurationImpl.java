@@ -67,7 +67,9 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
 				if (dbCalendars != null && !dbCalendars.isEmpty()) {
 					List<Calendar> calendars = new ArrayList<Calendar>();
 					for (CalendarUsageConfiguration dbCalendar : dbCalendars) {
-						calendars.add(dbCalendar.getCalendar());
+					    if (dbCalendar.getCalendar() != null) {
+	                        calendars.add(dbCalendar.getCalendar());
+	                    }
 					}
 					entity.setCalendars(calendars);
 				}
