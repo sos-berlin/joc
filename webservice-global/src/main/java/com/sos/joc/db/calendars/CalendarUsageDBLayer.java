@@ -233,6 +233,7 @@ public class CalendarUsageDBLayer extends DBLayer {
             sql.append(" and icu.schedulerId = :schedulerId");
             sql.append(" and icu.objectType = :objectType");
             sql.append(" and icu.path = :path");
+            sql.append(" and icu.configuration != null");
             Query<CalendarUsageConfiguration> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("objectType", objectType);
