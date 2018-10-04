@@ -1,8 +1,11 @@
 package com.sos.joc.db.audit;
 
 import java.util.List;
+
 import javax.persistence.TemporalType;
+
 import org.hibernate.query.Query;
+
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
