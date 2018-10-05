@@ -2,6 +2,7 @@ package com.sos.joc.tasks.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -144,6 +145,11 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 					}
 					listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer
 							.getSchedulerHistoryListFromOrder(jobsFilter.getOrders());
+					if (listOfDBItemReportTaskDBItems != null) {
+					    // JOC-574
+					    Set<DBItemReportTask> setOfDBItemReportTaskDBItems = new HashSet<DBItemReportTask>(listOfDBItemReportTaskDBItems);
+					    listOfDBItemReportTaskDBItems = new ArrayList<DBItemReportTask>(setOfDBItemReportTaskDBItems);
+					}
 				} else {
 					listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
 				}

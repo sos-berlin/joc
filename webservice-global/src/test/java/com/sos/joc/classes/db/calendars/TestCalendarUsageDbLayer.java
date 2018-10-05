@@ -69,16 +69,4 @@ public class TestCalendarUsageDbLayer {
         sosHibernateFactory.close();
     }
 
-//    @Test
-//    public void test() throws JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException {
-//        sosHibernateFactory = new SOSHibernateFactory(HIBERNATE_CONFIG_FILE);
-//        sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
-//        sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
-//        sosHibernateFactory.setAutoCommit(true);
-//        sosHibernateFactory.build();
-//        sosHibernateSession = sosHibernateFactory.openStatelessSession();
-//        RepairCalendarTables.exec(sosHibernateSession);
-//        sosHibernateSession.close();
-//    }
-
 }

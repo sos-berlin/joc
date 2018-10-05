@@ -292,8 +292,8 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 }
                 //check if update necessary
                 oldCalendar = mapper.readValue(calendarDbItem.getConfiguration(), Calendar.class);
-                newDates = new FrequencyResolver().resolveFromToday(calendar);
-                oldDates = new FrequencyResolver().resolveFromToday(oldCalendar);
+                newDates = new FrequencyResolver().resolveFromUTCYesterday(calendar);
+                oldDates = new FrequencyResolver().resolveFromUTCYesterday(oldCalendar);
                 updateUsageIsNecessary = (!newDates.getDates().equals(oldDates.getDates()));
                 //TODO check if update necessary
                 calendarDbItem = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getSchedulerId(), calendarDbItem, calendar);

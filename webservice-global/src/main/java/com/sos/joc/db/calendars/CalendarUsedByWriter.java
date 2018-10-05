@@ -28,6 +28,7 @@ public class CalendarUsedByWriter {
     private String command;
     private SOSHibernateSession sosHibernateSession;
     private Map<String, Calendar> calendars = new HashMap<String, Calendar>();
+    private boolean calendarEventIsNecessary = false;
 
     public CalendarUsedByWriter(SOSHibernateSession sosHibernateSession, String schedulerId, CalendarObjectType objectType, String path,
             String command) {
@@ -68,6 +69,7 @@ public class CalendarUsedByWriter {
             CalendarsDBLayer calendarsDBLayer = new CalendarsDBLayer(this.sosHibernateSession);
             List<DBItemInventoryClusterCalendarUsage> dbCalendarUsage = calendarUsageDBLayer.getCalendarUsagesOfAnObject(schedulerId, objectType.name(),
                     path);
+            calendarEventIsNecessary = dbCalendarUsage.size() + calendars.size() > 0;
             DBItemInventoryClusterCalendarUsage calendarUsageDbItem = new DBItemInventoryClusterCalendarUsage();
             calendarUsageDbItem.setSchedulerId(schedulerId);
             calendarUsageDbItem.setObjectType(objectType.name());
@@ -110,7 +112,7 @@ public class CalendarUsedByWriter {
         }
     }
 
-    public String getEvent() throws JsonProcessingException {
+    public String getPublishEventCommand() throws JsonProcessingException {
         CalendarEvent calEvt = new CalendarEvent();
         calEvt.setKey("CalendarUsageUpdated");
         CalendarVariables calEvtVars = new CalendarVariables();
@@ -120,6 +122,19 @@ public class CalendarUsedByWriter {
         String xmlCommand = new ObjectMapper().writeValueAsString(calEvt);
         xmlCommand = "<publish_event>" + xmlCommand + "</publish_event>";
         return xmlCommand;
+    }
+    
+    public CalendarEvent getCalendarEvent() throws JsonProcessingException {
+        if (!calendarEventIsNecessary) {
+            return null;
+        }
+        CalendarEvent calEvt = new CalendarEvent();
+        calEvt.setKey("CalendarUsageUpdated");
+        CalendarVariables calEvtVars = new CalendarVariables();
+        calEvtVars.setPath(path);
+        calEvtVars.setObjectType(objectType);
+        calEvt.setVariables(calEvtVars);
+        return calEvt;
     }
 
 }
