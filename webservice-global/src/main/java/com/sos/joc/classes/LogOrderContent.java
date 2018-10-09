@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -14,14 +11,13 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
+import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.model.order.OrderHistoryFilter;
 
 public class LogOrderContent extends LogContent {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogOrderContent.class);
-    private static final String XPATH_ORDER_LOG = "/spooler/answer/order/log";
     private OrderHistoryFilter orderHistoryFilter;
 
     public LogOrderContent(OrderHistoryFilter orderHistoryFilter, DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
@@ -29,39 +25,20 @@ public class LogOrderContent extends LogContent {
         this.orderHistoryFilter = orderHistoryFilter;
     }
 
-    public String getLog() throws Exception {
-
-        String log = getLogFromDB();
-        if (log == null) {
-            log = getOrderLogFromXmlCommand();
-        }
-        if (log == null) {
-            String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(),
-                    orderHistoryFilter.getHistoryId());
-            throw new JobSchedulerObjectNotExistException(msg);
-        }
-        return log;
-    }
-
-    public Path writeLogFile() throws Exception {
-
-        Path path = writeLogFileFromDB();
-        if (path == null) {
-            path = writeOrderLogFileFromXmlCommand();
-        }
-        if (path == null) {
-            String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(),
-                    orderHistoryFilter.getHistoryId());
-            throw new JobSchedulerObjectNotExistException(msg);
-        }
-        return path;
-    }
-    
     public Path writeGzipLogFile() throws Exception {
 
         Path path = writeGzipLogFileFromDB();
         if (path == null) {
-            path = writeGzipOrderLogFileFromXmlCommand();
+            try {
+                path = writeGzipOrderLogFileFromXmlCommand();
+            } catch (JobSchedulerNoResponseException e) {
+                // occurs if log is deleted on disk but doesn't still exist in database
+                // retry database
+                path = writeGzipLogFileFromDB();
+                if (path == null) {
+                    throw e;
+                }
+            }
         }
         if (path == null) {
             String msg = String.format("Order log of %s,%s with id %s is missing", orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(),
@@ -70,48 +47,8 @@ public class LogOrderContent extends LogContent {
         }
         return path;
     }
-
-    private String getLogFromDB() throws DBMissingDataException, IOException {
-        SOSHibernateSession sosHibernateSession = null;
-        try {
-            SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
-            sosHibernateSession = sosHibernateFactory.openStatelessSession("getOrderLog");
-            try {
-                Globals.beginTransaction(sosHibernateSession);
-                JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(sosHibernateSession);
-                return jobSchedulerOrderHistoryDBLayer.getLogAsString(orderHistoryFilter);
-            } finally {
-                Globals.rollback(sosHibernateSession);
-            }
-        } catch (JocConfigurationException | SOSHibernateException | NumberFormatException e) {
-            LOGGER.warn(e.toString());
-            return null;
-        } finally {
-            Globals.disconnect(sosHibernateSession);
-        }
-    }
-
-    private Path writeLogFileFromDB() throws DBMissingDataException, IOException {
-        SOSHibernateSession sosHibernateSession = null;
-        try {
-            SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
-            sosHibernateSession = sosHibernateFactory.openStatelessSession("getOrderLog");
-            try {
-                Globals.beginTransaction(sosHibernateSession);
-                JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(sosHibernateSession);
-                return jobSchedulerOrderHistoryDBLayer.writeLogFile(orderHistoryFilter);
-            } finally {
-                Globals.rollback(sosHibernateSession);
-            }
-        } catch (JocConfigurationException | SOSHibernateException | NumberFormatException e) {
-            LOGGER.warn(e.toString());
-            return null;
-        } finally {
-            Globals.disconnect(sosHibernateSession);
-        }
-    }
     
-    private Path writeGzipLogFileFromDB() throws DBMissingDataException, IOException {
+    private Path writeGzipLogFileFromDB() throws DBMissingDataException, IOException, NumberFormatException, SOSHibernateException, JocConfigurationException {
         SOSHibernateSession sosHibernateSession = null;
         try {
             SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
@@ -123,31 +60,15 @@ public class LogOrderContent extends LogContent {
             } finally {
                 Globals.rollback(sosHibernateSession);
             }
-        } catch (JocConfigurationException | SOSHibernateException | NumberFormatException e) {
-            LOGGER.warn(e.toString());
-            return null;
         } finally {
             Globals.disconnect(sosHibernateSession);
         }
     }
     
-    private String getOrderLogFromXmlCommand() throws Exception {
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-        String xml = jocXmlCommand.getShowOrderCommand(orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(), "log");
-        jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
-        return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_ORDER_LOG, null);
-    }
-
-    private Path writeOrderLogFileFromXmlCommand() throws Exception {
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-        String xml = jocXmlCommand.getShowOrderCommand(orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(), "log");
-        return jocXmlCommand.getLogPath(xml, getAccessToken(), getPrefix(), false);
-    }
-    
     private Path writeGzipOrderLogFileFromXmlCommand() throws Exception {
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-        String xml = jocXmlCommand.getShowOrderCommand(orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(), "log");
-        return jocXmlCommand.getLogPath(xml, getAccessToken(), getPrefix(), true);
+        String logFilename = String.format("order.%s.%s.log", orderHistoryFilter.getJobChain().replaceFirst("^/+", "").replaceAll("/", ","),
+                orderHistoryFilter.getOrderId().replaceAll("[/\\\\:]", "_"));
+        return writeGzipTaskLogFileFromGet(logFilename, getPrefix());
     }
     
     private String getPrefix() {

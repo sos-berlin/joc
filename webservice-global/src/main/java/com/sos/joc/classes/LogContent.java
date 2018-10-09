@@ -15,6 +15,7 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.exceptions.JocException;
 
 public class LogContent {
     
@@ -281,6 +282,12 @@ public class LogContent {
             return null;
         }
         return String.format(HTML_START, title) + colouredLog(new Scanner(log)) + String.format(HTML_END);
+    }
+    
+    protected Path writeGzipTaskLogFileFromGet(String logFilename, String prefix) throws JocException {
+        JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance);
+        jocJsonCommand.setUriBuilderForMainLog(logFilename);
+        return jocJsonCommand.getFilePathFromGet(jocJsonCommand.getURI(), getAccessToken(), prefix, "text/plain,application/octet-stream", true);
     }
 }
 

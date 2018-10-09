@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.exception.SOSConnectionRefusedException;
 import com.sos.exception.SOSConnectionResetException;
 import com.sos.exception.SOSNoResponseException;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
@@ -37,6 +38,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     private static final String MASTER_API_PATH = "/jobscheduler/master/api/";
     private UriBuilder uriBuilder;
     private JOCResourceImpl jocResourceImpl;
+    private String url = null;
     
     public JOCJsonCommand() {
         setProperties();
@@ -44,12 +46,14 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
 
     public JOCJsonCommand(JOCResourceImpl jocResourceImpl) {
         this.jocResourceImpl = jocResourceImpl;
+        this.url = jocResourceImpl.getUrl();
         setBasicAuthorization(jocResourceImpl.getBasicAuthorization());
         setProperties();
     }
     
     public JOCJsonCommand(JOCResourceImpl jocResourceImpl, String path) {
         this.jocResourceImpl = jocResourceImpl;
+        this.url = jocResourceImpl.getUrl();
         setBasicAuthorization(jocResourceImpl.getBasicAuthorization());
         setProperties();
         setUriBuilder(jocResourceImpl.getUrl(), path);
@@ -57,13 +61,21 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     
     public JOCJsonCommand(JOCJsonCommand jocJsonCommand) {
         this.jocResourceImpl = jocJsonCommand.getJOCResourceImpl();
+        this.url = jocResourceImpl.getUrl();
         setBasicAuthorization(jocResourceImpl.getBasicAuthorization());
         setProperties();
         this.uriBuilder = jocJsonCommand.getUriBuilder();
     }
+    
+    public JOCJsonCommand(DBItemInventoryInstance dbItemInventoryInstance) {
+        setBasicAuthorization(dbItemInventoryInstance.getAuth());
+        this.url = dbItemInventoryInstance.getUrl();
+        setProperties();
+    }
 
     public void setJOCResourceImpl(JOCResourceImpl jocResourceImpl) {
         this.jocResourceImpl = jocResourceImpl;
+        this.url = jocResourceImpl.getUrl();
     }
     
     public JOCResourceImpl getJOCResourceImpl() {
@@ -71,7 +83,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
 
     public void setUriBuilderForOrders() {
-        setUriBuilderForOrders(jocResourceImpl.getUrl());
+        setUriBuilderForOrders(url);
     }
     
     public void setUriBuilderForOrders(String url) {
@@ -79,7 +91,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
     
     public void setUriBuilderForEvents() {
-        setUriBuilderForEvents(jocResourceImpl.getUrl());
+        setUriBuilderForEvents(url);
     }
     
     public void setUriBuilderForEvents(String url) {
@@ -87,7 +99,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
 
     public void setUriBuilderForProcessClasses() {
-        setUriBuilderForProcessClasses(jocResourceImpl.getUrl());
+        setUriBuilderForProcessClasses(url);
     }
     
     public void setUriBuilderForProcessClasses(String url) {
@@ -95,7 +107,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
 
     public void setUriBuilderForJobs() {
-        setUriBuilderForJobs(jocResourceImpl.getUrl());
+        setUriBuilderForJobs(url);
     }
     
     public void setUriBuilderForJobs(String url) {
@@ -103,18 +115,18 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
     
     public void setUriBuilderForMainLog() {
-        setUriBuilder(jocResourceImpl.getUrl(), "/jobscheduler/engine-cpp/show_log");
+        setUriBuilder(url, "/jobscheduler/engine-cpp/show_log");
         uriBuilder.queryParam("main", "");
     }
     
     public void setUriBuilderForMainLog(String logFileBaseName) {
         //Don't work on Linux, why?
-        //setUriBuilder(jocResourceImpl.getUrl(), "/jobscheduler/joc/scheduler_data/logs/" + logFileBaseName);
-        setUriBuilder(jocResourceImpl.getUrl(), "/jobscheduler/engine-cpp/scheduler_data/logs/" + logFileBaseName);
+        //setUriBuilder(jurl, "/jobscheduler/joc/scheduler_data/logs/" + logFileBaseName);
+        setUriBuilder(url, "/jobscheduler/engine-cpp/scheduler_data/logs/" + logFileBaseName);
     }
     
     public void setUriBuilder(String path) {
-        uriBuilder = UriBuilder.fromPath(jocResourceImpl.getUrl());
+        uriBuilder = UriBuilder.fromPath(url);
         uriBuilder.path(path);
     }
     
