@@ -220,13 +220,12 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             }
             long l = session.getTimeout()-1000;
             if (l < 0) {
-                l = 0;
+                return 0;
             }
-            if (l > Integer.MAX_VALUE) {
+            if (l >= Integer.MAX_VALUE) {
                 return Integer.MAX_VALUE;
-            } else {
-                return new Long(l).intValue();
             }
+            return new Long(l).intValue();
         } catch (SessionNotExistException e) {
             throw e;
         } catch (InvalidSessionException e) {
