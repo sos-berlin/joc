@@ -453,7 +453,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                     for (int i = 0; i < 6; i++) {
                         if (!(Boolean) session.getAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY)) {
                             try { // collect further events after 2sec to minimize the number of responses
-                                int delay = Math.min(250, new Long(getSessionTimeout()).intValue());
+                                int delay = Math.min(250, getSessionTimeout());
                                 if (delay > 0) {
                                     Thread.sleep(delay);
                                 }
@@ -467,7 +467,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                     // add auditLogEvent
                     eventSnapshots.putAll(addAuditLogEvent());
                     try { // a small delay because events comes earlier then the JobScheduler has update its objects in some requests
-                        int delay = Math.min(500, new Long(getSessionTimeout()).intValue());
+                        int delay = Math.min(500, getSessionTimeout());
                         if (delay > 0) {
                             Thread.sleep(delay);
                         }
@@ -483,7 +483,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             // if current Jobscheduler down then retry after 15sec
             eventSnapshots.putAll(updateSavedInventoryInstance());
             try {
-                int delay = Math.min(15000, new Long(getSessionTimeout()).intValue());
+                int delay = Math.min(15000, getSessionTimeout());
                 LOGGER.debug(command.getSchemeAndAuthority() + ": connection refused; retry after " + delay + "ms");
                 while (delay > 0) {
                     Thread.sleep(1000);

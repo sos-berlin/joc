@@ -92,7 +92,7 @@ public class EventCallableJobSchedulerStateChanged extends EventCallable impleme
                     for (int i=0; i < 6; i++) {
                         if (!(Boolean) session.getAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY)) {
                             try { //collect further events after 2sec to minimize the number of responses 
-                                int delay = Math.min(250, new Long(getSessionTimeout()).intValue());
+                                int delay = Math.min(250, getSessionTimeout());
                                 if (delay > 0) {
                                     Thread.sleep(delay);
                                 }
@@ -102,7 +102,7 @@ public class EventCallableJobSchedulerStateChanged extends EventCallable impleme
                     }
                     eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
                     try { //a small delay because events comes earlier then the JobScheduler has update its objects in some requests 
-                        int delay = Math.min(500, new Long(getSessionTimeout()).intValue());
+                        int delay = Math.min(500, getSessionTimeout());
                         if (delay > 0) {
                             Thread.sleep(delay);
                         }

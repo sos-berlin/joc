@@ -140,7 +140,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     }
     
     protected JsonObject getJsonObject(String eventId, Integer evtTimeout) throws JocException {
-        int timeout = Math.min(evtTimeout, new Long(getSessionTimeout() / 1000).intValue());
+        int timeout = Math.min(evtTimeout, getSessionTimeout() / 1000);
         command.replaceEventQuery(eventId, timeout);
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("path", "/");
@@ -172,7 +172,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                     eventSnapshots.addAll(getEventSnapshots(newEventId.toString())); 
                 } else {
                     try { //collect further events after 2sec to minimize the number of responses 
-                        int delay = Math.min(2000, new Long(getSessionTimeout()).intValue());
+                        int delay = Math.min(2000, getSessionTimeout());
                         if (delay > 0) {
                             Thread.sleep(delay);
                         }
@@ -188,7 +188,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         } catch (JobSchedulerNoResponseException | JobSchedulerConnectionRefusedException e) {
             // if current Jobscheduler down then retry after 15sec
             try {
-                int delay = Math.min(15000, new Long(getSessionTimeout()).intValue());
+                int delay = Math.min(15000, getSessionTimeout());
                 LOGGER.debug(command.getSchemeAndAuthority() + ": connection refused: retry after " + delay + "ms");
                 while (delay > 0) {
                     Thread.sleep(1000);
@@ -213,7 +213,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         return eventSnapshots;
     }
 
-    protected long getSessionTimeout() throws SessionNotExistException {
+    protected int getSessionTimeout() throws SessionNotExistException {
         try {
             if (session == null) {
                 throw new SessionNotExistException("session is invalid");
@@ -222,7 +222,11 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             if (l < 0) {
                 l = 0;
             }
-            return l;
+            if (l > Integer.MAX_VALUE) {
+                return Integer.MAX_VALUE;
+            } else {
+                return new Long(l).intValue();
+            }
         } catch (SessionNotExistException e) {
             throw e;
         } catch (InvalidSessionException e) {
