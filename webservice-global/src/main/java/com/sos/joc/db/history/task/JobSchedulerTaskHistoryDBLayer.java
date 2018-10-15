@@ -13,7 +13,7 @@ import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.model.job.TaskFilter;
 
 public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
-    
+
     private String job = null;
 
     public JobSchedulerTaskHistoryDBLayer(SOSHibernateSession conn) {
@@ -21,83 +21,101 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
     }
 
     public byte[] getLogAsByteArray(TaskFilter taskFilter) throws NumberFormatException, SOSHibernateException, DBMissingDataException, IOException {
-            if (this.getSession().getFactory().dbmsIsPostgres()) {
-                SchedulerTaskHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerTaskHistoryLogDBItemPostgres) this.getSession().get(
-                        SchedulerTaskHistoryLogDBItemPostgres.class, Long.parseLong(taskFilter.getTaskId()));
-                if (schedulerHistoryDBItem == null) {
-                    throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
-                }
-                job = schedulerHistoryDBItem.getJobName();
-                if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
-                    throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
-                }
-                return schedulerHistoryDBItem.getLogAsByteArray();
+        if (this.getSession().getFactory().dbmsIsPostgres()) {
+            SchedulerTaskHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerTaskHistoryLogDBItemPostgres) this.getSession().get(
+                    SchedulerTaskHistoryLogDBItemPostgres.class, Long.parseLong(taskFilter.getTaskId()));
+            if (schedulerHistoryDBItem == null) {
+                // in case of task which doesn't get connection to agent the db is also empty.
+                // throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+                return null;
             } else {
-                SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(
-                        SchedulerTaskHistoryDBItem.class, Long.parseLong(taskFilter.getTaskId()));
-                if (schedulerHistoryDBItem == null) {
-                    throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
-                }
                 job = schedulerHistoryDBItem.getJobName();
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
-                    throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
+                    throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
                 }
                 return schedulerHistoryDBItem.getLogAsByteArray();
             }
+        } else {
+            SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(SchedulerTaskHistoryDBItem.class,
+                    Long.parseLong(taskFilter.getTaskId()));
+            if (schedulerHistoryDBItem == null) {
+                // in case of task which doesn't get connection to agent the db is also empty.
+                // throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+                return null;
+            } else {
+                job = schedulerHistoryDBItem.getJobName();
+                if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
+                    throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
+                }
+                return schedulerHistoryDBItem.getLogAsByteArray();
+            }
+        }
     }
-    
+
     public Path writeLogFile(TaskFilter taskFilter) throws NumberFormatException, SOSHibernateException, DBMissingDataException, IOException {
-            if (this.getSession().getFactory().dbmsIsPostgres()) {
-                SchedulerTaskHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerTaskHistoryLogDBItemPostgres) this.getSession().get(
-                        SchedulerTaskHistoryLogDBItemPostgres.class, Long.parseLong(taskFilter.getTaskId()));
-                if (schedulerHistoryDBItem == null) {
-                    throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
-                }
-                job = schedulerHistoryDBItem.getJobName();
-                if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
-                    throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
-                }
-                return schedulerHistoryDBItem.writeLogFile(getPrefix(taskFilter.getTaskId(), job));
+        if (this.getSession().getFactory().dbmsIsPostgres()) {
+            SchedulerTaskHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerTaskHistoryLogDBItemPostgres) this.getSession().get(
+                    SchedulerTaskHistoryLogDBItemPostgres.class, Long.parseLong(taskFilter.getTaskId()));
+            if (schedulerHistoryDBItem == null) {
+                // in case of task which doesn't get connection to agent the db is also empty.
+                // throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+                return null;
             } else {
-                SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(
-                        SchedulerTaskHistoryDBItem.class, Long.parseLong(taskFilter.getTaskId()));
-                if (schedulerHistoryDBItem == null) {
-                    throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
-                }
                 job = schedulerHistoryDBItem.getJobName();
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
-                    throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
+                    throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
                 }
                 return schedulerHistoryDBItem.writeLogFile(getPrefix(taskFilter.getTaskId(), job));
             }
+        } else {
+            SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(SchedulerTaskHistoryDBItem.class,
+                    Long.parseLong(taskFilter.getTaskId()));
+            if (schedulerHistoryDBItem == null) {
+                // in case of task which doesn't get connection to agent the db is also empty.
+                // throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+                return null;
+            } else {
+                job = schedulerHistoryDBItem.getJobName();
+                if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
+                    throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
+                }
+                return schedulerHistoryDBItem.writeLogFile(getPrefix(taskFilter.getTaskId(), job));
+            }
+        }
     }
-    
+
     public Path writeGzipLogFile(TaskFilter taskFilter) throws NumberFormatException, SOSHibernateException, DBMissingDataException, IOException {
         if (this.getSession().getFactory().dbmsIsPostgres()) {
             SchedulerTaskHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerTaskHistoryLogDBItemPostgres) this.getSession().get(
                     SchedulerTaskHistoryLogDBItemPostgres.class, Long.parseLong(taskFilter.getTaskId()));
             if (schedulerHistoryDBItem == null) {
-                throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+                // in case of task which doesn't get connection to agent the db is also empty.
+                // throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+                return null;
+            } else {
+                job = schedulerHistoryDBItem.getJobName();
+                if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
+                    throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
+                }
+                return schedulerHistoryDBItem.writeGzipLogFile(getPrefix(taskFilter.getTaskId(), job));
             }
-            job = schedulerHistoryDBItem.getJobName();
-            if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
-                throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
-            }
-            return schedulerHistoryDBItem.writeGzipLogFile(getPrefix(taskFilter.getTaskId(), job));
         } else {
-            SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(
-                    SchedulerTaskHistoryDBItem.class, Long.parseLong(taskFilter.getTaskId()));
+            SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(SchedulerTaskHistoryDBItem.class,
+                    Long.parseLong(taskFilter.getTaskId()));
             if (schedulerHistoryDBItem == null) {
-                throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+                // in case of task which doesn't get connection to agent the db is also empty.
+                // throw new DBMissingDataException("Task log with id " +taskFilter.getTaskId()+ " is missing");
+                return null;
+            } else {
+                job = schedulerHistoryDBItem.getJobName();
+                if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
+                    throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
+                }
+                return schedulerHistoryDBItem.writeGzipLogFile(getPrefix(taskFilter.getTaskId(), job));
             }
-            job = schedulerHistoryDBItem.getJobName();
-            if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
-                throw new DBMissingDataException("Task log of " + job + " with id " +taskFilter.getTaskId()+ " is missing");
-            }
-            return schedulerHistoryDBItem.writeGzipLogFile(getPrefix(taskFilter.getTaskId(), job));
         }
-}
-    
+    }
+
     public String getLogAsString(TaskFilter taskFilter) throws NumberFormatException, SOSHibernateException, DBMissingDataException, IOException {
         byte[] bytes = getLogAsByteArray(taskFilter);
         if (bytes != null) {
@@ -109,7 +127,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
     public String getJob() {
         return job;
     }
-    
+
     private String getPrefix(String taskId, String jobName) {
         String prefix = taskId + "";
         if (jobName != null && !jobName.isEmpty()) {

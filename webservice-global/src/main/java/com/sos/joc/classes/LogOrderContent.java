@@ -65,10 +65,17 @@ public class LogOrderContent extends LogContent {
         }
     }
     
+    // JobScheduler removes log file from disk after restart!
+//    private Path writeGzipOrderLogFileFromXmlCommand() throws Exception {
+//        String logFilename = String.format("order.%s.%s.log", orderHistoryFilter.getJobChain().replaceFirst("^/+", "").replaceAll("/", ","),
+//                orderHistoryFilter.getOrderId().replaceAll("[/\\\\:]", "_"));
+//        return writeGzipTaskLogFileFromGet(logFilename, getPrefix());
+//    }
+    
     private Path writeGzipOrderLogFileFromXmlCommand() throws Exception {
-        String logFilename = String.format("order.%s.%s.log", orderHistoryFilter.getJobChain().replaceFirst("^/+", "").replaceAll("/", ","),
-                orderHistoryFilter.getOrderId().replaceAll("[/\\\\:]", "_"));
-        return writeGzipTaskLogFileFromGet(logFilename, getPrefix());
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+        String xml = jocXmlCommand.getShowOrderCommand(orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(), "log");
+        return jocXmlCommand.getLogPath(xml, getAccessToken(), getPrefix(), true);
     }
     
     private String getPrefix() {

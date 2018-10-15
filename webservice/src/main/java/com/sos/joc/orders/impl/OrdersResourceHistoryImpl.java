@@ -20,7 +20,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
@@ -157,7 +156,6 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 				}
 
 				Matcher childOrderMatcher = Pattern.compile(CHILD_ORDER_PATTERN).matcher("");
-				List<OrderHistoryItem> children = null;
 
 				for (DBItemReportTrigger dbItemReportTrigger : listOfDBItemReportTrigger) {
 
@@ -202,12 +200,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 						continue;
 					}
 
-					children = historyChildren.remove(history.getHistoryId());
-					if (children != null) {
-						history.setChildren(children);
-					} else {
-						history.setChildren(null);
-					}
+					history.setChildren(historyChildren.remove(history.getHistoryId()));
 
 					childOrderMatcher = childOrderMatcher.reset(dbItemReportTrigger.getName());
 					String parentHistoryId = null;
