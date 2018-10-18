@@ -10,6 +10,7 @@ import javax.json.JsonObjectBuilder;
 
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.jobchains.JobChainVolatile;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.model.order.OrdersSummary;
 
 public class OrdersSummaryCallable implements Callable<Map<String, JobChainVolatile>> {
@@ -34,28 +35,49 @@ public class OrdersSummaryCallable implements Callable<Map<String, JobChainVolat
 
     @Override
     public Map<String, JobChainVolatile> call() throws Exception {
-        return getOrdersSummary(jobChain, jocJsonCommand, accessToken);
+        return callOrdersSummary();
     }
 
     public OrdersSummary getOrdersSummary() throws Exception {
-        return getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChain.getPath()), accessToken));
+        try {
+            return getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChain.getPath()), accessToken));
+        } catch (JobSchedulerBadRequestException e) {
+            //LOGGER.warn("", e);
+            return getOrdersSummary(null);
+        }
     }
 
-    private Map<String, JobChainVolatile> getOrdersSummary(JobChainVolatile jobChain, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
+    private Map<String, JobChainVolatile> callOrdersSummary() throws Exception {
         Map<String, JobChainVolatile> summaryMap = new HashMap<String, JobChainVolatile>();
-        jobChain.setOrdersSummary(getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChain.getPath()), accessToken)));
+        try {
+            jobChain.setOrdersSummary(getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChain.getPath()), accessToken)));
+        } catch (JobSchedulerBadRequestException e) {
+            //LOGGER.warn("", e);
+            jobChain.setOrdersSummary(getOrdersSummary(null));
+        }
         summaryMap.put(jobChain.getPath(), jobChain);
         return summaryMap;
     }
 
     private OrdersSummary getOrdersSummary(JsonObject json) {
         OrdersSummary summary = new OrdersSummary();
-        summary.setBlacklist(json.getInt("blacklisted", 0));
-        summary.setPending(json.getInt("notPlanned", 0) + json.getInt("planned", 0));
-        summary.setRunning(json.getInt("inTaskProcess", 0) + json.getInt("occupiedByClusterMember", 0));
-        summary.setSetback(json.getInt("setback", 0));
-        summary.setSuspended(json.getInt("suspended", 0));
-        summary.setWaitingForResource(json.getInt("waitingForResource", 0) + json.getInt("due", 0) + json.getInt("inTask", 0) - json.getInt("inTaskProcess", 0));
+        if (json != null) {
+            summary.setBlacklist(json.getInt("blacklisted", 0));
+            summary.setPending(json.getInt("notPlanned", 0) + json.getInt("planned", 0));
+            summary.setRunning(json.getInt("inTaskProcess", 0) + json.getInt("occupiedByClusterMember", 0));
+            summary.setSetback(json.getInt("setback", 0));
+            summary.setSuspended(json.getInt("suspended", 0));
+            summary.setWaitingForResource(json.getInt("waitingForResource", 0) + json.getInt("due", 0) + json.getInt("inTask", 0) - json.getInt(
+                    "inTaskProcess", 0));
+        } else {
+            return null;
+//            summary.setBlacklist(0);
+//            summary.setPending(0);
+//            summary.setRunning(0);
+//            summary.setSetback(0);
+//            summary.setSuspended(0);
+//            summary.setWaitingForResource(0);
+        }
         return summary;
     }
 
