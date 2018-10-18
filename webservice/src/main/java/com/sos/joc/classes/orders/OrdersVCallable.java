@@ -335,6 +335,9 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
             for (String order : orders.getOrders()) {
                 ordersArray.add(order);
             }
+            if (suppressJobSchedulerObjectNotExistException && orders.getOrders().size() == 1) {
+                ordersArray.add(""); //hack for distributed orders, otherwise SCHEDULER-161 There is no Order 'xxx'
+            }
             builder.add("orderIds", ordersArray);
         } else {
             builder = filterProcessingStateAndType(ordersBody);

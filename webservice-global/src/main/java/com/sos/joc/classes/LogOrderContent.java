@@ -10,6 +10,7 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
@@ -19,6 +20,7 @@ import com.sos.joc.model.order.OrderHistoryFilter;
 public class LogOrderContent extends LogContent {
 
     private OrderHistoryFilter orderHistoryFilter;
+    private String clusterMemberId = null;
 
     public LogOrderContent(OrderHistoryFilter orderHistoryFilter, DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
         super(dbItemInventoryInstance, accessToken);
@@ -56,7 +58,14 @@ public class LogOrderContent extends LogContent {
             try {
                 Globals.beginTransaction(sosHibernateSession);
                 JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(sosHibernateSession);
-                return jobSchedulerOrderHistoryDBLayer.writeGzipLogFile(orderHistoryFilter);
+                boolean isDistributed = "active".equals(dbItemInventoryInstance.getClusterType());
+                if (isDistributed) {
+                    Path p = jobSchedulerOrderHistoryDBLayer.writeGzipLogFile(orderHistoryFilter, true);
+                    clusterMemberId = jobSchedulerOrderHistoryDBLayer.getClusterMemberId();
+                    return p;
+                } else {
+                    return jobSchedulerOrderHistoryDBLayer.writeGzipLogFile(orderHistoryFilter, false);
+                }
             } finally {
                 Globals.rollback(sosHibernateSession);
             }
@@ -73,7 +82,20 @@ public class LogOrderContent extends LogContent {
 //    }
     
     private Path writeGzipOrderLogFileFromXmlCommand() throws Exception {
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+        DBItemInventoryInstance itemInventoryInstance = dbItemInventoryInstance;
+        if (clusterMemberId != null && !clusterMemberId.isEmpty()) {
+            String currentClusterMemberId = String.format("%s/%s:%s", dbItemInventoryInstance.getSchedulerId(), dbItemInventoryInstance
+                    .getHostname(), dbItemInventoryInstance.getUrl().replaceFirst(".*:(\\d+)$", "$1"));
+            if (!clusterMemberId.equals(currentClusterMemberId)) {
+                SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("getOrderLog");
+                InventoryInstancesDBLayer instancesDbLayer = new InventoryInstancesDBLayer(sosHibernateSession);
+                DBItemInventoryInstance itemInventoryInstance2 = instancesDbLayer.getInventoryInstanceByClusterMemberId(clusterMemberId);
+                if (itemInventoryInstance2 != null) {
+                    itemInventoryInstance = itemInventoryInstance2;
+                }
+            }
+        }
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(itemInventoryInstance);
         String xml = jocXmlCommand.getShowOrderCommand(orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(), "log");
         return jocXmlCommand.getLogPath(xml, getAccessToken(), getPrefix(), true);
     }

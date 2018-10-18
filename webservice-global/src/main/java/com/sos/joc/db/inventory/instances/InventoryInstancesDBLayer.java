@@ -2,6 +2,8 @@ package com.sos.joc.db.inventory.instances;
 
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
@@ -92,6 +94,30 @@ public class InventoryInstancesDBLayer extends DBLayer {
         }
     }
     
+    public DBItemInventoryInstance getInventoryInstanceByClusterMemberId(String clusterMemberId) throws DBInvalidDataException,
+            DBConnectionRefusedException, UnknownJobSchedulerMasterException {
+        try {
+            Matcher m = Pattern.compile("(.+)/([^/]+):(\\d+)").matcher(clusterMemberId);
+            if (m.find()) {
+                String sql = String.format("from %s where schedulerId = :schedulerId and hostname = :hostname and url like :port",
+                        DBITEM_INVENTORY_INSTANCES);
+                Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
+                query.setParameter("hostname", m.group(2));
+                query.setParameter("port", "%:" + m.group(3));
+                query.setParameter("schedulerId", m.group(1));
+                DBItemInventoryInstance result = getSession().getSingleResult(query);
+                if (result != null) {
+                    return setMappedUrl(result);
+                } 
+            }
+            return null;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
     public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws DBInvalidDataException, DBConnectionRefusedException {
         return getInventoryInstancesBySchedulerId(schedulerId, false);
     }

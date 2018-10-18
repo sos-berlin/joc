@@ -15,6 +15,7 @@ import com.sos.joc.model.job.TaskFilter;
 public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
 
     private String job = null;
+    private String clusterMemberId = null;
 
     public JobSchedulerTaskHistoryDBLayer(SOSHibernateSession conn) {
         super(conn);
@@ -30,6 +31,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
                 return null;
             } else {
                 job = schedulerHistoryDBItem.getJobName();
+                clusterMemberId = schedulerHistoryDBItem.getClusterMemberId();
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                     throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
                 }
@@ -44,6 +46,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
                 return null;
             } else {
                 job = schedulerHistoryDBItem.getJobName();
+                clusterMemberId = schedulerHistoryDBItem.getClusterMemberId();
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                     throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
                 }
@@ -62,6 +65,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
                 return null;
             } else {
                 job = schedulerHistoryDBItem.getJobName();
+                clusterMemberId = schedulerHistoryDBItem.getClusterMemberId();
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                     throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
                 }
@@ -76,6 +80,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
                 return null;
             } else {
                 job = schedulerHistoryDBItem.getJobName();
+                clusterMemberId = schedulerHistoryDBItem.getClusterMemberId();
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                     throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
                 }
@@ -94,6 +99,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
                 return null;
             } else {
                 job = schedulerHistoryDBItem.getJobName();
+                clusterMemberId = schedulerHistoryDBItem.getClusterMemberId();
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                     throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
                 }
@@ -108,6 +114,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
                 return null;
             } else {
                 job = schedulerHistoryDBItem.getJobName();
+                clusterMemberId = schedulerHistoryDBItem.getClusterMemberId();
                 if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
                     throw new DBMissingDataException("Task log of " + job + " with id " + taskFilter.getTaskId() + " is missing");
                 }
@@ -126,6 +133,10 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
 
     public String getJob() {
         return job;
+    }
+    
+    public String getClusterMemberId() {
+        return clusterMemberId;
     }
 
     private String getPrefix(String taskId, String jobName) {

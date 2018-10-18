@@ -284,8 +284,8 @@ public class LogContent {
         return String.format(HTML_START, title) + colouredLog(new Scanner(log)) + String.format(HTML_END);
     }
     
-    protected Path writeGzipTaskLogFileFromGet(String logFilename, String prefix) throws JocException {
-        JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance);
+    protected Path writeGzipTaskLogFileFromGet(DBItemInventoryInstance itemInventoryInstance, String logFilename, String prefix) throws JocException {
+        JOCJsonCommand jocJsonCommand = new JOCJsonCommand(itemInventoryInstance);
         jocJsonCommand.setUriBuilderForMainLog(logFilename);
         return jocJsonCommand.getFilePathFromGet(jocJsonCommand.getURI(), getAccessToken(), prefix, "text/plain,application/octet-stream", true);
     }

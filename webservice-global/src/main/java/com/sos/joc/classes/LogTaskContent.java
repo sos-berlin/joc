@@ -11,6 +11,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.db.history.task.JobSchedulerTaskHistoryDBLayer;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
@@ -22,6 +23,7 @@ public class LogTaskContent extends LogContent {
 
     private TaskFilter taskFilter;
     private String job = null;
+    private String clusterMemberId = null;
 
     public LogTaskContent(TaskFilter taskFilter, DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
         super(dbItemInventoryInstance, accessToken);
@@ -60,6 +62,7 @@ public class LogTaskContent extends LogContent {
                 JobSchedulerTaskHistoryDBLayer jobSchedulerTaskHistoryDBLayer = new JobSchedulerTaskHistoryDBLayer(sosHibernateSession);
                 Path path = jobSchedulerTaskHistoryDBLayer.writeGzipLogFile(taskFilter);
                 job = jobSchedulerTaskHistoryDBLayer.getJob();
+                clusterMemberId = jobSchedulerTaskHistoryDBLayer.getClusterMemberId();
                 return path;
             } finally {
                 Globals.rollback(sosHibernateSession);
@@ -72,14 +75,40 @@ public class LogTaskContent extends LogContent {
     private Path writeGzipTaskLogFileFromXmlCommand() throws Exception {
         SOSHibernateSession sosHibernateSession = null;
         String logFilename = null;
+        DBItemInventoryInstance itemInventoryInstance = dbItemInventoryInstance;
         try {
+            if ("active".equals(dbItemInventoryInstance.getClusterType()) && clusterMemberId != null && !clusterMemberId.isEmpty()) {
+                String currentClusterMemberId = String.format("%s/%s:%s", dbItemInventoryInstance.getSchedulerId(), dbItemInventoryInstance
+                        .getHostname(), dbItemInventoryInstance.getUrl().replaceFirst(".*:(\\d+)$", "$1"));
+                if (!clusterMemberId.equals(currentClusterMemberId)) {
+                    sosHibernateSession = Globals.createSosHibernateStatelessConnection("getTaskLog");
+                    InventoryInstancesDBLayer instancesDbLayer = new InventoryInstancesDBLayer(sosHibernateSession);
+                    DBItemInventoryInstance itemInventoryInstance2 = instancesDbLayer.getInventoryInstanceByClusterMemberId(clusterMemberId);
+                    if (itemInventoryInstance2 != null) {
+                        itemInventoryInstance = itemInventoryInstance2;
+                    }
+                }
+            }
             if (job == null || job.isEmpty()) {
-                throw new DBMissingDataException("Job of task with id " + taskFilter.getTaskId() + " could not determine");
-
+                // call show_task for the case of "running" tasks where the agent is not reachable
+                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(itemInventoryInstance);
+                try {
+                    jocXmlCommand.executePostWithRetry("<show_task id=\"" + taskFilter.getTaskId() + "\" />", getAccessToken());
+                    // job = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/task/@job");
+                    logFilename = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/task/@log_file");
+                } catch (Exception e) {
+                }
+                if (logFilename != null && !logFilename.isEmpty()) {
+                    logFilename = Paths.get(logFilename).getFileName().toString();
+                } else {
+                    throw new DBMissingDataException("Task log with id " + taskFilter.getTaskId() + " is missing");
+                }
             } else {
-                sosHibernateSession = Globals.createSosHibernateStatelessConnection("taskLog");
-                InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(sosHibernateSession);
-                DBItemInventoryJob jobItem = dbLayer.getInventoryJobByName(("/" + job).replaceAll("/+", "/"), dbItemInventoryInstance.getId());
+                if (sosHibernateSession == null) {
+                    sosHibernateSession = Globals.createSosHibernateStatelessConnection("getTaskLog");
+                }
+                InventoryJobsDBLayer jobsDbLayer = new InventoryJobsDBLayer(sosHibernateSession);
+                DBItemInventoryJob jobItem = jobsDbLayer.getInventoryJobByName(("/" + job).replaceAll("/+", "/"), itemInventoryInstance.getId());
                 if (jobItem != null) {
                     String j = job.replaceFirst("^/+", "").replaceAll("/", ",");
                     if (jobItem.getMaxTasks() <= 1) {
@@ -90,7 +119,7 @@ public class LogTaskContent extends LogContent {
                 }
             }
             if (logFilename != null && !logFilename.isEmpty()) {
-                return writeGzipTaskLogFileFromGet(logFilename, getPrefix());
+                return writeGzipTaskLogFileFromGet(itemInventoryInstance, logFilename, getPrefix());
             } else {
                 throw new DBMissingDataException("Filename of runnig task log with id " + taskFilter.getTaskId() + " could not determine");
             }

@@ -264,11 +264,16 @@ public class JOCXmlCommand extends SOSXmlCommand {
     public Path getLogPath(String xmlCommand, String accessToken, String prefix, boolean withGzipEncoding) throws JocException {
         try {
             return getFilePathResponseFromLog(requestXMLPost(xmlCommand, accessToken),prefix, withGzipEncoding);
-        } catch (JobSchedulerNoResponseException e) {
+        } catch (JobSchedulerNoResponseException | JobSchedulerBadRequestException e) {
             e.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
             throw e;
         } catch (Exception e) {
-            JobSchedulerConnectionRefusedException ee = new JobSchedulerConnectionRefusedException(e.getCause());
+            JobSchedulerConnectionRefusedException ee = null;
+            if (e.getCause() != null) {
+                ee = new JobSchedulerConnectionRefusedException(e.getCause());
+            } else {
+                ee = new JobSchedulerConnectionRefusedException(e);
+            }
             ee.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
             throw ee;
         }
@@ -278,9 +283,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
         Path path = null;
         try {
             if (connection != null) {
-                LOGGER.info(Instant.now().getEpochSecond()+"");
                 InputStream instream = connection.getInputStream();
-                LOGGER.info(Instant.now().getEpochSecond()+"");
                 OutputStream out = null;
                 if (instream != null) {
                     try {
