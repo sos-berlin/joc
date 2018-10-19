@@ -78,7 +78,7 @@ public class LogTaskContent extends LogContent {
         DBItemInventoryInstance itemInventoryInstance = dbItemInventoryInstance;
         try {
             if ("active".equals(dbItemInventoryInstance.getClusterType()) && clusterMemberId != null && !clusterMemberId.isEmpty()) {
-                if (!clusterMemberId.equals(dbItemInventoryInstance.getClusterMemberId())) {
+                if (!clusterMemberId.equals(dbItemInventoryInstance.clusterMemberId())) {
                     sosHibernateSession = Globals.createSosHibernateStatelessConnection("getTaskLog");
                     InventoryInstancesDBLayer instancesDbLayer = new InventoryInstancesDBLayer(sosHibernateSession);
                     DBItemInventoryInstance itemInventoryInstance2 = instancesDbLayer.getInventoryInstanceByClusterMemberId(clusterMemberId);

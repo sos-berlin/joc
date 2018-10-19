@@ -259,7 +259,7 @@ public class JOCResourceImpl {
     }
 	
     public String getClusterMemberId() {
-        return dbItemInventoryInstance.getClusterMemberId();
+        return dbItemInventoryInstance.clusterMemberId();
     }
 	
 	public boolean versionIsOlderThan(String version) {
