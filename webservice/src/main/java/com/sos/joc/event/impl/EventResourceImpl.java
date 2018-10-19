@@ -150,16 +150,17 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                             }
                         }
                     }
-
-                    for (DBItemInventoryInstance jobSchedulerMember : jobSchedulerMembers) {
-                        if (jobSchedulerMember.equals(instance)) {
-                            continue;
+                    if (jobSchedulerMembers != null) {
+                        for (DBItemInventoryInstance jobSchedulerMember : jobSchedulerMembers) {
+                            if (jobSchedulerMember == null || jobSchedulerMember.equals(instance)) {
+                                continue;
+                            }
+                            JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, jobSchedulerMember.getId(), defaultEventId);
+                            JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, setMappedUrl(jobSchedulerMember), "SchedulerEvent");
+                            jocJsonCommandsOfClusterMember.add(commandOfMember);
+                            tasksOfClusterMember.add(new EventCallableJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
+                                    jobSchedulerMember.getId()));
                         }
-                        JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, jobSchedulerMember.getId(), defaultEventId);
-                        JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, setMappedUrl(jobSchedulerMember), "SchedulerEvent");
-                        jocJsonCommandsOfClusterMember.add(commandOfMember);
-                        tasksOfClusterMember.add(new EventCallableJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
-                                jobSchedulerMember.getId()));
                     }
                 }
                 
