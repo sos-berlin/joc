@@ -81,6 +81,13 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     public JOCResourceImpl getJOCResourceImpl() {
         return jocResourceImpl;
     }
+    
+    public String getClusterMemberId() {
+        if (jocResourceImpl != null) {
+            return jocResourceImpl.getClusterMemberId();
+        }
+        return null;
+    }
 
     public void setUriBuilderForOrders() {
         setUriBuilderForOrders(url);

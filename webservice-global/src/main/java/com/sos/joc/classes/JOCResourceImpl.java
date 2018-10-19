@@ -107,7 +107,7 @@ public class JOCResourceImpl {
         }
 	    return jobschedulerUser;
     }
-
+	
 	public JocError getJocError() {
 		return jocError;
 	}
@@ -256,6 +256,10 @@ public class JOCResourceImpl {
 	
 	public String getVersion() {
         return dbItemInventoryInstance.getVersion();
+    }
+	
+    public String getClusterMemberId() {
+        return dbItemInventoryInstance.getClusterMemberId();
     }
 	
 	public boolean versionIsOlderThan(String version) {

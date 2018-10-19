@@ -84,9 +84,7 @@ public class LogOrderContent extends LogContent {
     private Path writeGzipOrderLogFileFromXmlCommand() throws Exception {
         DBItemInventoryInstance itemInventoryInstance = dbItemInventoryInstance;
         if (clusterMemberId != null && !clusterMemberId.isEmpty()) {
-            String currentClusterMemberId = String.format("%s/%s:%s", dbItemInventoryInstance.getSchedulerId(), dbItemInventoryInstance
-                    .getHostname(), dbItemInventoryInstance.getUrl().replaceFirst(".*:(\\d+)$", "$1"));
-            if (!clusterMemberId.equals(currentClusterMemberId)) {
+            if (!clusterMemberId.equals(dbItemInventoryInstance.getClusterMemberId())) {
                 SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("getOrderLog");
                 InventoryInstancesDBLayer instancesDbLayer = new InventoryInstancesDBLayer(sosHibernateSession);
                 DBItemInventoryInstance itemInventoryInstance2 = instancesDbLayer.getInventoryInstanceByClusterMemberId(clusterMemberId);
