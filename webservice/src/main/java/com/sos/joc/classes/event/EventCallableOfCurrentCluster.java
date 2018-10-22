@@ -28,7 +28,7 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
     private static final Logger LOGGER = LoggerFactory.getLogger(EventCallableOfCurrentCluster.class);
     private final String accessToken;
     private final Boolean isCurrent;
-    private List<EventCallable> tasksOfClustermember = null;
+    private List<EventCallable> tasksOfClusterMember = null;
     private List<JOCJsonCommand> jocJsonCommands = null;
     private String jobSchedulerId = null;
     private String eventId = null;
@@ -37,10 +37,10 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
     private final SOSShiroCurrentUser shiroUser;
     
     public EventCallableOfCurrentCluster(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
-            Long instanceId, SOSShiroCurrentUser shiroUser, List<EventCallable> tasksOfClustermember, List<JOCJsonCommand> jocJsonCommands, Boolean isCurrentJobScheduler) {
+            Long instanceId, SOSShiroCurrentUser shiroUser, List<EventCallable> tasksOfClusterMember, List<JOCJsonCommand> jocJsonCommands, Boolean isCurrentJobScheduler) {
         super();
         this.accessToken = accessToken;
-        this.tasksOfClustermember = tasksOfClustermember;
+        this.tasksOfClusterMember = tasksOfClusterMember;
         this.jocJsonCommands = jocJsonCommands;
         this.jobSchedulerId = jobSchedulerEvent.getJobschedulerId();
         this.shiroUser = shiroUser;
@@ -51,9 +51,9 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
 
     @Override
     public JobSchedulerEvent call() throws Exception {
-        ExecutorService executorService = Executors.newFixedThreadPool(tasksOfClustermember.size());
+        ExecutorService executorService = Executors.newFixedThreadPool(tasksOfClusterMember.size());
         try {
-            JobSchedulerEvent evt = executorService.invokeAny(tasksOfClustermember);
+            JobSchedulerEvent evt = executorService.invokeAny(tasksOfClusterMember);
             LOGGER.debug("EventOfCluster: " + evt.getJobschedulerId() + "," + evt.getEventId() );
             if (evt.getJobschedulerId().startsWith("__instance__")) {
                 shiroSession.setAttribute(jobSchedulerId + "#eventIdOfClusterMembers", evt.getEventId());

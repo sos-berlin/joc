@@ -17,10 +17,14 @@ import javax.json.JsonObjectBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.jobchains.JobChainVolatile;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
@@ -44,9 +48,11 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
     private final Boolean compact;
     private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
+    private final String clusterMemberId;
     private final Boolean suppressJobSchedulerObjectNotExistException;
     private final Boolean checkOrderPathIsInFolder;
     private List<String> yadeJobs;
+    private SOSHibernateSession connection = null;
 
     public OrdersVCallable(String job, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.orders = null;
@@ -57,6 +63,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.compact = compact;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.clusterMemberId = jocJsonCommand.getClusterMemberId();
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = false;
         this.yadeJobs = null;
@@ -71,6 +78,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.compact = ordersBody.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.clusterMemberId = jocJsonCommand.getClusterMemberId();
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = null;
         this.yadeJobs = null;
@@ -85,6 +93,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.compact = ordersBody.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.clusterMemberId = jocJsonCommand.getClusterMemberId();
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = null;
         this.yadeJobs = yadeJobs;
@@ -101,6 +110,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.compact = false;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.clusterMemberId = jocJsonCommand.getClusterMemberId();
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = jobChain.hasJobChainNodes();
         this.yadeJobs = null;
@@ -118,7 +128,26 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.compact = order.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.clusterMemberId = jocJsonCommand.getClusterMemberId();
         this.suppressJobSchedulerObjectNotExistException = order.getSuppressNotExistException();
+        this.checkOrderPathIsInFolder = null;
+        this.yadeJobs = null;
+    }
+    
+    public OrdersVCallable(OrderVolatile order, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
+        OrdersPerJobChain o = new OrdersPerJobChain();
+        o.setJobChain(order.getJobChain());
+        o.addOrder(order.getOrderId());
+        this.orders = o;
+        this.job = null;
+        this.folder = null;
+        this.folderPath = Paths.get(order.getJobChain()).getParent();
+        this.ordersBody = null;
+        this.compact = compact;
+        this.jocJsonCommand = jocJsonCommand;
+        this.accessToken = accessToken;
+        this.clusterMemberId = jocJsonCommand.getClusterMemberId();
+        this.suppressJobSchedulerObjectNotExistException = false;
         this.checkOrderPathIsInFolder = null;
         this.yadeJobs = null;
     }
@@ -132,6 +161,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.compact = ordersBody.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.clusterMemberId = jocJsonCommand.getClusterMemberId();
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = !("/".equals(folder.getFolder()));
         this.yadeJobs = null;
@@ -146,6 +176,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.compact = ordersBody.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.clusterMemberId = jocJsonCommand.getClusterMemberId();
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = !("/".equals(folder.getFolder()));
         this.yadeJobs = yadeJobs;
@@ -186,6 +217,18 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
                 return o;
             }
             throw e;
+        }
+    }
+    
+    public OrderVolatile getOrderVolatile() {
+        try {
+            Map<String, OrderVolatile> orderMap = getOrders(orders, compact, jocJsonCommand);
+            if (orderMap == null || orderMap.isEmpty()) {
+                return null;
+            }
+            return orderMap.values().iterator().next();
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -270,7 +313,8 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
 
         for (JsonObject ordersItem : json.getJsonArray("orders").getValuesAs(JsonObject.class)) {
             OrderVolatile order = new OrderVolatile(ordersItem, origJobChain);
-            order.setPathJobChainAndOrderId();
+            order.setPathJobChainOrderIdAndClusterMember();
+            
             if (orders != null && !orders.getOrders().isEmpty() && !orders.containsOrder(order.getOrderId())) {
                 continue;
             }
@@ -288,9 +332,29 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
 //                LOGGER.debug("...processing skipped caused by 'runTimeIsTemporary=" + filterByRunTimeIsTemporary + "'");
 //                continue; 
 //            }
+            if (order.getProcessedBy() != null && clusterMemberId != null && !clusterMemberId.equals(order.getProcessedBy())) {
+                try {
+                    if (connection == null) {
+                        connection = Globals.createSosHibernateStatelessConnection("OrdersVCallable-" + order.getPath());
+                        InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+                        DBItemInventoryInstance inventoryInstance = dbLayer.getInventoryInstanceByClusterMemberId(order.getProcessedBy());
+                        JOCJsonCommand jocJsonCommand2 = new JOCJsonCommand(inventoryInstance);
+                        jocJsonCommand2.setUriBuilderForOrders();
+                        jocJsonCommand2.addOrderCompactQuery(compact);
+                        OrderVolatile o = new OrdersVCallable(order, compact, jocJsonCommand2, accessToken).getOrderVolatile();
+                        o.setProcessedBy(order.getProcessedBy());
+                        listOrderQueue.put(o.getPath(), o);
+                        continue;
+                    }
+                } catch (Exception e) {
+                } finally {
+                    Globals.disconnect(connection);
+                    connection = null;
+                }
+            }
             order.setSurveyDate(surveyDate);
             order.setFields(usedNodes, usedTasks, compact);
-            if(yadeJobs != null && !yadeJobs.contains(order.getJob())) {
+            if (yadeJobs != null && !yadeJobs.contains(order.getJob())) {
                 continue;
             }
             if (!order.processingStateIsSet() && order.isWaitingForJob()) {
@@ -302,7 +366,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
                 order.readJobChainObstacles(usedJobChains.get(order.getJobChain()));
             }
             if (!order.processingStateIsSet() && order.getTaskId() != null) {
-                //it's very special situation of nested order while changing the job chain
+                // it's very special situation of nested order while changing the job chain
                 order.setSeverity(OrderStateText.RUNNING);
             }
             if (checkSuspendedOrdersWithFilter(order.getProcessingFilterState(), processingStates)) {

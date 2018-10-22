@@ -205,7 +205,7 @@ public class OrderVolatile extends OrderV {
         }
     }
     
-    public void setPathJobChainAndOrderId() throws JobSchedulerInvalidResponseDataException {
+    public void setPathJobChainOrderIdAndClusterMember() throws JobSchedulerInvalidResponseDataException {
         String path = overview.getString("path", null);
         if (path == null || path.isEmpty()) {
             throw new JobSchedulerInvalidResponseDataException("Invalid resonsed data: path is empty");
@@ -225,6 +225,7 @@ public class OrderVolatile extends OrderV {
 //        if (origJobChain == null) {
 //            origJobChain = pathParts[0];  
 //        }
+        setProcessedBy(overview.getJsonObject("orderProcessingState").getString("clusterMemberId", null));
     }
     
     private void cleanArrays() {

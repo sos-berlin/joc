@@ -137,7 +137,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                         DBItemInventoryInstance supervisor = instanceLayer.getInventoryInstanceByKey(instance.getSupervisorId());
                         if (supervisor != null) {
                             JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, supervisor.getId(), defaultEventId);
-                            JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, supervisor, "SchedulerEvent");
+                            JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, setMappedUrl(supervisor), "SchedulerEvent");
                             jocJsonCommandsOfClusterMember.add(commandOfMember);
                             tasksOfClusterMember.add(new EventCallableJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
                                     supervisor.getId()));
