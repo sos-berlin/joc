@@ -15,6 +15,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersHistoricSummary;
@@ -80,10 +81,10 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             if (hasPermission) {
                 OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
                 entity.setOrders(ordersHistoricSummary);
-                reportTriggerDBLayer.getFilter().setFailed(true);
+                reportTriggerDBLayer.getFilter().setState(HistoryStateText.FAILED.toString());
                 ordersHistoricSummary.setFailed(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
 
-                reportTriggerDBLayer.getFilter().setSuccess(true);
+                reportTriggerDBLayer.getFilter().setState(HistoryStateText.SUCCESSFUL.toString());
                 ordersHistoricSummary.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
             } else {
                 entity.setOrders(null);
