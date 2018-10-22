@@ -435,7 +435,10 @@ public class JOCResourceImpl {
 			} catch (Exception e) {
 			}
 			throw new DBInvalidDataException(ex);
+		}finally {
+			Globals.disconnect(sosHibernateSession);
 		}
+		
 	}
 
 	protected String getParent(String path) {

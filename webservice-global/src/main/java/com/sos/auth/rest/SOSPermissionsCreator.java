@@ -45,73 +45,78 @@ public class SOSPermissionsCreator {
 	}
 
 	public void loginFromAccessToken(String accessToken) throws JocException {
- 
-		if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null
-				|| Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken) == null) {
+		SOSHibernateSession sosHibernateSession = null;
+		try {
+			if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null
+					|| Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken) == null) {
 
-			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> hand over session.");
-			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> login with accessToken=" + accessToken);
-			Globals.sosShiroProperties = new JocCockpitProperties();
-			Globals.setProperties();
+				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> hand over session.");
+				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> login with accessToken=" + accessToken);
+				Globals.sosShiroProperties = new JocCockpitProperties();
+				Globals.setProperties();
 
-			SOSHibernateSession sosHibernateSession = Globals
-					.createSosHibernateStatelessConnection("JOC: loginFromAccessToken");
-			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> hibernateSession created");
-			SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
-			try {
-				sosShiroIniShare.provideIniFile();
-				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> ini file provided");
-			} catch (IOException e) {
-				throw new JocException(e);
-			} catch (SOSHibernateException e) {
-				throw new DBInvalidDataException(e);
-			}
-			sosHibernateSession.close();
-
-			IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
-			SecurityManager securityManager = factory.getInstance();
-			SecurityUtils.setSecurityManager(securityManager);
-			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> securityManager created");
-
-			Subject subject = new Subject.Builder().sessionId(accessToken).buildSubject();
-			LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject created");
-			if (subject.isAuthenticated()) {
-				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject is authenticated");
-				TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-				currentUser = new SOSShiroCurrentUser((String) subject.getPrincipals().getPrimaryPrincipal(), "", "");
-
-				if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
-					Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
+				sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOC: loginFromAccessToken");
+				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> hibernateSession created");
+				SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
+				try {
+					sosShiroIniShare.provideIniFile();
+					LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> ini file provided");
+				} catch (IOException e) {
+					throw new JocException(e);
+				} catch (SOSHibernateException e) {
+					throw new DBInvalidDataException(e);
 				}
+				sosHibernateSession.close();
 
-				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> removeTimedOutUser");
-				Globals.jocWebserviceDataContainer.getCurrentUsersList().removeTimedOutUser(currentUser.getUsername());
+				IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
+				SecurityManager securityManager = factory.getInstance();
+				SecurityUtils.setSecurityManager(securityManager);
+				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> securityManager created");
 
-				currentUser.setCurrentSubject(subject);
-				currentUser.setAccessToken(accessToken);
+				Subject subject = new Subject.Builder().sessionId(accessToken).buildSubject();
+				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject created");
+				if (subject.isAuthenticated()) {
+					LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject is authenticated");
+					TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+					currentUser = new SOSShiroCurrentUser((String) subject.getPrincipals().getPrimaryPrincipal(), "",
+							"");
 
-				SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(
-						accessToken);
-				LOGGER.debug(getClass().getName()
-						+ ": loginFromAccessToken --> JocCockpitPermissionMasterObjectList created");
-				currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
-				currentUser.initFolders();
-				LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> folders initialized");
-
-				Section section = getIni().getSection("folders");
-				if (section != null) {
-					for (String role : section.keySet()) {
-						currentUser.addFolder(role, section.get(role));
+					if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
+						Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
 					}
-				}
-				SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(
-						accessToken);
-				LOGGER.debug(
-						getClass().getName() + ": loginFromAccessToken --> CommandsPermissionMasterObjectList created");
 
-				currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
-				Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
+					LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> removeTimedOutUser");
+					Globals.jocWebserviceDataContainer.getCurrentUsersList()
+							.removeTimedOutUser(currentUser.getUsername());
+
+					currentUser.setCurrentSubject(subject);
+					currentUser.setAccessToken(accessToken);
+
+					SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(
+							accessToken);
+					LOGGER.debug(getClass().getName()
+							+ ": loginFromAccessToken --> JocCockpitPermissionMasterObjectList created");
+					currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
+					currentUser.initFolders();
+					LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> folders initialized");
+
+					Section section = getIni().getSection("folders");
+					if (section != null) {
+						for (String role : section.keySet()) {
+							currentUser.addFolder(role, section.get(role));
+						}
+					}
+					SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(
+							accessToken);
+					LOGGER.debug(getClass().getName()
+							+ ": loginFromAccessToken --> CommandsPermissionMasterObjectList created");
+
+					currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
+					Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
+				}
 			}
+		} finally {
+			Globals.disconnect(sosHibernateSession);
 		}
 	}
 
@@ -120,36 +125,42 @@ public class SOSPermissionsCreator {
 
 		Map<String, String> unique = new HashMap<String, String>();
 		SOSHibernateSession session = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");
-		InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
-		Globals.beginTransaction(session);
-		List<DBItemInventoryInstance> listOfInstances = dbLayer.getInventoryInstances();
-		Globals.rollback(session);
-		session.close();
-		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
-		SOSPermissionRoles sosPermissionRoles = sosPermissionsCreator.getRoles(true);
 		SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = new SOSPermissionJocCockpitMasters();
+		try {
+			InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
+			Globals.beginTransaction(session);
+			List<DBItemInventoryInstance> listOfInstances = dbLayer.getInventoryInstances();
+			Globals.rollback(session);
+			session.close();
+			SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
+			SOSPermissionRoles sosPermissionRoles = sosPermissionsCreator.getRoles(true);
 
-		SOSPermissionJocCockpitMaster sosPermissionJocCockpitMaster = new SOSPermissionJocCockpitMaster();
+			SOSPermissionJocCockpitMaster sosPermissionJocCockpitMaster = new SOSPermissionJocCockpitMaster();
 
-		SOSPermissionJocCockpit sosPermissionJocCockpit = sosPermissionsCreator.getSosPermissionJocCockpit("");
-		sosPermissionJocCockpit.setSOSPermissionRoles(sosPermissionRoles);
-		sosPermissionJocCockpit.setPrecedence(-1);
-		sosPermissionJocCockpitMaster.setSOSPermissionJocCockpit(sosPermissionJocCockpit);
-		sosPermissionJocCockpitMaster.setJobSchedulerMaster("");
-		sosPermissionJocCockpitMasters.getSOSPermissionJocCockpitMaster().add(sosPermissionJocCockpitMaster);
-		unique.put("", "");
-		for (DBItemInventoryInstance instance : listOfInstances) {
-			sosPermissionJocCockpitMaster = new SOSPermissionJocCockpitMaster();
-
-			sosPermissionJocCockpit = sosPermissionsCreator.getSosPermissionJocCockpit(instance.getSchedulerId());
+			SOSPermissionJocCockpit sosPermissionJocCockpit = sosPermissionsCreator.getSosPermissionJocCockpit("");
 			sosPermissionJocCockpit.setSOSPermissionRoles(sosPermissionRoles);
-			sosPermissionJocCockpit.setPrecedence(instance.getPrecedence());
+			sosPermissionJocCockpit.setPrecedence(-1);
 			sosPermissionJocCockpitMaster.setSOSPermissionJocCockpit(sosPermissionJocCockpit);
-			sosPermissionJocCockpitMaster.setJobSchedulerMaster(instance.getSchedulerId());
-			if (unique.get(sosPermissionJocCockpitMaster.getJobSchedulerMaster()) == null) {
-				sosPermissionJocCockpitMasters.getSOSPermissionJocCockpitMaster().add(sosPermissionJocCockpitMaster);
-				unique.put(sosPermissionJocCockpitMaster.getJobSchedulerMaster(), "");
+			sosPermissionJocCockpitMaster.setJobSchedulerMaster("");
+			sosPermissionJocCockpitMasters.getSOSPermissionJocCockpitMaster().add(sosPermissionJocCockpitMaster);
+			unique.put("", "");
+			for (DBItemInventoryInstance instance : listOfInstances) {
+				sosPermissionJocCockpitMaster = new SOSPermissionJocCockpitMaster();
+
+				sosPermissionJocCockpit = sosPermissionsCreator.getSosPermissionJocCockpit(instance.getSchedulerId());
+				sosPermissionJocCockpit.setSOSPermissionRoles(sosPermissionRoles);
+				sosPermissionJocCockpit.setPrecedence(instance.getPrecedence());
+				sosPermissionJocCockpitMaster.setSOSPermissionJocCockpit(sosPermissionJocCockpit);
+				sosPermissionJocCockpitMaster.setJobSchedulerMaster(instance.getSchedulerId());
+				if (unique.get(sosPermissionJocCockpitMaster.getJobSchedulerMaster()) == null) {
+					sosPermissionJocCockpitMasters.getSOSPermissionJocCockpitMaster()
+							.add(sosPermissionJocCockpitMaster);
+					unique.put(sosPermissionJocCockpitMaster.getJobSchedulerMaster(), "");
+				}
 			}
+		} finally {
+			Globals.disconnect(session);
+			session = null;
 		}
 		return sosPermissionJocCockpitMasters;
 	}
@@ -159,31 +170,37 @@ public class SOSPermissionsCreator {
 
 		Map<String, String> unique = new HashMap<String, String>();
 		SOSHibernateSession session = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");
-		InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
-		Globals.beginTransaction(session);
-		List<DBItemInventoryInstance> listOfInstances = dbLayer.getInventoryInstances();
-		Globals.rollback(session);
-		session.close();
-		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
 		SOSPermissionCommandsMasters sosPermissionCommandsMasters = new SOSPermissionCommandsMasters();
+		try {
+			InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
+			Globals.beginTransaction(session);
+			List<DBItemInventoryInstance> listOfInstances = dbLayer.getInventoryInstances();
+			Globals.rollback(session);
+			session.close();
+			SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
 
-		SOSPermissionCommands sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands("");
-		SOSPermissionCommandsMaster sosPermissionCommandsMaster = new SOSPermissionCommandsMaster();
-		sosPermissionCommandsMaster.setSOSPermissionCommands(sosPermissionCommands);
-		sosPermissionCommandsMaster.setJobSchedulerMaster("");
-		sosPermissionCommandsMasters.getSOSPermissionCommandsMaster().add(sosPermissionCommandsMaster);
-		unique.put("", "");
-
-		for (DBItemInventoryInstance instance : listOfInstances) {
-			sosPermissionCommandsMaster = new SOSPermissionCommandsMaster();
-
-			sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands(instance.getSchedulerId());
+			SOSPermissionCommands sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands("");
+			SOSPermissionCommandsMaster sosPermissionCommandsMaster = new SOSPermissionCommandsMaster();
 			sosPermissionCommandsMaster.setSOSPermissionCommands(sosPermissionCommands);
-			sosPermissionCommandsMaster.setJobSchedulerMaster(instance.getSchedulerId());
-			if (unique.get(sosPermissionCommandsMaster.getJobSchedulerMaster()) == null) {
-				sosPermissionCommandsMasters.getSOSPermissionCommandsMaster().add(sosPermissionCommandsMaster);
-				unique.put(sosPermissionCommandsMaster.getJobSchedulerMaster(), "");
+			sosPermissionCommandsMaster.setJobSchedulerMaster("");
+			sosPermissionCommandsMasters.getSOSPermissionCommandsMaster().add(sosPermissionCommandsMaster);
+			unique.put("", "");
+
+			for (DBItemInventoryInstance instance : listOfInstances) {
+				sosPermissionCommandsMaster = new SOSPermissionCommandsMaster();
+
+				sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands(instance.getSchedulerId());
+				sosPermissionCommandsMaster.setSOSPermissionCommands(sosPermissionCommands);
+				sosPermissionCommandsMaster.setJobSchedulerMaster(instance.getSchedulerId());
+				if (unique.get(sosPermissionCommandsMaster.getJobSchedulerMaster()) == null) {
+					sosPermissionCommandsMasters.getSOSPermissionCommandsMaster().add(sosPermissionCommandsMaster);
+					unique.put(sosPermissionCommandsMaster.getJobSchedulerMaster(), "");
+				}
 			}
+
+		} finally {
+			Globals.disconnect(session);
+			session = null;
 		}
 		return sosPermissionCommandsMasters;
 	}
@@ -222,8 +239,8 @@ public class SOSPermissionsCreator {
 			sosPermissionJocCockpit.getRuntime().setExecute(o.createSOSPermissionJocCockpitRuntimeExecute());
 			sosPermissionJocCockpit.setJoc(o.createSOSPermissionJocCockpitJoc());
 			sosPermissionJocCockpit.getJoc().setView(o.createSOSPermissionJocCockpitJocView());
-			
-    		sosPermissionJocCockpit.setCalendar(o.createSOSPermissionJocCockpitCalendar());
+
+			sosPermissionJocCockpit.setCalendar(o.createSOSPermissionJocCockpitCalendar());
 			sosPermissionJocCockpit.getCalendar().setView(o.createSOSPermissionJocCockpitCalendarView());
 			sosPermissionJocCockpit.getCalendar().setEdit(o.createSOSPermissionJocCockpitCalendarEdit());
 			sosPermissionJocCockpit.getCalendar().getEdit()
@@ -295,8 +312,8 @@ public class SOSPermissionsCreator {
 			sosPermissionJocCockpit.getYADE().setView(o.createSOSPermissionJocCockpitYADEView());
 			sosPermissionJocCockpit.getYADE().setExecute(o.createSOSPermissionJocCockpitYADEExecute());
 
-			
-			sosPermissionJocCockpit.getJoc().getView().setLog(haveRight(masterId, "sos:products:joc_cockpit:joc:view:log"));
+			sosPermissionJocCockpit.getJoc().getView()
+					.setLog(haveRight(masterId, "sos:products:joc_cockpit:joc:view:log"));
 
 			sosPermissionJocCockpit.getJobschedulerMaster().getView()
 					.setStatus(haveRight(masterId, "sos:products:joc_cockpit:jobscheduler_master:view:status"));

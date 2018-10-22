@@ -298,7 +298,7 @@ public class SOSSecurityConfiguration {
 
 			return this.securityConfiguration;
 		} finally {
-			sosHibernateSession.close();
+			Globals.disconnect(sosHibernateSession);
 		}
 	}
 }

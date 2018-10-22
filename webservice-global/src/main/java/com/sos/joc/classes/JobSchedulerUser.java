@@ -43,14 +43,18 @@ public class JobSchedulerUser {
 	}
 
 	public DBItemInventoryInstance getSchedulerInstance(String jobSchedulerId) throws JocException {
-		if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerId) == null) {
-			SOSHibernateSession session = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");
-			InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
-			Globals.beginTransaction(session);
-			getSosShiroCurrentUser().addSchedulerInstanceDBItem(jobSchedulerId,
-					dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerId, getAccessToken()));
+		SOSHibernateSession session = null;
+		try {
+			if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerId) == null) {
+				session = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");
+				InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
+				Globals.beginTransaction(session);
+				getSosShiroCurrentUser().addSchedulerInstanceDBItem(jobSchedulerId,
+						dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerId, getAccessToken()));
+			}
+		} finally {
 			Globals.rollback(session);
-			session.close();
+			Globals.disconnect(session);
 		}
 		return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerId);
 	}
@@ -68,8 +72,7 @@ public class JobSchedulerUser {
 	}
 
 	public void setJocJsonCommands(Set<JOCJsonCommand> jocJsonCommands) {
-		sosShiroCurrentUser.setJocJsonCommands(jocJsonCommands);	
+		sosShiroCurrentUser.setJocJsonCommands(jocJsonCommands);
 	}
 
- 
 }
