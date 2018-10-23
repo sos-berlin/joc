@@ -45,7 +45,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
                 command.setUriBuilderForJobs();
                 command.addJobCompactQuery(jobFilter.getCompact());
                 jobFilter.setJob(jobPath);
-                JobsVCallable j = new JobsVCallable(jobFilter, command, accessToken, true);
+                JobsVCallable j = new JobsVCallable(jobFilter, command, accessToken, true, null);
                 entity.setJob(j.getJob());
 			}
 			entity.setDeliveryDate(new Date());

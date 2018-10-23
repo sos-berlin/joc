@@ -44,7 +44,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
 	            command.setUriBuilderForJobs();
 	            command.addJobCompactQuery(jobFilter.getCompact());
 	            jobFilter.setJob(jobPath);
-	            JobsVCallable j = new JobsVCallable(jobFilter, command, accessToken, false);
+	            JobsVCallable j = new JobsVCallable(jobFilter, command, accessToken, false, null);
 	            entity.setJob(j.getJob());
 			}
 			entity.setDeliveryDate(new Date());

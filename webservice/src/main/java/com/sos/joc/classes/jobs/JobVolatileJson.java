@@ -45,12 +45,14 @@ public class JobVolatileJson extends JobV {
     private final Boolean withOrderQueue;
     private JOCResourceImpl jocResourceImpl;
     private String accessToken = null;
+    private JsonObject summary = null;
     
-    public JobVolatileJson(JsonObject job) {
+    public JobVolatileJson(JsonObject job, JsonObject summary) {
         this.job = job;
         this.overview = getOrderOverview();
         this.orderJob = this.overview.getBoolean("isOrderJob", false);
         this.withOrderQueue = false;
+        this.summary = summary;
     }
     
     public JobVolatileJson(JsonObject job, Boolean withOrderQueue) {
@@ -58,6 +60,7 @@ public class JobVolatileJson extends JobV {
         this.overview = getOrderOverview();
         this.orderJob = this.overview.getBoolean("isOrderJob", false);
         this.withOrderQueue = withOrderQueue;
+        this.summary = null;
     }
     
     public boolean isOrderJob() {
@@ -306,18 +309,35 @@ public class JobVolatileJson extends JobV {
     
     private void setSummary() throws JocException {
         if (isOrderJob()) {
-            JOCJsonCommand jocJsonCommand = new JOCJsonCommand(jocResourceImpl);
-            jocJsonCommand.setUriBuilderForJobs();
-            jocJsonCommand.addOrderStatisticsQuery(false);
-            OrdersSnapshotEvent o = new OrdersSnapshotCallable(getPath(), jocJsonCommand, accessToken).getOrdersSnapshot();
-            OrdersSummary ordersSummary = new OrdersSummary();
-            ordersSummary.setPending(o.getPending());
-            ordersSummary.setSetback(o.getSetback());
-            ordersSummary.setRunning(o.getRunning());
-            ordersSummary.setSuspended(o.getSuspended());
-            ordersSummary.setWaitingForResource(o.getWaitingForResource());
-            setOrdersSummary(ordersSummary);
-        } 
+            JsonObject j = null;
+            if (summary != null) {
+                j = summary.getJsonObject(this.getPath());
+            }
+            if (j != null) {
+                OrdersSummary ordersSummary = new OrdersSummary();
+                ordersSummary.setBlacklist(j.getInt("blacklisted", 0));
+                ordersSummary.setPending(j.getInt("notPlanned", 0) + j.getInt("planned", 0));
+                ordersSummary.setSetback(j.getInt("setback", 0));
+                ordersSummary.setRunning(j.getInt("inTaskProcess", 0) + j.getInt("occupiedByClusterMember", 0));
+                ordersSummary.setSuspended(j.getInt("suspended", 0));
+                ordersSummary.setWaitingForResource(j.getInt("waitingForResource", 0) + j.getInt("due", 0) + j.getInt("inTask", 0) - j.getInt(
+                        "inTaskProcess", 0));
+                setOrdersSummary(ordersSummary);
+            } else {
+                JOCJsonCommand jocJsonCommand = new JOCJsonCommand(jocResourceImpl);
+                jocJsonCommand.setUriBuilderForJobs();
+                jocJsonCommand.addOrderStatisticsQuery(false);
+                OrdersSnapshotEvent o = new OrdersSnapshotCallable(getPath(), jocJsonCommand, accessToken).getOrdersSnapshot();
+                OrdersSummary ordersSummary = new OrdersSummary();
+                ordersSummary.setBlacklist(o.getBlacklist());
+                ordersSummary.setPending(o.getPending());
+                ordersSummary.setSetback(o.getSetback());
+                ordersSummary.setRunning(o.getRunning());
+                ordersSummary.setSuspended(o.getSuspended());
+                ordersSummary.setWaitingForResource(o.getWaitingForResource());
+                setOrdersSummary(ordersSummary);
+            }
+        }
     }
     
     private JsonObject getOrderOverview() {

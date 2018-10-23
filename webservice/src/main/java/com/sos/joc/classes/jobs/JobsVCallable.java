@@ -1,5 +1,6 @@
 package com.sos.joc.classes.jobs;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,8 +41,9 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
     private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
     private final Boolean suppressJobSchedulerObjectNotExistException;
+    private final JsonObject summary;
 
-    public JobsVCallable(JobFilter job, JOCJsonCommand jocJsonCommand, String accessToken, Boolean withOrderQueue) {
+    public JobsVCallable(JobFilter job, JOCJsonCommand jocJsonCommand, String accessToken, Boolean withOrderQueue, JsonObject summary) {
         this.job = job.getJob();
         this.folder = null;
         this.jobsBody = null;
@@ -50,9 +52,10 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = false;
         this.withOrderQueue = withOrderQueue;
+        this.summary = summary;
     }
     
-    public JobsVCallable(JobPath job, JobsFilter jobs, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public JobsVCallable(JobPath job, JobsFilter jobs, JOCJsonCommand jocJsonCommand, String accessToken, JsonObject summary) {
         this.job = job.getJob();
         this.folder = null;
         this.jobsBody = jobs;
@@ -61,9 +64,10 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
         this.withOrderQueue = false;
+        this.summary = summary;
     }
     
-    public JobsVCallable(Folder folder, JobsFilter jobs, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public JobsVCallable(Folder folder, JobsFilter jobs, JOCJsonCommand jocJsonCommand, String accessToken, JsonObject summary) {
         this.job = null;
         this.folder = folder;
         this.jobsBody = jobs;
@@ -72,6 +76,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
         this.withOrderQueue = false;
+        this.summary = summary;
     }
 
     @Override
@@ -138,7 +143,8 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         } else {
             List<JobStateText> filterStates = getFilterStates(processingStates);
             for (JsonObject jobsItem : json.getJsonArray("elements").getValuesAs(JsonObject.class)) {
-                JobVolatileJson job = new JobVolatileJson(jobsItem);
+                
+                JobVolatileJson job = new JobVolatileJson(jobsItem, summary);
                 job.setPath();
                 if (folder != null && "/scheduler_file_order_sink".equals(job.getPath())) {
                     continue; 

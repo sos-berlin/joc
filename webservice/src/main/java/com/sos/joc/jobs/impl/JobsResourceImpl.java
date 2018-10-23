@@ -11,6 +11,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SearchStringHelper;
@@ -82,6 +85,11 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 }
                 
             } else {
+                JOCJsonCommand jocSummaryCommand = new JOCJsonCommand(this);
+                jocSummaryCommand.setUriBuilderForJobs();
+                jocSummaryCommand.addOrderStatisticsQuery(false);
+                JsonObject summary = jocSummaryCommand.getJsonObjectFromPostWithRetry(getServiceBody("/"), accessToken);
+                
                 JOCJsonCommand command = new JOCJsonCommand(this);
                 command.setUriBuilderForJobs();
                 command.addJobCompactQuery(jobsFilter.getCompact());
@@ -89,21 +97,24 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 List<JobsVCallable> tasks = new ArrayList<JobsVCallable>();
                 
                 if (jobs != null && !jobs.isEmpty()) {
+                    Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                     for (JobPath job : jobs) {
-                        tasks.add(new JobsVCallable(job, jobsFilter, new JOCJsonCommand(command), accessToken));
+                        if (job != null && canAdd(job.getJob(), permittedFolders)) {
+                            tasks.add(new JobsVCallable(job, jobsFilter, new JOCJsonCommand(command), accessToken, summary));
+                        }
                     }
                 } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                     // no permission
                 } else if (folders != null && !folders.isEmpty()) {
                     for (Folder folder : folders) {
                         folder.setFolder(normalizeFolder(folder.getFolder()));
-                        tasks.add(new JobsVCallable(folder, jobsFilter, new JOCJsonCommand(command), accessToken));
+                        tasks.add(new JobsVCallable(folder, jobsFilter, new JOCJsonCommand(command), accessToken, summary));
                     }
                 } else {
                     Folder rootFolder = new Folder();
                     rootFolder.setFolder("/");
                     rootFolder.setRecursive(true);
-                    JobsVCallable callable = new JobsVCallable(rootFolder, jobsFilter, command, accessToken);
+                    JobsVCallable callable = new JobsVCallable(rootFolder, jobsFilter, command, accessToken, summary);
                     listJobs.putAll(callable.call());
                 }
                 
@@ -142,5 +153,11 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
         //} finally {
             //Globals.disconnect(connection);
         }
+    }
+    
+    private String getServiceBody(String path) {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("path", path);
+        return builder.build().toString();
     }
 }
