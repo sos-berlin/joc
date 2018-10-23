@@ -49,7 +49,7 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
             Integer countQueuedTasks = 0;
             Integer curRunningTasks = 0;
             Integer curQueuedTasks = 0;
-            NodeList jobStatistics = jocXmlCommand.getSosxml().selectNodeList("//job[not(@path='/scheduler_file_order_sink') and @enabled='yes']");
+            NodeList jobStatistics = jocXmlCommand.getSosxml().selectNodeList("//job[not(@path='/scheduler_file_order_sink') and not(@path='/scheduler_service_forwarder') and @enabled='yes']");
             Set<Folder> folders = folderPermissions.getListOfFolders();
             for (int i = 0; i < jobStatistics.getLength(); i++) {
                 Element job = (Element) jobStatistics.item(i);
