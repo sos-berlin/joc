@@ -140,9 +140,12 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
             for (JsonObject jobsItem : json.getJsonArray("elements").getValuesAs(JsonObject.class)) {
                 JobVolatileJson job = new JobVolatileJson(jobsItem);
                 job.setPath();
-                if ("/scheduler_file_order_sink".equals(job.getPath())) {
+                if (folder != null && "/scheduler_file_order_sink".equals(job.getPath())) {
                     continue; 
-                 }
+                }
+                if (folder != null && "/scheduler_service_forwarder".equals(job.getPath())) {
+                    continue; 
+                }
                 if (isOrderJob != null && isOrderJob != job.isOrderJob()) {
                     continue;
                 }
