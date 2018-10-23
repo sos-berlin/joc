@@ -85,10 +85,13 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 }
                 
             } else {
-                JOCJsonCommand jocSummaryCommand = new JOCJsonCommand(this);
-                jocSummaryCommand.setUriBuilderForJobs();
-                jocSummaryCommand.addOrderStatisticsQuery(false);
-                JsonObject summary = jocSummaryCommand.getJsonObjectFromPostWithRetry(getServiceBody("/"), accessToken);
+                JsonObject summary = null;
+                if (jobsFilter.getIsOrderJob() == null || jobsFilter.getIsOrderJob()) {
+                    JOCJsonCommand jocSummaryCommand = new JOCJsonCommand(this);
+                    jocSummaryCommand.setUriBuilderForJobs();
+                    jocSummaryCommand.addOrderStatisticsQuery(false);
+                    summary = jocSummaryCommand.getJsonObjectFromPostWithRetry(getServiceBody("/"), accessToken);
+                }
                 
                 JOCJsonCommand command = new JOCJsonCommand(this);
                 command.setUriBuilderForJobs();
