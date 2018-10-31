@@ -6,3 +6,4 @@ The response contains
   * cause
   * jobschedulerId
   * numOfSuccessfulTasks
+  * numOfJobs (number of distinct jobs per day)

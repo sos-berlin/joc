@@ -7,7 +7,8 @@
   "required": [
     "agent",
     "cause",
-    "numOfSuccessfulTasks"
+    "numOfSuccessfulTasks",
+    "numOfJobs"
   ],
   "properties": {
     "jobschedulerId": {
@@ -22,6 +23,9 @@
       "$ref": "../job/taskCause-schema.json"
     },
     "numOfSuccessfulTasks": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
+    "numOfJobs": {
       "$ref": "../common/nonNegativeLong-schema.json"
     }
   }
