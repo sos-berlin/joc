@@ -20,18 +20,12 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.event.EventSnapshot;
 import com.sos.joc.model.event.JobSchedulerEvent;
 
-public class EventCallableJobSchedulerStateChanged extends EventCallable implements Callable<JobSchedulerEvent> {
+public class EventCallablePassiveJobSchedulerStateChanged extends EventCallable implements Callable<JobSchedulerEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventCallableJobSchedulerStateChanged.class);
-    private final JobSchedulerEvent jobSchedulerEvent;
-    private final JOCJsonCommand command;
-    private final Session session;
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventCallablePassiveJobSchedulerStateChanged.class);
 
-    public EventCallableJobSchedulerStateChanged(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session, Long instanceId) {
+    public EventCallablePassiveJobSchedulerStateChanged(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session, Long instanceId) {
         super(command, jobSchedulerEvent, accessToken, session, instanceId);
-        this.command = command;
-        this.jobSchedulerEvent = jobSchedulerEvent;
-        this.session = session;
     }
 
     @Override
@@ -44,7 +38,7 @@ public class EventCallableJobSchedulerStateChanged extends EventCallable impleme
         return getEventSnapshotsMap(eventId).values();
     }
     
-    private Events nonEmptyEvent(Long newEventId, JsonObject json) {
+    protected Events nonEmptyEvent(Long newEventId, JsonObject json) {
         Events eventSnapshots = new Events();
         jobSchedulerEvent.setEventId(newEventId.toString());
         for (JsonObject event : json.getJsonArray("eventSnapshots").getValuesAs(JsonObject.class)) {
@@ -73,7 +67,7 @@ public class EventCallableJobSchedulerStateChanged extends EventCallable impleme
         return eventSnapshots;
     }
     
-    private Events getEventSnapshotsMap(String eventId) throws JocException {
+    protected Events getEventSnapshotsMap(String eventId) throws JocException {
         Events eventSnapshots = new Events();
         checkTimeout();
         try {

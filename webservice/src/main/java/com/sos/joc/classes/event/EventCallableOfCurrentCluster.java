@@ -33,7 +33,7 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
     private String jobSchedulerId = null;
     private String eventId = null;
     private Session shiroSession = null;
-    private SOSHibernateSession session = null;
+    private SOSHibernateSession connection = null;
     private final SOSShiroCurrentUser shiroUser;
     
     public EventCallableOfCurrentCluster(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
@@ -91,14 +91,14 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
             curInstance = Globals.urlFromJobSchedulerId.get(jobSchedulerId);
         }
         try {
-            if (session == null) {
-                session = Globals.createSosHibernateStatelessConnection("eventClusterCallable-" + jobSchedulerId);
+            if (connection == null) {
+                connection = Globals.createSosHibernateStatelessConnection("eventClusterCallable-" + jobSchedulerId);
             }
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
-            Globals.beginTransaction(session);
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+            Globals.beginTransaction(connection);
             DBItemInventoryInstance inst = dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerId, accessToken, curInstance);
             shiroUser.addSchedulerInstanceDBItem(jobSchedulerId, inst);
-            Globals.rollback(session);
+            Globals.rollback(connection);
             Globals.urlFromJobSchedulerId.put(jobSchedulerId, inst);
             if (isCurrent && inst != null && !inst.equals(curInstance)) {
                 EventSnapshot masterChangedEventSnapshot = new EventSnapshot();
@@ -109,8 +109,8 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
             }
         } catch (Exception e) {
         } finally {
-            Globals.disconnect(session);
-            session = null;
+            Globals.disconnect(connection);
+            connection = null;
         }
         return events;
     }

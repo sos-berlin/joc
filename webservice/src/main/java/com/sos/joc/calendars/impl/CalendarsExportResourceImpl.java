@@ -15,8 +15,6 @@ import javax.ws.rs.Path;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemCalendar;
-import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.joc.Globals;

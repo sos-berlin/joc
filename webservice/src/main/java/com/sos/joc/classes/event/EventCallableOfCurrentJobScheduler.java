@@ -42,13 +42,8 @@ import com.sos.joc.model.event.NodeTransitionType;
 public class EventCallableOfCurrentJobScheduler extends EventCallable implements Callable<JobSchedulerEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventCallableOfCurrentJobScheduler.class);
-    private final String accessToken;
-    private final JobSchedulerEvent jobSchedulerEvent;
-    private final JOCJsonCommand command;
     private final SOSShiroCurrentUser shiroUser;
     private final Map<String, Set<String>> nestedJobChains;
-    private final Long instanceId;
-    private final Session session;
     private String eventId = null;
     private SOSHibernateSession connection = null;
     private Set<String> removedObjects = new HashSet<String>();
@@ -58,15 +53,9 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
     public EventCallableOfCurrentJobScheduler(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
             Long instanceId, SOSShiroCurrentUser shiroUser, Map<String, Set<String>> nestedJobChains) {
         super(command, jobSchedulerEvent, accessToken, session, instanceId);
-        // this.accessToken = accessToken;
-        this.accessToken = accessToken;
-        this.command = command;
-        this.jobSchedulerEvent = jobSchedulerEvent;
         this.eventId = jobSchedulerEvent.getEventId();
         this.shiroUser = shiroUser;
         this.nestedJobChains = nestedJobChains;
-        this.instanceId = instanceId;
-        this.session = session;
     }
 
     @Override

@@ -315,5 +315,42 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+
+    public List<String> getDistributedJobChains(Long instanceId) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select name from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" where distributed = 1 and instanceId = :instanceId");
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<String> result = getSession().getResultList(query);
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public List<String> getDistributedJobs(Long instanceId) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select jcn.jobName from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" jcn, ").append(DBITEM_INVENTORY_JOB_CHAINS);
+            sql.append(" jc").append(" where jcn.jobChainId = jc.id and jcn.instanceId = :instanceId and jcn.nodeType = 1 and jc.distributed = 1");
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<String> result = getSession().getResultList(query);
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
     
 }

@@ -35,11 +35,11 @@ import com.sos.joc.model.event.NodeTransitionType;
 public class EventCallable implements Callable<JobSchedulerEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventCallable.class);
-    private final String accessToken;
-    private final JobSchedulerEvent jobSchedulerEvent;
-    private final JOCJsonCommand command;
-    private final Session session;
-    private final Long instanceId;
+    public final String accessToken;
+    public final JobSchedulerEvent jobSchedulerEvent;
+    public final JOCJsonCommand command;
+    public final Session session;
+    public final Long instanceId;
     private Long startTime = 0L;
     private SOSHibernateSession connection = null;
 
