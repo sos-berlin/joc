@@ -14,18 +14,18 @@ import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 
 public class InventoryJobsDBLayerTest {
-    private static final String LDAP_PASSWORD = "sos01";
-    private static final String LDAP_USER = "SOS01";
+    private static final String PASSWORD = "root";
+    private static final String USER = "root";
 
     @Test
     public void getJobSchedulerJobs() throws Exception {
         InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection("InventoryInstancesDBLayer"));
-        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current", getAccessToken());
+        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler.1.12", getAccessToken());
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.createSosHibernateStatelessConnection("InventoryJobsDBLayer"));
         
         List<DBItemInventoryJob>  listOfJobs = dbLayer.getInventoryJobs(instance.getId());
         
-        assertEquals("getJobSchedulerJobs", "batch_install_universal_agent/PerformInstall", listOfJobs.get(0).getName());
+        assertEquals("getJobSchedulerJobs", false, listOfJobs.isEmpty());
 
     }
     
@@ -33,14 +33,14 @@ public class InventoryJobsDBLayerTest {
     @Test
     public void getJobSchedulerJob() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        sosServicePermissionShiro.loginPost("", USER, PASSWORD).getEntity();
         InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection("InventoryInstancesDBLayer"));
-        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current", getAccessToken());
+        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler.1.12", getAccessToken());
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.createSosHibernateStatelessConnection("InventoryJobsDBLayer"));
         
-        DBItemInventoryJob job = dbLayer.getInventoryJobByName("batch_install_universal_agent/PerformInstall", instance.getId());
+        DBItemInventoryJob job = dbLayer.getInventoryJobByName("/sos/dailyplan/CreateDailyPlan", instance.getId());
         
-        assertEquals("getJobSchedulerJob", "PerformInstall", job.getBaseName());
+        assertEquals("getJobSchedulerJob", "CreateDailyPlan", job.getBaseName());
 
     }
 

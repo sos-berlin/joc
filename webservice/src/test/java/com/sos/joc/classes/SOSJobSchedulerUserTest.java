@@ -13,19 +13,19 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 public class SOSJobSchedulerUserTest {
  
 
-    private static final String LDAP_PASSWORD = "sos01";
-    private static final String LDAP_USER = "SOS01";
+    private static final String PASSWORD = "root";
+    private static final String USER = "root";
 
     @Test
 
     public void getJobSchedulerInstance() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", USER, PASSWORD).getEntity();
 
         JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(sosShiroCurrentUserAnswer.getAccessToken());
 
-        DBItemInventoryInstance schedulerInstancesDBItem = sosJobschedulerUser.getSchedulerInstance("scheduler_current");
-        assertEquals("getJobSchedulerInstance", "http://localhost:4444", schedulerInstancesDBItem.getUrl());
+        DBItemInventoryInstance schedulerInstancesDBItem = sosJobschedulerUser.getSchedulerInstance("scheduler.1.12");
+        assertEquals("getJobSchedulerInstance", "http://galadriel:40412", schedulerInstancesDBItem.getUrl());
 
     }
 }

@@ -1,6 +1,7 @@
 package com.sos.joc.classes;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
@@ -32,10 +33,11 @@ public class ConfigurationStatusTest {
 //    };
     
     @Test
+    @Ignore
     public void getConfigurationStatusFromOrderTest() throws Exception{
         StringBuffer s = new StringBuffer();
         s.append("<order>");
-        s.append("<file_based state=\"not_initialized\">");
+        s.append("<file_based state=\"error\">");
         s.append("<requisites/>");
         s.append("</file_based>");
         s.append("</order>");

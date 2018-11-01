@@ -14,15 +14,15 @@ import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.job.JobConfigurationFilter;
  
 public class JobResourceConfigurationImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
+    private static final String PASSWORD = "root";
+    private static final String USER = "root";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceConfigurationImplTest.class);
-    private static final String SCHEDULER_ID = "scheduler_4444";
+    private static final String SCHEDULER_ID = "scheduler_1.12";
      
     @Test
     public void postJobConfigurationDefaultTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", USER, PASSWORD).getEntity();
         JobConfigurationFilter jobConfigurationFilterSchema = new JobConfigurationFilter();
         jobConfigurationFilterSchema.setJob("check_history/check");
         jobConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
@@ -35,7 +35,7 @@ public class JobResourceConfigurationImplTest {
     @Test
     public void postJobConfigurationHtmlTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", USER, PASSWORD).getEntity();
         JobConfigurationFilter jobConfigurationFilterSchema = new JobConfigurationFilter();
         jobConfigurationFilterSchema.setJob("check_history/check");
         jobConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);

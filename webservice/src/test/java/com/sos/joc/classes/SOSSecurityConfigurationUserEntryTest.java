@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import com.sos.joc.Globals;
 import com.sos.joc.classes.security.SOSSecurityConfigurationUserEntry;
+import com.sos.joc.classes.security.SOSSecurityHashSettings;
 
 
 public class SOSSecurityConfigurationUserEntryTest {
@@ -16,9 +17,10 @@ public class SOSSecurityConfigurationUserEntryTest {
         if (Globals.sosShiroProperties == null) {
             Globals.sosShiroProperties = new JocCockpitProperties();
         }
-        SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry("",null,null);
+        SOSSecurityHashSettings sosSecurityHashSettings = new SOSSecurityHashSettings();
+        SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry("",null,sosSecurityHashSettings);
         String s = sosSecurityConfigurationUserEntry.crypt("root");
-        Assert.assertEquals("Crypt","", s);
+        Assert.assertEquals("Crypt","root", s);
 
     }
 
