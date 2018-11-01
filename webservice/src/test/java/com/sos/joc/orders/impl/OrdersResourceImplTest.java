@@ -20,7 +20,7 @@ import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersV;
 
 public class OrdersResourceImplTest {
-    private static final String LDAP_PASSWORD = "secret";
+    private static final String LDAP_PASSWORD = "root";
     private static final String LDAP_USER = "root";
      
     @Test
@@ -28,7 +28,7 @@ public class OrdersResourceImplTest {
          
         OrdersFilter ordersBody = new OrdersFilter();
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
+        //assertEquals("postOrdersTest","/06_YADEFileTransfer/01_yade_file_transfer", ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
@@ -116,7 +116,7 @@ public class OrdersResourceImplTest {
     }
     
     private OrdersV TestHelper(OrdersFilter ordersBody) throws Exception {
-        ordersBody.setJobschedulerId("scheduler.1.10");
+        ordersBody.setJobschedulerId("scheduler.1.12");
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrdersResourceImpl ordersImpl = new OrdersResourceImpl();

@@ -13,15 +13,15 @@ import com.sos.joc.model.lock.LocksFilter;
 import com.sos.joc.model.lock.LocksV;
 
 public class LocksResourceImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
+    private static final String PASSWORD = "root";
+    private static final String USER = "root";
     private static final Logger LOGGER = LoggerFactory.getLogger(LocksResourceImplTest.class);
-    private static final String SCHEDULER_ID = "scheduler_4444";
+    private static final String SCHEDULER_ID = "scheduler.1.12";
 
     @Test
     public void postLocksTest() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", USER, PASSWORD).getEntity();
         LocksFilter locksFilterSchema = new LocksFilter();
         locksFilterSchema.setJobschedulerId(SCHEDULER_ID);
         LocksResourceImpl locksResourceImpl = new LocksResourceImpl();
