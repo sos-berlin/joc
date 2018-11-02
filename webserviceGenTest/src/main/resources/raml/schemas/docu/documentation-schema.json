@@ -1,0 +1,30 @@
+{
+  "title": "documentation",
+  "id": "schemas/docu/documentation",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.docu.Documentation",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "$ref": "mimeType-schema.json"
+    },
+    "title": {
+      "type": "string"
+    },
+    "usedBy": {
+      "type": "array",
+      "item": {
+      	"$ref": "../common/path-schema.json"
+      }
+    }
+  }
+}
