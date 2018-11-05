@@ -1,28 +1,29 @@
 package com.sos.joc.order.impl;
- 
+
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
- 
+
 public class OrderLogHtmlResourceImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
     @Test
-    public void postOrderLogHtmlTest() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
-         
+    public void postOrderLogHtmlTest() throws Exception {
+
         OrderLogResourceImpl orderLogHtmlImpl = new OrderLogResourceImpl();
-        JOCDefaultResponse ordersResponse = orderLogHtmlImpl.getOrderLogHtml(sosShiroCurrentUserAnswer.getAccessToken(), "", "scheduler_current","orderId", "jobChain","0", null);
+        JOCDefaultResponse ordersResponse = orderLogHtmlImpl.getOrderLogHtml(accessToken, "", GlobalsTest.SCHEDULER_ID, GlobalsTest.ORDER, GlobalsTest.JOB_CHAIN, "0", null);
         String logContentSchema = (String) ordersResponse.getEntity();
-        assertEquals("postOrderLogHtmlTest","<html><body>myLog</body></html>", logContentSchema);
-     }
+        assertEquals("postOrderLogHtmlTest", "<!DOCT", logContentSchema.substring(0, 6));
+    }
 
 }
-

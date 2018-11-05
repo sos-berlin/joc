@@ -1,31 +1,39 @@
 package com.sos.joc.order.impl;
  
 import static org.junit.Assert.*;
- 
+
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.order.OrderFilter;
 
 public class OrderRuntimeResourceImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+    private String accessToken;
+    
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
     @Test
     public void postOrderRunTimeTest() throws Exception   {
          
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrderFilter orderFilterSchema = new OrderFilter();
-        orderFilterSchema.setJobChain("Cluster/cluster/job_chain1");
-        orderFilterSchema.setOrderId("8");
-        orderFilterSchema.setJobschedulerId("scheduler_current");
+        orderFilterSchema.setJobChain(GlobalsTest.JOB_CHAIN);
+        orderFilterSchema.setOrderId(GlobalsTest.ORDER);
+        orderFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
         OrderRunTimeResourceImpl orderRunTimeImpl = new OrderRunTimeResourceImpl();
-        JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(sosShiroCurrentUserAnswer.getAccessToken(), orderFilterSchema);
+        JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(accessToken, orderFilterSchema);
         RunTime200 orderRunTimeSchema = (RunTime200) ordersResponse.getEntity();
-        assertEquals("postOrderRunTimeTest","myRuntime", orderRunTimeSchema.getRunTime().getRunTime());
+        assertEquals("postOrderRunTimeTest","<run_time>\r\n" + 
+                "        <weekdays>\r\n" + 
+                "            <day day=\"1 2 3 4 5 6 7\">\r\n" + 
+                "                <period single_start=\"00:01\"/>\r\n" + 
+                "            </day>\r\n" + 
+                "        </weekdays>\r\n" + 
+                "    </run_time>", orderRunTimeSchema.getRunTime().getRunTime());
      }
 
 }

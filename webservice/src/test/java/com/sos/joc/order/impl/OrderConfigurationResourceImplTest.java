@@ -1,31 +1,35 @@
 package com.sos.joc.order.impl;
  
 import static org.junit.Assert.*;
- 
+
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.order.OrderConfigurationFilter;
 
 public class OrderConfigurationResourceImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+    
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
+    
     @Test
     public void postOrderConfTest() throws Exception   {
          
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrderConfigurationFilter orderConfigurationBody = new OrderConfigurationFilter();
-        orderConfigurationBody.setJobChain("/webservice/setback");
-        orderConfigurationBody.setOrderId("1");
-        orderConfigurationBody.setJobschedulerId("scheduler.1.10");
+        orderConfigurationBody.setJobChain(GlobalsTest.JOB_CHAIN);
+        orderConfigurationBody.setOrderId(GlobalsTest.ORDER);
+        orderConfigurationBody.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
         OrderConfigurationResourceImpl orderConfigurationImpl = new OrderConfigurationResourceImpl();
-        JOCDefaultResponse ordersResponse = orderConfigurationImpl.postOrderConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), orderConfigurationBody);
+        JOCDefaultResponse ordersResponse = orderConfigurationImpl.postOrderConfiguration(accessToken, orderConfigurationBody);
         Configuration200 orderConfigurationSchema = (Configuration200) ordersResponse.getEntity();
-        assertEquals("postOrderConfTest","/webservice/setback,1", orderConfigurationSchema.getConfiguration().getPath());
+        assertEquals("postOrderConfTest",GlobalsTest.JOB_CHAIN + "," + GlobalsTest.ORDER, orderConfigurationSchema.getConfiguration().getPath());
      }
 
 }

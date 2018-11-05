@@ -2,29 +2,34 @@ package com.sos.joc.job.impl;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+
+import com.sos.joc.Globals;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryFilter;
 
 public class JobResourceHistoryImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
+    private String accessToken;
+    
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
 
     @Test
     public void postJobHistoryTest() throws Exception {
 
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         TaskHistoryFilter jobHistoryFilterSchema = new TaskHistoryFilter();
-        jobHistoryFilterSchema.setJobschedulerId("scheduler_current");
-        jobHistoryFilterSchema.setJob("job1");
+        jobHistoryFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        jobHistoryFilterSchema.setJob(GlobalsTest.JOB);
         JobResourceHistoryImpl jobHistoryImpl = new JobResourceHistoryImpl();
-        JOCDefaultResponse jobsResponse = jobHistoryImpl.postJobHistory(sosShiroCurrentUserAnswer.getAccessToken(), jobHistoryFilterSchema);
+        JOCDefaultResponse jobsResponse = jobHistoryImpl.postJobHistory(accessToken, jobHistoryFilterSchema);
         TaskHistory history = (TaskHistory) jobsResponse.getEntity();
-        assertEquals("postJobHistoryTest", "job1", history.getHistory().get(0).getJob());
+        assertEquals("postJobHistoryTest", GlobalsTest.JOB, Globals.normalizePath(history.getHistory().get(0).getJob()));
     }
 
 }

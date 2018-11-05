@@ -1,30 +1,28 @@
 package com.sos.joc.classes;
 
 import static org.junit.Assert.*;
-
- 
+import org.junit.Before;
 import org.junit.Test;
-
-import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.GlobalsTest;
 
  
 public class SOSJobSchedulerUserTest {
  
-
-    private static final String PASSWORD = "root";
-    private static final String USER = "root";
+ 
+    private String accessToken;
+    
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
 
     @Test
-
     public void getJobSchedulerInstance() throws Exception {
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", USER, PASSWORD).getEntity();
 
-        JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(sosShiroCurrentUserAnswer.getAccessToken());
+        JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(accessToken);
 
-        DBItemInventoryInstance schedulerInstancesDBItem = sosJobschedulerUser.getSchedulerInstance("scheduler.1.12");
+        DBItemInventoryInstance schedulerInstancesDBItem = sosJobschedulerUser.getSchedulerInstance(GlobalsTest.SCHEDULER_ID);
         assertEquals("getJobSchedulerInstance", "http://galadriel:40412", schedulerInstancesDBItem.getUrl());
 
     }

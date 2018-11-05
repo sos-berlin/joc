@@ -2,28 +2,40 @@ package com.sos.joc.jobchains.impl;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.model.jobChain.JobChainPath;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.jobChain.JobChainsV;
 
 public class JobChainsResourceImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
+
+    private String accessToken;
+    
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
 
     @Test
     public void postJobChainsTest() throws Exception {
 
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobChainsFilter jobChainsFilterSchema = new JobChainsFilter();
-        jobChainsFilterSchema.setJobschedulerId("scheduler_current");
+        jobChainsFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        List<JobChainPath> jobChains = new  ArrayList<JobChainPath>();
+        JobChainPath jobChainPath = new JobChainPath();
+        jobChainPath.setJobChain(GlobalsTest.JOB_CHAIN);
+        jobChains.add(jobChainPath);
+        jobChainsFilterSchema.setJobChains(jobChains);
         JobChainsResourceImpl jobChainsImpl = new JobChainsResourceImpl();
-        JOCDefaultResponse jobsResponse = jobChainsImpl.postJobChains(sosShiroCurrentUserAnswer.getAccessToken(), jobChainsFilterSchema);
+        JOCDefaultResponse jobsResponse = jobChainsImpl.postJobChains(accessToken, jobChainsFilterSchema);
         JobChainsV jobChainsVSchema = (JobChainsV) jobsResponse.getEntity();
-        assertEquals("postJobChainsTest", "myPath", jobChainsVSchema.getJobChains().get(0).getPath());
+        assertEquals("postJobChainsTest", GlobalsTest.JOB_CHAIN, jobChainsVSchema.getJobChains().get(0).getPath());
     }
 
 }

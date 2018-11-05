@@ -1,33 +1,35 @@
 package com.sos.joc.order.impl;
- 
+
 import static org.junit.Assert.*;
- 
+
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.order.OrderV200;
 import com.sos.joc.model.order.OrderFilter;
 
 public class OrderResourceImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
     @Test
-    public void postOrderTest() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postOrderTest() throws Exception {
+
         OrderFilter orderBody = new OrderFilter();
-        orderBody.setJobschedulerId("scheduler.1.10");
-        orderBody.setJobChain("/webservice/setback");
-        orderBody.setOrderId("1");
+        orderBody.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        orderBody.setJobChain(GlobalsTest.JOB_CHAIN);
+        orderBody.setOrderId(GlobalsTest.ORDER);
         OrderResourceImpl orderImpl = new OrderResourceImpl();
-        JOCDefaultResponse ordersResponse = orderImpl.postOrder(sosShiroCurrentUserAnswer.getAccessToken(), orderBody);
+        JOCDefaultResponse ordersResponse = orderImpl.postOrder(accessToken, orderBody);
         OrderV200 order200VSchema = (OrderV200) ordersResponse.getEntity();
-        //System.out.println(order200VSchema.getOrder().toString());
-        //assertEquals("postOrderTest",-1, order200VSchema.getOrder().getHistoryId().intValue());
-     }
+        // System.out.println(order200VSchema.getOrder().toString());
+        assertEquals("postOrderTest", GlobalsTest.JOB_CHAIN, order200VSchema.getOrder().getJobChain());
+    }
 
 }
-

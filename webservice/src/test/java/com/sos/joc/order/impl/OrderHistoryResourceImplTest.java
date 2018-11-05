@@ -1,33 +1,35 @@
 package com.sos.joc.order.impl;
- 
+
 import static org.junit.Assert.*;
- 
+
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.order.OrderHistoryFilter;
 import com.sos.joc.model.order.OrderStepHistory;
 
 public class OrderHistoryResourceImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
     @Test
-    public void postOrderHistoryTest() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postOrderHistoryTest() throws Exception {
+
         OrderHistoryFilter orderFilterSchema = new OrderHistoryFilter();
-        orderFilterSchema.setJobChain("Cluster/cluster/job_chain1");
-        orderFilterSchema.setOrderId("8");
-        orderFilterSchema.setJobschedulerId("scheduler_joc_cockpit");
-        orderFilterSchema.setHistoryId("690");
+        orderFilterSchema.setJobChain(GlobalsTest.JOB_CHAIN);
+        orderFilterSchema.setOrderId(GlobalsTest.ORDER);
+        orderFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        orderFilterSchema.setHistoryId(GlobalsTest.VALID_HISTORY_ID);
         OrderHistoryResourceImpl orderHistoryImpl = new OrderHistoryResourceImpl();
-        JOCDefaultResponse ordersResponse = orderHistoryImpl.postOrderHistory(sosShiroCurrentUserAnswer.getAccessToken(), orderFilterSchema);
+        JOCDefaultResponse ordersResponse = orderHistoryImpl.postOrderHistory(accessToken, orderFilterSchema);
         OrderStepHistory stepHistorySchema = (OrderStepHistory) ordersResponse.getEntity();
-        assertEquals("postOrderHistoryTest",2, stepHistorySchema.getHistory().getSteps().get(1).getStep().intValue());
-     }
+        assertEquals("postOrderHistoryTest", 1, stepHistorySchema.getHistory().getSteps().get(0).getStep().intValue());
+    }
 
 }
-

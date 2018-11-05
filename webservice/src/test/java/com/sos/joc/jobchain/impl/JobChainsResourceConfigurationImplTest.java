@@ -2,30 +2,32 @@ package com.sos.joc.jobchain.impl;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
-
-import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.jobChain.JobChainConfigurationFilter;
 
 public class JobChainsResourceConfigurationImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
 
     @Test
     public void postJobChainConfigurationTest() throws Exception {
 
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobChainConfigurationFilter jobChainFilterSchema = new JobChainConfigurationFilter();
-        jobChainFilterSchema.setJobschedulerId("scheduler.1.10");
-        jobChainFilterSchema.setJobChain("/webservice/setback");
+        jobChainFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        jobChainFilterSchema.setJobChain(GlobalsTest.JOB_CHAIN);
         JobChainResourceConfigurationImpl jobChainsImpl = new JobChainResourceConfigurationImpl();
-        JOCDefaultResponse response = jobChainsImpl.postJobChainConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), jobChainFilterSchema);
+        JOCDefaultResponse response = jobChainsImpl.postJobChainConfiguration(accessToken, jobChainFilterSchema);
         Configuration200 configurationSchema = (Configuration200) response.getEntity();
-        assertEquals("postJobChainConfigurationTest", 116, configurationSchema.getConfiguration().getConfigurationDate().getYear());
+        assertEquals("postJobChainConfigurationTest", GlobalsTest.JOB_CHAIN, configurationSchema.getConfiguration().getPath());
     }
 
 }
