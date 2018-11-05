@@ -65,6 +65,7 @@ resourceTypes:
   - postForDownload: !include resourceTypes/common/postForDownload.raml
   - postForUpload: !include resourceTypes/common/postForUpload.raml
   - postLog: !include resourceTypes/common/postLog.raml
+  - postDocu: !include resourceTypes/docu/postDocu.raml
   - login: !include resourceTypes/user/login.raml
   - logout: !include resourceTypes/user/logout.raml
   - postEvent: !include resourceTypes/common/postEvent.raml
@@ -2354,3 +2355,47 @@ traits:
         audit: !include documentation/audit/auditLog.md
         example: !include examples/calendar/calendarRename-example.json
      
+/documentations:
+  type:
+    postJSON:
+      description: Sends collection of documentations
+      description1: !include documentation/common/compact.md
+      description2: !include documentation/common/regex.md
+      description3: !include documentation/common/folders.md
+      description4: " "
+      description5: " "
+      description6: !include documentation/docu/filteredByPaths.md
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: !include documentation/docu/docu.md
+      schema: !include schemas/docu/documentationsFilter-schema.json
+      schema200: !include schemas/docu/documentations-schema.json
+      example: " "
+      example200: " "
+
+/documentation:
+  type:
+    postDocu:
+      schema: !include schemas/docu/documentationContent-schema.json
+      example: " "
+  /export:
+    type:
+      postDocu:
+        schema: !include schemas/docu/documentationContent-schema.json
+        example: " "
+  /import:
+    type:
+#      postCalendarWithOkResponse:
+      postForUpload:
+        description: Import Documentation
+#        description1: !include documentation/calendar/calendarsObj.md
+#        description2: " "
+#        description3: " "
+#        description4: " "
+#        description200: " "
+#        schema: !include schemas/calendar/calendarImportFilter-schema.json
+#        audit: !include documentation/audit/auditLog.md
+#        example: " "
+

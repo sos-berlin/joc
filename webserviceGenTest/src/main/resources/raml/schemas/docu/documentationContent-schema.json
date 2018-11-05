@@ -1,0 +1,22 @@
+{
+  "title": "Documentation content filter",
+  "id": "schemas/docu/documentationContent",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.docu.DocumentationContentFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
+    },
+    "html": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
