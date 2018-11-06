@@ -14,36 +14,33 @@ import com.sos.joc.GlobalsTest;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 
 public class InventoryJobsDBLayerTest {
- 
-     
+
     @Before
     public void setUp() throws Exception {
         GlobalsTest.getAccessToken();
     }
 
-    
     @Test
     public void getJobSchedulerJobs() throws Exception {
-        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection("InventoryInstancesDBLayer"));
+        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection(
+                "InventoryInstancesDBLayer"));
         DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(GlobalsTest.SCHEDULER_ID, getAccessToken());
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.createSosHibernateStatelessConnection("InventoryJobsDBLayer"));
-        
-        List<DBItemInventoryJob>  listOfJobs = dbLayer.getInventoryJobs(instance.getId());
-        
+
+        List<DBItemInventoryJob> listOfJobs = dbLayer.getInventoryJobs(instance.getId());
         assertEquals("getJobSchedulerJobs", false, listOfJobs.isEmpty());
 
     }
-    
-    
+
     @Test
     public void getJobSchedulerJob() throws Exception {
-        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection("InventoryInstancesDBLayer"));
+        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection(
+                "InventoryInstancesDBLayer"));
         DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(GlobalsTest.SCHEDULER_ID, getAccessToken());
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.createSosHibernateStatelessConnection("InventoryJobsDBLayer"));
-        
+
         DBItemInventoryJob job = dbLayer.getInventoryJobByName(GlobalsTest.JOB_CHAIN, instance.getId());
-        
-        assertEquals("getJobSchedulerJob", GlobalsTest.JOB_CHAIN, job.getBaseName());
+        assertEquals("getJobSchedulerJob", GlobalsTest.JOB, job.getName());
 
     }
 

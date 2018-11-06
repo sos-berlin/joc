@@ -8,11 +8,10 @@ import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.junit.Before;
 import org.junit.Test;
-
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrderType;
@@ -20,23 +19,21 @@ import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersV;
 
 public class OrdersResourceImplTest {
-    private static final String LDAP_PASSWORD = "root";
-    private static final String LDAP_USER = "root";
-     
-    @Test
-    public void postOrdersTest() throws Exception   {
-         
-        OrdersFilter ordersBody = new OrdersFilter();
-        OrdersV ordersVSchema = TestHelper(ordersBody);
-        //assertEquals("postOrdersTest","/06_YADEFileTransfer/01_yade_file_transfer", ordersVSchema.getOrders().get(0).getJob());
-    }
     
+    private String accessToken;
+    
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
+     
     @Test
     public void postOrdersTest2() throws Exception   {
          
         OrdersFilter ordersBody = new OrdersFilter();
         Folder folder = new Folder();
-        folder.setFolder("/webservice");
+        folder.setFolder(GlobalsTest.JOB_CHAIN_FOLDER);
         Folder folder2 = new Folder();
         folder2.setFolder("/examples");
         folder2.setRecursive(false);
@@ -44,7 +41,7 @@ public class OrdersResourceImplTest {
         folders.add(folder);
         folders.add(folder2);
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",GlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
@@ -52,15 +49,15 @@ public class OrdersResourceImplTest {
          
         OrdersFilter ordersBody = new OrdersFilter();
         Folder folder = new Folder();
-        folder.setFolder("/webservice");
+        folder.setFolder(GlobalsTest.JOB_CHAIN_FOLDER);
         Folder folder2 = new Folder();
         folder2.setFolder("/examples");
         List<Folder> folders = ordersBody.getFolders();
         folders.add(folder);
         folders.add(folder2);
-        ordersBody.setRegex("SplitAndSync");
+        ordersBody.setRegex("Create");
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",GlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
@@ -68,20 +65,20 @@ public class OrdersResourceImplTest {
          
         OrdersFilter ordersBody = new OrdersFilter();
         Folder folder = new Folder();
-        folder.setFolder("/webservice");
+        folder.setFolder(GlobalsTest.JOB_CHAIN_FOLDER);
         Folder folder2 = new Folder();
         folder2.setFolder("/examples");
         List<Folder> folders = ordersBody.getFolders();
         folders.add(folder);
         folders.add(folder2);
-        ordersBody.setRegex("SplitAndSync");
+        ordersBody.setRegex("Create");
         List<OrderPath> orders = ordersBody.getOrders();
         OrderPath order = new OrderPath();
-        order.setJobChain("/webservice/setback");
-        order.setOrderId("2");
+        order.setJobChain(GlobalsTest.JOB_CHAIN);
+        order.setOrderId(GlobalsTest.ORDER);
         orders.add(order);
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",GlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
@@ -89,7 +86,7 @@ public class OrdersResourceImplTest {
          
         OrdersFilter ordersBody = new OrdersFilter();
         Folder folder = new Folder();
-        folder.setFolder("/webservice");
+        folder.setFolder(GlobalsTest.JOB_CHAIN_FOLDER);
         Folder folder2 = new Folder();
         folder2.setFolder("/examples");
         List<Folder> folders = ordersBody.getFolders();
@@ -99,7 +96,7 @@ public class OrdersResourceImplTest {
         types.add(OrderType.AD_HOC);
         ordersBody.setTypes(types);
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",GlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
@@ -108,19 +105,17 @@ public class OrdersResourceImplTest {
         OrdersFilter ordersBody = new OrdersFilter();
         List<OrderPath> orders = ordersBody.getOrders();
         OrderPath order = new OrderPath();
-        order.setJobChain("/webservice/setbac");
-        order.setOrderId("unknown");
+        order.setJobChain(GlobalsTest.JOB_CHAIN);
+        order.setOrderId(GlobalsTest.ORDER);
         orders.add(order);
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",GlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     private OrdersV TestHelper(OrdersFilter ordersBody) throws Exception {
-        ordersBody.setJobschedulerId("scheduler.1.12");
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        ordersBody.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
         OrdersResourceImpl ordersImpl = new OrdersResourceImpl();
-        JOCDefaultResponse ordersResponse = ordersImpl.postOrders(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
+        JOCDefaultResponse ordersResponse = ordersImpl.postOrders(accessToken, ordersBody);
         OrdersV ordersVSchema = (OrdersV) ordersResponse.getEntity();
         return ordersVSchema;
     }

@@ -31,7 +31,7 @@ public class LocksResourceImplTest {
         LocksResourceImpl locksResourceImpl = new LocksResourceImpl();
         JOCDefaultResponse jobsResponse = locksResourceImpl.postLocks(accessToken, locksFilterSchema);
         LocksV locksVSchema = (LocksV) jobsResponse.getEntity();
-        assertEquals("postLocksTest", "/myName", Globals.normalizePath(locksVSchema.getLocks().get(0).getName()));
+        assertEquals("postLocksTest", GlobalsTest.LOCK, Globals.normalizePath(locksVSchema.getLocks().get(0).getName()));
         LOGGER.info(jobsResponse.toString());
     }
 

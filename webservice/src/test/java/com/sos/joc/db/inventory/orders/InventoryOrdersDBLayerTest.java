@@ -52,7 +52,7 @@ public class InventoryOrdersDBLayerTest {
 		InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(sosHibernateSession);
 		DBItemInventoryOrder order = dbLayer.getInventoryOrderByOrderId(GlobalsTest.JOB_CHAIN,
 		        GlobalsTest.ORDER, instance.getId());
-		assertEquals("getOrderschedulerOrder", GlobalsTest.JOB_CHAIN + "," + GlobalsTest.ORDER, order.getBaseName());
+		assertEquals("getOrderschedulerOrder", GlobalsTest.JOB_CHAIN + "," + GlobalsTest.ORDER, order.getName());
 		sosHibernateSession.close();
 	}
 

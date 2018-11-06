@@ -1,23 +1,28 @@
 package com.sos.joc.task.impl;
- 
-import org.junit.Test;
 
-import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import org.junit.Before;
+import org.junit.Test;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
- 
+import com.sos.joc.exceptions.DBMissingDataException;
+
 public class TaskResourceLogHtmlImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
     @Test
-    public void postOrderTest() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postOrderTest() throws Exception {
+
         TaskLogResourceImpl taskLogHtmlResourceImpl = new TaskLogResourceImpl();
-        JOCDefaultResponse okResponse = taskLogHtmlResourceImpl.getTaskLogHtml(sosShiroCurrentUserAnswer.getAccessToken(),"","scheduler_id","0", null);
-     }
+        try {
+            JOCDefaultResponse okResponse = taskLogHtmlResourceImpl.getTaskLogHtml(accessToken, "", GlobalsTest.SCHEDULER_ID, "0", null);
+        } catch (DBMissingDataException e) {
+        }
+    }
 
 }
-

@@ -1,30 +1,32 @@
 package com.sos.joc.tasks.impl;
- 
+
 import static org.junit.Assert.*;
- 
+
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.JobsFilter;
 
 public class TasksResourceHistoryImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
     @Test
-    public void postTasksHistoryTest() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postTasksHistoryTest() throws Exception {
+
         JobsFilter jobsFilterSchema = new JobsFilter();
-        jobsFilterSchema.setJobschedulerId("scheduler_current");
+        jobsFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
         TasksResourceHistoryImpl tasksHistoryImpl = new TasksResourceHistoryImpl();
-        JOCDefaultResponse taskHistoryResponse = tasksHistoryImpl.postTasksHistory(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
+        JOCDefaultResponse taskHistoryResponse = tasksHistoryImpl.postTasksHistory(accessToken, jobsFilterSchema);
         TaskHistory historySchema = (TaskHistory) taskHistoryResponse.getEntity();
-        assertEquals("postTasksHistoryTest","myJob", historySchema.getHistory().get(0).getJob());
-     }
+        assertEquals("postTasksHistoryTest", GlobalsTest.JOB, historySchema.getHistory().get(0).getJob());
+    }
 
 }
-

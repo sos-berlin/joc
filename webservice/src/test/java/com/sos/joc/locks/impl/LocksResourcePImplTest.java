@@ -31,7 +31,7 @@ public class LocksResourcePImplTest {
         LocksResourcePImpl locksResourcePImpl = new LocksResourcePImpl();
         JOCDefaultResponse jobsResponse = locksResourcePImpl.postLocksP(accessToken, locksFilterSchema);
         LocksP locksVSchema = (LocksP) jobsResponse.getEntity();
-        assertEquals("postLocksTest", "/myName", Globals.normalizePath(locksVSchema.getLocks().get(0).getName()));
+        assertEquals("postLocksTest", GlobalsTest.LOCK, Globals.normalizePath(locksVSchema.getLocks().get(0).getName()));
         LOGGER.info(jobsResponse.toString());
     }
 

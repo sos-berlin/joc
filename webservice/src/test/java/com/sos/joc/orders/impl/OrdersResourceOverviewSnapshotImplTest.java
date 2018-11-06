@@ -1,30 +1,34 @@
 package com.sos.joc.orders.impl;
- 
+
 import static org.junit.Assert.*;
- 
+
+import org.junit.Before;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.order.OrdersSnapshot;
 
 public class OrdersResourceOverviewSnapshotImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
     @Test
-    public void postOrdersOverviewSnapshot() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postOrdersOverviewSnapshot() throws Exception {
+
         JobChainsFilter filterSchema = new JobChainsFilter();
-        filterSchema.setJobschedulerId("scheduler_current");
+        filterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
         OrdersResourceOverviewSnapshotImpl ordersResourceOverviewSnapshotImpl = new OrdersResourceOverviewSnapshotImpl();
-        JOCDefaultResponse ordersResponse = ordersResourceOverviewSnapshotImpl.postOrdersOverviewSnapshot(sosShiroCurrentUserAnswer.getAccessToken(), filterSchema);
+        JOCDefaultResponse ordersResponse = ordersResourceOverviewSnapshotImpl.postOrdersOverviewSnapshot(accessToken, filterSchema);
         OrdersSnapshot snapshotSchema = (OrdersSnapshot) ordersResponse.getEntity();
-        assertEquals("postOrdersOverviewSnapshot",-1, snapshotSchema.getOrders().getRunning().intValue());
-     }
+        assertEquals("postOrdersOverviewSnapshot", 0, snapshotSchema.getOrders().getRunning().intValue());
+    }
 
 }
-

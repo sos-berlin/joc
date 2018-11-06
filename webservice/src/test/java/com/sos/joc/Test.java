@@ -14,6 +14,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 import com.sos.jitl.restclient.JobSchedulerRestClient;
 
@@ -36,6 +37,7 @@ public class Test {
     }
 
     @org.junit.Test
+    @Ignore
     public void test() throws Exception {
         JobSchedulerRestClient.headers.put("Authorization", "Basic U09TMDE6c29zMDE=");
         JobSchedulerRestClient.headers.put("Content-Type", "application/json");
@@ -50,6 +52,7 @@ public class Test {
     }
 
     @org.junit.Test
+    @Ignore
     public void jobSchedulerWebSservice() throws Exception {
         JobSchedulerRestClient.headers.put("Authorization", "Basic U09TMDE6c29zMDE=");
         JobSchedulerRestClient.headers.put("Content-Type", "application/json");

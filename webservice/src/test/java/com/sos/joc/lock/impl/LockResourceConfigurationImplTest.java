@@ -29,18 +29,18 @@ public class LockResourceConfigurationImplTest {
     @Test
     public void postLockConfigurationDefaultTest() throws Exception {
         LockConfigurationFilter lockConfigurationFilterSchema = new LockConfigurationFilter();
-        lockConfigurationFilterSchema.setLock("myName");
+        lockConfigurationFilterSchema.setLock(GlobalsTest.LOCK);
         lockConfigurationFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
         LockResourceConfigurationImpl lockResourceConfigurationImpl = new LockResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = lockResourceConfigurationImpl.postLockConfiguration(accessToken, lockConfigurationFilterSchema);
         Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
-        assertEquals("postLockConfigurationTest", "myName", configurationSchema.getConfiguration().getPath());
+        assertEquals("postLockConfigurationTest", GlobalsTest.LOCK, configurationSchema.getConfiguration().getPath());
     }
 
     @Test
     public void postLockConfigurationHtmlTest() throws Exception {
         LockConfigurationFilter lockConfigurationFilterSchema = new LockConfigurationFilter();
-        lockConfigurationFilterSchema.setLock("myName");
+        lockConfigurationFilterSchema.setLock(GlobalsTest.LOCK);
         lockConfigurationFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
         lockConfigurationFilterSchema.setMime(ConfigurationMime.HTML);
         LockResourceConfigurationImpl lockResourceConfigurationImpl = new LockResourceConfigurationImpl();

@@ -1,46 +1,49 @@
 package com.sos.joc.orders.impl;
- 
+
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.Ok;
+import com.sos.joc.model.order.AddedOrders;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
- 
+
 public class OrdersResourceOrderCommandAddOrderImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = GlobalsTest.getAccessToken();
+    }
+
     @Test
-    public void postOrdersCommandAddOrder() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postOrdersCommandAddOrder() throws Exception {
+
         ModifyOrders modifyOrderSchema = new ModifyOrders();
         ArrayList<ModifyOrder> orders = new ArrayList<ModifyOrder>();
         ModifyOrder order = new ModifyOrder();
         order.setOrderId("junit_test1");
-        order.setJobChain("/test/job_chain1");
+        order.setJobChain(GlobalsTest.JOB_CHAIN);
         orders.add(order);
-     
+
         ModifyOrder order2 = new ModifyOrder();
         order2.setOrderId("junit_test1");
-        order2.setState("200");
-        order2.setJobChain("/test/job_chain1");
+        order2.setState("Create");
+        order2.setJobChain(GlobalsTest.JOB_CHAIN);
         orders.add(order2);
 
         modifyOrderSchema.setOrders(orders);
-        modifyOrderSchema.setJobschedulerId("scheduler.1.11");
+        modifyOrderSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
         OrdersResourceCommandAddOrderImpl ordersResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
-        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersAdd(sosShiroCurrentUserAnswer.getAccessToken(), modifyOrderSchema);
-        Ok okSchema = (Ok) ordersResponse.getEntity();
-        assertEquals("postOrdersCommandAddOrder",true, okSchema.getOk());
-     }
+        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersAdd(accessToken, modifyOrderSchema);
+        AddedOrders okSchema = (AddedOrders) ordersResponse.getEntity();
+        assertEquals("postOrdersCommandAddOrder", true, okSchema.getOk());
+    }
 
 }
-

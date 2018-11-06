@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -19,6 +20,7 @@ public class TasksResourceKillImplTest {
     private static final String LDAP_USER = "root";
      
     @Test
+    @Ignore
     public void postTasksKillTest() throws Exception   {
         //Preparation: Start the jobs on JobScheduler assigned to scheduler_id and put the task id in the list.
          
