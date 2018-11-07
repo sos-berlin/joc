@@ -3,6 +3,7 @@ package com.sos.joc.jobscheduler.impl;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
