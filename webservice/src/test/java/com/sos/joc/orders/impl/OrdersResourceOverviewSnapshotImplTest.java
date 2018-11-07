@@ -4,10 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.GlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.order.OrdersSnapshot;
 
