@@ -93,7 +93,7 @@ public class OrdersResourceImplTest {
         folders.add(folder);
         folders.add(folder2);
         List<OrderType> types = ordersBody.getTypes();
-        types.add(OrderType.AD_HOC);
+        types.add(OrderType.PERMANENT);
         ordersBody.setTypes(types);
         OrdersV ordersVSchema = TestHelper(ordersBody);
         assertEquals("postOrdersTest",TestEnvWebserviceTest.JOB, ordersVSchema.getOrders().get(0).getJob());

@@ -34,7 +34,7 @@ public class JobRuntimeResourceImplTest {
         JOCDefaultResponse jobResponse = jobRunTimeImpl.postJobRunTime(accessToken, jobFilterSchema);
         RunTime200 jobRunTimeSchema = (RunTime200) jobResponse.getEntity();
         LOGGER.info(jobRunTimeSchema.getRunTime().getRunTime());
-        assertTrue("", jobRunTimeSchema.getRunTime().getRunTime().startsWith("<run_time>"));
+        assertTrue("", jobRunTimeSchema.getRunTime().getRunTime().startsWith("<run_time"));
      }
 
 }

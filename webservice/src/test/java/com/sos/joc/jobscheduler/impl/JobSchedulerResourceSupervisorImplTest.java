@@ -1,31 +1,35 @@
 package com.sos.joc.jobscheduler.impl;
- 
+
 import static org.junit.Assert.*;
- 
+
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceSupervisorImpl;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.jobscheduler.JobSchedulerV200;
 
 public class JobSchedulerResourceSupervisorImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = TestEnvWebserviceTest.getAccessToken();
+    }
+
     @Test
-    public void postjobschedulerSupervisorTest() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postjobschedulerSupervisorTest() throws Exception {
+
         JobSchedulerId jobSchedulerFilterSchema = new JobSchedulerId();
-        jobSchedulerFilterSchema.setJobschedulerId("scheduler_current");
+        jobSchedulerFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceSupervisorImpl jobschedulerResourceSupervisorImpl = new JobSchedulerResourceSupervisorImpl();
-        JOCDefaultResponse jobschedulerResponse = jobschedulerResourceSupervisorImpl.postJobschedulerSupervisor(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerFilterSchema);
+        JOCDefaultResponse jobschedulerResponse = jobschedulerResourceSupervisorImpl.postJobschedulerSupervisor(accessToken,
+                jobSchedulerFilterSchema);
         JobSchedulerV200 jobschedulerSupervisorSchema = (JobSchedulerV200) jobschedulerResponse.getEntity();
-        assertEquals("postjobschedulerSupervisorTest.javaTest", "supervisor_scheduler_id", jobschedulerSupervisorSchema.getJobscheduler().getJobschedulerId());
-     }
+        assertEquals("postjobschedulerSupervisorTest.javaTest", "scheduler_joc_cockpit", jobschedulerSupervisorSchema.getJobscheduler()
+                .getJobschedulerId());
+    }
 
 }
-

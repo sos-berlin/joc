@@ -28,14 +28,14 @@ public class JobSchedulerResourceAgentsPImplTest {
         AgentFilter agentFilterSchema = new AgentFilter();
         ArrayList<AgentUrl> agents = new ArrayList<AgentUrl>();
         AgentUrl jobSchedulerAgent = new AgentUrl();
-        jobSchedulerAgent.setAgent("http://galadriel:4445");
+        jobSchedulerAgent.setAgent("http://galadriel:40412");
         agents.add(jobSchedulerAgent);
         agentFilterSchema.setAgents(agents);
         agentFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceAgentsPImpl jobschedulerResourceAgentsPImpl = new JobSchedulerResourceAgentsPImpl();
         JOCDefaultResponse jobschedulerAgentsPResponse = jobschedulerResourceAgentsPImpl.postJobschedulerAgentsP(accessToken, agentFilterSchema);
         AgentsP agentsPSchema = (AgentsP) jobschedulerAgentsPResponse.getEntity();
-        assertEquals("postjobschedulerAgentsPTest", "http://galadriel:4445", agentsPSchema.getAgents().get(0).getUrl());
+        assertEquals("postjobschedulerAgentsPTest", "http://galadriel:40412", agentsPSchema.getAgents().get(0).getUrl());
     }
 
 }

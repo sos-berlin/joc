@@ -1,31 +1,33 @@
 package com.sos.joc.jobscheduler.impl;
- 
+
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.jobscheduler.HostPortParameter;
 import com.sos.joc.model.jobscheduler.JobSchedulerV200;
 
 public class JobSchedulerResourceImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = TestEnvWebserviceTest.getAccessToken();
+    }
+
     @Test
-    public void postjobschedulerTest() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postjobschedulerTest() throws Exception {
+
         HostPortParameter jobSchedulerFilterSchema = new HostPortParameter();
-        jobSchedulerFilterSchema.setJobschedulerId("scheduler_current");
+        jobSchedulerFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceImpl jobschedulerResourceImpl = new JobSchedulerResourceImpl();
-        JOCDefaultResponse jobschedulerResponse = jobschedulerResourceImpl.postJobscheduler(sosShiroCurrentUserAnswer.getAccessToken(), sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerFilterSchema);
+        JOCDefaultResponse jobschedulerResponse = jobschedulerResourceImpl.postJobscheduler(accessToken, accessToken, jobSchedulerFilterSchema);
         JobSchedulerV200 jobscheduler200VSchema = (JobSchedulerV200) jobschedulerResponse.getEntity();
-        assertEquals("postjobschedulerTest", 4000, jobscheduler200VSchema.getJobscheduler().getPort().intValue());
-     }
+        assertEquals("postjobschedulerTest", 40412, jobscheduler200VSchema.getJobscheduler().getPort().intValue());
+    }
 
 }
-

@@ -1,31 +1,35 @@
 package com.sos.joc.jobscheduler.impl;
- 
+
 import static org.junit.Assert.*;
- 
+
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceAgentClustersPImpl;
 import com.sos.joc.model.jobscheduler.AgentClusterFilter;
-import com.sos.joc.model.jobscheduler.AgentClustersP;
+import com.sos.joc.model.jobscheduler.AgentClusters;
 
 public class JobSchedulerResourceAgentClustersPImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = TestEnvWebserviceTest.getAccessToken();
+    }
+
     @Test
-    public void postjobschedulerAgentClustersPTest() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postjobschedulerAgentClustersPTest() throws Exception {
+
         AgentClusterFilter agentClusterFilterSchema = new AgentClusterFilter();
-        agentClusterFilterSchema.setJobschedulerId("scheduler_current");
+        agentClusterFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceAgentClustersPImpl jobschedulerResourceAgentClustersPImpl = new JobSchedulerResourceAgentClustersPImpl();
-        JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceAgentClustersPImpl.postJobschedulerAgentClustersP(sosShiroCurrentUserAnswer.getAccessToken(), agentClusterFilterSchema);
-        AgentClustersP agentClustersPSchema = (AgentClustersP) jobschedulerClusterResponse.getEntity();
-        assertEquals("postjobschedulerAgentClustersPTest", -1, agentClustersPSchema.getAgentClusters().get(0).getNumOfAgents().getAny().intValue());
-     }
+        JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceAgentClustersPImpl.postJobschedulerAgentClustersP(accessToken,
+                agentClusterFilterSchema);
+        AgentClusters agentClustersPSchema = (AgentClusters) jobschedulerClusterResponse.getEntity();
+        assertEquals("postjobschedulerAgentClustersPTest", 1, agentClustersPSchema.getAgentClusters().get(0).getNumOfAgents().getAny().intValue());
+    }
 
 }
-

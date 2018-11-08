@@ -12,6 +12,7 @@ import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSwitch;
 import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.joc.model.common.Ok;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements IJobSchedulerResourceSwitch {
@@ -50,7 +51,9 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
 			} catch (Exception e) {
 			}
 
-			return jocDefaultResponse;
+			Ok okSchema = new Ok();
+			okSchema.setOk(true);
+			return JOCDefaultResponse.responseStatus200(okSchema);
 
 		} catch (JocException e) {
 			e.addErrorMetaInfo(getJocError());

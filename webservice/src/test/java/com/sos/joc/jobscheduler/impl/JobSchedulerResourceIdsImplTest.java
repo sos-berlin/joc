@@ -1,27 +1,29 @@
 package com.sos.joc.jobscheduler.impl;
- 
+
 import static org.junit.Assert.*;
- 
+
+import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.jobscheduler.JobSchedulerIds;
 
 public class JobSchedulerResourceIdsImplTest {
-    private static final String LDAP_PASSWORD = "secret";
-    private static final String LDAP_USER = "root";
-     
+
+    private String accessToken;
+
+    @Before
+    public void setUp() throws Exception {
+        accessToken = TestEnvWebserviceTest.getAccessToken();
+    }
+
     @Test
-    public void postjobschedulerIdsTest() throws Exception   {
-         
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+    public void postjobschedulerIdsTest() throws Exception {
+
         JobSchedulerResourceIdsImpl jobschedulerResourceIdsImpl = new JobSchedulerResourceIdsImpl();
-        JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceIdsImpl.postJobschedulerIds(sosShiroCurrentUserAnswer.getAccessToken());
+        JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceIdsImpl.postJobschedulerIds(accessToken);
         JobSchedulerIds idsSchema = (JobSchedulerIds) jobschedulerClusterResponse.getEntity();
-        assertEquals("postjobschedulerIdsTest", "re-dell_4444_jobscheduler.1.9.5x86-snapshot", idsSchema.getJobschedulerIds().get(0));
-     }
+        assertEquals("postjobschedulerIdsTest", "scheduler.1.11.1", idsSchema.getJobschedulerIds().get(0));
+    }
 
 }
-
