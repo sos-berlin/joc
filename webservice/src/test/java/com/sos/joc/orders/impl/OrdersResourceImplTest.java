@@ -10,7 +10,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderPath;
@@ -24,7 +24,7 @@ public class OrdersResourceImplTest {
     
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
      
@@ -33,7 +33,7 @@ public class OrdersResourceImplTest {
          
         OrdersFilter ordersBody = new OrdersFilter();
         Folder folder = new Folder();
-        folder.setFolder(TestEnvWebserviceGlobalsTest.JOB_CHAIN_FOLDER);
+        folder.setFolder(TestEnvWebserviceTest.JOB_CHAIN_FOLDER);
         Folder folder2 = new Folder();
         folder2.setFolder("/examples");
         folder2.setRecursive(false);
@@ -41,7 +41,7 @@ public class OrdersResourceImplTest {
         folders.add(folder);
         folders.add(folder2);
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        assertEquals("postOrdersTest",TestEnvWebserviceGlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",TestEnvWebserviceTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
@@ -49,7 +49,7 @@ public class OrdersResourceImplTest {
          
         OrdersFilter ordersBody = new OrdersFilter();
         Folder folder = new Folder();
-        folder.setFolder(TestEnvWebserviceGlobalsTest.JOB_CHAIN_FOLDER);
+        folder.setFolder(TestEnvWebserviceTest.JOB_CHAIN_FOLDER);
         Folder folder2 = new Folder();
         folder2.setFolder("/examples");
         List<Folder> folders = ordersBody.getFolders();
@@ -57,7 +57,7 @@ public class OrdersResourceImplTest {
         folders.add(folder2);
         ordersBody.setRegex("Create");
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        assertEquals("postOrdersTest",TestEnvWebserviceGlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",TestEnvWebserviceTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
@@ -65,7 +65,7 @@ public class OrdersResourceImplTest {
          
         OrdersFilter ordersBody = new OrdersFilter();
         Folder folder = new Folder();
-        folder.setFolder(TestEnvWebserviceGlobalsTest.JOB_CHAIN_FOLDER);
+        folder.setFolder(TestEnvWebserviceTest.JOB_CHAIN_FOLDER);
         Folder folder2 = new Folder();
         folder2.setFolder("/examples");
         List<Folder> folders = ordersBody.getFolders();
@@ -74,11 +74,11 @@ public class OrdersResourceImplTest {
         ordersBody.setRegex("Create");
         List<OrderPath> orders = ordersBody.getOrders();
         OrderPath order = new OrderPath();
-        order.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
-        order.setOrderId(TestEnvWebserviceGlobalsTest.ORDER);
+        order.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
+        order.setOrderId(TestEnvWebserviceTest.ORDER);
         orders.add(order);
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        assertEquals("postOrdersTest",TestEnvWebserviceGlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",TestEnvWebserviceTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
@@ -86,7 +86,7 @@ public class OrdersResourceImplTest {
          
         OrdersFilter ordersBody = new OrdersFilter();
         Folder folder = new Folder();
-        folder.setFolder(TestEnvWebserviceGlobalsTest.JOB_CHAIN_FOLDER);
+        folder.setFolder(TestEnvWebserviceTest.JOB_CHAIN_FOLDER);
         Folder folder2 = new Folder();
         folder2.setFolder("/examples");
         List<Folder> folders = ordersBody.getFolders();
@@ -96,7 +96,7 @@ public class OrdersResourceImplTest {
         types.add(OrderType.AD_HOC);
         ordersBody.setTypes(types);
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        assertEquals("postOrdersTest",TestEnvWebserviceGlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",TestEnvWebserviceTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
@@ -105,15 +105,15 @@ public class OrdersResourceImplTest {
         OrdersFilter ordersBody = new OrdersFilter();
         List<OrderPath> orders = ordersBody.getOrders();
         OrderPath order = new OrderPath();
-        order.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
-        order.setOrderId(TestEnvWebserviceGlobalsTest.ORDER);
+        order.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
+        order.setOrderId(TestEnvWebserviceTest.ORDER);
         orders.add(order);
         OrdersV ordersVSchema = TestHelper(ordersBody);
-        assertEquals("postOrdersTest",TestEnvWebserviceGlobalsTest.JOB, ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest",TestEnvWebserviceTest.JOB, ordersVSchema.getOrders().get(0).getJob());
     }
     
     private OrdersV TestHelper(OrdersFilter ordersBody) throws Exception {
-        ordersBody.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        ordersBody.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceImpl ordersImpl = new OrdersResourceImpl();
         JOCDefaultResponse ordersResponse = ordersImpl.postOrders(accessToken, ordersBody);
         OrdersV ordersVSchema = (OrdersV) ordersResponse.getEntity();

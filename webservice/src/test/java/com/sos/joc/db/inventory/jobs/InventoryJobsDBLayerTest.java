@@ -10,21 +10,21 @@ import org.junit.Test;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 
 public class InventoryJobsDBLayerTest {
 
     @Before
     public void setUp() throws Exception {
-        TestEnvWebserviceGlobalsTest.getAccessToken();
+        TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
     public void getJobSchedulerJobs() throws Exception {
         InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection(
                 "InventoryInstancesDBLayer"));
-        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID, getAccessToken());
+        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(TestEnvWebserviceTest.SCHEDULER_ID, getAccessToken());
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.createSosHibernateStatelessConnection("InventoryJobsDBLayer"));
 
         List<DBItemInventoryJob> listOfJobs = dbLayer.getInventoryJobs(instance.getId());
@@ -36,11 +36,11 @@ public class InventoryJobsDBLayerTest {
     public void getJobSchedulerJob() throws Exception {
         InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection(
                 "InventoryInstancesDBLayer"));
-        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID, getAccessToken());
+        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(TestEnvWebserviceTest.SCHEDULER_ID, getAccessToken());
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.createSosHibernateStatelessConnection("InventoryJobsDBLayer"));
 
-        DBItemInventoryJob job = dbLayer.getInventoryJobByName(TestEnvWebserviceGlobalsTest.JOB_CHAIN, instance.getId());
-        assertEquals("getJobSchedulerJob", TestEnvWebserviceGlobalsTest.JOB, job.getName());
+        DBItemInventoryJob job = dbLayer.getInventoryJobByName(TestEnvWebserviceTest.JOB_CHAIN, instance.getId());
+        assertEquals("getJobSchedulerJob", TestEnvWebserviceTest.JOB, job.getName());
 
     }
 

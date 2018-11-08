@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.order.OrderFilter;
@@ -14,16 +14,16 @@ public class OrderRuntimeResourceImplTest {
     
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
     public void postOrderRunTimeTest() throws Exception   {
          
         OrderFilter orderFilterSchema = new OrderFilter();
-        orderFilterSchema.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
-        orderFilterSchema.setOrderId(TestEnvWebserviceGlobalsTest.ORDER);
-        orderFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        orderFilterSchema.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
+        orderFilterSchema.setOrderId(TestEnvWebserviceTest.ORDER);
+        orderFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrderRunTimeResourceImpl orderRunTimeImpl = new OrderRunTimeResourceImpl();
         JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(accessToken, orderFilterSchema);
         RunTime200 orderRunTimeSchema = (RunTime200) ordersResponse.getEntity();

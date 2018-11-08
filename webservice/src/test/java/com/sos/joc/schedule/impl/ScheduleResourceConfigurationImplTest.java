@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.schedule.Configuration200;
@@ -20,25 +20,25 @@ public class ScheduleResourceConfigurationImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
     public void postScheduleConfigurationDefaultTest() throws Exception {
         ScheduleConfigurationFilter scheduleConfigurationFilterSchema = new ScheduleConfigurationFilter();
-        scheduleConfigurationFilterSchema.setSchedule(TestEnvWebserviceGlobalsTest.SCHEDULE);
-        scheduleConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        scheduleConfigurationFilterSchema.setSchedule(TestEnvWebserviceTest.SCHEDULE);
+        scheduleConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         ScheduleResourceConfigurationImpl scheduleResourceConfigurationImpl = new ScheduleResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = scheduleResourceConfigurationImpl.postScheduleConfiguration(accessToken, scheduleConfigurationFilterSchema);
         Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
-        assertEquals("postScheduleConfigurationDefaultTest", TestEnvWebserviceGlobalsTest.SCHEDULE, configurationSchema.getConfiguration().getPath());
+        assertEquals("postScheduleConfigurationDefaultTest", TestEnvWebserviceTest.SCHEDULE, configurationSchema.getConfiguration().getPath());
     }
 
     @Test
     public void postScheduleConfigurationHtmlTest() throws Exception {
         ScheduleConfigurationFilter scheduleConfigurationFilterSchema = new ScheduleConfigurationFilter();
-        scheduleConfigurationFilterSchema.setSchedule(TestEnvWebserviceGlobalsTest.SCHEDULE);
-        scheduleConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        scheduleConfigurationFilterSchema.setSchedule(TestEnvWebserviceTest.SCHEDULE);
+        scheduleConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         scheduleConfigurationFilterSchema.setMime(ConfigurationMime.HTML);
         ScheduleResourceConfigurationImpl scheduleResourceConfigurationImpl = new ScheduleResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = scheduleResourceConfigurationImpl.postScheduleConfiguration(accessToken, scheduleConfigurationFilterSchema);

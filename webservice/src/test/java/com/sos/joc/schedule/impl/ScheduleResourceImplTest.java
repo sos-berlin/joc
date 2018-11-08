@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.schedule.ScheduleV200;
 import com.sos.joc.model.schedule.ScheduleFilter;
@@ -21,18 +21,18 @@ public class ScheduleResourceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
     public void postScheduleTest() throws Exception {
         ScheduleFilter scheduleFilterSchema = new ScheduleFilter();
-        scheduleFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
-        scheduleFilterSchema.setSchedule(TestEnvWebserviceGlobalsTest.SCHEDULE);
+        scheduleFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
+        scheduleFilterSchema.setSchedule(TestEnvWebserviceTest.SCHEDULE);
         ScheduleResourceImpl scheduleResourceImpl = new ScheduleResourceImpl();
         JOCDefaultResponse jobsResponse = scheduleResourceImpl.postSchedule(accessToken, scheduleFilterSchema);
         ScheduleV200 scheduleVSchema = (ScheduleV200) jobsResponse.getEntity();
-        assertEquals("postScheduleTest", TestEnvWebserviceGlobalsTest.SCHEDULE, scheduleVSchema.getSchedule().getPath());
+        assertEquals("postScheduleTest", TestEnvWebserviceTest.SCHEDULE, scheduleVSchema.getSchedule().getPath());
         LOGGER.info(jobsResponse.toString());
     }
 

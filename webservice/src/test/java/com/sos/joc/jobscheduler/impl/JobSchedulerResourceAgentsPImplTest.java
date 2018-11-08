@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceAgentsPImpl;
 import com.sos.joc.model.jobscheduler.AgentFilter;
@@ -19,7 +19,7 @@ public class JobSchedulerResourceAgentsPImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
@@ -31,7 +31,7 @@ public class JobSchedulerResourceAgentsPImplTest {
         jobSchedulerAgent.setAgent("http://galadriel:4445");
         agents.add(jobSchedulerAgent);
         agentFilterSchema.setAgents(agents);
-        agentFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        agentFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceAgentsPImpl jobschedulerResourceAgentsPImpl = new JobSchedulerResourceAgentsPImpl();
         JOCDefaultResponse jobschedulerAgentsPResponse = jobschedulerResourceAgentsPImpl.postJobschedulerAgentsP(accessToken, agentFilterSchema);
         AgentsP agentsPSchema = (AgentsP) jobschedulerAgentsPResponse.getEntity();

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Ok;
 import com.sos.joc.model.order.ModifyOrder;
@@ -18,7 +18,7 @@ public class OrdersResourceOrderCommandsImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
@@ -30,18 +30,18 @@ public class OrdersResourceOrderCommandsImplTest {
         order.setAt("now + 60");
         order.setState("Create");
         order.setOrderId("junit_test");
-        order.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
+        order.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
         orders.add(order);
 
         ModifyOrder order2 = new ModifyOrder();
         order2.setAt("now + 60");
         order2.setOrderId("test");
         order2.setState("Create");
-        order2.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
+        order2.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
         orders.add(order2);
 
         modifyOrderSchema.setOrders(orders);
-        modifyOrderSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        modifyOrderSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceCommandModifyOrderImpl ordersResourceHistoryImpl = new OrdersResourceCommandModifyOrderImpl();
         OrdersResourceCommandAddOrderImpl ordersAddResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
         JOCDefaultResponse ordersResponse = ordersAddResourceHistoryImpl.postOrdersAdd(accessToken, modifyOrderSchema);

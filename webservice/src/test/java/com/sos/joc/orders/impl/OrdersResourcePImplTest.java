@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.Folder;
@@ -21,31 +21,31 @@ public class OrdersResourcePImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
     public void postOrdersPLDAPTest() throws Exception {
 
         OrdersFilter ordersFilterSchema = new OrdersFilter();
-        ordersFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        ordersFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         List<Folder> folders = new ArrayList<Folder>();
         Folder folder = new Folder();
-        folder.setFolder(TestEnvWebserviceGlobalsTest.JOB_CHAIN_FOLDER);
+        folder.setFolder(TestEnvWebserviceTest.JOB_CHAIN_FOLDER);
         folders.add(folder);
         ordersFilterSchema.setFolders(folders);
         OrdersResourcePImpl ordersPImpl = new OrdersResourcePImpl();
         JOCDefaultResponse ordersResponseP = ordersPImpl.postOrdersP(accessToken, ordersFilterSchema);
 
         OrdersP ordersPSchema = (OrdersP) ordersResponseP.getEntity();
-        assertEquals("postjobschedulerClusterTest", TestEnvWebserviceGlobalsTest.getOrderPath(), ordersPSchema.getOrders().get(0).getPath());
+        assertEquals("postjobschedulerClusterTest", TestEnvWebserviceTest.getOrderPath(), ordersPSchema.getOrders().get(0).getPath());
     }
 
     @Test
     public void postOrdersPTest() throws Exception {
 
         OrdersFilter ordersFilterSchema = new OrdersFilter();
-        ordersFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        ordersFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourcePImpl ordersPImpl = new OrdersResourcePImpl();
         JOCDefaultResponse ordersResponseP = ordersPImpl.postOrdersP(accessToken, ordersFilterSchema);
         OrdersP ordersPSchema = (OrdersP) ordersResponseP.getEntity();

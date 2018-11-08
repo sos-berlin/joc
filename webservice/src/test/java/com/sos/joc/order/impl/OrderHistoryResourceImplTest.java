@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.order.OrderHistoryFilter;
 import com.sos.joc.model.order.OrderStepHistory;
@@ -15,17 +15,17 @@ public class OrderHistoryResourceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
     public void postOrderHistoryTest() throws Exception {
 
         OrderHistoryFilter orderFilterSchema = new OrderHistoryFilter();
-        orderFilterSchema.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
-        orderFilterSchema.setOrderId(TestEnvWebserviceGlobalsTest.ORDER);
-        orderFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
-        orderFilterSchema.setHistoryId(TestEnvWebserviceGlobalsTest.VALID_HISTORY_ID);
+        orderFilterSchema.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
+        orderFilterSchema.setOrderId(TestEnvWebserviceTest.ORDER);
+        orderFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
+        orderFilterSchema.setHistoryId(TestEnvWebserviceTest.VALID_HISTORY_ID);
         OrderHistoryResourceImpl orderHistoryImpl = new OrderHistoryResourceImpl();
         JOCDefaultResponse ordersResponse = orderHistoryImpl.postOrderHistory(accessToken, orderFilterSchema);
         OrderStepHistory stepHistorySchema = (OrderStepHistory) ordersResponse.getEntity();

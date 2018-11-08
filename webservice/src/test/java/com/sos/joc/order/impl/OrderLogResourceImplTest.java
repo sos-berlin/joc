@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.LogContent200;
 import com.sos.joc.model.order.OrderHistoryFilter;
@@ -16,7 +16,7 @@ public class OrderLogResourceImplTest {
     
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
@@ -24,10 +24,10 @@ public class OrderLogResourceImplTest {
     public void postOrderHistoryTest() throws Exception   {
          
         OrderHistoryFilter orderFilterWithHistoryIdSchema = new OrderHistoryFilter();
-        orderFilterWithHistoryIdSchema.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
-        orderFilterWithHistoryIdSchema.setOrderId(TestEnvWebserviceGlobalsTest.ORDER);
+        orderFilterWithHistoryIdSchema.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
+        orderFilterWithHistoryIdSchema.setOrderId(TestEnvWebserviceTest.ORDER);
         orderFilterWithHistoryIdSchema.setHistoryId("1320022");
-        orderFilterWithHistoryIdSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        orderFilterWithHistoryIdSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrderLogResourceImpl orderLogImpl = new OrderLogResourceImpl();
         JOCDefaultResponse ordersResponse = orderLogImpl.postOrderLog(accessToken, orderFilterWithHistoryIdSchema);
         LogContent200 logContentSchema = (LogContent200) ordersResponse.getEntity();

@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.tree.TreeFilter;
 import com.sos.joc.model.tree.TreeView;
@@ -16,13 +16,13 @@ public class TreeResourceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
     public void postTreeTest() throws Exception {
         TreeFilter treeFilterSchema = new TreeFilter();
-        treeFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        treeFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         TreeResourceImpl treeResourceImpl = new TreeResourceImpl();
         JOCDefaultResponse treeResponse = treeResourceImpl.postTree(accessToken, treeFilterSchema);
         TreeView treeViewSchema = (TreeView) treeResponse.getEntity();

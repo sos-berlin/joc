@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.configuration.Configuration;
 import com.sos.joc.model.configuration.Configuration200;
@@ -18,7 +18,7 @@ public class JocConfigurationResourceTest {
     
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
      
@@ -44,7 +44,7 @@ public class JocConfigurationResourceTest {
     public void readJocConfigurationsTest() throws Exception   {
         Configuration configuration = new Configuration();
         configuration.setId(2L);
-        configuration.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        configuration.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JocConfigurationResourceImpl jocConfigurationResourceImpl = new JocConfigurationResourceImpl();
         JOCDefaultResponse jocResponse = jocConfigurationResourceImpl.postReadConfiguration(accessToken, configuration);
         Configuration200 configurationSchema = (Configuration200) jocResponse.getEntity();

@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.jobChain.JobChainPath;
 import com.sos.joc.model.jobChain.JobChainsFilter;
@@ -19,23 +19,23 @@ public class JobChainsResourceImplTest {
     
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
     public void postJobChainsTest() throws Exception {
 
         JobChainsFilter jobChainsFilterSchema = new JobChainsFilter();
-        jobChainsFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        jobChainsFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         List<JobChainPath> jobChains = new  ArrayList<JobChainPath>();
         JobChainPath jobChainPath = new JobChainPath();
-        jobChainPath.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
+        jobChainPath.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
         jobChains.add(jobChainPath);
         jobChainsFilterSchema.setJobChains(jobChains);
         JobChainsResourceImpl jobChainsImpl = new JobChainsResourceImpl();
         JOCDefaultResponse jobsResponse = jobChainsImpl.postJobChains(accessToken, jobChainsFilterSchema);
         JobChainsV jobChainsVSchema = (JobChainsV) jobsResponse.getEntity();
-        assertEquals("postJobChainsTest", TestEnvWebserviceGlobalsTest.JOB_CHAIN, jobChainsVSchema.getJobChains().get(0).getPath());
+        assertEquals("postJobChainsTest", TestEnvWebserviceTest.JOB_CHAIN, jobChainsVSchema.getJobChains().get(0).getPath());
     }
 
 }

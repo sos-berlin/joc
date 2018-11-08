@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceSupervisorPImpl;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -17,7 +17,7 @@ public class JobSchedulerResourceSupervisorPImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
@@ -25,12 +25,12 @@ public class JobSchedulerResourceSupervisorPImplTest {
     public void postjobschedulerSupervisorPTest() throws Exception {
 
         JobSchedulerId jobSchedulerFilterSchema = new JobSchedulerId();
-        jobSchedulerFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        jobSchedulerFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceSupervisorPImpl jobschedulerResourceSupervisorPImpl = new JobSchedulerResourceSupervisorPImpl();
         JOCDefaultResponse jobschedulerResponse = jobschedulerResourceSupervisorPImpl.postJobschedulerSupervisorP(accessToken,
                 jobSchedulerFilterSchema);
         JobSchedulerP200 jobschedulerSupervisorSchema = (JobSchedulerP200) jobschedulerResponse.getEntity();
-        assertEquals("postjobschedulerSupervisorPTest.javaTest", TestEnvWebserviceGlobalsTest.SCHEDULER_ID, jobschedulerSupervisorSchema.getJobscheduler()
+        assertEquals("postjobschedulerSupervisorPTest.javaTest", TestEnvWebserviceTest.SCHEDULER_ID, jobschedulerSupervisorSchema.getJobscheduler()
                 .getJobschedulerId());
     }
 

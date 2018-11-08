@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.TestEnvWebserviceGlobalsTest;
+import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobsFilter;
@@ -19,23 +19,23 @@ public class JobsResourcePImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceTest.getAccessToken();
     }
 
     @Test
     public void postJobsPTest() throws Exception {
 
         JobsFilter jobsFilterSchema = new JobsFilter();
-        jobsFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        jobsFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         List<Folder> folders = new ArrayList<Folder>();
         Folder folder = new Folder();
-        folder.setFolder(TestEnvWebserviceGlobalsTest.JOB_CHAIN_FOLDER);
+        folder.setFolder(TestEnvWebserviceTest.JOB_CHAIN_FOLDER);
         folders.add(folder);
         jobsFilterSchema.setFolders(folders);
         JobsResourcePImpl jobsPImpl = new JobsResourcePImpl();
         JOCDefaultResponse jobsPResponse = jobsPImpl.postJobsP(accessToken, jobsFilterSchema);
         JobsP jobsPSchema = (JobsP) jobsPResponse.getEntity();
-        assertEquals("postJobsPTest", TestEnvWebserviceGlobalsTest.JOB, jobsPSchema.getJobs().get(0).getPath());
+        assertEquals("postJobsPTest", TestEnvWebserviceTest.JOB, jobsPSchema.getJobs().get(0).getPath());
     }
 
 }
