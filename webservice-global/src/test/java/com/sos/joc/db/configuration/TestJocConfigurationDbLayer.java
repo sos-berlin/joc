@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 
 public class TestJocConfigurationDbLayer {
 
@@ -18,21 +18,21 @@ public class TestJocConfigurationDbLayer {
 
     @Before
     public void setUp() throws Exception {
-        sosHibernateSession = GlobalsTest.getSession();
+        sosHibernateSession = TestEnvWebserviceGlobalsTest.getSession();
         jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         Globals.disconnect(sosHibernateSession);
-        Globals.sosHibernateFactory.close();
+        Globals.closeFactory();
     }
 
     private void initFilter() {
-//        jocConfigurationDBLayer.getFilter().setObjectType("customization");
+        // jocConfigurationDBLayer.getFilter().setObjectType("customization");
         jocConfigurationDBLayer.getFilter().setConfigurationType("PROFILE");
-        jocConfigurationDBLayer.getFilter().setSchedulerId(GlobalsTest.SCHEDULER_ID);
-//        jocConfigurationDBLayer.getFilter().setName("test");
+        jocConfigurationDBLayer.getFilter().setSchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        // jocConfigurationDBLayer.getFilter().setName("test");
         jocConfigurationDBLayer.getFilter().setAccount("root");
     }
 
@@ -64,7 +64,7 @@ public class TestJocConfigurationDbLayer {
 
     @Test
     public void testJocConfigurationDeleteRecord() throws Exception {
-        jocConfigurationDBLayer.getFilter().setSchedulerId(GlobalsTest.SCHEDULER_ID);
+        jocConfigurationDBLayer.getFilter().setSchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         jocConfigurationDBLayer.getFilter().setAccount("root");
         jocConfigurationDBLayer.getFilter().setConfigurationType("profil");
         jocConfigurationDBLayer.getFilter().setName("profil");

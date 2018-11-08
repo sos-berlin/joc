@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.joc.Globals;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 
 public class TestCalendarUsageDbLayer {
@@ -16,7 +16,7 @@ public class TestCalendarUsageDbLayer {
 
     @Before
     public void setUp() throws Exception {
-        sosHibernateSession = GlobalsTest.getSession();
+        sosHibernateSession = TestEnvWebserviceGlobalsTest.getSession();
         sosHibernateSession.setAutoCommit(false);
         calendarUsageDBLayer = new CalendarUsageDBLayer(sosHibernateSession);
     }
@@ -32,7 +32,7 @@ public class TestCalendarUsageDbLayer {
         dbItemCalendarUsage.setCalendarId(2L);
         dbItemCalendarUsage.setObjectType("JOB");
         dbItemCalendarUsage.setPath("/job4");
-        dbItemCalendarUsage.setSchedulerId(GlobalsTest.SCHEDULER_ID);
+        dbItemCalendarUsage.setSchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         calendarUsageDBLayer.saveCalendarUsage(dbItemCalendarUsage);
 
         dbItemCalendarUsage = new DBItemInventoryClusterCalendarUsage();
@@ -55,7 +55,8 @@ public class TestCalendarUsageDbLayer {
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         Globals.disconnect(sosHibernateSession);
-        Globals.sosHibernateFactory.close();
+        Globals.closeFactory();
+
     }
 
 }

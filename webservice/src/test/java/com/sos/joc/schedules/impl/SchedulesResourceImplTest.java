@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.schedule.SchedulesFilter;
 import com.sos.joc.model.schedule.SchedulesV;
@@ -18,17 +18,17 @@ public class SchedulesResourceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     @Test
     public void postSchedulesTest() throws Exception {
         SchedulesFilter schedulesFilterSchema = new SchedulesFilter();
-        schedulesFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        schedulesFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         SchedulesResourceImpl schedulesResourceImpl = new SchedulesResourceImpl();
         JOCDefaultResponse jobsResponse = schedulesResourceImpl.postSchedules(accessToken, schedulesFilterSchema);
         SchedulesV schedulesVSchema = (SchedulesV) jobsResponse.getEntity();
-        assertEquals("postSchedulesTest", GlobalsTest.SCHEDULE, schedulesVSchema.getSchedules().get(0).getPath());
+        assertEquals("postSchedulesTest", TestEnvWebserviceGlobalsTest.SCHEDULE, schedulesVSchema.getSchedules().get(0).getPath());
         LOGGER.info(jobsResponse.toString());
     }
 

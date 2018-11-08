@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Ok;
 import com.sos.joc.model.order.ModifyOrder;
@@ -16,7 +16,7 @@ public class OrdersResourceOrderCommandDeleteOrderImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     @Test
@@ -27,19 +27,19 @@ public class OrdersResourceOrderCommandDeleteOrderImplTest {
         ModifyOrder order = new ModifyOrder();
         order.setAt("now + 60");
         order.setOrderId("junit_test");
-        order.setJobChain(GlobalsTest.JOB_CHAIN);
+        order.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
         orders.add(order);
 
         ModifyOrder order2 = new ModifyOrder();
         order2.setOrderId("junit_test2");
         order2.setAt("now + 60");
         order2.setState("Create");
-        order2.setJobChain(GlobalsTest.JOB_CHAIN);
+        order2.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
         orders.add(order2);
 
         modifyOrdersSchema.setOrders(orders);
 
-        modifyOrdersSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        modifyOrdersSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         OrdersResourceCommandDeleteOrderImpl ordersDeleteResourceHistoryImpl = new OrdersResourceCommandDeleteOrderImpl();
         OrdersResourceCommandAddOrderImpl ordersAddResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
 

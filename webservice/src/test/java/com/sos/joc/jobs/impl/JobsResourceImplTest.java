@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobStateFilter;
@@ -24,7 +24,7 @@ public class JobsResourceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceImplTest.class);
@@ -32,7 +32,7 @@ public class JobsResourceImplTest {
     @Test
     public void postMinConfJobsTest() throws Exception {
         JobsFilter jobsFilterSchema = new JobsFilter();
-        jobsFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        jobsFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, jobsFilterSchema);
         JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
@@ -43,7 +43,7 @@ public class JobsResourceImplTest {
     @Test
     public void postCompactJobsTest() throws Exception {
         JobsFilter jobsFilterSchema = new JobsFilter();
-        jobsFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        jobsFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, jobsFilterSchema);
@@ -56,7 +56,7 @@ public class JobsResourceImplTest {
     public void postJobsWithFoldersRecursiveTest() throws Exception {
         Date start = new Date();
         JobsFilter jobsFilterSchema = new JobsFilter();
-        jobsFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        jobsFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
         List<Folder> folders = new ArrayList<Folder>();
         Folder folder = new Folder();
@@ -85,7 +85,7 @@ public class JobsResourceImplTest {
     @Test
     public void postJobsWithFoldersNotRecursiveTest() throws Exception {
         JobsFilter jobsFilterSchema = new JobsFilter();
-        jobsFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        jobsFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
         List<Folder> folders = new ArrayList<Folder>();
         Folder folder = new Folder();
@@ -103,7 +103,7 @@ public class JobsResourceImplTest {
     @Test
     public void postJobsPendingTest() throws Exception {
         JobsFilter jobsFilterSchema = new JobsFilter();
-        jobsFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        jobsFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         List<JobStateFilter> states = new ArrayList<JobStateFilter>();
         states.add(JobStateFilter.PENDING);
         jobsFilterSchema.setStates(states);
@@ -117,7 +117,7 @@ public class JobsResourceImplTest {
     @Test
     public void postJobsFromToTest() throws Exception {
         JobsFilter jobsFilterSchema = new JobsFilter();
-        jobsFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        jobsFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         jobsFilterSchema.setDateFrom("2016-09-06 00:00:00.000Z");
         jobsFilterSchema.setDateTo("2016-09-06 23:59:59.999Z");
         JobsResourceImpl jobsImpl = new JobsResourceImpl();

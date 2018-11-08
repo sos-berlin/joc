@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.order.OrderP200;
 import com.sos.joc.model.order.OrderFilter;
@@ -15,20 +15,20 @@ public class OrderPResourceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     @Test
     public void postOrderPTest() throws Exception {
 
         OrderFilter orderFilterWithCompactSchema = new OrderFilter();
-        orderFilterWithCompactSchema.setJobChain(GlobalsTest.JOB_CHAIN);
-        orderFilterWithCompactSchema.setOrderId(GlobalsTest.ORDER);
-        orderFilterWithCompactSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        orderFilterWithCompactSchema.setJobChain(TestEnvWebserviceGlobalsTest.JOB_CHAIN);
+        orderFilterWithCompactSchema.setOrderId(TestEnvWebserviceGlobalsTest.ORDER);
+        orderFilterWithCompactSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         OrderPResourceImpl orderPImpl = new OrderPResourceImpl();
         JOCDefaultResponse ordersResponse = orderPImpl.postOrderP(accessToken, orderFilterWithCompactSchema);
         OrderP200 order200PSchema = (OrderP200) ordersResponse.getEntity();
-        assertEquals("postOrderPTest", GlobalsTest.ORDER, order200PSchema.getOrder().getOrderId());
+        assertEquals("postOrderPTest", TestEnvWebserviceGlobalsTest.ORDER, order200PSchema.getOrder().getOrderId());
     }
 
 }

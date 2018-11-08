@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.processClass.ProcessClassesFilter;
 import com.sos.joc.model.processClass.ProcessClassesP;
@@ -20,13 +20,13 @@ public class ProcessClassesResourcePImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     @Test
     public void postProcessClassesTest() throws Exception {
         ProcessClassesFilter processClassesFilterSchema = new ProcessClassesFilter();
-        processClassesFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        processClassesFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         ProcessClassesResourcePImpl processClassesResourcePImpl = new ProcessClassesResourcePImpl();
         JOCDefaultResponse jobsResponse = processClassesResourcePImpl.postProcessClassesP(accessToken, processClassesFilterSchema);
         ProcessClassesP processClassesPSchema = (ProcessClassesP) jobsResponse.getEntity();

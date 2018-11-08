@@ -415,6 +415,13 @@ public class Globals {
         }
     }
 
+    public static void closeFactory() {
+        if (sosHibernateFactory != null) {
+            sosHibernateFactory.close();
+            sosHibernateFactory = null;
+        }
+    }
+    
     public static String normalizePath(String path) {
         if (path == null) {
             return null;

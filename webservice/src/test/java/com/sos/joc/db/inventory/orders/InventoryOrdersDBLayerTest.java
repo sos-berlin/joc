@@ -13,7 +13,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.db.inventory.agents.AgentClusterPermanent;
 import com.sos.joc.db.inventory.agents.InventoryAgentsDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
@@ -24,7 +24,7 @@ public class InventoryOrdersDBLayerTest {
      
     @Before
     public void setUp() throws Exception {
-         GlobalsTest.getAccessToken();
+         TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
 	@Test
@@ -33,7 +33,7 @@ public class InventoryOrdersDBLayerTest {
 		sosHibernateSession = Globals.createSosHibernateStatelessConnection("getOrderschedulerOrders");
 
 		InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(sosHibernateSession);
-		DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(GlobalsTest.SCHEDULER_ID,
+		DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID,
 				getAccessToken());
 		InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(sosHibernateSession);
 		List<DBItemInventoryOrder> listOfOrders = dbLayer.getInventoryOrders(instance.getId());
@@ -47,12 +47,12 @@ public class InventoryOrdersDBLayerTest {
 		sosHibernateSession = Globals.createSosHibernateStatelessConnection("getOrderschedulerOrder");
  
 		InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(sosHibernateSession);
-		DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(GlobalsTest.SCHEDULER_ID,
+		DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID,
 				getAccessToken());
 		InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(sosHibernateSession);
-		DBItemInventoryOrder order = dbLayer.getInventoryOrderByOrderId(GlobalsTest.JOB_CHAIN,
-		        GlobalsTest.ORDER, instance.getId());
-		assertEquals("getOrderschedulerOrder", GlobalsTest.JOB_CHAIN + "," + GlobalsTest.ORDER, order.getName());
+		DBItemInventoryOrder order = dbLayer.getInventoryOrderByOrderId(TestEnvWebserviceGlobalsTest.JOB_CHAIN,
+		        TestEnvWebserviceGlobalsTest.ORDER, instance.getId());
+		assertEquals("getOrderschedulerOrder", TestEnvWebserviceGlobalsTest.JOB_CHAIN + "," + TestEnvWebserviceGlobalsTest.ORDER, order.getName());
 		sosHibernateSession.close();
 	}
 

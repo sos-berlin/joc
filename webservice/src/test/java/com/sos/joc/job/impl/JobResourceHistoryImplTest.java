@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.sos.joc.Globals;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryFilter;
@@ -16,7 +16,7 @@ public class JobResourceHistoryImplTest {
     
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
 
@@ -24,12 +24,12 @@ public class JobResourceHistoryImplTest {
     public void postJobHistoryTest() throws Exception {
 
         TaskHistoryFilter jobHistoryFilterSchema = new TaskHistoryFilter();
-        jobHistoryFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
-        jobHistoryFilterSchema.setJob(GlobalsTest.JOB);
+        jobHistoryFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        jobHistoryFilterSchema.setJob(TestEnvWebserviceGlobalsTest.JOB);
         JobResourceHistoryImpl jobHistoryImpl = new JobResourceHistoryImpl();
         JOCDefaultResponse jobsResponse = jobHistoryImpl.postJobHistory(accessToken, jobHistoryFilterSchema);
         TaskHistory history = (TaskHistory) jobsResponse.getEntity();
-        assertEquals("postJobHistoryTest", GlobalsTest.JOB, Globals.normalizePath(history.getHistory().get(0).getJob()));
+        assertEquals("postJobHistoryTest", TestEnvWebserviceGlobalsTest.JOB, Globals.normalizePath(history.getHistory().get(0).getJob()));
     }
 
 }

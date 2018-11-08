@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.model.job.JobFilter;
 
 public class JobResourceOrderQueueImplTest {
@@ -16,7 +16,7 @@ public class JobResourceOrderQueueImplTest {
     
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
 
@@ -25,11 +25,11 @@ public class JobResourceOrderQueueImplTest {
 
         LOGGER.info("postJobOrderQueueTest start");
         JobFilter jobFilterSchema = new JobFilter();
-        jobFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
-        jobFilterSchema.setJob(GlobalsTest.JOB);
+        jobFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        jobFilterSchema.setJob(TestEnvWebserviceGlobalsTest.JOB);
         JobResourceOrderQueueImpl jobOrderQueueImpl = new JobResourceOrderQueueImpl();
         jobOrderQueueImpl.postJobOrderQueue(accessToken, jobFilterSchema);
-        assertEquals("postJobOrderQueueTest", GlobalsTest.JOB, jobFilterSchema.getJob());
+        assertEquals("postJobOrderQueueTest", TestEnvWebserviceGlobalsTest.JOB, jobFilterSchema.getJob());
     }
 
 }

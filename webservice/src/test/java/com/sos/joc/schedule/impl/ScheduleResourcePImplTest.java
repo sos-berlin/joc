@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.schedule.ScheduleP200;
 import com.sos.joc.model.schedule.ScheduleFilter;
@@ -16,18 +16,18 @@ public class ScheduleResourcePImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     @Test
     public void postschedulePTest() throws Exception {
         ScheduleFilter scheduleFilterSchema = new ScheduleFilter();
-        scheduleFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
-        scheduleFilterSchema.setSchedule(GlobalsTest.SCHEDULE);
+        scheduleFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        scheduleFilterSchema.setSchedule(TestEnvWebserviceGlobalsTest.SCHEDULE);
         ScheduleResourcePImpl scheduleResourcePImpl = new ScheduleResourcePImpl();
         JOCDefaultResponse jobsResponse = scheduleResourcePImpl.postScheduleP(accessToken, scheduleFilterSchema);
         ScheduleP200 schedulePSchema = (ScheduleP200) jobsResponse.getEntity();
-        assertEquals("postschedulePTest", GlobalsTest.JOB_USED, schedulePSchema.getSchedule().getUsedByJobs().get(0).getJob());
+        assertEquals("postschedulePTest", TestEnvWebserviceGlobalsTest.JOB_USED, schedulePSchema.getSchedule().getUsedByJobs().get(0).getJob());
     }
 
 }

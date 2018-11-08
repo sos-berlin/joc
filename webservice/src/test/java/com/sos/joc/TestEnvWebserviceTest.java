@@ -2,7 +2,7 @@ package com.sos.joc;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
  
-public class GlobalsTest {
+public class TestEnvWebserviceTest {
 
         private static final String PASSWORD = "root";
         private static final String USER = "root";

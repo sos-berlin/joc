@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 
 public class SOSJobSchedulerUserTest {
 
@@ -13,7 +13,7 @@ public class SOSJobSchedulerUserTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     @Test
@@ -21,7 +21,7 @@ public class SOSJobSchedulerUserTest {
 
         JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(accessToken);
 
-        DBItemInventoryInstance schedulerInstancesDBItem = sosJobschedulerUser.getSchedulerInstance(GlobalsTest.SCHEDULER_ID);
+        DBItemInventoryInstance schedulerInstancesDBItem = sosJobschedulerUser.getSchedulerInstance(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         assertEquals("getJobSchedulerInstance", "http://galadriel:40412", schedulerInstancesDBItem.getUrl());
 
     }

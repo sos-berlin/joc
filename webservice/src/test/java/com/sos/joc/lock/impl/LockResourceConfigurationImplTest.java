@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.ConfigurationMime;
@@ -23,25 +23,25 @@ public class LockResourceConfigurationImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     @Test
     public void postLockConfigurationDefaultTest() throws Exception {
         LockConfigurationFilter lockConfigurationFilterSchema = new LockConfigurationFilter();
-        lockConfigurationFilterSchema.setLock(GlobalsTest.LOCK);
-        lockConfigurationFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        lockConfigurationFilterSchema.setLock(TestEnvWebserviceGlobalsTest.LOCK);
+        lockConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         LockResourceConfigurationImpl lockResourceConfigurationImpl = new LockResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = lockResourceConfigurationImpl.postLockConfiguration(accessToken, lockConfigurationFilterSchema);
         Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
-        assertEquals("postLockConfigurationTest", GlobalsTest.LOCK, configurationSchema.getConfiguration().getPath());
+        assertEquals("postLockConfigurationTest", TestEnvWebserviceGlobalsTest.LOCK, configurationSchema.getConfiguration().getPath());
     }
 
     @Test
     public void postLockConfigurationHtmlTest() throws Exception {
         LockConfigurationFilter lockConfigurationFilterSchema = new LockConfigurationFilter();
-        lockConfigurationFilterSchema.setLock(GlobalsTest.LOCK);
-        lockConfigurationFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        lockConfigurationFilterSchema.setLock(TestEnvWebserviceGlobalsTest.LOCK);
+        lockConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         lockConfigurationFilterSchema.setMime(ConfigurationMime.HTML);
         LockResourceConfigurationImpl lockResourceConfigurationImpl = new LockResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = lockResourceConfigurationImpl.postLockConfiguration(accessToken, lockConfigurationFilterSchema);

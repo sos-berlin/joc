@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.Task200;
 import com.sos.joc.model.job.TaskFilter;
@@ -16,7 +16,7 @@ public class TaskResourceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     @Test
@@ -24,7 +24,7 @@ public class TaskResourceImplTest {
     public void postOrderTest() throws Exception {
 
         TaskFilter taskFilterSchema = new TaskFilter();
-        taskFilterSchema.setJobschedulerId(GlobalsTest.SCHEDULER_ID);
+        taskFilterSchema.setJobschedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         TaskResourceImpl taskImpl = new TaskResourceImpl();
         taskFilterSchema.setTaskId("1");
         JOCDefaultResponse ordersResponse = taskImpl.postTask(accessToken, taskFilterSchema);

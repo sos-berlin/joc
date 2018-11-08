@@ -2,7 +2,7 @@ package com.sos.joc.task.impl;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.joc.GlobalsTest;
+import com.sos.joc.TestEnvWebserviceGlobalsTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.exceptions.DBMissingDataException;
 
@@ -12,7 +12,7 @@ public class TaskResourceLogHtmlImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accessToken = GlobalsTest.getAccessToken();
+        accessToken = TestEnvWebserviceGlobalsTest.getAccessToken();
     }
 
     @Test
@@ -20,7 +20,7 @@ public class TaskResourceLogHtmlImplTest {
 
         TaskLogResourceImpl taskLogHtmlResourceImpl = new TaskLogResourceImpl();
         try {
-            JOCDefaultResponse okResponse = taskLogHtmlResourceImpl.getTaskLogHtml(accessToken, "", GlobalsTest.SCHEDULER_ID, "0", null);
+            JOCDefaultResponse okResponse = taskLogHtmlResourceImpl.getTaskLogHtml(accessToken, "", TestEnvWebserviceGlobalsTest.SCHEDULER_ID, "0", null);
         } catch (DBMissingDataException e) {
         }
     }
