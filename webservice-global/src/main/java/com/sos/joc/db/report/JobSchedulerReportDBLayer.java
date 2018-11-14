@@ -11,6 +11,7 @@ import org.hibernate.query.Query;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
+import com.sos.jitl.reporting.db.DBItemReportTask;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -25,7 +26,8 @@ public class JobSchedulerReportDBLayer extends DBLayer {
         super(conn);
     }
 
-    public Agents getExecutedAgentTasks(String jobschedulerId, List<String> agentList, Date from, Date to) throws DBConnectionRefusedException, DBInvalidDataException{
+    public Agents getExecutedAgentTasks(String jobschedulerId, List<String> agentList, Date from, Date to)
+            throws DBConnectionRefusedException, DBInvalidDataException{
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_TASKS);
@@ -77,6 +79,52 @@ public class JobSchedulerReportDBLayer extends DBLayer {
             agents.setAgents(agentsL);
             agents.setDeliveryDate(Date.from(Instant.now()));
             return agents;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public List<DBItemReportTask> getAllStartedAgentTasks(String jobschedulerId, List<String> agentList, Date from, Date to)
+            throws DBConnectionRefusedException, DBInvalidDataException{
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_REPORT_TASKS);
+            sql.append(" where agentUrl is not null");
+            if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
+                sql.append(" and schedulerId = :jobschedulerId"); 
+            }
+            if (from != null) {
+                sql.append(" and startTime >= :dateFrom"); 
+            }
+            if (to != null) {
+                sql.append(" and startTime < :dateTo"); 
+            }
+            if (agentList != null && !agentList.isEmpty()) {
+               if (agentList.size() == 1) {
+                   sql.append(String.format(" and agentUrl %s :agent",SearchStringHelper.getSearchOperator(agentList.get(0))));  
+               } else {
+                   sql.append(" and " + SearchStringHelper.getStringListSql(agentList, "agents"));
+               }
+            }
+            sql.append(" group by startTime");//schedulerId, agentUrl, cause
+            Query<DBItemReportTask> query = getSession().createQuery(sql.toString(), DBItemReportTask.class);
+            if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
+                query.setParameter("jobschedulerId", jobschedulerId);
+            }
+            if (from != null) {
+                query.setParameter("dateFrom", from, TemporalType.TIMESTAMP);
+            }
+            if (to != null) {
+                query.setParameter("dateTo", to, TemporalType.TIMESTAMP);
+            }
+            if (agentList != null && !agentList.isEmpty()) {
+                if (agentList.size() == 1) {
+                    query.setParameter("agent", agentList.get(0));
+                }
+            }
+            return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
