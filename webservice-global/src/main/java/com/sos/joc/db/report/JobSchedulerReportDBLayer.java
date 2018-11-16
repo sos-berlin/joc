@@ -3,6 +3,8 @@ package com.sos.joc.db.report;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.TemporalType;
 
@@ -33,8 +35,8 @@ public class JobSchedulerReportDBLayer extends DBLayer {
             sql.append("select new ").append(AGENT_TASKS);
             sql.append(" (count(id), schedulerId, agentUrl, cause) from ").append(DBITEM_REPORT_TASKS);
             sql.append(" where error = 0");
-            sql.append(" and endTime is not null");
-            sql.append(" and agentUrl is not null");
+            sql.append(" and endTime != null");
+            sql.append(" and agentUrl != null");
             if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
                 sql.append(" and schedulerId = :jobschedulerId"); 
             }
@@ -62,18 +64,14 @@ public class JobSchedulerReportDBLayer extends DBLayer {
             if (to != null) {
                 query.setParameter("dateTo", to, TemporalType.TIMESTAMP);
             }
-            if (agentList != null && !agentList.isEmpty()) {
-                if (agentList.size() == 1) {
-                    query.setParameter("agent", agentList.get(0));
-                }
+            if (agentList != null && agentList.size() == 1) {
+                query.setParameter("agent", agentList.get(0));
             }
             Agents agents = new Agents();
             List<Agent> agentsL = getSession().getResultList(query);
             Long totalNumOfSuccessfulTasks = 0L;
             if (agentsL != null && !agentsL.isEmpty()) {
-               for (Agent a : agentsL) {
-                   totalNumOfSuccessfulTasks = totalNumOfSuccessfulTasks + a.getNumOfSuccessfulTasks(); 
-               }
+                totalNumOfSuccessfulTasks = agentsL.stream().mapToLong(e -> e.getNumOfSuccessfulTasks()).sum();
             }
             agents.setTotalNumOfSuccessfulTasks(totalNumOfSuccessfulTasks);
             agents.setAgents(agentsL);
@@ -86,12 +84,12 @@ public class JobSchedulerReportDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemReportTask> getAllStartedAgentTasks(String jobschedulerId, List<String> agentList, Date from, Date to)
+    public Map<Agent, List<DBItemReportTask>> getAllStartedAgentTasks(String jobschedulerId, List<String> agentList, Date from, Date to)
             throws DBConnectionRefusedException, DBInvalidDataException{
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_REPORT_TASKS);
-            sql.append(" where agentUrl is not null");
+            sql.append(" where agentUrl != null");
             if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
                 sql.append(" and schedulerId = :jobschedulerId"); 
             }
@@ -108,7 +106,6 @@ public class JobSchedulerReportDBLayer extends DBLayer {
                    sql.append(" and " + SearchStringHelper.getStringListSql(agentList, "agents"));
                }
             }
-            sql.append(" group by startTime");//schedulerId, agentUrl, cause
             Query<DBItemReportTask> query = getSession().createQuery(sql.toString(), DBItemReportTask.class);
             if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
                 query.setParameter("jobschedulerId", jobschedulerId);
@@ -119,12 +116,14 @@ public class JobSchedulerReportDBLayer extends DBLayer {
             if (to != null) {
                 query.setParameter("dateTo", to, TemporalType.TIMESTAMP);
             }
-            if (agentList != null && !agentList.isEmpty()) {
-                if (agentList.size() == 1) {
-                    query.setParameter("agent", agentList.get(0));
-                }
+            if (agentList != null && agentList.size() == 1) {
+                query.setParameter("agent", agentList.get(0));
             }
-            return getSession().getResultList(query);
+            List<DBItemReportTask> result = getSession().getResultList(query);
+            if (result != null) {
+                return result.stream().collect(Collectors.groupingBy(reportTask -> new AgentTasks(reportTask)));
+            }
+            return null;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

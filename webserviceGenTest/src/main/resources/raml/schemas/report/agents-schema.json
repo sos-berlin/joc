@@ -20,6 +20,9 @@
     },
     "totalNumOfSuccessfulTasks": {
       "$ref": "../common/nonNegativeLong-schema.json"
+    },
+    "totalNumOfJobs": {
+      "$ref": "../common/nonNegativeLong-schema.json"
     }
   }
 }
