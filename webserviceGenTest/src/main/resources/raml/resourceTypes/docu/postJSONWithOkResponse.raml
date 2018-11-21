@@ -1,26 +1,7 @@
 type: error
-get?:
-  is: [ accessToken, jobschedulerMaster, filteredByPath ]
+post:
   description: |
-    <h2>Documentation</h2>
-    <<description>>
-    ___
-  responses:
-    200:
-      description: Content of documentation or its resources.
-      headers:
-        Content-Type:
-          type: string
-          required: false
-      body:
-        binary/octet-stream:
-        application/xml:
-        text/html:
-        text/plain:
-post?:
-  description: |
-    <h2>Documentation</h2>
-    <<description>>
+    <h2><<description>></h2>
     ___
     <h4>Parameters in the POST body schema</h4>
     <table class="params" style="table-layout:auto;">
@@ -37,27 +18,26 @@ post?:
     <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
     <<description1>>
     <<description2>>
+    <<description3>>
+    <<description4>>
+    <<audit>>
     </tbody></table>
-
   body:
     application/json:
       schema: <<schema>>
       example: <<example>>
   responses:
     200:
-      description: Content of documentation.
-      headers:
-        Content-Type:
-          type: string
-          required: false
-      body:
-        binary/octet-stream:
-        application/xml:
-        text/html:
-        text/plain:
-    420:
+      description: |
+        **Confirm <span style="text-transform: capitalize;"><<resourcePathName>></span> successfully**
       body:
         application/json:
-    440:
+          example: |
+            {
+              "deliveryDate":"2016-05-05T21:13:35Z",
+              "ok":true
+            }
+          schema: ok
+    419:
       body:
         application/json:

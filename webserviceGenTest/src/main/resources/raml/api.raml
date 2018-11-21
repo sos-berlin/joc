@@ -45,6 +45,7 @@ resourceTypes:
   - error: !include resourceTypes/common/error.raml
   - postWithPlainResponse: !include resourceTypes/joc/postWithPlainResponse.raml
   - postCalendarWithOkResponse: !include resourceTypes/calendar/postJSONWithOkResponse.raml
+  - postDocuWithOkResponse: !include resourceTypes/docu/postJSONWithOkResponse.raml
   - postTaskWithOkResponse: !include resourceTypes/job/postWithOkResponse.raml
   - postTaskAndTimeoutWithOkResponse: !include resourceTypes/job/postTimeoutWithOkResponse.raml
   - postTimeoutWithOkResponse: !include resourceTypes/common/postTimeoutWithOkResponse.raml
@@ -92,6 +93,7 @@ resourceTypes:
 traits:
   - jobschedulerMaster: !include traits/jobschedulerMaster.raml
   - filteredByJob: !include ./traits/filteredByJob.raml
+  - filteredByPath: !include ./traits/filteredByPath.raml
   - filteredByTransferFileId: !include ./traits/filteredByTransferFileId.raml
   - accessToken: !include ./traits/accessToken.raml
   - filename: !include ./traits/filename.raml
@@ -2359,12 +2361,12 @@ traits:
   type:
     postJSON:
       description: Sends collection of documentations
-      description1: !include documentation/common/compact.md
-      description2: !include documentation/common/regex.md
-      description3: !include documentation/common/folders.md
-      description4: " "
+      description1: !include documentation/docu/filteredByPaths.md
+      description2: !include documentation/common/compact.md
+      description3: !include documentation/common/regex.md
+      description4: !include documentation/common/folders.md
       description5: " "
-      description6: !include documentation/docu/filteredByPaths.md
+      description6: " "
       description7: " "
       description8: " "
       description9: " "
@@ -2374,28 +2376,90 @@ traits:
       schema200: !include schemas/docu/documentations-schema.json
       example: " "
       example200: " "
-
-/documentation:
-  type:
-    postDocu:
-      schema: !include schemas/docu/documentationContent-schema.json
-      example: " "
   /export:
     type:
-      postDocu:
-        schema: !include schemas/docu/documentationContent-schema.json
+      postForDownload:
+        description: Provides export file (zip) as download of documentations
+        description1: !include documentation/docu/filteredByPaths.md
+        description2: !include documentation/common/folders.md
+        description3: " "
+        description4: " "
+        description5: " "
+        schema: !include schemas/docu/documentationsFilter-schema.json
         example: " "
   /import:
     type:
-#      postCalendarWithOkResponse:
       postForUpload:
-        description: Import Documentation
-#        description1: !include documentation/calendar/calendarsObj.md
+        description: Import Documentations
+
+/documentation:
+  get:
+  type:
+    postDocu:
+      description: " "
+      description1: !include documentation/docu/docuId.md
+      description2: " "
+      example: " "
+  /used:
+    type:
+      postJSON:
+        description: Sends a list of JobScheduler objects which use the documentation
+        description1: !include documentation/docu/docuId.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/docu/docuId-schema.json
+        schema200: !include schemas/docu/usedBy-schema.json
+        example: " "
+        example200: " "
+  /show:
+    post:
+    type:
+      postDocu:
+        description: Sends the documentation of a JobScheduler object
+        description1: !include documentation/docu/jsObject.md
+        description2: " "
+        schema: !include schemas/docu/documentationShow-schema.json
+        example: " "    
+#  /store:
+#    type:
+#      postDocuWithOkResponse:
+#        description: Save or Rename a documentation
+#        description1: !include documentation/docu/calendarStoreObj.md
 #        description2: " "
 #        description3: " "
 #        description4: " "
-#        description200: " "
-#        schema: !include schemas/calendar/calendarImportFilter-schema.json
+#        schema: !include schemas/docu/calendarObjectFilter-schema.json
+#        audit: !include documentation/audit/auditLog.md
+#        example: " "  
+#  /save_as:
+#    type:
+#      postDocuWithOkResponse:
+#        description: SaveAs a documentation
+#        description1: !include documentation/docu/calendarObj.md
+#        description2: " "
+#        description3: " "
+#        description4: " "
+#        schema: !include schemas/docu/calendarObjectFilter-schema.json
+#        audit: !include documentation/audit/auditLog.md
+#        example: " "  
+#  /rename:
+#    type:
+#      postDocuWithOkResponse:
+#        description: Renames a documentation
+#        description1: !include documentation/docu/calendarRequired.md
+#        description2: " "
+#        description3: !include documentation/docu/calendarNewRequired.md
+#        description4: " "
+#        schema: !include schemas/docu/calendarRenameFilter-schema.json
 #        audit: !include documentation/audit/auditLog.md
 #        example: " "
+  
 

@@ -3,20 +3,6 @@ post:
   description: |
     <h2><<description>></h2>
     ___
-    <h4>Parameters in the POST body schema</h4>
-    <table class="params" style="table-layout:auto;">
-    <colgroup>
-      <col width="10%"/>
-      <col width="10%"/>
-      <col width="*"/>
-      <col width="20%"/>
-      <col width="10%"/>
-    </colgroup>
-    <thead>
-    <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
-    </thead><tbody>
-    <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
-    </tbody></table>
   body:
     multipart/form-data:
       formParameters:
@@ -28,7 +14,17 @@ post:
           required: true
           type: string
           description: JobScheduler Master ID
-          example: scheduler  
+          example: scheduler
+        accessToken:
+          required: false
+          type: string
+          description: is used if the header doesn't contain ``X-Access-Token``
+          example: 550e8400-e29b-11d4-a716-446655440000
+        folder:
+          required: false
+          type: string
+          description: Folder where is file should be stored in JOC
+          default: /  
   responses:
     200:
       description: |

@@ -19,12 +19,6 @@
     },
     "title": {
       "type": "string"
-    },
-    "usedBy": {
-      "type": "array",
-      "item": {
-      	"$ref": "../common/path-schema.json"
-      }
     }
   }
 }
