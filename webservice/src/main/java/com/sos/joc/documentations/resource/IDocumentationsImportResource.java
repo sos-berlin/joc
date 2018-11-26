@@ -15,10 +15,10 @@ public interface IDocumentationsImportResource {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.TEXT_PLAIN) 
+    @Produces(MediaType.APPLICATION_JSON) 
     public JOCDefaultResponse postImportDocumentations(
             @HeaderParam("X-Access-Token") String xAccessToken,
             @FormDataParam("jobschedulerId") String jobschedulerId, 
-            @FormDataParam("directory") String directory, 
+            @FormDataParam("folder") String directory, 
             @FormDataParam("file") FormDataBodyPart body) throws Exception;
 }
