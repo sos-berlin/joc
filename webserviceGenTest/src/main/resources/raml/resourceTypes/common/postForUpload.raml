@@ -24,7 +24,19 @@ post:
           required: false
           type: string
           description: Folder where is file should be stored in JOC
-          default: /  
+          default: /
+        comment:
+          description: for auditLog
+          required: false
+          type: string
+        timeSpent:
+          description: for auditLog
+          required: false
+          type: string
+        ticketLink:
+          description: for auditLog
+          required: false
+          type: string  
   responses:
     200:
       description: |

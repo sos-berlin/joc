@@ -2391,6 +2391,25 @@ traits:
     type:
       postForUpload:
         description: Import Documentations
+  /delete:
+    type:
+      postJSON:
+        description: Deletes a list of Documentations
+        description1: !include documentation/docu/filteredByPaths.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/docu/documentationsFilter-schema.json
+        schema200: ok
+        example: " "
+        example200: " "
 
 /documentation:
   /{jobschedulerId}/{accessToken}/{path}:
@@ -2420,6 +2439,15 @@ traits:
         schema200: !include schemas/docu/usedBy-schema.json
         example: " "
         example200: " "
+  /preview:
+    post:
+    type:
+      postDocu:
+        description: Preview the documentation
+        description1: !include documentation/docu/docPath.md
+        description2: " "
+        schema: !include schemas/docu/documentationShow-schema.json
+        example: " "
   /show:
     post:
     type:

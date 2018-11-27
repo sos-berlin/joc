@@ -15,7 +15,7 @@
       "type": "string"
     },
     "type": {
-      "$ref": "string"
+      "type": "string"
     },
     "title": {
       "type": "string"
