@@ -18,6 +18,7 @@ public interface IDocumentationsImportResource {
     @Produces(MediaType.APPLICATION_JSON) 
     public JOCDefaultResponse postImportDocumentations(
             @HeaderParam("X-Access-Token") String xAccessToken,
+            @FormDataParam("accessToken") String accessToken, 
             @FormDataParam("jobschedulerId") String jobschedulerId, 
             @FormDataParam("folder") String directory, 
             @FormDataParam("file") FormDataBodyPart body) throws Exception;

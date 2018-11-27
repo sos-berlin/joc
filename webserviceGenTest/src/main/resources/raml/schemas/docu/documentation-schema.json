@@ -8,6 +8,9 @@
     "id": {
       "$ref": "../common/nonNegativeLong-schema.json"
     },
+    "jobschedulerId": {
+      "type": "string"
+    },
     "path": {
       "$ref": "../common/path-schema.json"
     },
@@ -16,6 +19,9 @@
     },
     "type": {
       "type": "string"
+    },
+    "modified": {
+      "$ref": "../common/timestamp-schema.json"
     }
   }
 }

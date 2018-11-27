@@ -38,12 +38,17 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocUnsupportedFileTypeException;
 import com.sos.joc.model.docu.DocumentationImport;
 
-@Path("/documentations/import")
+@Path("documentations")
 public class DocumentationsImportResourceImpl extends JOCResourceImpl implements IDocumentationsImportResource {
     
     private static final String API_CALL = "/documentations/import";
-
+    
     @Override
+    public JOCDefaultResponse postImportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String directory, FormDataBodyPart body)
+            throws Exception {
+        return postImportDocumentations(getAccessToken(xAccessToken, accessToken), jobschedulerId, directory, body);
+    }
+
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, String jobschedulerId, String directory, FormDataBodyPart body)
             throws Exception {
         

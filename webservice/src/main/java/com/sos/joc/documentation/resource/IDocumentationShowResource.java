@@ -16,6 +16,12 @@ public interface IDocumentationShowResource {
     public JOCDefaultResponse show(@HeaderParam("X-Access-Token") String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception;
     
     @POST
+    @Path("preview")
+    @Consumes("application/json")
+    // @Produces({ MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse preview(@HeaderParam("X-Access-Token") String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception;
+    
+    @POST
     @Path("url")
     @Consumes("application/json")
     // @Produces({ MediaType.APPLICATION_JSON })
