@@ -55,6 +55,16 @@ public class DocumentationDBLayer extends DBLayer {
         }
     }
     
+    public DBItemDocumentationImage getDocumentationImage(Long id) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            return getSession().get(DBItemDocumentationImage.class, id);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
     public List<DBItemDocumentation> getDocumentations (String schedulerId, List<String> folders)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
@@ -105,7 +115,6 @@ public class DocumentationDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_DOCUMENTATION_IMAGES);
             sql.append(" where id = :id");
-            sql.append(" and image = :image");
             Query<DBItemDocumentationImage> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             return getSession().getSingleResult(query);

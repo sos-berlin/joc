@@ -2,15 +2,16 @@ package com.sos.joc.documentation.resource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.docu.DocumentationsFilter;
 
 public interface IDocumentationResource {
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postDocumentation(@HeaderParam("X-Access-Token") String xAccessToken, DocumentationsFilter filter) throws Exception;
+    // @Produces({ MediaType.APPLICATION_OCTET_STREAM, MediaType.TEXT_PLAIN })
+    @Path("{jobschedulerId}/{accessToken}/{path : .+}")
+    public JOCDefaultResponse postDocumentation(@HeaderParam("X-Access-Token") String xAccessToken, @PathParam("accessToken") String accessToken,
+            @PathParam("jobschedulerId") String jobschedulerId, @PathParam("path") String path) throws Exception;
 }
