@@ -17,6 +17,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
@@ -97,6 +98,7 @@ public class TreePermanent {
 		});
 		Set<String> bodyTypes = new HashSet<String>();
 		Set<String> calendarTypes = new HashSet<String>();
+		Set<String> docTypes = new HashSet<String>();
         if (treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
 			for (JobSchedulerObjectType type : treeBody.getTypes()) {
 				switch (type) {
@@ -119,6 +121,9 @@ public class TreePermanent {
                     bodyTypes.add("non_working_days_calendar");
                     calendarTypes.add("NON_WORKING_DAYS");
                     break;
+				case DOCUMENTATION:
+				    bodyTypes.add("documentation");
+				    docTypes.add("documentation");
 				default:
 					bodyTypes.add(type.name().toLowerCase());
 					break;
@@ -126,7 +131,8 @@ public class TreePermanent {
 			}
 		} else {
 		    calendarTypes.add("WORKING_DAYS");
-		    calendarTypes.add("NON_WORKING_DAYS"); 
+		    calendarTypes.add("NON_WORKING_DAYS");
+		    docTypes.add("documentation");
 		}
 
 		SOSHibernateSession connection = null;
@@ -138,8 +144,10 @@ public class TreePermanent {
 			Globals.beginTransaction(connection);
 			InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(connection);
 			CalendarsDBLayer dbCalendarLayer = new CalendarsDBLayer(connection);
-			List<String> results = null;
+			DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
+            List<String> results = null;
 			List<String> calendarResults = null;
+			List<String> docResults = null;
 			if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
 				for (Folder folder : treeBody.getFolders()) {
 					String normalizedFolder = ("/" + folder.getFolder()).replaceAll("//+", "/");
@@ -153,6 +161,15 @@ public class TreePermanent {
 					        results.addAll(calendarResults);
 					    }
 					}
+					if (!docTypes.isEmpty()) {
+                        docResults = dbDocLayer.getFoldersByFolder(schedulerId, normalizedFolder);
+                        if (docResults != null && !docResults.isEmpty()) {
+                            if (results == null) {
+                                results = new ArrayList<String>();
+                            } 
+                            results.addAll(docResults);
+                        }
+                    }
 					if (results != null && !results.isEmpty()) {
 						if (folder.getRecursive() == null || folder.getRecursive()) {
 							folders.addAll(results);
@@ -175,6 +192,15 @@ public class TreePermanent {
                             results = new ArrayList<String>();
                         } 
                         results.addAll(calendarResults);
+                    }
+                }
+				if (!docTypes.isEmpty()) {
+				    docResults = dbDocLayer.getFoldersByFolder(schedulerId, "/");
+                    if (docResults != null && !docResults.isEmpty()) {
+                        if (results == null) {
+                            results = new ArrayList<String>();
+                        } 
+                        results.addAll(docResults);
                     }
                 }
 				if (results != null && !results.isEmpty()) {

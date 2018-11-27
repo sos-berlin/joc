@@ -132,4 +132,27 @@ public class DocumentationDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+
+    public List<String> getFoldersByFolder(String schedulerId, String folderName) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select directory from ").append(DBITEM_DOCUMENTATION);
+            sql.append(" where schedulerId = :schedulerId");
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                sql.append(" and ( directory = :folderName or directory like :likeFolderName )");
+            }
+            sql.append(" group by directory");
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                query.setParameter("folderName", folderName);
+                query.setParameter("likeFolderName", folderName + "/%");
+            }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
 }

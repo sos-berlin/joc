@@ -25,6 +25,7 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
 
     private static final String API_CALL_SHOW = "/documentation/show";
     private static final String API_CALL_URL = "/documentation/url";
+    private static final String API_CALL_PREVIEW = "/documentation/preview";
 
     @Override
     public JOCDefaultResponse show(String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception {
@@ -37,8 +38,33 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
             }
 
             String entity = String.format(
-                    "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='./%s'\" />%n</head>%n<body>%n</body>%n</html>",
+                    "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='../%s'\" />%n</head>%n<body>%n</body>%n</html>",
                     getUrl(API_CALL_SHOW, xAccessToken, documentationFilter));
+
+            return JOCDefaultResponse.responseHtmlStatus200(entity);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }
+    }
+
+    @Override
+    public JOCDefaultResponse preview(String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception {
+        try {
+            // TODO Permission
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_PREVIEW, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
+                    true);
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
+            checkRequiredParameter("path", documentationFilter.getPath());
+
+            String entity = String.format(
+                    "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='../%s/%s%s'\" />%n</head>%n<body>%n</body>%n</html>",
+                    documentationFilter.getJobschedulerId(), xAccessToken, documentationFilter.getPath());
 
             return JOCDefaultResponse.responseHtmlStatus200(entity);
         } catch (JocException e) {
