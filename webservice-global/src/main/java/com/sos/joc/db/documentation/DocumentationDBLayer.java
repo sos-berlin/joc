@@ -12,6 +12,7 @@ import com.sos.jitl.reporting.db.DBItemDocumentationImage;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.docu.DocumentationShowFilter;
 
 public class DocumentationDBLayer extends DBLayer {
 
@@ -111,5 +112,24 @@ public class DocumentationDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
+    public String getDocumentationPath(DocumentationShowFilter documentationFilter) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select concat(d.directory, '/', d.name) from ").append(DBITEM_DOCUMENTATION).append(" d, ").append(DBITEM_DOCUMENTATION_USAGE).append(" du");
+            sql.append(" where d.id = du.documentationId");
+            sql.append(" and du.schedulerId = :schedulerId");
+            sql.append(" and du.objectType = :objectType");
+            sql.append(" and du.path = :path");
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulerId", documentationFilter.getJobschedulerId());
+            query.setParameter("objectType", documentationFilter.getType().name());
+            query.setParameter("path", documentationFilter.getPath());
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
 }
