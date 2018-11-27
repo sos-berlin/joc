@@ -20,8 +20,6 @@ import javax.ws.rs.Path;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.util.ByteArrayBuffer;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -42,26 +40,26 @@ import com.sos.joc.model.docu.DocumentationImport;
 @Path("/documentations/import")
 public class DocumentationsImportResourceImpl extends JOCResourceImpl implements IDocumentationsImportResource {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentationsImportResourceImpl.class);
     private static final String API_CALL = "/documentations/import";
     private boolean hasUnsupportedFiles = false;
 
     @Override
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, String jobschedulerId, String directory, FormDataBodyPart body)
             throws Exception {
+        
         DocumentationImport filter = new DocumentationImport();
         filter.setJobschedulerId(jobschedulerId);
         filter.setFolder(directory);
         filter.setFile(body.getContentDisposition().getFileName());
-//        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken,
-//                jobschedulerId, getPermissonsJocCockpit(jobschedulerId, xAccessToken).getDocumentationImport().getView().isStatus());
-//        if (jocDefaultResponse != null) {
-//            return jocDefaultResponse;
-//        }
+        // TODO: permissions
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, jobschedulerId, true);
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
         SOSHibernateSession connection = null;
         InputStream stream = null;
         try {
-            connection = Globals.createSosHibernateStatelessConnection("/documentations/import");
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             Set<DBItemDocumentation> documentations = new HashSet<DBItemDocumentation>();
             stream = body.getEntityAs(InputStream.class);
@@ -115,7 +113,8 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
     }
     
     private void readZipFileContent(InputStream inputStream, String jobschedulerId, String directory, Set<DBItemDocumentation> documentations,
-            FormDataBodyPart body, DocumentationDBLayer dbLayer) {
+            FormDataBodyPart body, DocumentationDBLayer dbLayer) throws DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException,
+            IOException {
         ZipInputStream zipStream = null;
         try {
             zipStream = new ZipInputStream(inputStream);
@@ -150,16 +149,12 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                             DBItemDocumentationImage image = new DBItemDocumentationImage();
                             image.setSchedulerId(jobschedulerId);
                             image.setImage(bytes);
-                            try {
-                                DBItemDocumentationImage imageFromDB = dbLayer.getDocumentationImage(image.getSchedulerId(), image.getImage());
-                                if (imageFromDB != null) {
-                                    documentation.setImageId(imageFromDB.getId());
-                                } else {
-                                    dbLayer.getSession().save(image);
-                                    documentation.setImageId(image.getId());
-                                }
-                            } catch (SOSHibernateException | DBConnectionRefusedException | DBInvalidDataException e) {
-                                LOGGER.error(e.getMessage(), e);
+                            DBItemDocumentationImage imageFromDB = dbLayer.getDocumentationImage(image.getSchedulerId(), image.getImage());
+                            if (imageFromDB != null) {
+                                documentation.setImageId(imageFromDB.getId());
+                            } else {
+                                dbLayer.getSession().save(image);
+                                documentation.setImageId(image.getId());
                             }
                         } else {                                
                             documentation.setContent(new String(bytes));
@@ -174,7 +169,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 documentations.add(documentation);
             }
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            throw e;
         } finally {
             if (zipStream != null) {
                 try {
@@ -185,22 +180,18 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
     }
     
     private void readFileContent(InputStream inputStream, String jobschedulerId, String directory, Set<DBItemDocumentation> documentations,
-            FormDataBodyPart body) {
+            FormDataBodyPart body) throws IOException {
         DBItemDocumentation documentation = new DBItemDocumentation();
         documentation.setSchedulerId(jobschedulerId);
         documentation.setDirectory(directory);
         documentation.setName(body.getContentDisposition().getFileName());
         documentation.setCreated(Date.from(Instant.now()));
         documentation.setModified(Date.from(Instant.now()));
-        try {
-            documentation.setType(guessContentTypeFromBytes(IOUtils.toByteArray(inputStream), getExtensionFromFilename(documentation.getName())));
-            if (documentation.getType() == null) {
-                hasUnsupportedFiles = true;
-            }
-            documentation.setContent(IOUtils.toString(inputStream, Charsets.UTF_8.toString()));
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        }           
+        documentation.setType(guessContentTypeFromBytes(IOUtils.toByteArray(inputStream), getExtensionFromFilename(documentation.getName())));
+        if (documentation.getType() == null) {
+            hasUnsupportedFiles = true;
+        }
+        documentation.setContent(IOUtils.toString(inputStream, Charsets.UTF_8.toString()));
         documentations.add(documentation);
     }
 
