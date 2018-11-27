@@ -33,7 +33,7 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
     private static final String API_CALL = "/documentations/export";
     private static final String DEFAULT_TARGET_FILENAME = "documentation.zip";
     @Override
-    public JOCDefaultResponse postImportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
+    public JOCDefaultResponse postExportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
         
         // TODO: permissions
         JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), true);

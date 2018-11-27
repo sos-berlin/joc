@@ -12,5 +12,5 @@ public interface IDocumentationsExportResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public JOCDefaultResponse postImportDocumentations(@HeaderParam("X-Access-Token") String xAccessToken, DocumentationsFilter filter) throws Exception;
+    public JOCDefaultResponse postExportDocumentations(@HeaderParam("X-Access-Token") String xAccessToken, DocumentationsFilter filter) throws Exception;
 }
