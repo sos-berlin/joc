@@ -1,7 +1,11 @@
 package com.sos.joc.documentations.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +13,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +35,6 @@ import com.sos.joc.model.docu.DocumentationsFilter;
 @Path("/documentations/export")
 public class DocumentationsExportResourceImpl extends JOCResourceImpl implements IDocumentationsExportResource{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentationsExportResourceImpl.class);
     private static final String API_CALL = "/documentations/export";
     private static final String DEFAULT_TARGET_FILENAME = "documentation.zip";
     @Override
@@ -63,9 +67,9 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
             }
             out = createZipOutputStreamForDownload(docs, dbLayer);
             if (targetFilename != null && !targetFilename.isEmpty()) {
-                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(docs, targetFilename);
+                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(out, targetFilename);
             } else {
-                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(docs, DEFAULT_TARGET_FILENAME);
+                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(out, DEFAULT_TARGET_FILENAME);
             }
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -93,7 +97,7 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
             if (documentation.getContent() != null) {
                 zipOut.write(documentation.getContent().getBytes());
             } else {
-                DBItemDocumentationImage image = dbLayer.getDocumentationImageById(documentation.getImageId());
+                DBItemDocumentationImage image = dbLayer.getDocumentationImage(documentation.getImageId());
                 if (image != null) {
                     zipOut.write(image.getImage());
                 }

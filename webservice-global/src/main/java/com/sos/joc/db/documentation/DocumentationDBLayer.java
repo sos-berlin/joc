@@ -110,19 +110,4 @@ public class DocumentationDBLayer extends DBLayer {
         }
     }
     
-    public DBItemDocumentationImage getDocumentationImageById (Long id) throws DBConnectionRefusedException, DBInvalidDataException {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_DOCUMENTATION_IMAGES);
-            sql.append(" where id = :id");
-            Query<DBItemDocumentationImage> query = getSession().createQuery(sql.toString());
-            query.setParameter("id", id);
-            return getSession().getSingleResult(query);
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
-        }
-    }
-
 }
