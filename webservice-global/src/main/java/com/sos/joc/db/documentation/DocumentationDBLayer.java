@@ -102,7 +102,7 @@ public class DocumentationDBLayer extends DBLayer {
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("folder", folder);
             if (recursive) {
-                query.setParameter("folder2", MatchMode.END.toMatchString(folder + "/"));
+                query.setParameter("folder2", MatchMode.START.toMatchString(folder + "/"));
             }
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
