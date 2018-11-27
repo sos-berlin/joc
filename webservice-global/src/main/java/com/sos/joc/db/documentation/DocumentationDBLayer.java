@@ -94,13 +94,15 @@ public class DocumentationDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_DOCUMENTATION);
             sql.append(" where schedulerId = :schedulerId");
-            sql.append(" and directory in :folders");
+            sql.append(" and directory = :folder");
+            if (recursive) {
+                sql.append(" or directory like :folder2");
+            }
             Query<DBItemDocumentation> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
+            query.setParameter("folder", folder);
             if (recursive) {
-                query.setParameter("folders", MatchMode.END.toMatchString(folder));
-            } else {
-                query.setParameter("folders", MatchMode.START.toMatchString(folder));
+                query.setParameter("folder2", MatchMode.END.toMatchString(folder + "/"));
             }
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
