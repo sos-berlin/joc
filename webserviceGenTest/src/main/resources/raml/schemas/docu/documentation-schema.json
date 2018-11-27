@@ -15,7 +15,7 @@
       "type": "string"
     },
     "type": {
-      "$ref": "mimeType-schema.json"
+      "$ref": "string"
     },
     "title": {
       "type": "string"

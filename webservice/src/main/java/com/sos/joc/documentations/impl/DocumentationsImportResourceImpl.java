@@ -41,7 +41,6 @@ import com.sos.joc.model.docu.DocumentationImport;
 public class DocumentationsImportResourceImpl extends JOCResourceImpl implements IDocumentationsImportResource {
     
     private static final String API_CALL = "/documentations/import";
-    private boolean hasUnsupportedFiles = false;
 
     @Override
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, String jobschedulerId, String directory, FormDataBodyPart body)
@@ -63,16 +62,10 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             Set<DBItemDocumentation> documentations = new HashSet<DBItemDocumentation>();
             stream = body.getEntityAs(InputStream.class);
-            if (body.getMediaType().toString().contains("zip")) {
+            if (body.getMediaType().toString().contains("zip")) { //TODO not safe to determine if it is a zip
                 readZipFileContent(stream, jobschedulerId, directory, documentations, body, dbLayer);
-                if (hasUnsupportedFiles) {
-                    throw new JocUnsupportedFileTypeException("The zip file to upload contains at least one unsupported file type, upload is rejected!");
-                }
             } else {
                 readFileContent(stream, jobschedulerId, directory, documentations, body);
-                if (hasUnsupportedFiles) {
-                    throw new JocUnsupportedFileTypeException("The file to upload is an unsupported file type, upload is rejected!");
-                }
             }
             for (DBItemDocumentation doc : documentations) {
                 DBItemDocumentation docFromDB = dbLayer.getDocumentation(doc.getSchedulerId(), doc.getDirectory(), doc.getName());
@@ -114,7 +107,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
     
     private void readZipFileContent(InputStream inputStream, String jobschedulerId, String directory, Set<DBItemDocumentation> documentations,
             FormDataBodyPart body, DocumentationDBLayer dbLayer) throws DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException,
-            IOException {
+            IOException, JocUnsupportedFileTypeException {
         ZipInputStream zipStream = null;
         try {
             zipStream = new ZipInputStream(inputStream);
@@ -134,7 +127,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 java.nio.file.Path complete = targetFolder.resolve(entry.getName());
                 documentation.setDirectory(complete.getParent().toString().replace('\\', '/'));
                 documentation.setName(complete.getFileName().toString());
-                if (!entry.isDirectory()) {
+                if (!entry.isDirectory()) {  //obsolete
                     String fileExtension = getExtensionFromFilename(documentation.getName());
                     ByteArrayBuffer outBuffer = new ByteArrayBuffer(8192);
                     byte[] binBuffer = new byte[8192];
@@ -149,6 +142,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                             DBItemDocumentationImage image = new DBItemDocumentationImage();
                             image.setSchedulerId(jobschedulerId);
                             image.setImage(bytes);
+                            // maybe introducing hash field in table would be better?
                             DBItemDocumentationImage imageFromDB = dbLayer.getDocumentationImage(image.getSchedulerId(), image.getImage());
                             if (imageFromDB != null) {
                                 documentation.setImageId(imageFromDB.getId());
@@ -156,20 +150,17 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                                 dbLayer.getSession().save(image);
                                 documentation.setImageId(image.getId());
                             }
-                        } else {                                
+                        } else { //TODO knallt, wenn "application/pdf"                           
                             documentation.setContent(new String(bytes));
                         }
-                    } else {
-                        hasUnsupportedFiles = true;
-                        return;
+                    } else { //throw with info complete.toString(), what is supported?
+                        throw new JocUnsupportedFileTypeException("The zip file to upload contains at least one unsupported file type, upload is rejected!");
                     }
                 }
                 documentation.setCreated(Date.from(Instant.now()));
-                documentation.setModified(Date.from(Instant.now()));
+                documentation.setModified(documentation.getCreated());
                 documentations.add(documentation);
             }
-        } catch (IOException e) {
-            throw e;
         } finally {
             if (zipStream != null) {
                 try {
@@ -180,18 +171,19 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
     }
     
     private void readFileContent(InputStream inputStream, String jobschedulerId, String directory, Set<DBItemDocumentation> documentations,
-            FormDataBodyPart body) throws IOException {
+            FormDataBodyPart body) throws IOException, JocUnsupportedFileTypeException {
         DBItemDocumentation documentation = new DBItemDocumentation();
         documentation.setSchedulerId(jobschedulerId);
         documentation.setDirectory(directory);
         documentation.setName(body.getContentDisposition().getFileName());
         documentation.setCreated(Date.from(Instant.now()));
         documentation.setModified(Date.from(Instant.now()));
-        documentation.setType(guessContentTypeFromBytes(IOUtils.toByteArray(inputStream), getExtensionFromFilename(documentation.getName())));
-        if (documentation.getType() == null) {
-            hasUnsupportedFiles = true;
+        byte[] b = IOUtils.toByteArray(inputStream);
+        documentation.setType(guessContentTypeFromBytes(b, getExtensionFromFilename(documentation.getName())));
+        if (documentation.getType() == null) { //what is supported?
+            throw new JocUnsupportedFileTypeException("The file to upload is an unsupported file type, upload is rejected!");
         }
-        documentation.setContent(IOUtils.toString(inputStream, Charsets.UTF_8.toString()));
+        documentation.setContent(new String(b, Charsets.UTF_8));
         documentations.add(documentation);
     }
 
