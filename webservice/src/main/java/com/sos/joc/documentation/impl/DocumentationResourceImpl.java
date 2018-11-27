@@ -3,6 +3,7 @@ package com.sos.joc.documentation.impl;
 import java.nio.file.Paths;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemDocumentation;
@@ -35,6 +36,7 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
                 return jocDefaultResponse;
             }
 
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             java.nio.file.Path p = Paths.get(normalizePath(path));
             DBItemDocumentation dbItem = dbLayer.getDocumentation(jobschedulerId, p.getParent().toString().replace('\\', '/'), p.getFileName()
@@ -51,7 +53,7 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
                     throw new DBMissingDataException(errMessage);
                 }
                 if (type.isEmpty()) {
-                    type = "application/octet-stream";
+                    type = MediaType.APPLICATION_OCTET_STREAM;
                 }
                 return JOCDefaultResponse.responseStatus200(dbItemImage, type);
 
@@ -59,12 +61,12 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
                 switch (type) {
                 case "application/xsl":
                 case "application/xsd":
-                    type = "application/xml";
+                    type = MediaType.APPLICATION_XML;
                     break;
                 // TODO convert markdown -> html
                 case "text/markdown":
                 case "":
-                    type = "text/plain";
+                    type = MediaType.TEXT_PLAIN;
                     break;
                 }
                 if (type.startsWith("text/")) {
