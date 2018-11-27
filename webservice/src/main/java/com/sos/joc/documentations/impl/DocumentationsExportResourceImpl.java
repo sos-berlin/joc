@@ -35,12 +35,12 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
     @Override
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
         
-        SOSHibernateSession connection = null;
         // TODO: permissions
         JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), true);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
+        SOSHibernateSession connection = null;
         List<String> documentations = filter.getDocumentations();
         List<Folder> folders = filter.getFolders();
         String targetFilename = null;
