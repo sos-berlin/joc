@@ -17,6 +17,7 @@ import java.util.zip.ZipInputStream;
 
 import javax.ws.rs.Path;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.util.ByteArrayBuffer;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -62,9 +63,12 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             Set<DBItemDocumentation> documentations = new HashSet<DBItemDocumentation>();
             stream = body.getEntityAs(InputStream.class);
-            if (body.getMediaType().toString().contains("zip")) { //TODO not safe to determine if it is a zip
+            // TODO: not safe to determine if it is a zip 
+            // ---- negative test for gzip added to if
+            // ---- else changed to else if with negative test for gzip
+            if (body.getMediaType().toString().contains("zip") && !body.getMediaType().toString().contains("gzip")) {
                 readZipFileContent(stream, jobschedulerId, directory, documentations, body, dbLayer);
-            } else {
+            } else if (!body.getMediaType().toString().contains("gzip")){
                 readFileContent(stream, jobschedulerId, directory, documentations, body);
             }
             for (DBItemDocumentation doc : documentations) {
@@ -127,35 +131,38 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 java.nio.file.Path complete = targetFolder.resolve(entry.getName());
                 documentation.setDirectory(complete.getParent().toString().replace('\\', '/'));
                 documentation.setName(complete.getFileName().toString());
-                if (!entry.isDirectory()) {  //obsolete
-                    String fileExtension = getExtensionFromFilename(documentation.getName());
-                    ByteArrayBuffer outBuffer = new ByteArrayBuffer(8192);
-                    byte[] binBuffer = new byte[8192];
-                    int binRead = 0;
-                    while ((binRead = zipStream.read(binBuffer, 0, 8192)) >= 0) {
-                        outBuffer.append(binBuffer, 0, binRead);
-                    }
-                    byte[] bytes = outBuffer.toByteArray();
-                    documentation.setType(guessContentTypeFromBytes(bytes, fileExtension));
-                    if (documentation.getType() != null) {
-                        if (documentation.getType().startsWith("image")) {
-                            DBItemDocumentationImage image = new DBItemDocumentationImage();
-                            image.setSchedulerId(jobschedulerId);
-                            image.setImage(bytes);
-                            // maybe introducing hash field in table would be better?
-                            DBItemDocumentationImage imageFromDB = dbLayer.getDocumentationImage(image.getSchedulerId(), image.getImage());
-                            if (imageFromDB != null) {
-                                documentation.setImageId(imageFromDB.getId());
-                            } else {
-                                dbLayer.getSession().save(image);
-                                documentation.setImageId(image.getId());
-                            }
-                        } else { //TODO knallt, wenn "application/pdf"                           
-                            documentation.setContent(new String(bytes));
+                String fileExtension = getExtensionFromFilename(documentation.getName());
+                ByteArrayBuffer outBuffer = new ByteArrayBuffer(8192);
+                byte[] binBuffer = new byte[8192];
+                int binRead = 0;
+                while ((binRead = zipStream.read(binBuffer, 0, 8192)) >= 0) {
+                    outBuffer.append(binBuffer, 0, binRead);
+                }
+                byte[] bytes = outBuffer.toByteArray();
+                documentation.setType(guessContentTypeFromBytes(bytes, fileExtension));
+                if (documentation.getType() != null) {
+                    if (documentation.getType().startsWith("image")) {
+                        DBItemDocumentationImage image = new DBItemDocumentationImage();
+                        image.setSchedulerId(jobschedulerId);
+                        image.setImage(bytes);
+                        image.setMd5Hash(DigestUtils.md5Hex(bytes));
+                        DBItemDocumentationImage imageFromDB = dbLayer.getDocumentationImage(image.getSchedulerId(), image.getMd5Hash());
+                        if (imageFromDB != null) {
+                            documentation.setImageId(imageFromDB.getId());
+                        } else {
+                            dbLayer.getSession().save(image);
+                            documentation.setImageId(image.getId());
                         }
-                    } else { //throw with info complete.toString(), what is supported?
-                        throw new JocUnsupportedFileTypeException("The zip file to upload contains at least one unsupported file type, upload is rejected!");
+                    } else { 
+                        //TODO knallt, wenn "application/pdf"
+                        // bei pdf ist type = null --> knallt also nicht, kann aber bei anderen binaries knallen,
+                        // bei denen URLConnection.guessContentTypeFromStream nicht null liefert
+                        documentation.setContent(new String(bytes));
                     }
+                } else { // what is supported?
+                    throw new JocUnsupportedFileTypeException(
+                            String.format("The zip file to upload contains unsupported file - %1$s -, upload is rejected!",
+                                    complete.toString().replace('\\', '/')));
                 }
                 documentation.setCreated(Date.from(Instant.now()));
                 documentation.setModified(documentation.getCreated());
@@ -181,7 +188,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
         byte[] b = IOUtils.toByteArray(inputStream);
         documentation.setType(guessContentTypeFromBytes(b, getExtensionFromFilename(documentation.getName())));
         if (documentation.getType() == null) { //what is supported?
-            throw new JocUnsupportedFileTypeException("The file to upload is an unsupported file type, upload is rejected!");
+            throw new JocUnsupportedFileTypeException("The file to upload is an unsupported file, upload is rejected!");
         }
         documentation.setContent(new String(b, Charsets.UTF_8));
         documentations.add(documentation);

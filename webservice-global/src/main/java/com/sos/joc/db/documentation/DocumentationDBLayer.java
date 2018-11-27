@@ -39,15 +39,15 @@ public class DocumentationDBLayer extends DBLayer {
         }
     }
     
-    public DBItemDocumentationImage getDocumentationImage(String schedulerId, byte[] image) throws DBConnectionRefusedException, DBInvalidDataException {
+    public DBItemDocumentationImage getDocumentationImage(String schedulerId, String md5Hash) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_DOCUMENTATION_IMAGES);
             sql.append(" where schedulerId = :schedulerId");
-            sql.append(" and image = :image");
+            sql.append(" and md5Hash = :md5Hash");
             Query<DBItemDocumentationImage> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
-            query.setParameter("image", image);
+            query.setParameter("md5Hash", md5Hash);
             return getSession().getSingleResult(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

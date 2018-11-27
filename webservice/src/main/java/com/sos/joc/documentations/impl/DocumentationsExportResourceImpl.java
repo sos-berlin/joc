@@ -43,8 +43,7 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
         SOSHibernateSession connection = null;
         List<String> documentations = filter.getDocumentations();
         List<Folder> folders = filter.getFolders();
-        String targetFilename = null;
-//        filter.getTargetFilename();
+        String targetFilename = null;// filter.getTargetFilename();
         StreamingOutput out = null;
         try {
             targetFilename = DEFAULT_TARGET_FILENAME;
