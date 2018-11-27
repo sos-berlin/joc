@@ -1,6 +1,6 @@
 type: error
 get?:
-  is: [ accessToken, jobschedulerMaster, filteredByPath ]
+#  is: [ accessToken, jobschedulerMaster, filteredByPath ]
   description: |
     <h2>Documentation</h2>
     <<description>>
@@ -13,10 +13,13 @@ get?:
           type: string
           required: false
       body:
-        binary/octet-stream:
+        application/octet-stream:
         application/xml:
         text/html:
         text/plain:
+        image/gif:
+        image/jpeg:
+        image/png:
 post?:
   description: |
     <h2>Documentation</h2>
@@ -51,10 +54,13 @@ post?:
           type: string
           required: false
       body:
-        binary/octet-stream:
+        application/octet-stream:
         application/xml:
         text/html:
         text/plain:
+        image/gif:
+        image/jpeg:
+        image/png:
     420:
       body:
         application/json:

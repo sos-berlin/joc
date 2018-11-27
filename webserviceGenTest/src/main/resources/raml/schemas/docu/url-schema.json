@@ -1,0 +1,19 @@
+{
+  "title": "URL of documentation",
+  "id": "schemas/docu/url",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.docu.DocumentationUrl",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "url"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "url": {
+	  "type": "string"
+	}
+  }
+}

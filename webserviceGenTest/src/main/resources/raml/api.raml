@@ -2393,13 +2393,14 @@ traits:
         description: Import Documentations
 
 /documentation:
-  get:
-  type:
-    postDocu:
-      description: " "
-      description1: !include documentation/docu/docuId.md
-      description2: " "
-      example: " "
+  /{jobschedulerId}/{accessToken}/{path}:
+    get:
+    type:
+      postDocu:
+        description: " "
+        description1: !include documentation/docu/docuId.md
+        description2: " "
+        example: " "
   /used:
     type:
       postJSON:
@@ -2427,7 +2428,27 @@ traits:
         description1: !include documentation/docu/jsObject.md
         description2: " "
         schema: !include schemas/docu/documentationShow-schema.json
-        example: " "    
+        example: " "
+  /url:
+    post:
+    type:
+      postJSON:
+        description: Sends the URL of a documentation of a JobScheduler object
+        description1: !include documentation/docu/jsObject.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/docu/documentationShow-schema.json
+        schema200: !include schemas/docu/url-schema.json
+        example: " "
+        example200: " "    
 #  /store:
 #    type:
 #      postDocuWithOkResponse:

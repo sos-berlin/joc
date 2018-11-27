@@ -1,14 +1,11 @@
 package com.sos.joc.db.documentation;
 
 import org.hibernate.query.Query;
-import org.hibernate.type.Type;
-import org.hibernate.type.descriptor.java.ByteArrayTypeDescriptor;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemDocumentation;
 import com.sos.jitl.reporting.db.DBItemDocumentationImage;
-import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -48,6 +45,16 @@ public class DocumentationDBLayer extends DBLayer {
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("image", image);
             return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public DBItemDocumentationImage getDocumentationImage(Long id) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            return getSession().get(DBItemDocumentationImage.class, id);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
