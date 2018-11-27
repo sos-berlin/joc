@@ -33,6 +33,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
 
 		SOSHibernateSession connection = null;
 		try {
+		    // TODO: folder permissions
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
 					jobFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());

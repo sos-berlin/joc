@@ -1,11 +1,8 @@
 package com.sos.joc.documentations.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +12,13 @@ import java.util.zip.ZipOutputStream;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemDocumentation;
 import com.sos.jitl.reporting.db.DBItemDocumentationImage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.db.documentation.DocumentationContent;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentations.resource.IDocumentationsExportResource;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -40,17 +35,17 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
     @Override
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
         
-        SOSHibernateSession connection = null;
         // TODO: permissions
         JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), true);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
+        SOSHibernateSession connection = null;
         List<String> documentations = filter.getDocumentations();
         List<Folder> folders = filter.getFolders();
         String targetFilename = null;
 //        filter.getTargetFilename();
-        ZipOutputStream out = null;
+        StreamingOutput out = null;
         try {
             targetFilename = DEFAULT_TARGET_FILENAME;
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -65,7 +60,8 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
                     docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder.getFolder(), folder.getRecursive()));
                 }
             }
-            out = createZipOutputStreamForDownload(docs, dbLayer);
+            List<DocumentationContent> contents = mapToDocumentationContents(docs, dbLayer);
+            out = createZipOutputStreamForDownload(contents);
             if (targetFilename != null && !targetFilename.isEmpty()) {
                 return JOCDefaultResponse.responseOctetStreamDownloadStatus200(out, targetFilename);
             } else {
@@ -78,32 +74,46 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.disconnect(connection);
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (Exception e) {}
         }
     }
 
-    private ZipOutputStream createZipOutputStreamForDownload(List<DBItemDocumentation> docs, DocumentationDBLayer dbLayer)
-            throws IOException, DBConnectionRefusedException, DBInvalidDataException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ZipOutputStream zipOut = new ZipOutputStream(out);
-        for (DBItemDocumentation documentation : docs) {
-            java.nio.file.Path path = Paths.get(documentation.getDirectory(), documentation.getName());
-            ZipEntry entry = new ZipEntry(path.toString());
-            zipOut.putNextEntry(entry);
-            if (documentation.getContent() != null) {
-                zipOut.write(documentation.getContent().getBytes());
+    private List<DocumentationContent> mapToDocumentationContents (List<DBItemDocumentation> docs, DocumentationDBLayer dbLayer)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        List<DocumentationContent> contents = new ArrayList<DocumentationContent>();
+        for (DBItemDocumentation doc : docs) {
+            DocumentationContent content = null;
+            java.nio.file.Path path = Paths.get(doc.getDirectory(), doc.getName());
+            if (doc.getContent() != null) {
+                content = new DocumentationContent(path.toString(), doc.getContent().getBytes());
             } else {
-                DBItemDocumentationImage image = dbLayer.getDocumentationImage(documentation.getImageId());
+                DBItemDocumentationImage image = dbLayer.getDocumentationImage(doc.getImageId());
                 if (image != null) {
-                    zipOut.write(image.getImage());
+                    content = new DocumentationContent(path.toString(), image.getImage());
                 }
             }
-            zipOut.closeEntry();
+            contents.add(content);
         }
-        return zipOut;
+        return contents;
+    }
+    
+    private StreamingOutput createZipOutputStreamForDownload(List<DocumentationContent> contents) throws IOException {
+        StreamingOutput streamingOutput = new StreamingOutput() {
+            @Override
+            public void write(OutputStream output) throws IOException {
+                ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(output));
+                for (DocumentationContent content : contents) {
+                    ZipEntry entry = new ZipEntry(content.getPath());
+                    zipOut.putNextEntry(entry);
+                    if (content.getContent() != null) {
+                        zipOut.write(content.getContent());
+                    }
+                    zipOut.closeEntry();
+                }
+                zipOut.close();
+                output.flush();
+                output.close();
+            }
+        };
+        return streamingOutput;
     }
 }
