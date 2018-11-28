@@ -24,6 +24,7 @@ import com.sos.joc.documentations.resource.IDocumentationsExportResource;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.docu.DocumentationsFilter;
 
@@ -59,10 +60,12 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
                     String folder = Paths.get(documentation).getParent().toString().replace('\\', '/');
                     docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder));
                 }
-            } else if (folders != null) {
+            } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder.getFolder(), folder.getRecursive()));
                 }
+            } else {
+                throw new JocMissingRequiredParameterException("Neither 'documents' nor 'folders' are specified!");
             }
             List<DocumentationContent> contents = mapToDocumentationContents(docs, dbLayer);
             out = createZipOutputStreamForDownload(contents);
