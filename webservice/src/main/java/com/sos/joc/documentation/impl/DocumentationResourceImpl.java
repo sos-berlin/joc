@@ -16,7 +16,7 @@ import com.sos.joc.documentation.resource.IDocumentationResource;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 
-@Path("/documentation")
+@Path("documentation")
 public class DocumentationResourceImpl extends JOCResourceImpl implements IDocumentationResource {
 
     private static final String API_CALL = "./documentation";
@@ -55,24 +55,10 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
                 if (type.isEmpty()) {
                     type = MediaType.APPLICATION_OCTET_STREAM;
                 }
-                return JOCDefaultResponse.responseStatus200(dbItemImage, type);
+                return JOCDefaultResponse.responseStatus200(dbItemImage.getImage(), getType(type));
 
             } else if (dbItem.getContent() != null && !dbItem.getContent().isEmpty()) {
-                switch (type) {
-                case "application/xsl":
-                case "application/xsd":
-                    type = MediaType.APPLICATION_XML;
-                    break;
-                // TODO convert markdown -> html
-                case "text/markdown":
-                case "":
-                    type = MediaType.TEXT_PLAIN;
-                    break;
-                }
-                if (type.startsWith("text/")) {
-                    type += "; charset=UTF-8";
-                }
-                return JOCDefaultResponse.responseStatus200(dbItem.getContent(), type);
+                return JOCDefaultResponse.responseStatus200(dbItem.getContent(), getType(type));
 
             } else {
                 throw new DBMissingDataException(errMessage);
@@ -85,6 +71,40 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
         } finally {
             Globals.disconnect(connection);
         }
+    }
+    
+    private String getType(String type) {
+        switch (type) {
+        case "xml":
+        case "xsl":
+        case "xsd":
+            type = MediaType.APPLICATION_XML;
+            break;
+        // TODO convert markdown -> html
+        case "javascript":
+        case "css":
+            type = "text/"+type;
+            break;
+        case "json":
+            type = MediaType.APPLICATION_JSON;
+            break;
+        case "markdown":
+        case "":
+            type = MediaType.TEXT_PLAIN;
+            break;
+        case "html":
+            type = MediaType.TEXT_HTML;
+            break;
+        case "gif":
+        case "jpeg":
+        case "png":
+            type = "image/"+type;
+            break;
+        }
+        if (type.startsWith("text/")) {
+            type += "; charset=UTF-8";
+        }
+        return type;
     }
 
 }

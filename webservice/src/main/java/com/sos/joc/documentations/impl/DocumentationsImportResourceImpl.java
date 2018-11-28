@@ -1,6 +1,7 @@
 package com.sos.joc.documentations.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
@@ -9,8 +10,12 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -19,7 +24,6 @@ import javax.ws.rs.Path;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.util.ByteArrayBuffer;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 
 import com.google.common.base.Charsets;
@@ -34,59 +38,79 @@ import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentations.resource.IDocumentationsImportResource;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.JocUnsupportedFileTypeException;
 import com.sos.joc.model.docu.DocumentationImport;
 
 @Path("documentations")
 public class DocumentationsImportResourceImpl extends JOCResourceImpl implements IDocumentationsImportResource {
-    
+
     private static final String API_CALL = "/documentations/import";
-    
+    private static final List<String> SUPPORTED_SUBTYPES = new ArrayList<String>(Arrays.asList("html", "xml", "xsl", "xsd", "javascript", "json",
+            "css", "markdown", "gif", "jpeg", "png"));
+    private static final List<String> SUPPORTED_IMAGETYPES = new ArrayList<String>(Arrays.asList("gif", "jpeg", "png"));
+    private SOSHibernateSession connection = null;
+
     @Override
-    public JOCDefaultResponse postImportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String directory, FormDataBodyPart body)
-            throws Exception {
+    public JOCDefaultResponse postImportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String directory,
+            FormDataBodyPart body) throws Exception {
         return postImportDocumentations(getAccessToken(xAccessToken, accessToken), jobschedulerId, directory, body);
     }
 
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, String jobschedulerId, String directory, FormDataBodyPart body)
             throws Exception {
-        
+
         DocumentationImport filter = new DocumentationImport();
         filter.setJobschedulerId(jobschedulerId);
-        filter.setFolder(directory);
-        filter.setFile(body.getContentDisposition().getFileName());
-        // TODO: permissions
-        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, jobschedulerId, true);
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
+        if (directory == null || directory.isEmpty()) {
+            directory = "/";
         }
-        SOSHibernateSession connection = null;
+        filter.setFolder(normalizeFolder(directory.replace('\\', '/')));
+        if (body != null) {
+            filter.setFile(body.getContentDisposition().getFileName());
+        }
         InputStream stream = null;
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            Set<DBItemDocumentation> documentations = new HashSet<DBItemDocumentation>();
-            stream = body.getEntityAs(InputStream.class);
-            // TODO: not safe to determine if it is a zip 
-            // ---- negative test for gzip added to if
-            // ---- else changed to else if with negative test for gzip
-            if (body.getMediaType().toString().contains("zip") && !body.getMediaType().toString().contains("gzip")) {
-                readZipFileContent(stream, jobschedulerId, directory, documentations, body, dbLayer);
-            } else if (!body.getMediaType().toString().contains("gzip")){
-                readFileContent(stream, jobschedulerId, directory, documentations, body);
+            // TODO: permissions
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, jobschedulerId, true);
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
             }
-            for (DBItemDocumentation doc : documentations) {
-                DBItemDocumentation docFromDB = dbLayer.getDocumentation(doc.getSchedulerId(), doc.getDirectory(), doc.getName());
-                if (docFromDB != null) {
-                   docFromDB.setContent(doc.getContent());
-                   docFromDB.setImageId(doc.getImageId());
-                   docFromDB.setType(doc.getType());
-                   docFromDB.setModified(Date.from(Instant.now()));
-                   connection.update(docFromDB);
+
+            checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
+            if (body == null) {
+                throw new JocMissingRequiredParameterException("undefined 'file'");
+            }
+
+            stream = body.getEntityAs(InputStream.class);
+            String extention = getExtensionFromFilename(filter.getFile());
+
+            final String mediaSubType = body.getMediaType().getSubtype().replaceFirst("^x-", "");
+            Optional<String> supportedSubType = SUPPORTED_SUBTYPES.stream().filter(s -> mediaSubType.contains(s)).findFirst();
+            Optional<String> supportedImageType = SUPPORTED_IMAGETYPES.stream().filter(s -> mediaSubType.contains(s)).findFirst();
+            
+            if (mediaSubType.contains("zip") && !mediaSubType.contains("gzip")) {
+                readZipFileContent(stream, filter);
+
+            } else if (supportedImageType.isPresent()) {
+                saveOrUpdate(setDBItemDocumentationImage(IOUtils.toByteArray(stream), filter, supportedImageType.get()));
+
+            } else if (supportedSubType.isPresent()) {
+                saveOrUpdate(setDBItemDocumentation(IOUtils.toByteArray(stream), filter, supportedSubType.get()));
+
+            } else if ("md".equals(extention) || "markdown".equals(extention)) {
+                byte[] b = IOUtils.toByteArray(stream);
+                if (isPlainText(b)) {
+                    saveOrUpdate(setDBItemDocumentation(b, filter, "markdown"));
                 } else {
-                    connection.save(doc);
+                    throw new JocUnsupportedFileTypeException("Unsupported file type (" + mediaSubType + "), supported types are "
+                            + SUPPORTED_SUBTYPES.toString());
                 }
+            } else {
+                throw new JocUnsupportedFileTypeException("Unsupported file type (" + mediaSubType + "), supported types are " + SUPPORTED_SUBTYPES
+                        .toString());
             }
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -100,8 +124,59 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 if (stream != null) {
                     stream.close();
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
+    }
+
+    private void saveOrUpdate(DocumentationDBLayer dbLayer, DBItemDocumentation doc) throws DBConnectionRefusedException, DBInvalidDataException,
+            SOSHibernateException {
+        DBItemDocumentation docFromDB = dbLayer.getDocumentation(doc.getSchedulerId(), doc.getDirectory(), doc.getName());
+        if (docFromDB != null) {
+            if (doc.hasImage()) {
+                DBItemDocumentationImage imageFromDB = dbLayer.getDocumentationImage(docFromDB.getImageId());
+                if (imageFromDB == null) {
+                    //insert image if not exist
+                    docFromDB.setImageId(saveImage(dbLayer, doc));
+                } else {
+                    //update image if hash unequal
+                    String md5Hash = DigestUtils.md5Hex(doc.image());
+                    if (!imageFromDB.getMd5Hash().equals(md5Hash)) {
+                        imageFromDB.setMd5Hash(md5Hash);
+                        imageFromDB.setImage(doc.image());
+                        dbLayer.getSession().update(imageFromDB);
+                    }
+                }
+            }
+            docFromDB.setContent(doc.getContent());
+            docFromDB.setType(doc.getType());
+            docFromDB.setModified(Date.from(Instant.now()));
+            dbLayer.getSession().update(docFromDB);
+        } else {
+            if (doc.hasImage()) {
+                //insert image
+                doc.setImageId(saveImage(dbLayer, doc));
+            }
+            dbLayer.getSession().save(doc);
+        }
+    }
+
+    private void saveOrUpdate(DBItemDocumentation doc) throws DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException,
+            JocConfigurationException {
+        if (connection == null) {
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+        }
+        DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
+        saveOrUpdate(dbLayer, doc);
+    }
+    
+    private Long saveImage(DocumentationDBLayer dbLayer, DBItemDocumentation doc) throws SOSHibernateException {
+        DBItemDocumentationImage image = new DBItemDocumentationImage();
+        image.setSchedulerId(doc.getSchedulerId());
+        image.setImage(doc.image());
+        image.setMd5Hash(DigestUtils.md5Hex(doc.image()));
+        dbLayer.getSession().save(image);
+        return image.getId();
     }
 
     private String getExtensionFromFilename(String filename) {
@@ -113,11 +188,11 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
         }
         return extension;
     }
-    
-    private void readZipFileContent(InputStream inputStream, String jobschedulerId, String directory, Set<DBItemDocumentation> documentations,
-            FormDataBodyPart body, DocumentationDBLayer dbLayer) throws DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException,
-            IOException, JocUnsupportedFileTypeException {
+
+    private void readZipFileContent(InputStream inputStream, DocumentationImport filter) throws DBConnectionRefusedException, DBInvalidDataException,
+            SOSHibernateException, IOException, JocUnsupportedFileTypeException, JocConfigurationException {
         ZipInputStream zipStream = null;
+        Set<DBItemDocumentation> documentations = new HashSet<DBItemDocumentation>();
         try {
             zipStream = new ZipInputStream(inputStream);
             ZipEntry entry = null;
@@ -126,112 +201,133 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                     continue;
                 }
                 DBItemDocumentation documentation = new DBItemDocumentation();
-                documentation.setSchedulerId(jobschedulerId);
-                java.nio.file.Path targetFolder = null;
-                if (directory != null) {
-                    targetFolder = Paths.get(normalizeFolder(directory));
-                } else {
-                    targetFolder = Paths.get("/");
-                }
-                java.nio.file.Path complete = targetFolder.resolve(entry.getName());
+                documentation.setSchedulerId(filter.getJobschedulerId());
+                java.nio.file.Path targetFolder = Paths.get(filter.getFolder());
+                java.nio.file.Path complete = targetFolder.resolve(entry.getName().replace('\\', '/').replaceFirst("^/", ""));
                 documentation.setDirectory(complete.getParent().toString().replace('\\', '/'));
                 documentation.setName(complete.getFileName().toString());
                 String fileExtension = getExtensionFromFilename(documentation.getName());
-                ByteArrayBuffer outBuffer = new ByteArrayBuffer(8192);
+                ByteArrayOutputStream outBuffer = new ByteArrayOutputStream();
                 byte[] binBuffer = new byte[8192];
                 int binRead = 0;
                 while ((binRead = zipStream.read(binBuffer, 0, 8192)) >= 0) {
-                    outBuffer.append(binBuffer, 0, binRead);
+                    outBuffer.write(binBuffer, 0, binRead);
                 }
                 byte[] bytes = outBuffer.toByteArray();
-                documentation.setType(guessContentTypeFromBytes(bytes, fileExtension));
-                if (documentation.getType() != null) {
-                    if (documentation.getType().startsWith("image")) {
-                        DBItemDocumentationImage image = new DBItemDocumentationImage();
-                        image.setSchedulerId(jobschedulerId);
-                        image.setImage(bytes);
-                        image.setMd5Hash(DigestUtils.md5Hex(bytes));
-                        DBItemDocumentationImage imageFromDB = dbLayer.getDocumentationImage(image.getSchedulerId(), image.getMd5Hash());
-                        if (imageFromDB != null) {
-                            documentation.setImageId(imageFromDB.getId());
-                        } else {
-                            dbLayer.getSession().save(image);
-                            documentation.setImageId(image.getId());
-                        }
-                    } else { 
-                        //TODO knallt, wenn "application/pdf"
-                        // bei pdf ist type = null --> knallt also nicht, kann aber bei anderen binaries knallen,
-                        // bei denen URLConnection.guessContentTypeFromStream nicht null liefert
-                        documentation.setContent(new String(bytes));
+                boolean isPlainText = isPlainText(bytes);
+                final String guessedMediaType = guessContentTypeFromBytes(bytes, fileExtension, isPlainText);
+                if (guessedMediaType != null) {
+                    Optional<String> supportedSubType = SUPPORTED_SUBTYPES.stream().filter(s -> guessedMediaType.contains(s)).findFirst();
+                    Optional<String> supportedImageType = SUPPORTED_IMAGETYPES.stream().filter(s -> guessedMediaType.contains(s)).findFirst();
+                    if (supportedImageType.isPresent()) {
+                        documentation.setType(supportedImageType.get());
+                        documentation.setImage(bytes);
+                        documentation.setHasImage(true);
+                    } else if (supportedSubType.isPresent()) {
+                        documentation.setType(supportedSubType.get());
+                        documentation.setContent(new String(bytes, Charsets.UTF_8));
+                        documentation.setHasImage(false);
+                    } else {
+                        throw new JocUnsupportedFileTypeException(String.format("%1$s unsupported, supported types are %2$s", complete.toString()
+                                .replace('\\', '/'), SUPPORTED_SUBTYPES.toString()));
                     }
                 } else { // what is supported?
-                    throw new JocUnsupportedFileTypeException(
-                            String.format("The zip file to upload contains unsupported file - %1$s -, upload is rejected!",
-                                    complete.toString().replace('\\', '/')));
+                    throw new JocUnsupportedFileTypeException(String.format("%1$s unsupported, supported types are %2$s", complete.toString().replace(
+                            '\\', '/'), SUPPORTED_SUBTYPES.toString()));
                 }
                 documentation.setCreated(Date.from(Instant.now()));
                 documentation.setModified(documentation.getCreated());
                 documentations.add(documentation);
             }
+            if (!documentations.isEmpty()) {
+                if (connection == null) {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                }
+                DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
+                for (DBItemDocumentation itemDocumentation : documentations) {
+                    saveOrUpdate(dbLayer, itemDocumentation);
+                }
+            } else {
+                throw new JocUnsupportedFileTypeException("The zip file to upload doesn't contain any supported file, supported types are " + SUPPORTED_SUBTYPES.toString());
+            }
         } finally {
             if (zipStream != null) {
                 try {
                     zipStream.close();
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                }
             }
         }
     }
-    
-    private void readFileContent(InputStream inputStream, String jobschedulerId, String directory, Set<DBItemDocumentation> documentations,
-            FormDataBodyPart body) throws IOException, JocUnsupportedFileTypeException {
+
+    private DBItemDocumentation setDBItemDocumentation(byte[] b, DocumentationImport filter, String mediaSubType) throws IOException,
+            JocUnsupportedFileTypeException {
         DBItemDocumentation documentation = new DBItemDocumentation();
-        documentation.setSchedulerId(jobschedulerId);
-        documentation.setDirectory(directory);
-        documentation.setName(body.getContentDisposition().getFileName());
+        documentation.setSchedulerId(filter.getJobschedulerId());
+        documentation.setDirectory(filter.getFolder());
+        documentation.setName(filter.getFile());
         documentation.setCreated(Date.from(Instant.now()));
-        documentation.setModified(Date.from(Instant.now()));
-        byte[] b = IOUtils.toByteArray(inputStream);
-        documentation.setType(guessContentTypeFromBytes(b, getExtensionFromFilename(documentation.getName())));
-        if (documentation.getType() == null) { //what is supported?
-            throw new JocUnsupportedFileTypeException("The file to upload is an unsupported file, upload is rejected!");
-        }
+        documentation.setModified(documentation.getCreated());
+        documentation.setType(mediaSubType);
         documentation.setContent(new String(b, Charsets.UTF_8));
-        documentations.add(documentation);
+        documentation.setHasImage(false);
+        return documentation;
     }
 
-    private String guessContentTypeFromBytes(byte[] b, String extension) throws IOException {
+    private DBItemDocumentation setDBItemDocumentationImage(byte[] b, DocumentationImport filter, String mediaSubType) throws IOException,
+            JocUnsupportedFileTypeException {
+        DBItemDocumentation documentation = new DBItemDocumentation();
+        documentation.setSchedulerId(filter.getJobschedulerId());
+        documentation.setDirectory(filter.getFolder());
+        documentation.setName(filter.getFile());
+        documentation.setCreated(Date.from(Instant.now()));
+        documentation.setModified(documentation.getCreated());
+        documentation.setType(mediaSubType);
+        documentation.setImage(b);
+        documentation.setHasImage(true);
+        return documentation;
+    }
+
+    private String guessContentTypeFromBytes(byte[] b, String extension, boolean isPlainText) throws IOException {
         InputStream is = null;
+        String media = null;
         try {
             is = new ByteArrayInputStream(b);
-            String s = URLConnection.guessContentTypeFromStream(is);
-            if (s == null && isTextPlain(b)) {
+            media = URLConnection.guessContentTypeFromStream(is);
+            if (media != null) {
+                media = media.replaceFirst("^.*\\/(x-)?", "");
+            }
+            if (media == null && isPlainText) {
                 switch (extension) {
                 case "js":
-                    return "text/javascript";
+                    media = "javascript";
+                    break;
                 case "json":
-                    return "application/json";
+                    media = "json";
+                    break;
                 case "css":
-                    return "text/css";
+                    media = "css";
+                    break;
                 case "md":
                 case "markdown":
-                    return "text/markdown";
+                    media = "markdown";
+                    break;
                 case "txt":
-                    return "text/plain";
-                default:
-                    return null;    
+                    media = "plain";
+                    break;
                 }
-            } else if (s != null && s.equals("application/xml")) {
+            } else if (media != null && media.contains("xml")) {
                 switch (extension) {
                 case "xsl":
                 case "xslt":
-                    return "application/xsl";
+                    media = "xsl";
                 case "xsd":
-                    return "application/xsd";
+                    media = "xsd";
                 default:
-                    return s;   
+                    media = "xml";
                 }
             }
-            return s;
+            return media;
         } finally {
             if (is != null) {
                 try {
@@ -242,7 +338,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
         }
     }
 
-    private boolean isTextPlain(byte[] b) {
+    private boolean isPlainText(byte[] b) {
         try {
             Charset.availableCharsets().get("UTF-8").newDecoder().decode(ByteBuffer.wrap(b));
             return true;
