@@ -27,7 +27,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.docu.DocumentationsFilter;
 
-@Path("/documentations/export")
+@Path("documentations")
 public class DocumentationsExportResourceImpl extends JOCResourceImpl implements IDocumentationsExportResource{
 
     private static final String API_CALL = "/documentations/export";
