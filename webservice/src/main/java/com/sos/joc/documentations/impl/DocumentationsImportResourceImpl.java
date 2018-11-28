@@ -93,13 +93,10 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             
             if (mediaSubType.contains("zip") && !mediaSubType.contains("gzip")) {
                 readZipFileContent(stream, filter);
-
             } else if (supportedImageType.isPresent()) {
                 saveOrUpdate(setDBItemDocumentationImage(IOUtils.toByteArray(stream), filter, supportedImageType.get()));
-
             } else if (supportedSubType.isPresent()) {
                 saveOrUpdate(setDBItemDocumentation(IOUtils.toByteArray(stream), filter, supportedSubType.get()));
-
             } else if ("md".equals(extention) || "markdown".equals(extention)) {
                 byte[] b = IOUtils.toByteArray(stream);
                 if (isPlainText(b)) {
@@ -231,7 +228,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                         throw new JocUnsupportedFileTypeException(String.format("%1$s unsupported, supported types are %2$s", complete.toString()
                                 .replace('\\', '/'), SUPPORTED_SUBTYPES.toString()));
                     }
-                } else { // what is supported?
+                } else {
                     throw new JocUnsupportedFileTypeException(String.format("%1$s unsupported, supported types are %2$s", complete.toString().replace(
                             '\\', '/'), SUPPORTED_SUBTYPES.toString()));
                 }
@@ -248,14 +245,14 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                     saveOrUpdate(dbLayer, itemDocumentation);
                 }
             } else {
-                throw new JocUnsupportedFileTypeException("The zip file to upload doesn't contain any supported file, supported types are " + SUPPORTED_SUBTYPES.toString());
+                throw new JocUnsupportedFileTypeException("The zip file to upload doesn't contain any supported file, supported types are "
+                        + SUPPORTED_SUBTYPES.toString());
             }
         } finally {
             if (zipStream != null) {
                 try {
                     zipStream.close();
-                } catch (IOException e) {
-                }
+                } catch (IOException e) {}
             }
         }
     }
@@ -332,8 +329,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             if (is != null) {
                 try {
                     is.close();
-                } catch (Exception e) {
-                }
+                } catch (Exception e) {}
             }
         }
     }
