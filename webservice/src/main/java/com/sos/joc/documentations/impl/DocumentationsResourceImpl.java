@@ -39,8 +39,9 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             List<DBItemDocumentation> dbDocs = new ArrayList<DBItemDocumentation>();
             if (documentations != null && !documentations.isEmpty()) {
-                for (String path : documentations) {
-                    dbDocs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), path));
+                for (String documentation : documentations) {
+                    String folder = Paths.get(documentation).getParent().toString().replace('\\', '/');
+                    dbDocs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder));
                 }
             } else if (folders != null) {
                 for (Folder folder : folders) {

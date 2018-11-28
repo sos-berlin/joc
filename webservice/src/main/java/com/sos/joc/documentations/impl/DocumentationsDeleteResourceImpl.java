@@ -1,11 +1,16 @@
 package com.sos.joc.documentations.impl;
 
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemDocumentation;
+import com.sos.jitl.reporting.db.DBItemDocumentationImage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -29,11 +34,24 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
 
         SOSHibernateSession connection = null;
         try {
+            checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
             checkRequiredParameter("documentations", filter.getDocumentations());
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            //TODO delete according filter
-            
+            List<DBItemDocumentation> docs = new ArrayList<DBItemDocumentation>();
+            for (String documentation : filter.getDocumentations()) {
+                String folder = Paths.get(documentation).getParent().toString().replace('\\', '/');
+                docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder));
+            }
+            for (DBItemDocumentation dbDoc : docs) {
+                if (dbDoc.getImageId() != null) {
+                    DBItemDocumentationImage dbImage = connection.get(DBItemDocumentationImage.class, dbDoc.getImageId());
+                    if (dbImage != null) {
+                        connection.delete(dbImage);
+                    }
+                }
+                connection.delete(dbDoc);
+            }
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

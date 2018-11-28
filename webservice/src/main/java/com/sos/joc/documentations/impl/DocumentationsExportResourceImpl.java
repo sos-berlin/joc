@@ -28,13 +28,14 @@ import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.docu.DocumentationsFilter;
 
 @Path("documentations")
-public class DocumentationsExportResourceImpl extends JOCResourceImpl implements IDocumentationsExportResource{
+public class DocumentationsExportResourceImpl extends JOCResourceImpl implements IDocumentationsExportResource {
 
     private static final String API_CALL = "/documentations/export";
     private static final String DEFAULT_TARGET_FILENAME = "documentation.zip";
+
     @Override
     public JOCDefaultResponse postExportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
-        
+
         // TODO: permissions
         JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), true);
         if (jocDefaultResponse != null) {
@@ -47,13 +48,16 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
         String targetFilename = null;// filter.getTargetFilename();
         StreamingOutput out = null;
         try {
-            targetFilename = DEFAULT_TARGET_FILENAME;
+            if (targetFilename == null) {
+                targetFilename = DEFAULT_TARGET_FILENAME;
+            }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             List<DBItemDocumentation> docs = new ArrayList<DBItemDocumentation>();
             if (documentations != null && !documentations.isEmpty()) {
-                for (String path : documentations) {
-                    docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), path));
+                for (String documentation : documentations) {
+                    String folder = Paths.get(documentation).getParent().toString().replace('\\', '/');
+                    docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder));
                 }
             } else if (folders != null) {
                 for (Folder folder : folders) {
@@ -62,11 +66,7 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
             }
             List<DocumentationContent> contents = mapToDocumentationContents(docs, dbLayer);
             out = createZipOutputStreamForDownload(contents);
-            if (targetFilename != null && !targetFilename.isEmpty()) {
-                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(out, targetFilename);
-            } else {
-                return JOCDefaultResponse.responseOctetStreamDownloadStatus200(out, DEFAULT_TARGET_FILENAME);
-            }
+            return JOCDefaultResponse.responseOctetStreamDownloadStatus200(out, targetFilename);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -77,7 +77,7 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
         }
     }
 
-    private List<DocumentationContent> mapToDocumentationContents (List<DBItemDocumentation> docs, DocumentationDBLayer dbLayer)
+    private List<DocumentationContent> mapToDocumentationContents(List<DBItemDocumentation> docs, DocumentationDBLayer dbLayer)
             throws DBConnectionRefusedException, DBInvalidDataException {
         List<DocumentationContent> contents = new ArrayList<DocumentationContent>();
         for (DBItemDocumentation doc : docs) {
@@ -95,9 +95,10 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
         }
         return contents;
     }
-    
+
     private StreamingOutput createZipOutputStreamForDownload(List<DocumentationContent> contents) throws IOException {
         StreamingOutput streamingOutput = new StreamingOutput() {
+
             @Override
             public void write(OutputStream output) throws IOException {
                 ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(output));
