@@ -40,6 +40,7 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
+        checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
         SOSHibernateSession connection = null;
         List<String> documentations = filter.getDocumentations();
         List<Folder> folders = filter.getFolders();

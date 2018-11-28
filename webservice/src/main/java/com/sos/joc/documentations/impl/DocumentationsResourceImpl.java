@@ -30,6 +30,7 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
+        checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
         SOSHibernateSession connection = null;
         List<String> documentations = filter.getDocumentations();
         List<Folder> folders = filter.getFolders();
