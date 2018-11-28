@@ -34,6 +34,7 @@ import com.sos.jitl.reporting.db.DBItemDocumentationImage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.audit.ImportDocumentationAudit;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentations.resource.IDocumentationsImportResource;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -42,6 +43,7 @@ import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.JocUnsupportedFileTypeException;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.docu.DocumentationImport;
 
 @Path("documentations")
@@ -55,24 +57,33 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
 
     @Override
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String directory,
-            FormDataBodyPart body) throws Exception {
-        return postImportDocumentations(getAccessToken(xAccessToken, accessToken), jobschedulerId, directory, body);
+            FormDataBodyPart body, String timeSpent, String ticketLink, String comment) throws Exception {
+        AuditParams auditLog = new AuditParams();
+        auditLog.setComment(comment);
+        auditLog.setTicketLink(ticketLink);
+        try {
+            auditLog.setTimeSpent(Integer.valueOf(timeSpent));
+        } catch (Exception e) {
+        }
+        return postImportDocumentations(getAccessToken(xAccessToken, accessToken), jobschedulerId, directory, body, auditLog);
     }
 
-    public JOCDefaultResponse postImportDocumentations(String xAccessToken, String jobschedulerId, String directory, FormDataBodyPart body)
+    public JOCDefaultResponse postImportDocumentations(String xAccessToken, String jobschedulerId, String directory, FormDataBodyPart body, AuditParams auditLog)
             throws Exception {
 
-        DocumentationImport filter = new DocumentationImport();
-        filter.setJobschedulerId(jobschedulerId);
-        if (directory == null || directory.isEmpty()) {
-            directory = "/";
-        }
-        filter.setFolder(normalizeFolder(directory.replace('\\', '/')));
-        if (body != null) {
-            filter.setFile(body.getContentDisposition().getFileName());
-        }
         InputStream stream = null;
         try {
+            DocumentationImport filter = new DocumentationImport();
+            filter.setJobschedulerId(jobschedulerId);
+            if (directory == null || directory.isEmpty()) {
+                directory = "/";
+            }
+            filter.setFolder(normalizeFolder(directory.replace('\\', '/')));
+            if (body != null) {
+                filter.setFile(body.getContentDisposition().getFileName());
+            }
+            filter.setAuditLog(auditLog);
+            
             // TODO: permissions
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, jobschedulerId, true);
             if (jocDefaultResponse != null) {
@@ -90,12 +101,26 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             final String mediaSubType = body.getMediaType().getSubtype().replaceFirst("^x-", "");
             Optional<String> supportedSubType = SUPPORTED_SUBTYPES.stream().filter(s -> mediaSubType.contains(s)).findFirst();
             Optional<String> supportedImageType = SUPPORTED_IMAGETYPES.stream().filter(s -> mediaSubType.contains(s)).findFirst();
-            
+
+            ImportDocumentationAudit importAudit = new ImportDocumentationAudit(filter);
+            logAuditMessage(importAudit);
+
             if (mediaSubType.contains("zip") && !mediaSubType.contains("gzip")) {
                 readZipFileContent(stream, filter);
             } else if (supportedImageType.isPresent()) {
                 saveOrUpdate(setDBItemDocumentationImage(IOUtils.toByteArray(stream), filter, supportedImageType.get()));
             } else if (supportedSubType.isPresent()) {
+                if ("xml".equals(supportedSubType.get())) {
+                    switch (extention) {
+                    case "xsl":
+                    case "xslt":
+                        supportedSubType = Optional.of("xsl");
+                        break;
+                    case "xsd":
+                        supportedSubType = Optional.of("xsd");
+                        break;
+                    }
+                }
                 saveOrUpdate(setDBItemDocumentation(IOUtils.toByteArray(stream), filter, supportedSubType.get()));
             } else if ("md".equals(extention) || "markdown".equals(extention)) {
                 byte[] b = IOUtils.toByteArray(stream);
@@ -109,6 +134,8 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 throw new JocUnsupportedFileTypeException("Unsupported file type (" + mediaSubType + "), supported types are " + SUPPORTED_SUBTYPES
                         .toString());
             }
+
+            storeAuditLogEntry(importAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -133,10 +160,10 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             if (doc.hasImage()) {
                 DBItemDocumentationImage imageFromDB = dbLayer.getDocumentationImage(docFromDB.getImageId());
                 if (imageFromDB == null) {
-                    //insert image if not exist
+                    // insert image if not exist
                     docFromDB.setImageId(saveImage(dbLayer, doc));
                 } else {
-                    //update image if hash unequal
+                    // update image if hash unequal
                     String md5Hash = DigestUtils.md5Hex(doc.image());
                     if (!imageFromDB.getMd5Hash().equals(md5Hash)) {
                         imageFromDB.setMd5Hash(md5Hash);
@@ -151,7 +178,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             dbLayer.getSession().update(docFromDB);
         } else {
             if (doc.hasImage()) {
-                //insert image
+                // insert image
                 doc.setImageId(saveImage(dbLayer, doc));
             }
             dbLayer.getSession().save(doc);
@@ -166,7 +193,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
         DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
         saveOrUpdate(dbLayer, doc);
     }
-    
+
     private Long saveImage(DocumentationDBLayer dbLayer, DBItemDocumentation doc) throws SOSHibernateException {
         DBItemDocumentationImage image = new DBItemDocumentationImage();
         image.setSchedulerId(doc.getSchedulerId());
@@ -252,7 +279,8 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             if (zipStream != null) {
                 try {
                     zipStream.close();
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                }
             }
         }
     }
@@ -318,8 +346,10 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 case "xsl":
                 case "xslt":
                     media = "xsl";
+                    break;
                 case "xsd":
                     media = "xsd";
+                    break;
                 default:
                     media = "xml";
                 }
@@ -329,7 +359,8 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             if (is != null) {
                 try {
                     is.close();
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -342,4 +373,5 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             return false;
         }
     }
+
 }

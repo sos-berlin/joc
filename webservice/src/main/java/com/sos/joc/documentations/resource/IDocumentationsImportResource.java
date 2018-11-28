@@ -23,5 +23,8 @@ public interface IDocumentationsImportResource {
             @FormDataParam("accessToken") String accessToken, 
             @FormDataParam("jobschedulerId") String jobschedulerId, 
             @FormDataParam("folder") String directory, 
-            @FormDataParam("file") FormDataBodyPart body) throws Exception;
+            @FormDataParam("file") FormDataBodyPart body,
+            @FormDataParam("timeSpent") String timeSpent,
+            @FormDataParam("ticketLink") String ticketLink,
+            @FormDataParam("comment") String comment) throws Exception;
 }

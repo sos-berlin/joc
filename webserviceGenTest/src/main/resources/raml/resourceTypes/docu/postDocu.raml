@@ -1,10 +1,18 @@
 type: error
 get?:
-#  is: [ accessToken, jobschedulerMaster, filteredByPath ]
+  is: [ accessToken, jobschedulerMaster ]
+    
   description: |
     <h2>Documentation</h2>
     <<description>>
     ___
+  queryParameters:
+    <<jsObjectParam>>:
+      type: string
+      description: |
+        Path of a <<jsObject>>
+      pattern: /([^/]+/)*[^/]+
+      required: true
   responses:
     200:
       description: Content of documentation or its resources.

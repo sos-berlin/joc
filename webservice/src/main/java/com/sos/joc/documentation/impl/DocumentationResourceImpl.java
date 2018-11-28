@@ -35,6 +35,9 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            checkRequiredParameter("jobschedulerId", jobschedulerId);
+            checkRequiredParameter("path", path);
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);

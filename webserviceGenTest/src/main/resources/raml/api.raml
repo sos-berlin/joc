@@ -67,6 +67,7 @@ resourceTypes:
   - postForUpload: !include resourceTypes/common/postForUpload.raml
   - postLog: !include resourceTypes/common/postLog.raml
   - postDocu: !include resourceTypes/docu/postDocu.raml
+  - getDocu: !include resourceTypes/docu/getDocu.raml
   - login: !include resourceTypes/user/login.raml
   - logout: !include resourceTypes/user/logout.raml
   - postEvent: !include resourceTypes/common/postEvent.raml
@@ -94,6 +95,8 @@ traits:
   - jobschedulerMaster: !include traits/jobschedulerMaster.raml
   - filteredByJob: !include ./traits/filteredByJob.raml
   - filteredByPath: !include ./traits/filteredByPath.raml
+  - filteredByOrderId: !include ./traits/filteredByOrderId.raml
+  - filteredByJSType: !include ./traits/filteredByJSType.raml
   - filteredByTransferFileId: !include ./traits/filteredByTransferFileId.raml
   - accessToken: !include ./traits/accessToken.raml
   - filename: !include ./traits/filename.raml
@@ -860,6 +863,34 @@ traits:
         schema200: !include schemas/calendar/calendars-schema.json
         example: !include examples/order/filteredOrder-example.json
         example200: TODO
+  /documentation:
+    get:
+    is: [ filteredByOrderId ]
+    type:
+      postDocu:
+        description: Show documentation
+        jsObjectParam: jobChain
+        jsObject: JobChain
+#    /assign:
+#      type:
+#        postJSON:
+#          description: Assigns a Documentation to the Job
+#          description1: !include documentation/docu/docPath.md
+#          description2: " "
+#          description3: " "
+#          description4: " "
+#          description5: " "
+#          description6: " "
+#          description7: " "
+#          description8: " "
+#          description9: " "
+#          description10: " "
+#          description200: !include documentation/job/jobs_v.md
+#          schema: !include schemas/job/jobsFilter-schema.json
+#          schema200: jobs
+#          example: TODO
+#          example200: !include examples/job/jobs_v-example.json
+#          audit: !include documentation/audit/auditLog.md
 
 /jobs:
   type:
@@ -1081,14 +1112,14 @@ traits:
         schema200: !include schemas/common/configuration-schema.json
         example: " "
         example200: !include examples/job/configuration-example.json
-  /description:
-    is: [ accessToken, jobschedulerMaster, filteredByJob ]
-    type: error
-    get:
-      responses:
-        200:
-          body:
-            text/html:
+#  /description:
+#    is: [ accessToken, jobschedulerMaster, filteredByJob ]
+#    type: error
+#    get:
+#      responses:
+#        200:
+#          body:
+#            text/html:
   /run_time:
     type:
       postJSON:
@@ -1127,6 +1158,13 @@ traits:
         schema200: !include schemas/calendar/calendars-schema.json
         example: TODO
         example200: TODO
+  /documentation:
+    get:
+    type:
+      postDocu:
+        description: Show documentation
+        jsObjectParam: job
+        jsObject: Job
 /tasks:
   description: |
     This is not an API call. Use its children!!
@@ -1406,6 +1444,13 @@ traits:
         schema200: !include schemas/common/configuration-schema.json
         example: TODO
         example200: !include examples/jobChain/configuration-example.json
+  /documentation:
+    get:
+    type:
+      postDocu:
+        description: Show documentation
+        jsObjectParam: jobChain
+        jsObject: JobChain
 
 /job_chain_nodes:
   description: This resource doesn't have a response. Use ./skip, ./stop, ./activate
@@ -1463,7 +1508,10 @@ traits:
         schema200: !include schemas/lock/locks_p-schema.json
         example: TODO
         example200: !include examples/lock/locks_p-example.json
-/lock/configuration:
+/lock:
+  description: |
+    This is not an API call. Use its children!!
+  /configuration:
     type:
       postJSON:
         description: !include documentation/common/configuration.md
@@ -1482,6 +1530,13 @@ traits:
         schema200: !include schemas/common/configuration-schema.json
         example: !include examples/lock/filteredLock-example.json
         example200: !include examples/lock/configuration-example.json
+  /documentation:
+    get:
+    type:
+      postDocu:
+        description: Show documentation
+        jsObjectParam: lock
+        jsObject: Lock
 
 # entfaellt
 #/log:
@@ -1662,6 +1717,13 @@ traits:
         schema200: !include schemas/calendar/calendars-schema.json
         example: !include examples/schedule/filteredSchedule-example.json
         example200: " "
+  /documentation:
+    get:
+    type:
+      postDocu:
+        description: Show documentation
+        jsObjectParam: schedule
+        jsObject: Schedule
 
 /process_classes:
   type:
@@ -1721,6 +1783,13 @@ traits:
         schema200: !include schemas/common/configuration-schema.json
         example: TODO
         example200: !include examples/processClass/configuration-example.json
+  /documentation:
+    get:
+    type:
+      postDocu:
+        description: Show documentation
+        jsObjectParam: processClass
+        jsObject: ProcessClass
 
 /plan:
   type:
@@ -2356,13 +2425,20 @@ traits:
         schema: !include schemas/calendar/calendarRenameFilter-schema.json
         audit: !include documentation/audit/auditLog.md
         example: !include examples/calendar/calendarRename-example.json
+  /documentation:
+    get:
+    type:
+      postDocu:
+        description: Show documentation
+        jsObjectParam: calendar
+        jsObject: Calendar
      
 /documentations:
   type:
     postJSON:
       description: Sends collection of documentations
       description1: !include documentation/docu/filteredByPaths.md
-      description2: !include documentation/common/compact.md
+      description2: " "
       description3: !include documentation/common/regex.md
       description4: !include documentation/common/folders.md
       description5: " "
@@ -2412,14 +2488,16 @@ traits:
         example200: " "
 
 /documentation:
+  description: |
+    This is not an API call. Use its children!!
+  
   /{jobschedulerId}/{accessToken}/{path}:
-    get:
     type:
-      postDocu:
+      getDocu:
         description: " "
-        description1: !include documentation/docu/docuId.md
-        description2: " "
-        example: " "
+        #description1: !include documentation/docu/docuId.md
+        #description2: " "
+        #example: " "
   /used:
     type:
       postJSON:
@@ -2440,23 +2518,28 @@ traits:
         example: " "
         example200: " "
   /preview:
-    post:
+    get:
     type:
       postDocu:
         description: Preview the documentation
-        description1: !include documentation/docu/docPath.md
-        description2: " "
-        schema: !include schemas/docu/documentationShow-schema.json
-        example: " "
+        jsObjectParam: documentation
+        jsObject: documentation
+        #description1: !include documentation/docu/docPath.md
+        #description2: " "
+        #schema: !include schemas/docu/documentationShow-schema.json
+        #example: " "
   /show:
-    post:
+    get:
+    is: [ filteredByJSType ]
     type:
       postDocu:
         description: Sends the documentation of a JobScheduler object
-        description1: !include documentation/docu/jsObject.md
-        description2: " "
-        schema: !include schemas/docu/documentationShow-schema.json
-        example: " "
+        jsObjectParam: path
+        jsObject: JobScheduler object
+        #description1: !include documentation/docu/jsObject.md
+        #description2: " "
+        #schema: !include schemas/docu/documentationShow-schema.json
+        #example: " "
   /url:
     post:
     type:
