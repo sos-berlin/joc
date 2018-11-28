@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemDocumentation;
 import com.sos.jitl.reporting.db.DBItemDocumentationImage;
+import com.sos.jitl.reporting.db.DBItemDocumentationUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -44,6 +45,12 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
                 docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder));
             }
             for (DBItemDocumentation dbDoc : docs) {
+                List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), dbDoc.getId());
+                if (dbUsages != null && !dbUsages.isEmpty()) {
+                    for (DBItemDocumentationUsage dbUsage : dbUsages) {
+                        connection.delete(dbUsage);
+                    }
+                }                 
                 if (dbDoc.getImageId() != null) {
                     DBItemDocumentationImage dbImage = connection.get(DBItemDocumentationImage.class, dbDoc.getImageId());
                     if (dbImage != null) {

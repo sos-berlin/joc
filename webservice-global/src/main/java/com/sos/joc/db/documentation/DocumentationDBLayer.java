@@ -9,6 +9,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemDocumentation;
 import com.sos.jitl.reporting.db.DBItemDocumentationImage;
+import com.sos.jitl.reporting.db.DBItemDocumentationUsage;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -132,7 +133,7 @@ public class DocumentationDBLayer extends DBLayer {
             query.setParameter("schedulerId", schedulerId);
             if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
                 query.setParameter("folderName", folderName);
-                query.setParameter("likeFolderName", folderName + "/%");
+                query.setParameter("likeFolderName", MatchMode.START.toMatchString(folderName + "/"));
             }
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
@@ -141,4 +142,23 @@ public class DocumentationDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+
+    public List<DBItemDocumentationUsage> getDocumentationUsage (String schedulerId, Long documentationId)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_DOCUMENTATION_USAGE);
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and documentationId = :documentationId");
+            Query<DBItemDocumentationUsage> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("documentationId", documentationId);
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
 }
