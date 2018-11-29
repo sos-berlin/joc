@@ -163,16 +163,20 @@ public class DocumentationDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemDocumentationUsage> getDocumentationUsage (String schedulerId, String path)
+    public List<DBItemDocumentationUsage> getDocumentationUsage (String schedulerId, String directory, String name)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_DOCUMENTATION_USAGE);
-            sql.append(" where schedulerId = :schedulerId");
-            sql.append(" and path = :path");
-            Query<DBItemDocumentationUsage> query = getSession().createQuery(sql.toString());
+            StringBuilder hql = new StringBuilder();
+            hql.append("from ").append(DBITEM_DOCUMENTATION_USAGE).append(" du, ");
+            hql.append(DBITEM_DOCUMENTATION).append(" d");
+            hql.append(" where d.schedulerId = :schedulerId");
+            hql.append(" and d.directory = :directory");
+            hql.append(" and d.name = :name");
+            hql.append(" and du.documentationId = d.id");
+            Query<DBItemDocumentationUsage> query = getSession().createQuery(hql.toString());
             query.setParameter("schedulerId", schedulerId);
-            query.setParameter("path", path);
+            query.setParameter("directory", directory);
+            query.setParameter("name", name);
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
