@@ -2,7 +2,7 @@
   "title": "JobChainDocuFilter",
   "id": "schemas/jobChain/jobChainDocuFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.jobchain.JobChainDocuFilter",
+  "javaType": "com.sos.joc.model.jobChain.JobChainDocuFilter",
   "type": "object",
   "required": [
     "jobschedulerId",

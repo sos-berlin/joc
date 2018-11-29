@@ -58,7 +58,7 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
             }
 
             String entity = String.format(
-                    "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='../%s'\" />%n</head>%n<body>%n</body>%n</html>",
+                    "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='%s'\" />%n</head>%n<body>%n</body>%n</html>",
                     getUrl(API_CALL_SHOW, xAccessToken, documentationFilter));
 
             return JOCDefaultResponse.responseHtmlStatus200(entity);
@@ -95,7 +95,7 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
             checkRequiredParameter("path", documentationFilter.getPath());
 
             String entity = String.format(
-                    "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='../%s/%s%s'\" />%n</head>%n<body>%n</body>%n</html>",
+                    "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='%s/%s%s'\" />%n</head>%n<body>%n</body>%n</html>",
                     documentationFilter.getJobschedulerId(), xAccessToken, urlEncodedPath(documentationFilter.getPath()));
 
             return JOCDefaultResponse.responseHtmlStatus200(entity);
