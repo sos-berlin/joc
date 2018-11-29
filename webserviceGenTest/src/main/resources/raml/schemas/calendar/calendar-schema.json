@@ -17,6 +17,9 @@
     "basedOn": {
       "$ref": "../common/path-schema.json"
     },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
+    },
     "type": {
       "$ref": "calendarType-schema.json"
     },

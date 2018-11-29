@@ -25,6 +25,9 @@
     },
     "configurationDate": {
       "$ref": "../common/timestamp-schema.json"
+    },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
     }
   }
 }

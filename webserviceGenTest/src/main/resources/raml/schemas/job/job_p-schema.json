@@ -70,8 +70,8 @@
         "$ref": "../common/path-schema.json"
       }
     },
-    "hasDescription": {
-      "type": "boolean"
+    "documentation": {
+      "$ref": "../common/path-schema.json"
     },
     "configurationDate": {
       "$ref": "../common/timestamp-schema.json"

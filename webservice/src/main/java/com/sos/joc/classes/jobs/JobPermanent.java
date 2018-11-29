@@ -65,14 +65,14 @@ public class JobPermanent {
     public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, Boolean compact, Long instanceId) throws Exception {
         JobP job = new JobP();
         if ("/scheduler_file_order_sink".equals(inventoryJob.getName())) {
-            job.setHasDescription(false);
+            //job.setHasDescription(false);
             job.setIsOrderJob(true);
             job.setMaxTasks(1);
             job.setName("scheduler_file_order_sink");
             job.setPath(inventoryJob.getName());
             job.setEstimatedDuration(0);
         } else {
-            job.setHasDescription(inventoryJob.getHasDescription());
+            //job.setHasDescription(inventoryJob.getHasDescription());
             job.setIsOrderJob(inventoryJob.getIsOrderJob());
             job.setMaxTasks(inventoryJob.getMaxTasks());
             job.setName(inventoryJob.getBaseName());
