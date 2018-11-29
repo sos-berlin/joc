@@ -163,21 +163,39 @@ public class DocumentationDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemDocumentationUsage> getDocumentationUsage (String schedulerId, String directory, String name)
+    public List<DBItemDocumentationUsage> getDocumentationUsage (String schedulerId, String path) 
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder hql = new StringBuilder();
             hql.append("from ").append(DBITEM_DOCUMENTATION_USAGE).append(" du, ");
             hql.append(DBITEM_DOCUMENTATION).append(" d");
             hql.append(" where d.schedulerId = :schedulerId");
-            hql.append(" and d.directory = :directory");
-            hql.append(" and d.name = :name");
+            hql.append(" and d.path = :path");
             hql.append(" and du.documentationId = d.id");
             Query<DBItemDocumentationUsage> query = getSession().createQuery(hql.toString());
             query.setParameter("schedulerId", schedulerId);
-            query.setParameter("directory", directory);
-            query.setParameter("name", name);
+            query.setParameter("path", path);
             return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public DBItemDocumentationUsage getDocumentationUsageForAssignment (String schedulerId, String path, String objectType)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder hql = new StringBuilder();
+            hql.append("from ").append(DBITEM_DOCUMENTATION_USAGE);
+            hql.append(" where d.schedulerId = :schedulerId");
+            hql.append(" and path = :path");
+            hql.append(" and objectType = :objectType");
+            Query<DBItemDocumentationUsage> query = getSession().createQuery(hql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("path", path);
+            query.setParameter("objectType", objectType);
+            return getSession().getSingleResult(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
