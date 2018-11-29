@@ -41,7 +41,7 @@ public interface IDocumentationJSObjectResource {
     
     @GET
     @Path("calendar/documentation")
-    public JOCDefaultResponse calendarClassDocu(@HeaderParam("X-Access-Token") String xAccessToken, @QueryParam("accessToken") String accessToken,
+    public JOCDefaultResponse calendarDocu(@HeaderParam("X-Access-Token") String xAccessToken, @QueryParam("accessToken") String accessToken,
             @QueryParam("jobschedulerId") String jobschedulerId, @QueryParam("calendar") String calendar) throws Exception;
 
 }

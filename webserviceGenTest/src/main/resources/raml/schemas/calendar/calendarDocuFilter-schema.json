@@ -1,0 +1,26 @@
+{
+  "title": "calendarDocuFilter",
+  "id": "schemas/calendar/calendarDocuFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.CalendarDocuFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "calendar",
+    "documentation"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "calendar": {
+      "$ref": "../common/path-schema.json"
+    },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

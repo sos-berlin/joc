@@ -1,0 +1,30 @@
+{
+  "title": "OrderDocuFilter",
+  "id": "schemas/order/orderDocuFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderDocuFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "jobChain",
+    "orderId",
+    "documentation"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

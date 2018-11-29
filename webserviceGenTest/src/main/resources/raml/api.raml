@@ -871,27 +871,29 @@ traits:
         description: Show documentation
         jsObjectParam: jobChain
         jsObject: JobChain
-#    /assign:
-#      type:
-#        postJSON:
-#          description: Assigns a Documentation to the Job
-#          description1: !include documentation/docu/docPath.md
-#          description2: " "
-#          description3: " "
-#          description4: " "
-#          description5: " "
-#          description6: " "
-#          description7: " "
-#          description8: " "
-#          description9: " "
-#          description10: " "
-#          description200: !include documentation/job/jobs_v.md
-#          schema: !include schemas/job/jobsFilter-schema.json
-#          schema200: jobs
-#          example: TODO
-#          example200: !include examples/job/jobs_v-example.json
-#          audit: !include documentation/audit/auditLog.md
-
+    /assign:
+      type:
+        postDocuWithOkResponse:
+          description: Assigns a Documentation to the Order
+          description1: !include documentation/docu/docPath.md
+          description2: !include documentation/order/jobChain.md
+          description3: !include documentation/order/orderIdRequired.md
+          description4: " "
+          schema: !include schemas/order/orderDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
+    /unassign:
+      type:
+        postDocuWithOkResponse:
+          description: Removes a Documentation to the Order
+          description1: " "
+          description2: !include documentation/order/jobChain.md
+          description3: !include documentation/order/orderIdRequired.md
+          description4: " "
+          schema: !include schemas/order/orderDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
+       
 /jobs:
   type:
     postJSON:
@@ -1165,6 +1167,29 @@ traits:
         description: Show documentation
         jsObjectParam: job
         jsObject: Job
+    /assign:
+      type:
+        postDocuWithOkResponse:
+          description: Assigns a Documentation to the Job
+          description1: !include documentation/docu/docPath.md
+          description2: " "
+          description3: !include documentation/job/jobRequired.md
+          description4: " "
+          schema: !include schemas/job/jobDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
+    /unassign:
+      type:
+        postDocuWithOkResponse:
+          description: Removes a Documentation to the Job
+          description1: " "
+          description2: " "
+          description3: !include documentation/job/jobRequired.md
+          description4: " "
+          schema: !include schemas/job/jobDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
+          
 /tasks:
   description: |
     This is not an API call. Use its children!!
@@ -1451,6 +1476,28 @@ traits:
         description: Show documentation
         jsObjectParam: jobChain
         jsObject: JobChain
+    /assign:
+      type:
+        postDocuWithOkResponse:
+          description: Assigns a Documentation to the Job Chain
+          description1: !include documentation/docu/docPath.md
+          description2: " "
+          description3: !include documentation/jobChain/filteredByJobChain.md
+          description4: " "
+          schema: !include schemas/jobChain/jobChainDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
+    /unassign:
+      type:
+        postDocuWithOkResponse:
+          description: Removes a Documentation to the Job Chain
+          description1: " "
+          description2: " "
+          description3: !include documentation/jobChain/filteredByJobChain.md
+          description4: " "
+          schema: !include schemas/jobChain/jobChainDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
 
 /job_chain_nodes:
   description: This resource doesn't have a response. Use ./skip, ./stop, ./activate
@@ -1537,6 +1584,28 @@ traits:
         description: Show documentation
         jsObjectParam: lock
         jsObject: Lock
+    /assign:
+      type:
+        postDocuWithOkResponse:
+          description: Assigns a Documentation to the Lock
+          description1: !include documentation/docu/docPath.md
+          description2: " "
+          description3: !include documentation/lock/lockRequired.md
+          description4: " "
+          schema: !include schemas/lock/lockDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
+    /unassign:
+      type:
+        postDocuWithOkResponse:
+          description: Removes a Documentation to the Lock
+          description1: " "
+          description2: " "
+          description3: !include documentation/lock/lockRequired.md
+          description4: " "
+          schema: !include schemas/lock/lockDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
 
 # entfaellt
 #/log:
@@ -1724,6 +1793,28 @@ traits:
         description: Show documentation
         jsObjectParam: schedule
         jsObject: Schedule
+    /assign:
+      type:
+        postDocuWithOkResponse:
+          description: Assigns a Documentation to the Schedule
+          description1: !include documentation/docu/docPath.md
+          description2: " "
+          description3: !include documentation/schedule/scheduleRequired.md
+          description4: " "
+          schema: !include schemas/schedule/scheduleDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
+    /unassign:
+      type:
+        postDocuWithOkResponse:
+          description: Removes a Documentation to the Schedule
+          description1: " "
+          description2: " "
+          description3: !include documentation/schedule/scheduleRequired.md
+          description4: " "
+          schema: !include schemas/schedule/scheduleDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
 
 /process_classes:
   type:
@@ -1790,6 +1881,28 @@ traits:
         description: Show documentation
         jsObjectParam: processClass
         jsObject: ProcessClass
+    /assign:
+      type:
+        postDocuWithOkResponse:
+          description: Assigns a Documentation to the Process Class
+          description1: !include documentation/docu/docPath.md
+          description2: " "
+          description3: !include documentation/processClass/processClassRequired.md
+          description4: " "
+          schema: !include schemas/processClass/processClassDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
+    /unassign:
+      type:
+        postDocuWithOkResponse:
+          description: Removes a Documentation to the Process Class
+          description1: " "
+          description2: " "
+          description3: !include documentation/processClass/processClassRequired.md
+          description4: " "
+          schema: !include schemas/processClass/processClassDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
 
 /plan:
   type:
@@ -2432,6 +2545,28 @@ traits:
         description: Show documentation
         jsObjectParam: calendar
         jsObject: Calendar
+    /assign:
+      type:
+        postDocuWithOkResponse:
+          description: Assigns a Documentation to the Calendar
+          description1: !include documentation/docu/docPath.md
+          description2: " "
+          description3: !include documentation/calendar/calendarRequired.md
+          description4: " "
+          schema: !include schemas/calendar/calendarDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
+    /unassign:
+      type:
+        postDocuWithOkResponse:
+          description: Removes a Documentation to the Calendar
+          description1: " "
+          description2: " "
+          description3: !include documentation/calendar/calendarRequired.md
+          description4: " "
+          schema: !include schemas/calendar/calendarDocuFilter-schema.json
+          example: TODO
+          audit: !include documentation/audit/auditLog.md
      
 /documentations:
   type:
@@ -2502,7 +2637,7 @@ traits:
     type:
       postJSON:
         description: Sends a list of JobScheduler objects which use the documentation
-        description1: !include documentation/docu/docuId.md
+        description1: !include documentation/docu/docPath.md
         description2: " "
         description3: " "
         description4: " "
@@ -2513,7 +2648,7 @@ traits:
         description9: " "
         description10: " "
         description200: " "
-        schema: !include schemas/docu/docuId-schema.json
+        schema: !include schemas/docu/documentationFilter-schema.json
         schema200: !include schemas/docu/usedBy-schema.json
         example: " "
         example200: " "

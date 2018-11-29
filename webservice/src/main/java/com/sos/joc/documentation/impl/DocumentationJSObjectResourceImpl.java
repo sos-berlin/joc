@@ -54,7 +54,7 @@ public class DocumentationJSObjectResourceImpl extends JOCResourceImpl implement
     }
 
     @Override
-    public JOCDefaultResponse calendarClassDocu(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
+    public JOCDefaultResponse calendarDocu(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
         return showDocu(getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.WORKINGDAYSCALENDAR, "calendar");
     }
     
