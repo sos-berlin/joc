@@ -1,6 +1,5 @@
 package com.sos.joc.documentation.impl;
 
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,10 +39,7 @@ public class DocumentationUsedResourceImpl extends JOCResourceImpl implements ID
             UsedBy usedBy = new UsedBy();
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            java.nio.file.Path path = Paths.get(filter.getDocumentation());
-            String directory = path.getParent().toString().replace('\\', '/');
-            String filename = path.getFileName().toString();
-            List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), directory, filename);
+            List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), filter.getDocumentation());
             if (dbUsages != null && !dbUsages.isEmpty()) {
                 List<JobSchedulerObject> jobSchedulerObjects = new ArrayList<JobSchedulerObject>();
                 usedBy.setObjects(jobSchedulerObjects);
