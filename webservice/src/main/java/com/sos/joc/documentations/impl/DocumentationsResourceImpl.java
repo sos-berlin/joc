@@ -41,11 +41,11 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
             if (documentations != null && !documentations.isEmpty()) {
                 for (String documentation : documentations) {
                     String folder = Paths.get(documentation).getParent().toString().replace('\\', '/');
-                    dbDocs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder));
+                    dbDocs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), folder));
                 }
             } else if (folders != null) {
                 for (Folder folder : folders) {
-                    dbDocs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder.getFolder(), folder.getRecursive()));
+                    dbDocs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), folder.getFolder(), folder.getRecursive()));
                 }
             }
             return JOCDefaultResponse.responseStatus200(mapDbItemsToDocumentations(dbDocs));

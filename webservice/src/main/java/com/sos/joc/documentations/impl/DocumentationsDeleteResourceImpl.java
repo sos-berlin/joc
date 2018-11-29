@@ -42,7 +42,7 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
             List<DBItemDocumentation> docs = new ArrayList<DBItemDocumentation>();
             for (String documentation : filter.getDocumentations()) {
                 String folder = Paths.get(documentation).getParent().toString().replace('\\', '/');
-                docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder));
+                docs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), folder));
             }
             for (DBItemDocumentation dbDoc : docs) {
                 List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), dbDoc.getId());

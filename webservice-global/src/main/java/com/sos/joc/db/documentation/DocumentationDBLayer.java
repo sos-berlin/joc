@@ -21,17 +21,15 @@ public class DocumentationDBLayer extends DBLayer {
         super(connection);
     }
 
-    public DBItemDocumentation getDocumentation(String schedulerId, String directory, String name) throws DBConnectionRefusedException, DBInvalidDataException {
+    public DBItemDocumentation getDocumentation(String schedulerId, String path) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_DOCUMENTATION);
             sql.append(" where schedulerId = :schedulerId");
-            sql.append(" and directory = :directory");
-            sql.append(" and name = :name");
+            sql.append(" and path = :path");
             Query<DBItemDocumentation> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
-            query.setParameter("directory", directory);
-            query.setParameter("name", name);
+            query.setParameter("path", path);
             return getSession().getSingleResult(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
@@ -53,7 +51,7 @@ public class DocumentationDBLayer extends DBLayer {
         }
     }
     
-    public List<DBItemDocumentation> getDocumentations (String schedulerId, List<String> folders)
+    public List<DBItemDocumentation> getDocumentations(String schedulerId, List<String> folders)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -71,12 +69,12 @@ public class DocumentationDBLayer extends DBLayer {
         }
     }
     
-    public List<DBItemDocumentation> getDocumentation (String schedulerId, String folder)
+    public List<DBItemDocumentation> getDocumentations(String schedulerId, String folder)
             throws DBConnectionRefusedException, DBInvalidDataException {
-        return getDocumentation(schedulerId, folder, false);
+        return getDocumentations(schedulerId, folder, false);
     }
 
-    public List<DBItemDocumentation> getDocumentation (String schedulerId, String folder, boolean recursive)
+    public List<DBItemDocumentation> getDocumentations(String schedulerId, String folder, boolean recursive)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -103,7 +101,7 @@ public class DocumentationDBLayer extends DBLayer {
     public String getDocumentationPath(DocumentationShowFilter documentationFilter) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select concat(d.directory, '/', d.name) from ")
+            sql.append("select d.path from ")
                 .append(DBITEM_DOCUMENTATION).append(" d, ")
                 .append(DBITEM_DOCUMENTATION_USAGE).append(" du");
             sql.append(" where d.id = du.documentationId");
