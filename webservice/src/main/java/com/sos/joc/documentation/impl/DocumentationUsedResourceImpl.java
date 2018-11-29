@@ -18,7 +18,7 @@ import com.sos.joc.documentation.resource.IDocumentationUsedResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.JobSchedulerObject;
 import com.sos.joc.model.common.JobSchedulerObjectType;
-import com.sos.joc.model.docu.DocumentationShowFilter;
+import com.sos.joc.model.docu.DocumentationFilter;
 import com.sos.joc.model.docu.UsedBy;
 
 @Path("documentation")
@@ -28,19 +28,19 @@ public class DocumentationUsedResourceImpl extends JOCResourceImpl implements ID
     private SOSHibernateSession connection = null;
 
     @Override
-    public JOCDefaultResponse postDocumentationsUsed(String xAccessToken, DocumentationShowFilter filter) throws Exception {
+    public JOCDefaultResponse postDocumentationsUsed(String xAccessToken, DocumentationFilter filter) throws Exception {
         // TODO: permissions
         JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), true);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
         checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
-        checkRequiredParameter("path", filter.getPath());
+        checkRequiredParameter("path", filter.getDocumentation());
         try {
             UsedBy usedBy = new UsedBy();
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            java.nio.file.Path path = Paths.get(filter.getPath());
+            java.nio.file.Path path = Paths.get(filter.getDocumentation());
             String directory = path.getParent().toString().replace('\\', '/');
             String filename = path.getFileName().toString();
             List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), directory, filename);

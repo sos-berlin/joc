@@ -7,13 +7,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.docu.DocumentationShowFilter;
+import com.sos.joc.model.docu.DocumentationFilter;
 
 public interface IDocumentationUsedResource {
 
     @Path("used")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public JOCDefaultResponse postDocumentationsUsed(@HeaderParam("X-Access-Token") String xAccessToken, DocumentationShowFilter filter) throws Exception;
+    public JOCDefaultResponse postDocumentationsUsed(@HeaderParam("X-Access-Token") String xAccessToken, DocumentationFilter filter) throws Exception;
     
 }
