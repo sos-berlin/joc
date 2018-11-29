@@ -46,12 +46,9 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
         SOSHibernateSession connection = null;
         List<String> documentations = filter.getDocumentations();
         List<Folder> folders = filter.getFolders();
-        String targetFilename = null;// filter.getTargetFilename();
+        String targetFilename = "documentation_" + filter.getJobschedulerId() + ".zip";
         StreamingOutput out = null;
         try {
-            if (targetFilename == null) {
-                targetFilename = DEFAULT_TARGET_FILENAME;
-            }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             List<DBItemDocumentation> docs = new ArrayList<DBItemDocumentation>();
