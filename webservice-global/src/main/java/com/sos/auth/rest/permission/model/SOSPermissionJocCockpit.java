@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2018.10.01 um 04:45:58 PM CEST 
+// Generiert: 2018.11.29 um 04:03:44 PM CET 
 //
 
 
@@ -223,6 +223,7 @@ import javax.xml.bind.annotation.XmlType;
  *                             &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="orderLog" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -272,6 +273,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
+ *                   &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -290,6 +292,7 @@ import javax.xml.bind.annotation.XmlType;
  *                             &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="history" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -322,6 +325,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
+ *                   &lt;element name="assignDocumention" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -341,6 +345,7 @@ import javax.xml.bind.annotation.XmlType;
  *                             &lt;element name="taskLog" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="history" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -376,6 +381,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
+ *                   &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -393,6 +399,7 @@ import javax.xml.bind.annotation.XmlType;
  *                           &lt;sequence>
  *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -409,6 +416,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
+ *                   &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -426,6 +434,7 @@ import javax.xml.bind.annotation.XmlType;
  *                           &lt;sequence>
  *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -444,6 +453,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
+ *                   &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -461,6 +471,7 @@ import javax.xml.bind.annotation.XmlType;
  *                           &lt;sequence>
  *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -477,6 +488,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
+ *                   &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -679,6 +691,7 @@ import javax.xml.bind.annotation.XmlType;
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
  *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -710,6 +723,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
+ *                   &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -757,6 +771,20 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
+ *         &lt;element name="Documentation">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="import" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="export" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="isAuthenticated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="user" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -792,7 +820,8 @@ import javax.xml.bind.annotation.XmlType;
     "yade",
     "calendar",
     "runtime",
-    "joc"
+    "joc",
+    "documentation"
 })
 @XmlRootElement(name = "SOSPermissionJocCockpit")
 public class SOSPermissionJocCockpit {
@@ -839,6 +868,8 @@ public class SOSPermissionJocCockpit {
     protected SOSPermissionJocCockpit.Runtime runtime;
     @XmlElement(name = "Joc", required = true)
     protected SOSPermissionJocCockpit.Joc joc;
+    @XmlElement(name = "Documentation", required = true)
+    protected SOSPermissionJocCockpit.Documentation documentation;
     @XmlAttribute(name = "isAuthenticated")
     protected Boolean isAuthenticated;
     @XmlAttribute(name = "user")
@@ -1355,6 +1386,30 @@ public class SOSPermissionJocCockpit {
     }
 
     /**
+     * Ruft den Wert der documentation-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link SOSPermissionJocCockpit.Documentation }
+     *     
+     */
+    public SOSPermissionJocCockpit.Documentation getDocumentation() {
+        return documentation;
+    }
+
+    /**
+     * Legt den Wert der documentation-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link SOSPermissionJocCockpit.Documentation }
+     *     
+     */
+    public void setDocumentation(SOSPermissionJocCockpit.Documentation value) {
+        this.documentation = value;
+    }
+
+    /**
      * Ruft den Wert der isAuthenticated-Eigenschaft ab.
      * 
      * @return
@@ -1602,6 +1657,7 @@ public class SOSPermissionJocCockpit {
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
      *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -1633,6 +1689,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
+     *         &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -1644,7 +1701,8 @@ public class SOSPermissionJocCockpit {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
         "view",
-        "edit"
+        "edit",
+        "assignDocumentation"
     })
     public static class Calendar {
 
@@ -1652,6 +1710,8 @@ public class SOSPermissionJocCockpit {
         protected SOSPermissionJocCockpit.Calendar.View view;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Calendar.Edit edit;
+        @XmlElement(required = true)
+        protected Object assignDocumentation;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -1699,6 +1759,30 @@ public class SOSPermissionJocCockpit {
          */
         public void setEdit(SOSPermissionJocCockpit.Calendar.Edit value) {
             this.edit = value;
+        }
+
+        /**
+         * Ruft den Wert der assignDocumentation-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link Object }
+         *     
+         */
+        public Object getAssignDocumentation() {
+            return assignDocumentation;
+        }
+
+        /**
+         * Legt den Wert der assignDocumentation-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Object }
+         *     
+         */
+        public void setAssignDocumentation(Object value) {
+            this.assignDocumentation = value;
         }
 
 
@@ -1921,6 +2005,7 @@ public class SOSPermissionJocCockpit {
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
          *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -1931,11 +2016,14 @@ public class SOSPermissionJocCockpit {
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
-            "status"
+            "status",
+            "documentation"
         })
         public static class View {
 
             protected boolean status;
+            @XmlElement(required = true)
+            protected Object documentation;
 
             /**
              * Ruft den Wert der status-Eigenschaft ab.
@@ -1951,6 +2039,30 @@ public class SOSPermissionJocCockpit {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+            /**
+             * Ruft den Wert der documentation-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link Object }
+             *     
+             */
+            public Object getDocumentation() {
+                return documentation;
+            }
+
+            /**
+             * Legt den Wert der documentation-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link Object }
+             *     
+             */
+            public void setDocumentation(Object value) {
+                this.documentation = value;
             }
 
         }
@@ -2064,6 +2176,110 @@ public class SOSPermissionJocCockpit {
                 this.status = value;
             }
 
+        }
+
+    }
+
+
+    /**
+     * <p>Java-Klasse für anonymous complex type.
+     * 
+     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="import" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="export" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "view",
+        "_import",
+        "export",
+        "delete"
+    })
+    public static class Documentation {
+
+        protected boolean view;
+        @XmlElement(name = "import")
+        protected boolean _import;
+        protected boolean export;
+        protected boolean delete;
+
+        /**
+         * Ruft den Wert der view-Eigenschaft ab.
+         * 
+         */
+        public boolean isView() {
+            return view;
+        }
+
+        /**
+         * Legt den Wert der view-Eigenschaft fest.
+         * 
+         */
+        public void setView(boolean value) {
+            this.view = value;
+        }
+
+        /**
+         * Ruft den Wert der import-Eigenschaft ab.
+         * 
+         */
+        public boolean isImport() {
+            return _import;
+        }
+
+        /**
+         * Legt den Wert der import-Eigenschaft fest.
+         * 
+         */
+        public void setImport(boolean value) {
+            this._import = value;
+        }
+
+        /**
+         * Ruft den Wert der export-Eigenschaft ab.
+         * 
+         */
+        public boolean isExport() {
+            return export;
+        }
+
+        /**
+         * Legt den Wert der export-Eigenschaft fest.
+         * 
+         */
+        public void setExport(boolean value) {
+            this.export = value;
+        }
+
+        /**
+         * Ruft den Wert der delete-Eigenschaft ab.
+         * 
+         */
+        public boolean isDelete() {
+            return delete;
+        }
+
+        /**
+         * Legt den Wert der delete-Eigenschaft fest.
+         * 
+         */
+        public void setDelete(boolean value) {
+            this.delete = value;
         }
 
     }
@@ -2955,6 +3171,7 @@ public class SOSPermissionJocCockpit {
      *                   &lt;element name="taskLog" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="history" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -2990,6 +3207,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
+     *         &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -3002,7 +3220,8 @@ public class SOSPermissionJocCockpit {
     @XmlType(name = "", propOrder = {
         "view",
         "change",
-        "execute"
+        "execute",
+        "assignDocumentation"
     })
     public static class Job {
 
@@ -3012,6 +3231,8 @@ public class SOSPermissionJocCockpit {
         protected SOSPermissionJocCockpit.Job.Change change;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Job.Execute execute;
+        @XmlElement(required = true)
+        protected Object assignDocumentation;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -3083,6 +3304,30 @@ public class SOSPermissionJocCockpit {
          */
         public void setExecute(SOSPermissionJocCockpit.Job.Execute value) {
             this.execute = value;
+        }
+
+        /**
+         * Ruft den Wert der assignDocumentation-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link Object }
+         *     
+         */
+        public Object getAssignDocumentation() {
+            return assignDocumentation;
+        }
+
+        /**
+         * Legt den Wert der assignDocumentation-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Object }
+         *     
+         */
+        public void setAssignDocumentation(Object value) {
+            this.assignDocumentation = value;
         }
 
 
@@ -3344,6 +3589,7 @@ public class SOSPermissionJocCockpit {
          *         &lt;element name="taskLog" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="history" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -3357,7 +3603,8 @@ public class SOSPermissionJocCockpit {
             "status",
             "taskLog",
             "configuration",
-            "history"
+            "history",
+            "documentation"
         })
         public static class View {
 
@@ -3365,6 +3612,8 @@ public class SOSPermissionJocCockpit {
             protected boolean taskLog;
             protected boolean configuration;
             protected boolean history;
+            @XmlElement(required = true)
+            protected Object documentation;
 
             /**
              * Ruft den Wert der status-Eigenschaft ab.
@@ -3430,6 +3679,30 @@ public class SOSPermissionJocCockpit {
                 this.history = value;
             }
 
+            /**
+             * Ruft den Wert der documentation-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link Object }
+             *     
+             */
+            public Object getDocumentation() {
+                return documentation;
+            }
+
+            /**
+             * Legt den Wert der documentation-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link Object }
+             *     
+             */
+            public void setDocumentation(Object value) {
+                this.documentation = value;
+            }
+
         }
 
     }
@@ -3453,6 +3726,7 @@ public class SOSPermissionJocCockpit {
      *                   &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="history" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -3485,6 +3759,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
+     *         &lt;element name="assignDocumention" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -3497,7 +3772,8 @@ public class SOSPermissionJocCockpit {
     @XmlType(name = "", propOrder = {
         "view",
         "execute",
-        "change"
+        "change",
+        "assignDocumention"
     })
     public static class JobChain {
 
@@ -3507,6 +3783,8 @@ public class SOSPermissionJocCockpit {
         protected SOSPermissionJocCockpit.JobChain.Execute execute;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.JobChain.Change change;
+        @XmlElement(required = true)
+        protected Object assignDocumention;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -3578,6 +3856,30 @@ public class SOSPermissionJocCockpit {
          */
         public void setChange(SOSPermissionJocCockpit.JobChain.Change value) {
             this.change = value;
+        }
+
+        /**
+         * Ruft den Wert der assignDocumention-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link Object }
+         *     
+         */
+        public Object getAssignDocumention() {
+            return assignDocumention;
+        }
+
+        /**
+         * Legt den Wert der assignDocumention-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Object }
+         *     
+         */
+        public void setAssignDocumention(Object value) {
+            this.assignDocumention = value;
         }
 
 
@@ -3781,6 +4083,7 @@ public class SOSPermissionJocCockpit {
          *         &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="history" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -3793,13 +4096,16 @@ public class SOSPermissionJocCockpit {
         @XmlType(name = "", propOrder = {
             "configuration",
             "history",
-            "status"
+            "status",
+            "documentation"
         })
         public static class View {
 
             protected boolean configuration;
             protected boolean history;
             protected boolean status;
+            @XmlElement(required = true)
+            protected Object documentation;
 
             /**
              * Ruft den Wert der configuration-Eigenschaft ab.
@@ -3847,6 +4153,30 @@ public class SOSPermissionJocCockpit {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+            /**
+             * Ruft den Wert der documentation-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link Object }
+             *     
+             */
+            public Object getDocumentation() {
+                return documentation;
+            }
+
+            /**
+             * Legt den Wert der documentation-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link Object }
+             *     
+             */
+            public void setDocumentation(Object value) {
+                this.documentation = value;
             }
 
         }
@@ -5113,6 +5443,7 @@ public class SOSPermissionJocCockpit {
      *                 &lt;sequence>
      *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -5129,6 +5460,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
+     *         &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -5140,7 +5472,8 @@ public class SOSPermissionJocCockpit {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
         "view",
-        "change"
+        "change",
+        "assignDocumentation"
     })
     public static class Lock {
 
@@ -5148,6 +5481,8 @@ public class SOSPermissionJocCockpit {
         protected SOSPermissionJocCockpit.Lock.View view;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Lock.Change change;
+        @XmlElement(required = true)
+        protected Object assignDocumentation;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -5195,6 +5530,30 @@ public class SOSPermissionJocCockpit {
          */
         public void setChange(SOSPermissionJocCockpit.Lock.Change value) {
             this.change = value;
+        }
+
+        /**
+         * Ruft den Wert der assignDocumentation-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link Object }
+         *     
+         */
+        public Object getAssignDocumentation() {
+            return assignDocumentation;
+        }
+
+        /**
+         * Legt den Wert der assignDocumentation-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Object }
+         *     
+         */
+        public void setAssignDocumentation(Object value) {
+            this.assignDocumentation = value;
         }
 
 
@@ -5256,6 +5615,7 @@ public class SOSPermissionJocCockpit {
          *       &lt;sequence>
          *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -5267,12 +5627,15 @@ public class SOSPermissionJocCockpit {
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
             "status",
-            "configuration"
+            "configuration",
+            "documentation"
         })
         public static class View {
 
             protected boolean status;
             protected boolean configuration;
+            @XmlElement(required = true)
+            protected Object documentation;
 
             /**
              * Ruft den Wert der status-Eigenschaft ab.
@@ -5304,6 +5667,30 @@ public class SOSPermissionJocCockpit {
              */
             public void setConfiguration(boolean value) {
                 this.configuration = value;
+            }
+
+            /**
+             * Ruft den Wert der documentation-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link Object }
+             *     
+             */
+            public Object getDocumentation() {
+                return documentation;
+            }
+
+            /**
+             * Legt den Wert der documentation-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link Object }
+             *     
+             */
+            public void setDocumentation(Object value) {
+                this.documentation = value;
             }
 
         }
@@ -5459,6 +5846,7 @@ public class SOSPermissionJocCockpit {
      *                   &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="orderLog" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -5508,6 +5896,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
+     *         &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -5521,7 +5910,8 @@ public class SOSPermissionJocCockpit {
         "view",
         "change",
         "delete",
-        "execute"
+        "execute",
+        "assignDocumentation"
     })
     public static class Order {
 
@@ -5533,6 +5923,7 @@ public class SOSPermissionJocCockpit {
         protected SOSPermissionJocCockpit.Order.Delete delete;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Order.Execute execute;
+        protected boolean assignDocumentation;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -5628,6 +6019,22 @@ public class SOSPermissionJocCockpit {
          */
         public void setExecute(SOSPermissionJocCockpit.Order.Execute value) {
             this.execute = value;
+        }
+
+        /**
+         * Ruft den Wert der assignDocumentation-Eigenschaft ab.
+         * 
+         */
+        public boolean isAssignDocumentation() {
+            return assignDocumentation;
+        }
+
+        /**
+         * Legt den Wert der assignDocumentation-Eigenschaft fest.
+         * 
+         */
+        public void setAssignDocumentation(boolean value) {
+            this.assignDocumentation = value;
         }
 
 
@@ -5991,6 +6398,7 @@ public class SOSPermissionJocCockpit {
          *         &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="orderLog" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -6003,13 +6411,16 @@ public class SOSPermissionJocCockpit {
         @XmlType(name = "", propOrder = {
             "configuration",
             "orderLog",
-            "status"
+            "status",
+            "documentation"
         })
         public static class View {
 
             protected boolean configuration;
             protected boolean orderLog;
             protected boolean status;
+            @XmlElement(required = true)
+            protected Object documentation;
 
             /**
              * Ruft den Wert der configuration-Eigenschaft ab.
@@ -6059,6 +6470,30 @@ public class SOSPermissionJocCockpit {
                 this.status = value;
             }
 
+            /**
+             * Ruft den Wert der documentation-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link Object }
+             *     
+             */
+            public Object getDocumentation() {
+                return documentation;
+            }
+
+            /**
+             * Legt den Wert der documentation-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link Object }
+             *     
+             */
+            public void setDocumentation(Object value) {
+                this.documentation = value;
+            }
+
         }
 
     }
@@ -6081,6 +6516,7 @@ public class SOSPermissionJocCockpit {
      *                 &lt;sequence>
      *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -6097,6 +6533,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
+     *         &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -6108,7 +6545,8 @@ public class SOSPermissionJocCockpit {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
         "view",
-        "change"
+        "change",
+        "assignDocumentation"
     })
     public static class ProcessClass {
 
@@ -6116,6 +6554,8 @@ public class SOSPermissionJocCockpit {
         protected SOSPermissionJocCockpit.ProcessClass.View view;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.ProcessClass.Change change;
+        @XmlElement(required = true)
+        protected Object assignDocumentation;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -6163,6 +6603,30 @@ public class SOSPermissionJocCockpit {
          */
         public void setChange(SOSPermissionJocCockpit.ProcessClass.Change value) {
             this.change = value;
+        }
+
+        /**
+         * Ruft den Wert der assignDocumentation-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link Object }
+         *     
+         */
+        public Object getAssignDocumentation() {
+            return assignDocumentation;
+        }
+
+        /**
+         * Legt den Wert der assignDocumentation-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Object }
+         *     
+         */
+        public void setAssignDocumentation(Object value) {
+            this.assignDocumentation = value;
         }
 
 
@@ -6224,6 +6688,7 @@ public class SOSPermissionJocCockpit {
          *       &lt;sequence>
          *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -6235,12 +6700,15 @@ public class SOSPermissionJocCockpit {
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
             "status",
-            "configuration"
+            "configuration",
+            "documentation"
         })
         public static class View {
 
             protected boolean status;
             protected boolean configuration;
+            @XmlElement(required = true)
+            protected Object documentation;
 
             /**
              * Ruft den Wert der status-Eigenschaft ab.
@@ -6272,6 +6740,30 @@ public class SOSPermissionJocCockpit {
              */
             public void setConfiguration(boolean value) {
                 this.configuration = value;
+            }
+
+            /**
+             * Ruft den Wert der documentation-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link Object }
+             *     
+             */
+            public Object getDocumentation() {
+                return documentation;
+            }
+
+            /**
+             * Legt den Wert der documentation-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link Object }
+             *     
+             */
+            public void setDocumentation(Object value) {
+                this.documentation = value;
             }
 
         }
@@ -6407,6 +6899,7 @@ public class SOSPermissionJocCockpit {
      *                 &lt;sequence>
      *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -6425,6 +6918,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
+     *         &lt;element name="assignDocumentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -6436,7 +6930,8 @@ public class SOSPermissionJocCockpit {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
         "view",
-        "change"
+        "change",
+        "assignDocumentation"
     })
     public static class Schedule {
 
@@ -6444,6 +6939,8 @@ public class SOSPermissionJocCockpit {
         protected SOSPermissionJocCockpit.Schedule.View view;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Schedule.Change change;
+        @XmlElement(required = true)
+        protected Object assignDocumentation;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -6491,6 +6988,30 @@ public class SOSPermissionJocCockpit {
          */
         public void setChange(SOSPermissionJocCockpit.Schedule.Change value) {
             this.change = value;
+        }
+
+        /**
+         * Ruft den Wert der assignDocumentation-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link Object }
+         *     
+         */
+        public Object getAssignDocumentation() {
+            return assignDocumentation;
+        }
+
+        /**
+         * Legt den Wert der assignDocumentation-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Object }
+         *     
+         */
+        public void setAssignDocumentation(Object value) {
+            this.assignDocumentation = value;
         }
 
 
@@ -6590,6 +7111,7 @@ public class SOSPermissionJocCockpit {
          *       &lt;sequence>
          *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="configuration" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="documentation" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -6601,12 +7123,15 @@ public class SOSPermissionJocCockpit {
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
             "status",
-            "configuration"
+            "configuration",
+            "documentation"
         })
         public static class View {
 
             protected boolean status;
             protected boolean configuration;
+            @XmlElement(required = true)
+            protected Object documentation;
 
             /**
              * Ruft den Wert der status-Eigenschaft ab.
@@ -6638,6 +7163,30 @@ public class SOSPermissionJocCockpit {
              */
             public void setConfiguration(boolean value) {
                 this.configuration = value;
+            }
+
+            /**
+             * Ruft den Wert der documentation-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link Object }
+             *     
+             */
+            public Object getDocumentation() {
+                return documentation;
+            }
+
+            /**
+             * Legt den Wert der documentation-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link Object }
+             *     
+             */
+            public void setDocumentation(Object value) {
+                this.documentation = value;
             }
 
         }
