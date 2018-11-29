@@ -32,7 +32,6 @@ import com.sos.joc.model.docu.DocumentationsFilter;
 public class DocumentationsExportResourceImpl extends JOCResourceImpl implements IDocumentationsExportResource {
 
     private static final String API_CALL = "/documentations/export";
-    private static final String DEFAULT_TARGET_FILENAME = "documentation.zip";
 
     @Override
     public JOCDefaultResponse postExportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
@@ -55,11 +54,11 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
             if (documentations != null && !documentations.isEmpty()) {
                 for (String documentation : documentations) {
                     String folder = Paths.get(documentation).getParent().toString().replace('\\', '/');
-                    docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder));
+                    docs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), folder));
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    docs.addAll(dbLayer.getDocumentation(filter.getJobschedulerId(), folder.getFolder(), folder.getRecursive()));
+                    docs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), folder.getFolder(), folder.getRecursive()));
                 }
             } else {
                 throw new JocMissingRequiredParameterException("Neither 'documents' nor 'folders' are specified!");

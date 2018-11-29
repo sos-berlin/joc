@@ -41,9 +41,7 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            java.nio.file.Path p = Paths.get(normalizePath(path));
-            DBItemDocumentation dbItem = dbLayer.getDocumentation(jobschedulerId, p.getParent().toString().replace('\\', '/'), p.getFileName()
-                    .toString());
+            DBItemDocumentation dbItem = dbLayer.getDocumentation(jobschedulerId, normalizePath(path));
             String errMessage = "No database entry (" + jobschedulerId + "/" + path + ") as documentation resource found";
 
             if (dbItem == null) {

@@ -155,7 +155,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
 
     private void saveOrUpdate(DocumentationDBLayer dbLayer, DBItemDocumentation doc) throws DBConnectionRefusedException, DBInvalidDataException,
             SOSHibernateException {
-        DBItemDocumentation docFromDB = dbLayer.getDocumentation(doc.getSchedulerId(), doc.getDirectory(), doc.getName());
+        DBItemDocumentation docFromDB = dbLayer.getDocumentation(doc.getSchedulerId(), doc.getPath());
         if (docFromDB != null) {
             if (doc.hasImage()) {
                 DBItemDocumentationImage imageFromDB = dbLayer.getDocumentationImage(docFromDB.getImageId());
@@ -228,6 +228,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 documentation.setSchedulerId(filter.getJobschedulerId());
                 java.nio.file.Path targetFolder = Paths.get(filter.getFolder());
                 java.nio.file.Path complete = targetFolder.resolve(entry.getName().replace('\\', '/').replaceFirst("^/", ""));
+                documentation.setPath(complete.toString().replace('\\', '/'));
                 documentation.setDirectory(complete.getParent().toString().replace('\\', '/'));
                 documentation.setName(complete.getFileName().toString());
                 String fileExtension = getExtensionFromFilename(documentation.getName());
@@ -291,6 +292,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
         documentation.setSchedulerId(filter.getJobschedulerId());
         documentation.setDirectory(filter.getFolder());
         documentation.setName(filter.getFile());
+        documentation.setPath(filter.getFolder() + "/" +filter.getFile());
         documentation.setCreated(Date.from(Instant.now()));
         documentation.setModified(documentation.getCreated());
         documentation.setType(mediaSubType);
@@ -305,6 +307,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
         documentation.setSchedulerId(filter.getJobschedulerId());
         documentation.setDirectory(filter.getFolder());
         documentation.setName(filter.getFile());
+        documentation.setPath(filter.getFolder() + "/" +filter.getFile());
         documentation.setCreated(Date.from(Instant.now()));
         documentation.setModified(documentation.getCreated());
         documentation.setType(mediaSubType);
