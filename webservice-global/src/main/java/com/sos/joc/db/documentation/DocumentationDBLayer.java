@@ -103,7 +103,9 @@ public class DocumentationDBLayer extends DBLayer {
     public String getDocumentationPath(DocumentationShowFilter documentationFilter) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select concat(d.directory, '/', d.name) from ").append(DBITEM_DOCUMENTATION).append(" d, ").append(DBITEM_DOCUMENTATION_USAGE).append(" du");
+            sql.append("select concat(d.directory, '/', d.name) from ")
+                .append(DBITEM_DOCUMENTATION).append(" d, ")
+                .append(DBITEM_DOCUMENTATION_USAGE).append(" du");
             sql.append(" where d.id = du.documentationId");
             sql.append(" and du.schedulerId = :schedulerId");
             sql.append(" and du.objectType = :objectType");
@@ -153,6 +155,24 @@ public class DocumentationDBLayer extends DBLayer {
             Query<DBItemDocumentationUsage> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("documentationId", documentationId);
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public List<DBItemDocumentationUsage> getDocumentationUsage (String schedulerId, String path)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_DOCUMENTATION_USAGE);
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and path = :path");
+            Query<DBItemDocumentationUsage> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("path", path);
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
