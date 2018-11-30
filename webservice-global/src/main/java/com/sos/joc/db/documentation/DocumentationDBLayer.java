@@ -81,21 +81,49 @@ public class DocumentationDBLayer extends DBLayer {
     }
 
     public List<DBItemDocumentation> getDocumentations(String schedulerId, String folder, boolean recursive) throws DBConnectionRefusedException,
-            DBInvalidDataException {
+    DBInvalidDataException {
+try {
+    StringBuilder sql = new StringBuilder();
+    sql.append("from ").append(DBITEM_DOCUMENTATION);
+    sql.append(" where schedulerId = :schedulerId");
+    sql.append(" and directory = :folder");
+    if (recursive) {
+        sql.append(" or directory like :folder2");
+    }
+    Query<DBItemDocumentation> query = getSession().createQuery(sql.toString());
+    query.setParameter("schedulerId", schedulerId);
+    query.setParameter("folder", folder);
+    if (recursive) {
+        query.setParameter("folder2", MatchMode.START.toMatchString(folder + "/"));
+    }
+    return getSession().getResultList(query);
+} catch (SOSHibernateInvalidSessionException ex) {
+    throw new DBConnectionRefusedException(ex);
+} catch (Exception ex) {
+    throw new DBInvalidDataException(ex);
+}
+}
+
+    public List<DBItemDocumentation> getDocumentations(String schedulerId, List<String> types, String folder, boolean recursive)
+            throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_DOCUMENTATION);
             sql.append(" where schedulerId = :schedulerId");
-            sql.append(" and directory = :folder");
             if (recursive) {
-                sql.append(" or directory like :folder2");
+                sql.append(" and (directory = :folder");
+                sql.append(" or directory like :folder2)");
+            } else {
+                sql.append(" and directory = :folder");
             }
+            sql.append(" and type in :types");
             Query<DBItemDocumentation> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("folder", folder);
             if (recursive) {
                 query.setParameter("folder2", MatchMode.START.toMatchString(folder + "/"));
             }
+            query.setParameterList("types", types);
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

@@ -3,6 +3,8 @@ package com.sos.joc.documentations.impl;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
@@ -34,6 +36,8 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
         SOSHibernateSession connection = null;
         List<String> documentations = filter.getDocumentations();
         List<Folder> folders = filter.getFolders();
+        List<String> types = filter.getTypes();
+        String regex = filter.getRegex();
         try {
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
@@ -45,7 +49,14 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
                 }
             } else if (folders != null) {
                 for (Folder folder : folders) {
-                    dbDocs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), folder.getFolder(), folder.getRecursive()));
+                    if (types != null && !types.isEmpty()) {
+                        dbDocs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), types, folder.getFolder(), folder.getRecursive()));
+                    } else {
+                        dbDocs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), folder.getFolder(), folder.getRecursive()));
+                    }
+                }
+                if (regex != null) {
+                    dbDocs = filterByRegex(dbDocs, regex);
                 }
             }
             return JOCDefaultResponse.responseStatus200(mapDbItemsToDocumentations(dbDocs));
@@ -59,6 +70,21 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
         }
     }
     
+    private List<DBItemDocumentation> filterByRegex(List<DBItemDocumentation> unfilteredDocs, String regex) throws Exception {
+        List<DBItemDocumentation> filteredDocs = new ArrayList<DBItemDocumentation>();
+        for (DBItemDocumentation unfilteredDoc : unfilteredDocs) {
+            Matcher regExMatcher = Pattern.compile(regex).matcher(unfilteredDoc.getPath());
+            if (regExMatcher.find()) {
+                filteredDocs.add(unfilteredDoc);
+            }
+        }
+        if (!filteredDocs.isEmpty()) {
+            return filteredDocs;
+        } else {
+            return null;
+        }
+    }
+
     private List<Documentation> mapDbItemsToDocumentations(List<DBItemDocumentation> dbDocs) {
         List<Documentation> docs = new ArrayList<Documentation>();
         for(DBItemDocumentation dbDoc : dbDocs) {
