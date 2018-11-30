@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,9 +18,11 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.schedule.ScheduleP;
 import com.sos.joc.model.schedule.SchedulePath;
 import com.sos.joc.model.schedule.SchedulesFilter;
@@ -39,16 +42,14 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
     public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
         SOSHibernateSession connection = null;
 
-		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, schedulesFilter, accessToken,
-					schedulesFilter.getJobschedulerId(),
-					getPermissonsJocCockpit(schedulesFilter.getJobschedulerId(), accessToken).getSchedule().getView()
-							.isStatus());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-			// FILTER
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, schedulesFilter, accessToken, schedulesFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(schedulesFilter.getJobschedulerId(), accessToken).getSchedule().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            // FILTER
             boolean withFolderFilter = schedulesFilter.getFolders() != null && !schedulesFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
             List<SchedulePath> schedules = schedulesFilter.getSchedules();
@@ -56,6 +57,9 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             Globals.beginTransaction(connection);
             InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(connection);
             List<ScheduleP> listOfSchedules = new ArrayList<ScheduleP>();
+            DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
+            Map<String, String> documentations = dbDocLayer.getDocumentationPaths(schedulesFilter.getJobschedulerId(),
+                    JobSchedulerObjectType.SCHEDULE);
 
             if (schedules != null && !schedules.isEmpty()) {
                 List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
@@ -67,7 +71,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                         if (scheduleFromDb == null) {
                             continue;
                         }
-                        ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbItemInventoryInstance);
+                        ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, documentations.get(scheduleFromDb.getName()),  dbItemInventoryInstance);
                         if (scheduleP != null) {
                             schedulesToAdd.add(scheduleP);
                         }
@@ -83,14 +87,14 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                     List<DBItemInventorySchedule> schedulesFromDb = null;
                     schedulesFromDb = dbLayer.getSchedulesByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance.getId(), folder
                             .getRecursive().booleanValue());
-                    List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, schedulesFromDb, dbItemInventoryInstance, schedulesFilter.getRegex());
+                    List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, schedulesFromDb, documentations, dbItemInventoryInstance, schedulesFilter.getRegex());
                     if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                         listOfSchedules.addAll(schedulesToAdd);
                     }
                 }
             } else {
                 List<DBItemInventorySchedule> processClassesFromDb = dbLayer.getSchedules(dbItemInventoryInstance.getId());
-                List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, processClassesFromDb, dbItemInventoryInstance, schedulesFilter
+                List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, processClassesFromDb, documentations, dbItemInventoryInstance, schedulesFilter
                         .getRegex());
                 if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                     listOfSchedules.addAll(schedulesToAdd);
@@ -111,17 +115,17 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
     }
 
     private List<ScheduleP> getSchedulesToAdd(InventorySchedulesDBLayer dbLayer, List<DBItemInventorySchedule> schedulesFromDb,
-            DBItemInventoryInstance instance, String regex) throws Exception {
+            Map<String, String> documentations, DBItemInventoryInstance instance, String regex) throws Exception {
         List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
         if (schedulesFromDb != null) {
             for (DBItemInventorySchedule scheduleFromDb : schedulesFromDb) {
                 if (regex != null && !regex.isEmpty()) {
                     Matcher regExMatcher = Pattern.compile(regex).matcher(scheduleFromDb.getName());
                     if (regExMatcher.find()) {
-                        schedulesToAdd.add(SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, instance));
+                        schedulesToAdd.add(SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, documentations.get(scheduleFromDb.getName()), instance));
                     }
                 } else {
-                    schedulesToAdd.add(SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, instance));
+                    schedulesToAdd.add(SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, documentations.get(scheduleFromDb.getName()), instance));
                 }
             }
         }

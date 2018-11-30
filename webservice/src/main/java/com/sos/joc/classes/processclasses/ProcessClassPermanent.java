@@ -10,10 +10,9 @@ import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.model.processClass.ProcessClassP;
 
-
 public class ProcessClassPermanent {
 
-    public static Map<String, ProcessClassP> getProcessClassesMap(InventoryProcessClassesDBLayer dbLayer,
+    public static Map<String, ProcessClassP> getProcessClassesMap(InventoryProcessClassesDBLayer dbLayer, Map<String, String> documentations,
             List<DBItemInventoryProcessClass> processClassesFromDb, String regex) throws Exception {
         Map<String, ProcessClassP> processClassesToAdd = new HashMap<String, ProcessClassP>();
         if (processClassesFromDb != null) {
@@ -21,24 +20,26 @@ public class ProcessClassPermanent {
                 if (!FilterAfterResponse.matchRegex(regex, processClassFromDb.getName())) {
                     continue;
                 }
-                processClassesToAdd.put(processClassFromDb.getName(), getProcessClassP(dbLayer, processClassFromDb));
+                processClassesToAdd.put(processClassFromDb.getName(), getProcessClassP(dbLayer, documentations.get(processClassFromDb.getName()),
+                        processClassFromDb));
             }
         }
         return processClassesToAdd;
     }
-    
-    public static List<ProcessClassP> getProcessClassesList(InventoryProcessClassesDBLayer dbLayer,
+
+    public static List<ProcessClassP> getProcessClassesList(InventoryProcessClassesDBLayer dbLayer, Map<String, String> documentations,
             List<DBItemInventoryProcessClass> processClassesFromDb, String regex) throws Exception {
-        return new ArrayList<ProcessClassP>(getProcessClassesMap(dbLayer, processClassesFromDb, regex).values());
+        return new ArrayList<ProcessClassP>(getProcessClassesMap(dbLayer, documentations, processClassesFromDb, regex).values());
     }
 
-    public static ProcessClassP getProcessClassP(InventoryProcessClassesDBLayer dbLayer, DBItemInventoryProcessClass processClassFromDb)
-            throws Exception {
+    public static ProcessClassP getProcessClassP(InventoryProcessClassesDBLayer dbLayer, String documentation,
+            DBItemInventoryProcessClass processClassFromDb) throws Exception {
         if (processClassFromDb != null) {
             ProcessClassP processClassP = new ProcessClassP();
             processClassP.setMaxProcesses(processClassFromDb.getMaxProcesses());
             processClassP.setName(processClassFromDb.getBasename());
             processClassP.setPath(processClassFromDb.getName());
+            processClassP.setDocumentation(documentation);
             processClassP.setSurveyDate(processClassFromDb.getModified());
             processClassP.setConfigurationDate(dbLayer.getProcessClassConfigurationDate(processClassFromDb.getId()));
             return processClassP;
@@ -46,5 +47,5 @@ public class ProcessClassPermanent {
             return null;
         }
     }
-    
+
 }

@@ -21,15 +21,15 @@ import com.sos.joc.model.docu.DocumentationFilter;
 import com.sos.joc.model.docu.UsedBy;
 
 @Path("documentation")
-public class DocumentationUsedResourceImpl extends JOCResourceImpl implements IDocumentationUsedResource{
+public class DocumentationUsedResourceImpl extends JOCResourceImpl implements IDocumentationUsedResource {
 
     private static final String API_CALL = "/documentation/used";
     private SOSHibernateSession connection = null;
 
     @Override
     public JOCDefaultResponse postDocumentationsUsed(String xAccessToken, DocumentationFilter filter) throws Exception {
-        // TODO: permissions
-        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), true);
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
+                .getJobschedulerId(), xAccessToken).getDocumentation().isView());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -39,16 +39,17 @@ public class DocumentationUsedResourceImpl extends JOCResourceImpl implements ID
             UsedBy usedBy = new UsedBy();
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), filter.getDocumentation());
+            List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), normalizePath(filter
+                    .getDocumentation()));
             if (dbUsages != null && !dbUsages.isEmpty()) {
                 List<JobSchedulerObject> jobSchedulerObjects = new ArrayList<JobSchedulerObject>();
-                usedBy.setObjects(jobSchedulerObjects);
                 for (DBItemDocumentationUsage dbUsage : dbUsages) {
                     JobSchedulerObject jsObject = new JobSchedulerObject();
                     jsObject.setPath(dbUsage.getPath());
                     jsObject.setType(JobSchedulerObjectType.fromValue(dbUsage.getObjectType()));
-                    usedBy.getObjects().add(jsObject);
+                    jobSchedulerObjects.add(jsObject);
                 }
+                usedBy.setObjects(jobSchedulerObjects);
             }
             usedBy.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(usedBy);

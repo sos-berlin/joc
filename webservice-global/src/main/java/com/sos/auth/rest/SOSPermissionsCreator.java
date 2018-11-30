@@ -385,7 +385,7 @@ public class SOSPermissionsCreator {
                     "sos:products:joc_cockpit:job_chain:execute:process_jobchain_node"));
             sosPermissionJocCockpit.getJobChain().getExecute().setStopJobChainNode(haveRight(masterId,
                     "sos:products:joc_cockpit:job_chain:execute:stop_jobchain_node"));
-            sosPermissionJocCockpit.getJobChain().setAssignDocumention(haveRight(masterId,
+            sosPermissionJocCockpit.getJobChain().setAssignDocumentation(haveRight(masterId,
                     "sos:products:joc_cockpit:job_chain:assign_documentation"));
 
             sosPermissionJocCockpit.getJob().getView().setStatus(haveRight(masterId, "sos:products:joc_cockpit:job:view:status"));

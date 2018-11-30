@@ -36,8 +36,8 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
     @Override
     public JOCDefaultResponse postExportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
 
-        // TODO: permissions
-        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), true);
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
+                .getJobschedulerId(), xAccessToken).getDocumentation().isExport());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

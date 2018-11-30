@@ -13,6 +13,7 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.model.job.JobP;
 import com.sos.joc.model.job.LockUseP;
@@ -62,17 +63,16 @@ public class JobPermanent {
         return dbLayer.getJobChainsByJobId(job.getId(), instanceId);
     }
 
-    public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, Boolean compact, Long instanceId) throws Exception {
+    public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, String documentation, Boolean compact, Long instanceId) throws Exception {
         JobP job = new JobP();
         if ("/scheduler_file_order_sink".equals(inventoryJob.getName())) {
-            //job.setHasDescription(false);
             job.setIsOrderJob(true);
             job.setMaxTasks(1);
             job.setName("scheduler_file_order_sink");
             job.setPath(inventoryJob.getName());
             job.setEstimatedDuration(0);
         } else {
-            //job.setHasDescription(inventoryJob.getHasDescription());
+            job.setDocumentation(documentation);
             job.setIsOrderJob(inventoryJob.getIsOrderJob());
             job.setMaxTasks(inventoryJob.getMaxTasks());
             job.setName(inventoryJob.getBaseName());

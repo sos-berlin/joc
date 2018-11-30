@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -22,6 +23,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Calendar;
@@ -107,6 +109,8 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
 
             List<Calendar> calendarList = new ArrayList<Calendar>();
             if (dbCalendars != null) {
+                DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
+                Map<String,String> documentations = dbDocLayer.getDocumentationPathsOfCalendar(calendarsFilter.getJobschedulerId());
                 ObjectMapper om = new ObjectMapper();
                 boolean compact = calendarsFilter.getCompact() != null && calendarsFilter.getCompact();
                 if (withUsedBy) {
@@ -118,6 +122,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                         calendar.setId(dbCalendar.getId());
                         calendar.setPath(dbCalendar.getName());
                         calendar.setName(dbCalendar.getBaseName());
+                        calendar.setDocumentation(documentations.get(dbCalendar.getName()));
                         if (compact) {
                             calendar.setIncludes(null);
                             calendar.setExcludes(null);

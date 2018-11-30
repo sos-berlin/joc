@@ -7,6 +7,7 @@ import java.time.Instant;
 
 import javax.ws.rs.Path;
 
+import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -34,7 +35,7 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
     public JOCDefaultResponse show(String xAccessToken, String accessToken, String jobschedulerId, String path, String type) throws Exception {
         return show(getAccessToken(xAccessToken, accessToken), jobschedulerId, path, type);
     }
-    
+
     public JOCDefaultResponse show(String xAccessToken, String jobschedulerId, String path, String type) throws Exception {
         try {
             DocumentationShowFilter documentationFilter = new DocumentationShowFilter();
@@ -46,13 +47,42 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-    
+
     @Override
     public JOCDefaultResponse show(String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception {
         try {
-            // TODO Permission
+            boolean perm = false;
+            if (documentationFilter.getType() != null) {
+                SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(documentationFilter.getJobschedulerId(), xAccessToken);
+                switch (documentationFilter.getType()) {
+                case JOB: 
+                    perm = sosPermission.getJob().getView().isDocumentation();
+                    break;
+                case JOBCHAIN: 
+                    perm = sosPermission.getJobChain().getView().isDocumentation();
+                    break;
+                case LOCK: 
+                    perm = sosPermission.getLock().getView().isDocumentation();
+                    break;
+                case ORDER: 
+                    perm = sosPermission.getOrder().getView().isDocumentation();
+                    break;
+                case PROCESSCLASS: 
+                    perm = sosPermission.getProcessClass().getView().isDocumentation();
+                    break;
+                case SCHEDULE: 
+                    perm = sosPermission.getSchedule().getView().isDocumentation();
+                    break;
+                case NONWORKINGDAYSCALENDAR:
+                case WORKINGDAYSCALENDAR:
+                    perm = sosPermission.getCalendar().getView().isDocumentation();
+                    break;
+                default:
+                    break;
+                }
+            }
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_SHOW, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
-                    true);
+                    perm);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -69,12 +99,12 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-    
+
     @Override
     public JOCDefaultResponse preview(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
         return preview(getAccessToken(xAccessToken, accessToken), jobschedulerId, path);
     }
-    
+
     public JOCDefaultResponse preview(String xAccessToken, String jobschedulerId, String path) throws Exception {
         DocumentationShowFilter documentationFilter = new DocumentationShowFilter();
         documentationFilter.setJobschedulerId(jobschedulerId);
@@ -85,9 +115,8 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
     @Override
     public JOCDefaultResponse preview(String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception {
         try {
-            // TODO Permission
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_PREVIEW, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
-                    true);
+                    getPermissonsJocCockpit(documentationFilter.getJobschedulerId(), xAccessToken).getDocumentation().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -110,7 +139,6 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
     @Override
     public JOCDefaultResponse postUrl(String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception {
         try {
-            // TODO Permission
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_URL, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
                     true);
             if (jocDefaultResponse != null) {
@@ -152,7 +180,7 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
             Globals.disconnect(connection);
         }
     }
-    
+
     private String urlEncodedPath(String path) throws UnsupportedEncodingException {
         if ("/".equals(path)) {
             return "/";

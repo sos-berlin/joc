@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,9 +17,11 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrderPermanent;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersP;
@@ -46,6 +49,9 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             OrdersP entity = new OrdersP();
             Long instanceId = dbItemInventoryInstance.getId();
+            DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
+            Map<String,String> documentations = dbDocLayer.getDocumentationPaths(ordersFilter.getJobschedulerId(), JobSchedulerObjectType.ORDER);
+            
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
             String regex = ordersFilter.getRegex();
             List<OrderPath> orderPaths = ordersFilter.getOrders();
@@ -91,7 +97,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                     ordersFromDB.addAll(filteredOrders);
                 }
             }
-            entity.setOrders(OrderPermanent.fillOutputOrders(ordersFromDB, dbLayer, ordersFilter.getCompact()));
+            entity.setOrders(OrderPermanent.fillOutputOrders(ordersFromDB, dbLayer, documentations, ordersFilter.getCompact()));
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

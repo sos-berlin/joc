@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,10 +17,12 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JobPermanent;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.job.JobP;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
@@ -49,12 +52,14 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             session.beginTransaction();
 
             List<JobP> listJobs = new ArrayList<JobP>();
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(session);
+            InventoryJobsDBLayer dbJobsLayer = new InventoryJobsDBLayer(session);
+            DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(session);
+            Map<String,String> documentations = dbDocLayer.getDocumentationPaths(jobsFilter.getJobschedulerId(), JobSchedulerObjectType.JOB);
             Long instanceId = dbItemInventoryInstance.getId();
-            List<DBItemInventoryJob> listOfJobs = processFilters(dbLayer, jobsFilter);
+            List<DBItemInventoryJob> listOfJobs = processFilters(dbJobsLayer, jobsFilter);
             if (listOfJobs != null) {
                 for (DBItemInventoryJob inventoryJob : listOfJobs) {
-                    JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobsFilter.getCompact(), instanceId);
+                    JobP job = JobPermanent.getJob(inventoryJob, dbJobsLayer, documentations.get(inventoryJob.getName()), jobsFilter.getCompact(), instanceId);
                     if (job != null) {
                         listJobs.add(job);
                     }

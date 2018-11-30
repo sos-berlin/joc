@@ -27,8 +27,8 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
 
     @Override
     public JOCDefaultResponse deleteDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
-        // TODO: permissions
-        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), true);
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
+                .getJobschedulerId(), xAccessToken).getDocumentation().isDelete());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -50,7 +50,7 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
                     for (DBItemDocumentationUsage dbUsage : dbUsages) {
                         connection.delete(dbUsage);
                     }
-                }                 
+                }
                 if (dbDoc.getImageId() != null) {
                     DBItemDocumentationImage dbImage = connection.get(DBItemDocumentationImage.class, dbDoc.getImageId());
                     if (dbImage != null) {

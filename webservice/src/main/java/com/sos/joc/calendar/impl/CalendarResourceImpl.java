@@ -13,6 +13,7 @@ import com.sos.joc.calendar.resource.ICalendarResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -61,11 +62,14 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
 			if (!canAdd(calendarItem.getName(), folderPermissions.getListOfFolders())) {
 			    return accessDeniedResponse("Access to folder " + getParent(calendarItem.getName()) + " denied.");
             }
-
+			
+			DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
+            
 			Calendar calendar = new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class);
 			calendar.setId(calendarItem.getId());
 			calendar.setPath(calendarItem.getName());
 			calendar.setName(calendarItem.getBaseName());
+			calendar.setDocumentation(dbDocLayer.getDocumentationPathOfCalendar(calendarFilter.getJobschedulerId(), calendarItem.getName()));
 			Calendar200 entity = new Calendar200();
 			entity.setCalendar(calendar);
 			entity.setDeliveryDate(Date.from(Instant.now()));

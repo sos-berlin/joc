@@ -3,6 +3,7 @@ package com.sos.joc.classes.orders;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
@@ -13,11 +14,10 @@ import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.model.order.OrderP;
 import com.sos.joc.model.order.OrderType;
 
-
 public class OrderPermanent {
 
-    public static List<OrderP> fillOutputOrders(List<DBItemInventoryOrder> ordersFromDB, InventoryOrdersDBLayer dbLayer, Boolean compact)
-            throws Exception {
+    public static List<OrderP> fillOutputOrders(List<DBItemInventoryOrder> ordersFromDB, InventoryOrdersDBLayer dbLayer,
+            Map<String, String> documentations, Boolean compact) throws Exception {
         List<OrderP> listOfOutputOrders = new ArrayList<OrderP>();
         SOSHibernateSession connection = null;
 
@@ -32,6 +32,7 @@ public class OrderPermanent {
                 order.setPath(inventoryOrder.getName());
                 order.setOrderId(inventoryOrder.getOrderId());
                 order.setJobChain(inventoryOrder.getJobChainName());
+                order.setDocumentation(documentations.get(inventoryOrder.getName()));
                 Long estimatedDurationInMillis = dbLayerReporting.getOrderEstimatedDuration(inventoryOrder, limit);
                 if (estimatedDurationInMillis != null) {
                     order.setEstimatedDuration((estimatedDurationInMillis.intValue() / 1000));

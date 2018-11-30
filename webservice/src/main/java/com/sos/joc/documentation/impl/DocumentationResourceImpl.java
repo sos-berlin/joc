@@ -1,7 +1,5 @@
 package com.sos.joc.documentation.impl;
 
-import java.nio.file.Paths;
-
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
@@ -30,8 +28,8 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
         SOSHibernateSession connection = null;
         try {
             String request = String.format("%s/%s/%s/%s", API_CALL, jobschedulerId, accessToken, path);
-            // TODO Permission
-            JOCDefaultResponse jocDefaultResponse = init(request, null, accessToken, jobschedulerId, true);
+            boolean perm = getPermissonsJocCockpit(jobschedulerId, accessToken).getDocumentation().isView();
+            JOCDefaultResponse jocDefaultResponse = init(request, null, accessToken, jobschedulerId, perm);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

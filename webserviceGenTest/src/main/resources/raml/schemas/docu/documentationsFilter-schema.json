@@ -26,6 +26,12 @@
     "folders": {
       "$ref": "../common/folders-schema.json"
     },
+    "types": {
+      "type": "array",
+      "items": {
+        "type" : "string"
+      }
+    },
     "auditLog": {
       "$ref": "../audit/auditParams-schema.json"
     }

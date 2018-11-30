@@ -2,6 +2,7 @@ package com.sos.joc.order.impl;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 
@@ -12,9 +13,11 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderP;
 import com.sos.joc.model.order.OrderP200;
@@ -54,11 +57,13 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
 				throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s",
 						orderFilter.getJobChain(), orderFilter.getOrderId()));
 			}
+			DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
 			OrderP order = new OrderP();
 			order.setSurveyDate(dbItemInventoryOrder.getModified());
 			order.setPath(dbItemInventoryOrder.getName());
 			order.setOrderId(dbItemInventoryOrder.getOrderId());
 			order.setJobChain(dbItemInventoryOrder.getJobChainName());
+			order.setDocumentation(dbDocLayer.getDocumentationPath(orderFilter.getJobschedulerId(), JobSchedulerObjectType.ORDER, dbItemInventoryOrder.getName()));
 			Integer estimatedDuration = getEstimatedDurationInSeconds(dbItemInventoryOrder);
 			if (estimatedDuration != null) {
 				order.setEstimatedDuration(estimatedDuration);

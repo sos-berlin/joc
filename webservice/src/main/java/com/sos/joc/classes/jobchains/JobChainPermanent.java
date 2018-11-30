@@ -23,7 +23,7 @@ public class JobChainPermanent {
     public static Set<String> NESTED_JOB_CHAIN_NAMES = new HashSet<String>();
     public static Set<String> JOB_PATHS = new HashSet<String>();
 
-    public static JobChainP initJobChainP(InventoryJobChainsDBLayer dbLayer, DBItemInventoryJobChain inventoryJobChain, Map<Long,String> processClassJobs, Boolean compact,
+    public static JobChainP initJobChainP(InventoryJobChainsDBLayer dbLayer, DBItemInventoryJobChain inventoryJobChain, String documentation, Map<Long,String> processClassJobs, Boolean compact,
             Long instanceId) throws Exception {
         NESTED_JOB_CHAIN_NAMES = new HashSet<String>();
         JOB_PATHS = new HashSet<String>();
@@ -31,6 +31,7 @@ public class JobChainPermanent {
         jobChain.setSurveyDate(inventoryJobChain.getModified());
         jobChain.setPath(inventoryJobChain.getName());
         jobChain.setName(inventoryJobChain.getBaseName());
+        jobChain.setDocumentation(documentation);
         List<DBItemInventoryJobChainNode> jobChainNodesFromDb = dbLayer.getJobChainNodesByJobChainId(inventoryJobChain.getId(), instanceId);
         jobChain.setTitle(inventoryJobChain.getTitle());
         jobChain.setMaxOrders(inventoryJobChain.getMaxOrders());

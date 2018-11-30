@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Path;
@@ -14,10 +15,12 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.locks.LockPermanent;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.locks.InventoryLocksDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.locks.resource.ILocksResourceP;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.lock.LockP;
 import com.sos.joc.model.lock.LockPath;
 import com.sos.joc.model.lock.LocksFilter;
@@ -50,7 +53,8 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             String regex = locksFilter.getRegex();
             boolean withFolderFilter = locksFilter.getFolders() != null && !locksFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(locksFilter.getFolders());
-
+            DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
+            Map<String,String> documentations = dbDocLayer.getDocumentationPaths(locksFilter.getJobschedulerId(), JobSchedulerObjectType.LOCK);
             InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(connection);
             LocksP entity = new LocksP();
             List<LockP> listOfLocks = new ArrayList<LockP>();
@@ -62,7 +66,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                         if (lockFromDb == null) {
                             continue;
                         }
-                        LockP lock = LockPermanent.getLockP(dbLayer, lockFromDb);
+                        LockP lock = LockPermanent.getLockP(dbLayer, documentations.get(lockFromDb.getName()), lockFromDb);
                         listOfLocks.add(lock);
                     }
                 }
@@ -72,11 +76,11 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                 for (Folder folder : folders) {
                     List<DBItemInventoryLock> locksFromDb = dbLayer.getLocksByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance
                             .getId(), folder.getRecursive().booleanValue());
-                    listOfLocks.addAll(LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex));
+                    listOfLocks.addAll(LockPermanent.getListOfLocksToAdd(dbLayer, documentations, locksFromDb, regex));
                 }
             } else {
                 List<DBItemInventoryLock> locksFromDb = dbLayer.getLocks(dbItemInventoryInstance.getId());
-                listOfLocks = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
+                listOfLocks = LockPermanent.getListOfLocksToAdd(dbLayer, documentations, locksFromDb, regex);
             }
             entity.setLocks(listOfLocks);
             entity.setDeliveryDate(Date.from(Instant.now()));

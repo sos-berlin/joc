@@ -65,10 +65,10 @@ public interface IDocumentationAssignJSObjectResource {
     
     @POST
     @Path("calendar/documentation/assign")
-    public JOCDefaultResponse assignCalendarClassDocu(@HeaderParam("X-Access-Token") String xAccessToken, CalendarDocuFilter filter) throws Exception;
+    public JOCDefaultResponse assignCalendarDocu(@HeaderParam("X-Access-Token") String xAccessToken, CalendarDocuFilter filter) throws Exception;
 
     @POST
     @Path("calendar/documentation/unassign")
-    public JOCDefaultResponse unassignCalendarClassDocu(@HeaderParam("X-Access-Token") String xAccessToken, CalendarDocuFilter filter) throws Exception;
+    public JOCDefaultResponse unassignCalendarDocu(@HeaderParam("X-Access-Token") String xAccessToken, CalendarDocuFilter filter) throws Exception;
 
 }

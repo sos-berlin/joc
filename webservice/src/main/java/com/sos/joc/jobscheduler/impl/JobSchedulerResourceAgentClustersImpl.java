@@ -182,6 +182,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
                     }
                     List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembersById(dbItemInventoryInstance.getId(),
                             agentCluster.getAgentClusterId());
+                    //int countRunningAgents = agentClusterMembers.stream().filter(p -> p.getState().getSeverity() == 0).mapToInt(e -> 1).sum();
                     int countRunningAgents = 0;
                     for (AgentClusterMember agentClusterMember : agentClusterMembers) {
                         if (agentClusterMember.getState().getSeverity() == 0) {

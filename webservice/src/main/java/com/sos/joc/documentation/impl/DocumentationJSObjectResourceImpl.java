@@ -18,59 +18,68 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.docu.DocumentationShowFilter;
 
-
 public class DocumentationJSObjectResourceImpl extends JOCResourceImpl implements IDocumentationJSObjectResource {
 
     private static final String API_CALL = "/documentation/";
 
     @Override
-    public JOCDefaultResponse orderDocu(String xAccessToken, String accessToken, String jobschedulerId, String jobChain, String orderId) throws Exception {
-        return showDocu(getAccessToken(xAccessToken, accessToken), jobschedulerId, jobChain + "," + orderId, JobSchedulerObjectType.ORDER, "order");
+    public JOCDefaultResponse orderDocu(String xAccessToken, String accessToken, String jobschedulerId, String jobChain, String orderId)
+            throws Exception {
+        boolean perm = getPermissonsJocCockpit(jobschedulerId, xAccessToken).getOrder().getView().isDocumentation();
+        return showDocu(perm, getAccessToken(xAccessToken, accessToken), jobschedulerId, jobChain + "," + orderId, JobSchedulerObjectType.ORDER,
+                "order");
     }
-    
+
     @Override
     public JOCDefaultResponse jobDocu(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
-        return showDocu(getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.JOB, "job");
+        boolean perm = getPermissonsJocCockpit(jobschedulerId, xAccessToken).getJob().getView().isDocumentation();
+        return showDocu(perm, getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.JOB, "job");
     }
 
     @Override
     public JOCDefaultResponse jobChainDocu(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
-        return showDocu(getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.JOBCHAIN, "job_chain");
+        boolean perm = getPermissonsJocCockpit(jobschedulerId, xAccessToken).getJobChain().getView().isDocumentation();
+        return showDocu(perm, getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.JOBCHAIN, "job_chain");
     }
 
     @Override
     public JOCDefaultResponse scheduleDocu(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
-        return showDocu(getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.SCHEDULE, "schedule");
+        boolean perm = getPermissonsJocCockpit(jobschedulerId, xAccessToken).getSchedule().getView().isDocumentation();
+        return showDocu(perm, getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.SCHEDULE, "schedule");
     }
 
     @Override
     public JOCDefaultResponse lockDocu(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
-        return showDocu(getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.LOCK, "lock");
+        boolean perm = getPermissonsJocCockpit(jobschedulerId, xAccessToken).getLock().getView().isDocumentation();
+        return showDocu(perm, getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.LOCK, "lock");
     }
 
     @Override
     public JOCDefaultResponse processClassDocu(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
-        return showDocu(getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.PROCESSCLASS, "process_class");
+        boolean perm = getPermissonsJocCockpit(jobschedulerId, xAccessToken).getProcessClass().getView().isDocumentation();
+        return showDocu(perm, getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.PROCESSCLASS, "process_class");
     }
 
     @Override
     public JOCDefaultResponse calendarDocu(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
-        return showDocu(getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.WORKINGDAYSCALENDAR, "calendar");
+        boolean perm = getPermissonsJocCockpit(jobschedulerId, xAccessToken).getCalendar().getView().isDocumentation();
+        return showDocu(perm, getAccessToken(xAccessToken, accessToken), jobschedulerId, path, JobSchedulerObjectType.WORKINGDAYSCALENDAR,
+                "calendar");
     }
-    
-    public JOCDefaultResponse showDocu(String xAccessToken, String jobschedulerId, String path, JobSchedulerObjectType type, String apiCall) throws Exception {
+
+    public JOCDefaultResponse showDocu(boolean perm, String xAccessToken, String jobschedulerId, String path, JobSchedulerObjectType type,
+            String apiCall) throws Exception {
         DocumentationShowFilter documentationFilter = new DocumentationShowFilter();
         documentationFilter.setJobschedulerId(jobschedulerId);
         documentationFilter.setPath(path);
         documentationFilter.setType(type);
-        return show(xAccessToken, documentationFilter, apiCall);
+        return show(perm, xAccessToken, documentationFilter, apiCall);
     }
-    
-    public JOCDefaultResponse show(String xAccessToken, DocumentationShowFilter documentationFilter, String apiCall) throws Exception {
+
+    public JOCDefaultResponse show(boolean perm, String xAccessToken, DocumentationShowFilter documentationFilter, String apiCall) throws Exception {
         try {
-            // TODO Permission
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL+apiCall, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
-                    true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL + apiCall, documentationFilter, xAccessToken, documentationFilter
+                    .getJobschedulerId(), perm);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -87,7 +96,7 @@ public class DocumentationJSObjectResourceImpl extends JOCResourceImpl implement
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-    
+
     private String getUrl(String apiCall, String xAccessToken, DocumentationShowFilter documentationFilter)
             throws JocMissingRequiredParameterException, JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException,
             DBMissingDataException, UnsupportedEncodingException {
@@ -97,13 +106,10 @@ public class DocumentationJSObjectResourceImpl extends JOCResourceImpl implement
             checkRequiredParameter("path", documentationFilter.getPath());
 
             documentationFilter.setPath(normalizePath(documentationFilter.getPath()));
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL+apiCall);
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL + apiCall);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             String path = dbLayer.getDocumentationPath(documentationFilter);
-            if (path == null && "calendar".equals(apiCall)) {
-                documentationFilter.setType(JobSchedulerObjectType.NONWORKINGDAYSCALENDAR);
-                path = dbLayer.getDocumentationPath(documentationFilter); 
-            }
+            ;
             if (path == null) {
                 throw new DBMissingDataException("The documentation couldn't determine");
             }
@@ -113,7 +119,7 @@ public class DocumentationJSObjectResourceImpl extends JOCResourceImpl implement
             Globals.disconnect(connection);
         }
     }
-    
+
     private String urlEncodedPath(String path) throws UnsupportedEncodingException {
         if ("/".equals(path)) {
             return "/";
@@ -125,9 +131,5 @@ public class DocumentationJSObjectResourceImpl extends JOCResourceImpl implement
         }
         return s.toString();
     }
-
-
-
-    
 
 }

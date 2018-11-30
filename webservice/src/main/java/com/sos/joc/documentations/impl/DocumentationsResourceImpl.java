@@ -25,8 +25,8 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
 
     @Override
     public JOCDefaultResponse postDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
-        // TODO: permissions
-        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), true);
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
+                .getJobschedulerId(), xAccessToken).getDocumentation().isView());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

@@ -18,12 +18,13 @@ import com.sos.joc.model.schedule.UsedByOrder;
 public class SchedulePermanent {
 
     public static ScheduleP initSchedule(InventorySchedulesDBLayer dbLayer, DBItemInventorySchedule scheduleFromDb,
-            DBItemInventoryInstance instance) throws Exception {
+            String documentation, DBItemInventoryInstance instance) throws Exception {
         ScheduleP schedule = new ScheduleP();
         if (scheduleFromDb != null) {
             schedule.setConfigurationDate(dbLayer.getScheduleConfigurationDate(scheduleFromDb.getId()));
             schedule.setName(scheduleFromDb.getBasename());
             schedule.setPath(scheduleFromDb.getName());
+            schedule.setDocumentation(documentation);
             schedule.setSurveyDate(scheduleFromDb.getModified());
             String title = scheduleFromDb.getTitle();
             if (title != null && title.isEmpty()) {

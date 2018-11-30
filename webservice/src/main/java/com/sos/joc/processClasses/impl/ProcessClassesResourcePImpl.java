@@ -16,9 +16,11 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.processclasses.ProcessClassPermanent;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.processClass.ProcessClassP;
 import com.sos.joc.model.processClass.ProcessClassPath;
 import com.sos.joc.model.processClass.ProcessClassesFilter;
@@ -28,32 +30,31 @@ import com.sos.joc.processClasses.resource.IProcessClassesResourceP;
 @Path("process_classes")
 public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IProcessClassesResourceP {
 
-	private static final String API_CALL = "./process_classes/p";
+    private static final String API_CALL = "./process_classes/p";
 
-	@Override
-	public JOCDefaultResponse postProcessClassesP(String xAccessToken, String accessToken,
-			ProcessClassesFilter processClassFilter) throws Exception {
-		return postProcessClassesP(getAccessToken(xAccessToken, accessToken), processClassFilter);
-	}
+    @Override
+    public JOCDefaultResponse postProcessClassesP(String xAccessToken, String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
+        return postProcessClassesP(getAccessToken(xAccessToken, accessToken), processClassFilter);
+    }
 
-	public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter)
-			throws Exception {
-		SOSHibernateSession connection = null;
+    public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
+        SOSHibernateSession connection = null;
 
-		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken,
-					processClassFilter.getJobschedulerId(),
-					getPermissonsJocCockpit(processClassFilter.getJobschedulerId(), accessToken).getLock().getView()
-							.isStatus());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-			Globals.beginTransaction(connection);
-			ProcessClassesP entity = new ProcessClassesP();
-			InventoryProcessClassesDBLayer dbLayer = new InventoryProcessClassesDBLayer(connection);
-			List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
-			List<ProcessClassPath> processClassPaths = processClassFilter.getProcessClasses();
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken, processClassFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(processClassFilter.getJobschedulerId(), accessToken).getLock().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            Globals.beginTransaction(connection);
+            ProcessClassesP entity = new ProcessClassesP();
+            DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
+            Map<String, String> documentations = dbDocLayer.getDocumentationPaths(processClassFilter.getJobschedulerId(),
+                    JobSchedulerObjectType.PROCESSCLASS);
+            InventoryProcessClassesDBLayer dbLayer = new InventoryProcessClassesDBLayer(connection);
+            List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
+            List<ProcessClassPath> processClassPaths = processClassFilter.getProcessClasses();
             boolean withFolderFilter = processClassFilter.getFolders() != null && !processClassFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
 
@@ -67,7 +68,8 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                         if (processClassFromDb == null) {
                             continue;
                         }
-                        listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb));
+                        listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, documentations.get(processClassFromDb.getName()),
+                                processClassFromDb));
                     }
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
@@ -77,14 +79,15 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                 for (Folder folder : folders) {
                     List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(folder.getFolder(),
                             dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
-                    Map<String, ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesMap(dbLayer, processClassesFromDb,
-                            processClassFilter.getRegex());
+                    Map<String, ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesMap(dbLayer, documentations,
+                            processClassesFromDb, processClassFilter.getRegex());
                     mapOfProcessClasses.putAll(processClassesToAdd);
                 }
                 listOfProcessClasses = new ArrayList<ProcessClassP>(mapOfProcessClasses.values());
             } else {
                 List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClasses(dbItemInventoryInstance.getId());
-                listOfProcessClasses = ProcessClassPermanent.getProcessClassesList(dbLayer, processClassesFromDb, processClassFilter.getRegex());
+                listOfProcessClasses = ProcessClassPermanent.getProcessClassesList(dbLayer, documentations, processClassesFromDb, processClassFilter
+                        .getRegex());
             }
             entity.setProcessClasses(listOfProcessClasses);
             entity.setDeliveryDate(Date.from(Instant.now()));
