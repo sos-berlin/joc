@@ -338,9 +338,9 @@ public class SOSPermissionsCreator {
                     "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:terminate"));
 
             sosPermissionJocCockpit.getDocumentation().setView(haveRight(masterId, "sos:products:joc_cockpit:documentation:view"));
-            sosPermissionJocCockpit.getDocumentation().setView(haveRight(masterId, "sos:products:joc_cockpit:documentation:import"));
-            sosPermissionJocCockpit.getDocumentation().setView(haveRight(masterId, "sos:products:joc_cockpit:documentation:export"));
-            sosPermissionJocCockpit.getDocumentation().setView(haveRight(masterId, "sos:products:joc_cockpit:documentation:delete"));
+            sosPermissionJocCockpit.getDocumentation().setImport(haveRight(masterId, "sos:products:joc_cockpit:documentation:import"));
+            sosPermissionJocCockpit.getDocumentation().setExport(haveRight(masterId, "sos:products:joc_cockpit:documentation:export"));
+            sosPermissionJocCockpit.getDocumentation().setDelete(haveRight(masterId, "sos:products:joc_cockpit:documentation:delete"));
 
             sosPermissionJocCockpit.getDailyPlan().getView().setStatus(haveRight(masterId, "sos:products:joc_cockpit:daily_plan:view:status"));
 
