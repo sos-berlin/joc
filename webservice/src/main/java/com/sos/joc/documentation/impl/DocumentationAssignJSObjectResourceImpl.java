@@ -10,6 +10,14 @@ import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.audit.AssignmentCalendarDocuAudit;
+import com.sos.joc.classes.audit.AssignmentJobChainDocuAudit;
+import com.sos.joc.classes.audit.AssignmentJobDocuAudit;
+import com.sos.joc.classes.audit.AssignmentLockDocuAudit;
+import com.sos.joc.classes.audit.AssignmentOrderDocuAudit;
+import com.sos.joc.classes.audit.AssignmentProcessClassDocuAudit;
+import com.sos.joc.classes.audit.AssignmentScheduleDocuAudit;
+import com.sos.joc.classes.audit.DeleteDocumentationAudit;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentation.resource.IDocumentationAssignJSObjectResource;
@@ -37,8 +45,11 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentOrderDocuAudit assignAudit = new AssignmentOrderDocuAudit(filter);
+            logAuditMessage(assignAudit);
             assignDocu(filter.getJobschedulerId(), normalizePath(filter.getJobChain()) + "," + filter.getOrderId(), filter.getDocumentation(),
                     JobSchedulerObjectType.ORDER, apiCall);
+            storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -58,7 +69,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentOrderDocuAudit unassignAudit = new AssignmentOrderDocuAudit(filter);
+            logAuditMessage(unassignAudit);
             unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getJobChain()) + "," + filter.getOrderId(), JobSchedulerObjectType.ORDER, apiCall);
+            storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -77,7 +91,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentJobDocuAudit assignAudit = new AssignmentJobDocuAudit(filter);
+            logAuditMessage(assignAudit);
             assignDocu(filter.getJobschedulerId(), normalizePath(filter.getJob()), filter.getDocumentation(), JobSchedulerObjectType.JOB, apiCall);
+            storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -96,7 +113,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentJobDocuAudit unassignAudit = new AssignmentJobDocuAudit(filter);
+            logAuditMessage(unassignAudit);
             unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getJob()), JobSchedulerObjectType.JOB, apiCall);
+            storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -115,7 +135,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentJobChainDocuAudit assignAudit = new AssignmentJobChainDocuAudit(filter);
+            logAuditMessage(assignAudit);
             assignDocu(filter.getJobschedulerId(), normalizePath(filter.getJobChain()), filter.getDocumentation(), JobSchedulerObjectType.JOBCHAIN, apiCall);
+            storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -134,7 +157,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentJobChainDocuAudit unassignAudit = new AssignmentJobChainDocuAudit(filter);
+            logAuditMessage(unassignAudit);
             unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getJobChain()), JobSchedulerObjectType.JOBCHAIN, apiCall);
+            storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -153,7 +179,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentScheduleDocuAudit assignAudit = new AssignmentScheduleDocuAudit(filter);
+            logAuditMessage(assignAudit);
             assignDocu(filter.getJobschedulerId(), normalizePath(filter.getSchedule()), filter.getDocumentation(), JobSchedulerObjectType.SCHEDULE, apiCall);
+            storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -172,7 +201,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentScheduleDocuAudit unassignAudit = new AssignmentScheduleDocuAudit(filter);
+            logAuditMessage(unassignAudit);
             unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getSchedule()), JobSchedulerObjectType.SCHEDULE, apiCall);
+            storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -191,7 +223,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentLockDocuAudit assignAudit = new AssignmentLockDocuAudit(filter);
+            logAuditMessage(assignAudit);
             assignDocu(filter.getJobschedulerId(), normalizePath(filter.getLock()), filter.getDocumentation(), JobSchedulerObjectType.LOCK, apiCall);
+            storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -210,7 +245,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentLockDocuAudit unassignAudit = new AssignmentLockDocuAudit(filter);
+            logAuditMessage(unassignAudit);
             unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getLock()), JobSchedulerObjectType.LOCK, apiCall);
+            storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -229,7 +267,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentProcessClassDocuAudit assignAudit = new AssignmentProcessClassDocuAudit(filter);
+            logAuditMessage(assignAudit);
             assignDocu(filter.getJobschedulerId(), normalizePath(filter.getProcessClass()), filter.getDocumentation(), JobSchedulerObjectType.PROCESSCLASS, apiCall);
+            storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -248,7 +289,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentProcessClassDocuAudit unassignAudit = new AssignmentProcessClassDocuAudit(filter);
+            logAuditMessage(unassignAudit);
             unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getProcessClass()), JobSchedulerObjectType.PROCESSCLASS, apiCall);
+            storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -267,7 +311,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentCalendarDocuAudit assignAudit = new AssignmentCalendarDocuAudit(filter);
+            logAuditMessage(assignAudit);
             assignDocu(filter.getJobschedulerId(), normalizePath(filter.getCalendar()), filter.getDocumentation(), JobSchedulerObjectType.WORKINGDAYSCALENDAR, apiCall);
+            storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -286,7 +333,10 @@ public class DocumentationAssignJSObjectResourceImpl extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            AssignmentCalendarDocuAudit unassignAudit = new AssignmentCalendarDocuAudit(filter);
+            logAuditMessage(unassignAudit);
             unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getCalendar()), JobSchedulerObjectType.WORKINGDAYSCALENDAR, apiCall);
+            storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

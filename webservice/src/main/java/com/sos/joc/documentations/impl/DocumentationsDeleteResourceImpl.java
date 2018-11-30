@@ -15,9 +15,11 @@ import com.sos.jitl.reporting.db.DBItemDocumentationUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.audit.DeleteDocumentationAudit;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentations.resource.IDocumentationsDeleteResource;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.docu.DocumentationsFilter;
 
 @Path("/documentations")
@@ -32,7 +34,8 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-
+        DeleteDocumentationAudit deleteAudit = new DeleteDocumentationAudit(filter);
+        logAuditMessage(deleteAudit);
         SOSHibernateSession connection = null;
         try {
             checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
@@ -59,6 +62,7 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
                 }
                 connection.delete(dbDoc);
             }
+            storeAuditLogEntry(deleteAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
