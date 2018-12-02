@@ -17,7 +17,6 @@ import com.sos.joc.classes.audit.AssignmentLockDocuAudit;
 import com.sos.joc.classes.audit.AssignmentOrderDocuAudit;
 import com.sos.joc.classes.audit.AssignmentProcessClassDocuAudit;
 import com.sos.joc.classes.audit.AssignmentScheduleDocuAudit;
-import com.sos.joc.classes.audit.DeleteDocumentationAudit;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentation.resource.IDocumentationAssignJSObjectResource;

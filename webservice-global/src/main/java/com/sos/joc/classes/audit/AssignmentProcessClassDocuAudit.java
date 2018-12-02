@@ -1,5 +1,8 @@
 package com.sos.joc.classes.audit;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.processClass.ProcessClassDocuFilter;
@@ -16,13 +19,17 @@ public class AssignmentProcessClassDocuAudit extends ProcessClassDocuFilter impl
     private String ticketLink;
     
     @JsonIgnore
-    private String processClass;
+    private String folder;
     
     public AssignmentProcessClassDocuAudit(ProcessClassDocuFilter processClassDocuFilter) {
         setAuditParams(processClassDocuFilter.getAuditLog());
         setJobschedulerId(processClassDocuFilter.getJobschedulerId());
         setDocumentation(processClassDocuFilter.getDocumentation());
         setProcessClass(processClassDocuFilter.getProcessClass());
+        if (processClassDocuFilter.getProcessClass() != null) {
+            Path p = Paths.get(processClassDocuFilter.getProcessClass());
+            this.folder = p.getParent().toString().replace('\\', '/');
+        }
     }
 
     private void setAuditParams(AuditParams auditParams) {
@@ -51,16 +58,10 @@ public class AssignmentProcessClassDocuAudit extends ProcessClassDocuFilter impl
         return ticketLink;
     }
 
-    
-    @JsonIgnore
-    public String getProcessClass() {
-        return processClass;
-    }
-
     @Override
     @JsonIgnore
     public String getFolder() {
-        return null;
+        return folder;
     }
 
     @Override

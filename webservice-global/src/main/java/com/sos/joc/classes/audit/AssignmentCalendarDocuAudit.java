@@ -1,5 +1,8 @@
 package com.sos.joc.classes.audit;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.calendar.CalendarDocuFilter;
@@ -16,13 +19,17 @@ public class AssignmentCalendarDocuAudit extends CalendarDocuFilter implements I
     private String ticketLink;
     
     @JsonIgnore
-    private String calendar;
+    private String folder;
     
     public AssignmentCalendarDocuAudit(CalendarDocuFilter calendarDocuFilter) {
         setAuditParams(calendarDocuFilter.getAuditLog());
         setJobschedulerId(calendarDocuFilter.getJobschedulerId());
         setDocumentation(calendarDocuFilter.getDocumentation());
         setCalendar(calendarDocuFilter.getCalendar());
+        if (calendarDocuFilter.getCalendar() != null) {
+            Path p = Paths.get(calendarDocuFilter.getCalendar());
+            this.folder = p.getParent().toString().replace('\\', '/');
+        }
     }
 
     private void setAuditParams(AuditParams auditParams) {
@@ -53,14 +60,8 @@ public class AssignmentCalendarDocuAudit extends CalendarDocuFilter implements I
 
     @Override
     @JsonIgnore
-    public String getCalendar() {
-        return calendar;
-    }
-
-    @Override
-    @JsonIgnore
     public String getFolder() {
-        return null;
+        return folder;
     }
 
     @Override

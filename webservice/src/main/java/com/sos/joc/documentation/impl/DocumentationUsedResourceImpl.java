@@ -24,18 +24,18 @@ import com.sos.joc.model.docu.UsedBy;
 public class DocumentationUsedResourceImpl extends JOCResourceImpl implements IDocumentationUsedResource {
 
     private static final String API_CALL = "/documentation/used";
-    private SOSHibernateSession connection = null;
 
     @Override
     public JOCDefaultResponse postDocumentationsUsed(String xAccessToken, DocumentationFilter filter) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
-                .getJobschedulerId(), xAccessToken).getDocumentation().isView());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-        checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
-        checkRequiredParameter("path", filter.getDocumentation());
+        SOSHibernateSession connection = null;
         try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
+                    .getJobschedulerId(), xAccessToken).getDocumentation().isView());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
+            checkRequiredParameter("path", filter.getDocumentation());
             UsedBy usedBy = new UsedBy();
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);

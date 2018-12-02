@@ -1,5 +1,8 @@
 package com.sos.joc.classes.audit;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.job.JobDocuFilter;
@@ -16,13 +19,17 @@ public class AssignmentJobDocuAudit extends JobDocuFilter implements IAuditLog {
     private String ticketLink;
     
     @JsonIgnore
-    private String job;
+    private String folder;
     
     public AssignmentJobDocuAudit(JobDocuFilter jobDocuFilter) {
         setAuditParams(jobDocuFilter.getAuditLog());
         setJobschedulerId(jobDocuFilter.getJobschedulerId());
         setDocumentation(jobDocuFilter.getDocumentation());
         setJob(jobDocuFilter.getJob());
+        if (jobDocuFilter.getJob() != null) {
+            Path p = Paths.get(jobDocuFilter.getJob());
+            this.folder = p.getParent().toString().replace('\\', '/');
+        }
     }
 
     private void setAuditParams(AuditParams auditParams) {
@@ -53,14 +60,8 @@ public class AssignmentJobDocuAudit extends JobDocuFilter implements IAuditLog {
 
     @Override
     @JsonIgnore
-    public String getJob() {
-        return job;
-    }
-
-    @Override
-    @JsonIgnore
     public String getFolder() {
-        return null;
+        return folder;
     }
 
     @Override

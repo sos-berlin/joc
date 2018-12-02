@@ -1,5 +1,8 @@
 package com.sos.joc.classes.audit;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.order.OrderDocuFilter;
@@ -19,10 +22,7 @@ public class AssignmentOrderDocuAudit extends OrderDocuFilter implements IAuditL
     private String documentation;
     
     @JsonIgnore
-    private String jobChain;
-    
-    @JsonIgnore
-    private String orderId;
+    private String folder;
     
     public AssignmentOrderDocuAudit(OrderDocuFilter orderDocuFilter) {
         setAuditParams(orderDocuFilter.getAuditLog());
@@ -30,6 +30,10 @@ public class AssignmentOrderDocuAudit extends OrderDocuFilter implements IAuditL
         setDocumentation(orderDocuFilter.getDocumentation());
         setJobChain(orderDocuFilter.getJobChain());
         setOrderId(orderDocuFilter.getOrderId());
+        if (orderDocuFilter.getJobChain() != null) {
+            Path p = Paths.get(orderDocuFilter.getJobChain());
+            this.folder = p.getParent().toString().replace('\\', '/');
+        }
     }
 
     private void setAuditParams(AuditParams auditParams) {
@@ -60,18 +64,6 @@ public class AssignmentOrderDocuAudit extends OrderDocuFilter implements IAuditL
 
     @Override
     @JsonIgnore
-    public String getJobChain() {
-        return jobChain;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getOrderId() {
-        return orderId;
-    }
-
-    @Override
-    @JsonIgnore
     public String getCalendar() {
         return null;
     }
@@ -79,7 +71,7 @@ public class AssignmentOrderDocuAudit extends OrderDocuFilter implements IAuditL
     @Override
     @JsonIgnore
     public String getFolder() {
-        return null;
+        return folder;
     }
 
     @Override

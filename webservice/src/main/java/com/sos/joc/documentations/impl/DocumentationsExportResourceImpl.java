@@ -36,29 +36,27 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
     @Override
     public JOCDefaultResponse postExportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
 
-        JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
-                .getJobschedulerId(), xAccessToken).getDocumentation().isExport());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-        checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
-        SOSHibernateSession connection = null;
-        List<String> documentations = filter.getDocumentations();
-        List<Folder> folders = filter.getFolders();
-        String targetFilename = "documentation_" + filter.getJobschedulerId() + ".zip";
         StreamingOutput out = null;
+        SOSHibernateSession connection = null;
         try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
+                    .getJobschedulerId(), xAccessToken).getDocumentation().isExport());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
+            List<String> documentations = filter.getDocumentations();
+            List<Folder> folders = filter.getFolders();
+            String targetFilename = "documentation_" + filter.getJobschedulerId() + ".zip";
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             List<DBItemDocumentation> docs = new ArrayList<DBItemDocumentation>();
             if (documentations != null && !documentations.isEmpty()) {
-                for (String documentation : documentations) {
-                    String folder = Paths.get(documentation).getParent().toString().replace('\\', '/');
-                    docs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), folder));
-                }
+                docs = dbLayer.getDocumentations(filter.getJobschedulerId(), documentations);
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    docs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), folder.getFolder(), folder.getRecursive()));
+                    docs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), null, folder.getFolder(), folder.getRecursive()));
                 }
             } else {
                 throw new JocMissingRequiredParameterException("Neither 'documents' nor 'folders' are specified!");
