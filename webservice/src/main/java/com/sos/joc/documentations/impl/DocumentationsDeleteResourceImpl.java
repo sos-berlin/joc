@@ -37,13 +37,12 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
             checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
             checkRequiredParameter("documentations", filter.getDocumentations());
             
-            DeleteDocumentationAudit deleteAudit = new DeleteDocumentationAudit(filter);
-            logAuditMessage(deleteAudit);
-            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             List<DBItemDocumentation> docs = dbLayer.getDocumentations(filter.getJobschedulerId(), filter.getDocumentations());
             for (DBItemDocumentation dbDoc : docs) {
+                DeleteDocumentationAudit deleteAudit = new DeleteDocumentationAudit(filter, dbDoc.getPath(), dbDoc.getDirectory());
+                logAuditMessage(deleteAudit);
                 List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), dbDoc.getId());
                 if (dbUsages != null && !dbUsages.isEmpty()) {
                     for (DBItemDocumentationUsage dbUsage : dbUsages) {
@@ -57,8 +56,8 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
                     }
                 }
                 connection.delete(dbDoc);
+                storeAuditLogEntry(deleteAudit);
             }
-            storeAuditLogEntry(deleteAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

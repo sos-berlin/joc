@@ -1,5 +1,8 @@
 package com.sos.joc.classes.audit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.docu.DocumentationsFilter;
@@ -16,11 +19,17 @@ public class DeleteDocumentationAudit extends DocumentationsFilter implements IA
     @JsonIgnore
     private String ticketLink;
     
+    @JsonIgnore
+    private String folder;
     
-    public DeleteDocumentationAudit(DocumentationsFilter documentationsFilter) {
+    
+    public DeleteDocumentationAudit(DocumentationsFilter documentationsFilter, String path, String folder) {
         setAuditParams(documentationsFilter.getAuditLog());
         setJobschedulerId(documentationsFilter.getJobschedulerId());
-        setDocumentations(documentationsFilter.getDocumentations());
+        List<String> documentations = new ArrayList<String>();
+        documentations.add(path);
+        setDocumentations(documentations);
+        this.folder = folder;
     }
 
     private void setAuditParams(AuditParams auditParams) {
@@ -52,7 +61,7 @@ public class DeleteDocumentationAudit extends DocumentationsFilter implements IA
     @Override
     @JsonIgnore
     public String getFolder() {
-        return null;
+        return folder;
     }
 
     @Override
