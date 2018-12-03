@@ -116,7 +116,7 @@ public class DocumentationDBLayer extends DBLayer {
                 }
             }
             if (types != null && !types.isEmpty()) {
-                query.setParameterList("types", types);
+                query.setParameterList("types", types.stream().map(String::toLowerCase).collect(Collectors.toList()));
             }
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
