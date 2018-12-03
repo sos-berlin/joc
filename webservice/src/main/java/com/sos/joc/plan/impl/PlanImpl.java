@@ -297,6 +297,23 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                                 f = fromDate;
                             }
                             List<DailyPlanDBItem> listOfCalenderItems = calendar2Db.getStartTimesFromScheduler(f, toDate);
+                            
+                            Matcher regExMatcherJob = null;
+                            if (planFilter.getJob() != null && !planFilter.getJob().isEmpty()) {
+                                planFilter.setJob(SearchStringHelper.getRegexValue(planFilter.getJob()));
+                                regExMatcherJob = Pattern.compile(planFilter.getJob()).matcher("");
+                            }
+                            Matcher regExMatcherOrderId = null;
+                            if (planFilter.getOrderId() != null && !planFilter.getOrderId().isEmpty()) {
+                                planFilter.setOrderId(SearchStringHelper.getRegexValue(planFilter.getOrderId()));
+                                regExMatcherOrderId = Pattern.compile(planFilter.getOrderId()).matcher("");
+                            }
+                            Matcher regExMatcherJobChain = null;
+                            if (planFilter.getJobChain() != null && !planFilter.getJobChain().isEmpty()) {
+                                planFilter.setJobChain(SearchStringHelper.getRegexValue(planFilter.getJobChain()));
+                                regExMatcherJobChain = Pattern.compile(planFilter.getJobChain()).matcher("");
+                            }
+                            
 
                             for (DailyPlanDBItem dailyPlanDBItem : listOfCalenderItems) {
                                 DailyPlanWithReportTriggerDBItem dailyPlanWithReportTriggerDBItem = new DailyPlanWithReportTriggerDBItem(
@@ -324,10 +341,20 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                                 } else {
                                     path = dailyPlanDBItem.getJobChain();
                                 }
+                                
+                                if (regExMatcherJob != null) {
+                                    regExMatcherJob.reset(dailyPlanDBItem.getJob());
+                                    add = add && regExMatcherJob.find();
+                                }
+                                if (regExMatcherJobChain != null) {
+                                    regExMatcherJobChain.reset(dailyPlanDBItem.getJobChain());
+                                    add = add && regExMatcherJobChain.find();
+                                }
+                                if (regExMatcherOrderId != null) {
+                                    regExMatcherOrderId.reset(dailyPlanDBItem.getOrderId());
+                                    add = add && regExMatcherOrderId.find();
+                                }
 
-                                add = add && (planFilter.getJob() == null || planFilter.getJob().equals(dailyPlanDBItem.getJob()));
-                                add = add && (planFilter.getJobChain() == null || planFilter.getJobChain().equals(dailyPlanDBItem.getJobChain()));
-                                add = add && (planFilter.getOrderId() == null || planFilter.getOrderId().equals(dailyPlanDBItem.getOrderId()));
                                 add = add && (dailyPlanDBLayer.getFilter().containsFolder(path));
 
                                 if (add) {
