@@ -311,6 +311,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                                 if (regExMatcher != null) {
                                     regExMatcher.reset(dailyPlanDBItem.getJobChain() + "," + dailyPlanDBItem.getOrderId());
                                     add = regExMatcher.find();
+                                    regExMatcher.reset(dailyPlanDBItem.getJob());
+                                    add = add || regExMatcher.find();
                                 }
                                 p.setJobChain(dailyPlanDBItem.getJobChainOrNull());
                                 p.setOrderId(dailyPlanDBItem.getOrderIdOrNull());
