@@ -1,6 +1,8 @@
 package com.sos.joc.documentations.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +19,7 @@ import com.sos.joc.documentations.resource.IDocumentationsResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.docu.Documentation;
+import com.sos.joc.model.docu.Documentations;
 import com.sos.joc.model.docu.DocumentationsFilter;
 
 @Path("/documentations")
@@ -55,7 +58,10 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
                     dbDocs = filterByRegex(dbDocs, filter.getRegex());
                 }
             }
-            return JOCDefaultResponse.responseStatus200(mapDbItemsToDocumentations(dbDocs));
+            Documentations documentations = new Documentations();
+            documentations.setDocumentations(mapDbItemsToDocumentations(dbDocs));
+            documentations.setDeliveryDate(Date.from(Instant.now()));
+            return JOCDefaultResponse.responseStatus200(documentations);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
