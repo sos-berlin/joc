@@ -1,7 +1,6 @@
 
 package com.sos.joc.calendars.resource;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

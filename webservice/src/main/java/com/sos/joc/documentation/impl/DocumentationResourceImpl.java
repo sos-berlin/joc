@@ -1,8 +1,11 @@
 package com.sos.joc.documentation.impl;
 
+import java.nio.file.Paths;
+
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
+import com.github.rjeschke.txtmark.Processor;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemDocumentation;
 import com.sos.jitl.reporting.db.DBItemDocumentationImage;
@@ -18,13 +21,10 @@ import com.sos.joc.exceptions.JocException;
 public class DocumentationResourceImpl extends JOCResourceImpl implements IDocumentationResource {
 
     private static final String API_CALL = "./documentation";
+    private static final java.nio.file.Path css = Paths.get("/sos/css/github-markdown.css");
 
     @Override
-    public JOCDefaultResponse postDocumentation(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
-        return postDocumentation(getAccessToken(xAccessToken, accessToken), jobschedulerId, path);
-    }
-
-    private JOCDefaultResponse postDocumentation(String accessToken, String jobschedulerId, String path) {
+    public JOCDefaultResponse postDocumentation(String accessToken, String jobschedulerId, String path) {
         SOSHibernateSession connection = null;
         try {
             String request = String.format("%s/%s/%s/%s", API_CALL, jobschedulerId, accessToken, path);
@@ -33,7 +33,7 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             checkRequiredParameter("jobschedulerId", jobschedulerId);
             checkRequiredParameter("path", path);
 
@@ -57,7 +57,11 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
                 return JOCDefaultResponse.responseStatus200(dbItemImage.getImage(), getType(type));
 
             } else if (dbItem.getContent() != null && !dbItem.getContent().isEmpty()) {
-                return JOCDefaultResponse.responseStatus200(dbItem.getContent(), getType(type));
+                if ("markdown".equals(type)) {
+                    return JOCDefaultResponse.responseStatus200(createHTMLfromMarkdown(dbItem), MediaType.TEXT_HTML);
+                } else {
+                    return JOCDefaultResponse.responseStatus200(dbItem.getContent(), getType(type));
+                }
 
             } else {
                 throw new DBMissingDataException(errMessage);
@@ -71,7 +75,7 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
             Globals.disconnect(connection);
         }
     }
-    
+
     private String getType(String type) {
         switch (type) {
         case "xml":
@@ -79,10 +83,9 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
         case "xsd":
             type = MediaType.APPLICATION_XML;
             break;
-        // TODO convert markdown -> html
         case "javascript":
         case "css":
-            type = "text/"+type;
+            type = "text/" + type;
             break;
         case "json":
             type = MediaType.APPLICATION_JSON;
@@ -97,13 +100,30 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
         case "gif":
         case "jpeg":
         case "png":
-            type = "image/"+type;
+            type = "image/" + type;
             break;
         }
         if (type.startsWith("text/")) {
             type += "; charset=UTF-8";
         }
         return type;
+    }
+
+    private String createHTMLfromMarkdown(DBItemDocumentation dbItem) {
+        java.nio.file.Path p = Paths.get(dbItem.getDirectory());
+        StringBuilder s = new StringBuilder();
+        s.append("<!DOCTYPE html>");
+        s.append("<html>\n<head>\n");
+        s.append("  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge, chrome=1\">\n");
+        s.append("  <meta charset=\"utf-8\"/>\n");
+        s.append("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, minimal-ui\"/>\n");
+        //s.append("  <link rel=\"stylesheet\" href=\"").append(p.relativize(css).toString().replace('\\', '/')).append("\"/>\n");
+        s.append("  <title>").append(dbItem.getName()).append("</title>\n");
+        s.append("</head>\n<body>\n  <article class=\"markdown-body\">\n");
+        s.append(Processor.process(dbItem.getContent()));
+        s.append("  </article>\n</body>\n</html>");
+
+        return s.toString();
     }
 
 }
