@@ -38,7 +38,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
 			
 			if (versionIsOlderThan("1.12.6")) {
 			    JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
-			    entity.setJob(jocXmlCommand.getJob(jobPath, jobFilter.getCompact(), false));
+			    entity.setJob(jocXmlCommand.getJob(jobPath, jobFilter.getCompact(), jobFilter.getCompactView(), false));
 			} else {
 			    JOCJsonCommand command = new JOCJsonCommand(this);
 	            command.setUriBuilderForJobs();
