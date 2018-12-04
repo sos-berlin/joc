@@ -1,6 +1,7 @@
 package com.sos.joc.documentation.impl;
 
 import java.nio.file.Paths;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -110,20 +111,29 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
     }
 
     private String createHTMLfromMarkdown(DBItemDocumentation dbItem) {
-        java.nio.file.Path p = Paths.get(dbItem.getDirectory());
-        StringBuilder s = new StringBuilder();
-        s.append("<!DOCTYPE html>");
-        s.append("<html>\n<head>\n");
-        s.append("  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge, chrome=1\">\n");
-        s.append("  <meta charset=\"utf-8\"/>\n");
-        s.append("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, minimal-ui\"/>\n");
-        //s.append("  <link rel=\"stylesheet\" href=\"").append(p.relativize(css).toString().replace('\\', '/')).append("\"/>\n");
-        s.append("  <title>").append(dbItem.getName()).append("</title>\n");
-        s.append("</head>\n<body>\n  <article class=\"markdown-body\">\n");
-        s.append(Processor.process(dbItem.getContent()));
-        s.append("  </article>\n</body>\n</html>");
+        String html = Processor.process(dbItem.getContent());
 
-        return s.toString();
+        Pattern pattern = Pattern.compile("^\\s*(<!DOCTYPE [^>]*>)?\\s*<html[^>]*>", Pattern.CASE_INSENSITIVE + Pattern.DOTALL + Pattern.MULTILINE);
+        boolean isCompleteHTML = pattern.matcher(html).find();
+
+        if (isCompleteHTML) {
+            return html;
+        } else {
+            java.nio.file.Path path = Paths.get(dbItem.getDirectory());
+            StringBuilder s = new StringBuilder();
+            s.append("<!DOCTYPE html>");
+            s.append("<html>\n<head>\n");
+            s.append("  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge, chrome=1\">\n");
+            s.append("  <meta charset=\"utf-8\"/>\n");
+            s.append("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, minimal-ui\"/>\n");
+            // s.append(" <link rel=\"stylesheet\" href=\"").append(path.relativize(css).toString().replace('\\', '/')).append("\"/>\n");
+            s.append("  <title>").append(dbItem.getName()).append("</title>\n");
+            s.append("</head>\n<body>\n  <article class=\"markdown-body\">\n");
+            s.append(html);
+            s.append("  </article>\n</body>\n</html>");
+
+            return s.toString();
+        }
     }
 
 }

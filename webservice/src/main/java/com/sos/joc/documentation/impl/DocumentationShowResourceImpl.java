@@ -11,6 +11,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentation.resource.IDocumentationShowResource;
@@ -125,7 +126,7 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
 
             String entity = String.format(
                     "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='%s/%s%s'\" />%n</head>%n<body>%n</body>%n</html>",
-                    documentationFilter.getJobschedulerId(), xAccessToken, urlEncodedPath(documentationFilter.getPath()));
+                    documentationFilter.getJobschedulerId(), xAccessToken, JOCJsonCommand.urlEncodedPath(normalizePath(documentationFilter.getPath())));
 
             return JOCDefaultResponse.responseHtmlStatus200(entity);
         } catch (JocException e) {
@@ -175,22 +176,10 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
                 throw new DBMissingDataException("The documentation couldn't determine");
             }
 
-            return documentationFilter.getJobschedulerId() + "/" + xAccessToken + urlEncodedPath(path);
+            return documentationFilter.getJobschedulerId() + "/" + xAccessToken + JOCJsonCommand.urlEncodedPath(documentationFilter.getPath());
         } finally {
             Globals.disconnect(connection);
         }
-    }
-
-    private String urlEncodedPath(String path) throws UnsupportedEncodingException {
-        if ("/".equals(path)) {
-            return "/";
-        }
-        String[] pathParts = path.split("/");
-        StringBuilder s = new StringBuilder();
-        for (int i = 1; i < pathParts.length; i++) {
-            s.append("/").append(URLEncoder.encode(pathParts[i], "UTF-8"));
-        }
-        return s.toString();
     }
 
 }
