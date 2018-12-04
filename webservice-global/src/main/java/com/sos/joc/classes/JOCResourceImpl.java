@@ -263,10 +263,9 @@ public class JOCResourceImpl {
     }
 	
 	public boolean versionIsOlderThan(String version) {
-//	    return true;
 	    //TODO deactivated until JS-1793 is ready
 	    boolean hasSnapshot = dbItemInventoryInstance.getVersion().contains("-SNAPSHOT");
-	    String[] curVersions = dbItemInventoryInstance.getVersion().replaceFirst("-SNAPSHOT", "").split("\\.");
+	    String[] curVersions = dbItemInventoryInstance.getVersion().replaceFirst("-.*$", "").split("\\.");
 	    String[] versions = version.split("\\.");
 	    String curVersionsStr = curVersions[0];
 	    String versionsStr = versions[0];
