@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +44,10 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         this.accessToken = accessToken;
     }
     
-    public JobChainV getJobChain(String jobChain, Boolean compact, Integer maxOrders) throws Exception {
+    public JobChainV getJobChain(String jobChain, Boolean compact, Boolean compactView, Integer maxOrders) throws Exception {
         executePostWithThrowBadRequestAfterRetry(createShowJobChainPostCommand(jobChain, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job_chain");
-        JobChainVolatile jobChainV = new JobChainVolatile(jobElem, this);
+        JobChainVolatile jobChainV = new JobChainVolatile(jobElem, this, compactView);
         jobChainV.setFields(compact);
         nestedJobChains.addAll(jobChainV.getNestedJobChains());
         if (((compact == null || !compact) && jobChainV.getNumOfOrders() > 0) || jobChainV.hasJobChainNodes()) {
@@ -58,7 +59,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                 jobChainV.setOrders(orders, maxOrders);
             }
         }
-        if (!jobChainV.hasJobChainNodes()) {
+        if (!jobChainV.hasJobChainNodes() && compactView != Boolean.TRUE) {
             jobChainV.setOrdersSummary(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken).getOrdersSummary()); 
         }
         return jobChainV;
@@ -155,11 +156,22 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         List<OrdersSummaryCallable> summaryTasks = new ArrayList<OrdersSummaryCallable>();
         List<OrdersVCallable> orderTasks = new ArrayList<OrdersVCallable>();
         
+        Pattern regex = null;
+        Pattern jobRegex = null;
+        if (jobChainsFilter.getRegex() != null && !jobChainsFilter.getRegex().isEmpty()) {
+            regex = Pattern.compile(jobChainsFilter.getRegex());
+        }
+        if (jobChainsFilter.getJob() != null) {
+            if (jobChainsFilter.getJob().getRegex() != null && !jobChainsFilter.getJob().getRegex().isEmpty()) {
+                jobRegex = Pattern.compile(jobChainsFilter.getJob().getRegex());
+            } 
+        }
+        
         for (int i= 0; i < jobChainNodes.getLength(); i++) {
            Element jobChainElem = (Element) jobChainNodes.item(i);
-           JobChainVolatile jobChainV = new JobChainVolatile(jobChainElem, this);
+           JobChainVolatile jobChainV = new JobChainVolatile(jobChainElem, this, jobChainsFilter.getCompactView());
            jobChainV.setPath();
-           if (!FilterAfterResponse.matchRegex(jobChainsFilter.getRegex(), jobChainV.getPath())) {
+           if (!FilterAfterResponse.matchRegex(regex, jobChainV.getPath())) {
                LOGGER.debug("...processing skipped caused by 'regex=" + jobChainsFilter.getRegex() + "'");
                continue; 
            }
@@ -172,7 +184,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                if (jobChainV.getJobPaths() == null || jobChainV.getJobPaths().isEmpty()) {
                    continue;
                }
-               if (!FilterAfterResponse.matchRegex(jobChainsFilter.getJob().getRegex(), jobChainV.getJobPaths())) {
+               if (!FilterAfterResponse.matchRegex(jobRegex, jobChainV.getJobPaths())) {
                    LOGGER.debug("...processing skipped caused by 'jobRegex=" + jobChainsFilter.getJob().getRegex() + "'");
                    continue; 
                }
@@ -197,7 +209,9 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            }
            jobChainV.setFields(jobChainsFilter.getCompact());
            nestedJobChains.addAll(jobChainV.getNestedJobChains());
-           summaryTasks.add(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken));
+           if (jobChainsFilter.getCompactView() == null || !jobChainsFilter.getCompactView()) {
+               summaryTasks.add(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken));
+           }
            if (!jobChainsFilter.getCompact() || jobChainV.hasJobChainNodes()) {
                orderTasks.add(new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken)); 
            }
@@ -228,7 +242,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                                 JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().origJobChain());
                                 if (j != null) {
                                     if (j.hasJobChainNodes()) {
-                                        j.setOuterOrdersAndSummary(orders, jobChainsFilter.getMaxOrders(), jobChainsFilter.getCompact());
+                                        j.setOuterOrdersAndSummary(orders, jobChainsFilter.getMaxOrders(), jobChainsFilter.getCompact(), jobChainsFilter.getCompactView());
                                     } else {
                                         j.setOrders(orders, jobChainsFilter.getMaxOrders());
                                     }

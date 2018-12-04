@@ -74,4 +74,19 @@ public class FilterAfterResponse {
         }
         return false;
     }
+    
+    public static boolean matchRegex(Pattern pattern, Set<String> paths) {
+        if (pattern == null) {
+            return true;
+        }
+        if (paths == null || paths.isEmpty()) {
+            return false;
+        }
+        for (String path : paths) {
+            if (pattern.matcher(path).find()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

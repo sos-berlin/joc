@@ -86,7 +86,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 
             } else {
                 JsonObject summary = null;
-                if (jobsFilter.getIsOrderJob() == null || jobsFilter.getIsOrderJob()) {
+                if ((jobsFilter.getIsOrderJob() == null || jobsFilter.getIsOrderJob()) && jobsFilter.getCompactView() != Boolean.TRUE) {
                     JOCJsonCommand jocSummaryCommand = new JOCJsonCommand(this);
                     jocSummaryCommand.setUriBuilderForJobs();
                     jocSummaryCommand.addOrderStatisticsQuery(false);

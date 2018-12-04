@@ -34,21 +34,24 @@ public class JobVolatile extends JobV {
     private final Element job;
     private final Boolean orderJob;
     private final Boolean withOrderQueue;
+    private final Boolean compactView;
     private final JOCXmlCommand jocXmlCommand;
     private String accessToken = null;
     
-    public JobVolatile(Element job, JOCXmlCommand jocXmlCommand, Boolean withOrderQueue) {
+    public JobVolatile(Element job, JOCXmlCommand jocXmlCommand, Boolean compactView, Boolean withOrderQueue) {
         this.job = job;
         this.jocXmlCommand = jocXmlCommand;
         this.orderJob = "yes".equals(getAttributeValue("order", "no"));
         this.withOrderQueue = withOrderQueue;
+        this.compactView = compactView;
     }
     
-    public JobVolatile(Element job, JOCXmlCommand jocXmlCommand) {
+    public JobVolatile(Element job, JOCXmlCommand jocXmlCommand, Boolean compactView) {
         this.job = job;
         this.jocXmlCommand = jocXmlCommand;
         this.orderJob = "yes".equals(getAttributeValue("order", "no"));
         this.withOrderQueue = false;
+        this.compactView = compactView;
     }
     
     public JobVolatile() {
@@ -56,6 +59,7 @@ public class JobVolatile extends JobV {
         this.jocXmlCommand = null;
         this.orderJob = false;
         this.withOrderQueue = false;
+        this.compactView = false;
     }
     
     public boolean isOrderJob() {
@@ -303,7 +307,7 @@ public class JobVolatile extends JobV {
     }
     
     private void setSummary() throws Exception {
-        if (isOrderJob()) {
+        if (isOrderJob() && compactView != Boolean.TRUE) {
             NodeList orders = jocXmlCommand.getSosxml().selectNodeList(job, "order_queue/order");
             OrdersSummary ordersSummary = new OrdersSummary();
             int setback = 0;

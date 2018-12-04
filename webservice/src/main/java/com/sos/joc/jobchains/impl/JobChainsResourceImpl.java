@@ -18,7 +18,6 @@ import com.sos.joc.model.jobChain.JobChainPath;
 import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.jobChain.JobChainsV;
-import com.sos.joc.model.jobChain.JobsFilter;
 
 @Path("job_chains")
 public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChainsResource {

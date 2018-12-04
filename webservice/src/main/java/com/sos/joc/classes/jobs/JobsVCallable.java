@@ -1,6 +1,5 @@
 package com.sos.joc.classes.jobs;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,6 +36,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
     private final Folder folder;
     private final JobsFilter jobsBody;
     private final Boolean compact;
+    private final Boolean compactView;
     private final Boolean withOrderQueue;
     private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
@@ -48,6 +48,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         this.folder = null;
         this.jobsBody = null;
         this.compact = job.getCompact();
+        this.compactView = job.getCompactView();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = false;
@@ -60,6 +61,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         this.folder = null;
         this.jobsBody = jobs;
         this.compact = jobs.getCompact();
+        this.compactView = jobs.getCompactView();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
@@ -72,6 +74,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         this.folder = folder;
         this.jobsBody = jobs;
         this.compact = jobs.getCompact();
+        this.compactView = jobs.getCompactView();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
@@ -135,7 +138,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         Map<String, JobVolatileJson> listJobQueue = new HashMap<String, JobVolatileJson>();
         JsonArray elements = json.getJsonArray("elements");
         if (elements == null) {
-            JobVolatileJson job = new JobVolatileJson(json, withOrderQueue);
+            JobVolatileJson job = new JobVolatileJson(json, compactView, withOrderQueue);
             job.setRunTimeIsTemporary(false);
             job.setSurveyDate(surveyDate);
             job.setFields(compact, jocJsonCommand.getJOCResourceImpl(), accessToken);
@@ -144,7 +147,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
             List<JobStateText> filterStates = getFilterStates(processingStates);
             for (JsonObject jobsItem : json.getJsonArray("elements").getValuesAs(JsonObject.class)) {
                 
-                JobVolatileJson job = new JobVolatileJson(jobsItem, summary);
+                JobVolatileJson job = new JobVolatileJson(jobsItem, compactView, summary);
                 job.setPath();
                 if (folder != null && "/scheduler_file_order_sink".equals(job.getPath())) {
                     continue; 

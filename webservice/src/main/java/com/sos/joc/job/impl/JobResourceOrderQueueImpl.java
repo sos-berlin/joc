@@ -39,7 +39,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
 			JobV200 entity = new JobV200();
 			if (versionIsOlderThan("1.12.6")) {
 			    JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
-			    entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobPath, jobFilter.getCompact()));
+			    entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobPath, jobFilter.getCompact(), jobFilter.getCompactView()));
 			} else {
 			    JOCJsonCommand command = new JOCJsonCommand(this);
                 command.setUriBuilderForJobs();

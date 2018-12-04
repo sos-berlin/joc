@@ -46,15 +46,17 @@ public class JobChainVolatile extends JobChainV {
     private NodeList jobChainNodes = null;
     private NodeList blacklist = null;
     private Set<String> nestedJobChains = new HashSet<String>();
+    private Boolean compactView = Boolean.FALSE;
 
     public JobChainVolatile() {
         super();
     }
 
-    public JobChainVolatile(Element jobChain, JOCXmlJobChainCommand jocXmlCommand) {
+    public JobChainVolatile(Element jobChain, JOCXmlJobChainCommand jocXmlCommand, Boolean compactView) {
         super();
         this.jobChain = jobChain;
         this.jocXmlCommand = jocXmlCommand;
+        this.compactView = compactView;
     }
 
     public Set<String> getNestedJobChains() {
@@ -65,7 +67,9 @@ public class JobChainVolatile extends JobChainV {
         if (getPath() == null) {
             setPath(jobChain.getAttribute(WebserviceConstants.PATH));
             LOGGER.debug("...processing jobChain: " + getPath());
-            setInitialOrdersSummary();
+            if (compactView != Boolean.TRUE) {
+                setInitialOrdersSummary();
+            }
         }
     }
 
@@ -136,11 +140,18 @@ public class JobChainVolatile extends JobChainV {
             node.setNumOfOrders(num == null ? 0 : num);
         }
     }
-
+    
     public void setOuterOrdersAndSummary(Map<String, OrderVolatile> orders, Integer maxOrders, Boolean compact) {
+        setOuterOrdersAndSummary(orders, maxOrders, compact, compactView);
+    }
+
+    public void setOuterOrdersAndSummary(Map<String, OrderVolatile> orders, Integer maxOrders, Boolean compact, Boolean compactView) {
         Map<String, List<OrderV>> nodeMap = new HashMap<String, List<OrderV>>();
         Map<String, Integer> nodeMapCounter = new HashMap<String, Integer>();
-        OrdersSummary summary = setInitialOrdersSummary();
+        OrdersSummary summary = null;
+        if (compactView != Boolean.TRUE) {
+            summary = setInitialOrdersSummary();
+        }
         if (orders == null) {
             setNumOfOrders(0);
         } else {
@@ -153,33 +164,35 @@ public class JobChainVolatile extends JobChainV {
                 if (oStateText == null) {
                     continue;
                 }
-                switch (oStateText) {
-                case BLACKLIST:
-                    summary.setBlacklist(summary.getBlacklist() + 1);
-                    break;
-                case JOB_CHAIN_STOPPED:
-                case JOB_NOT_IN_PERIOD:
-                case JOB_STOPPED:
-                case NODE_DELAY:
-                case NODE_STOPPED:
-                case WAITING_FOR_AGENT:
-                case WAITING_FOR_LOCK:
-                case WAITING_FOR_PROCESS:
-                case WAITING_FOR_TASK:
-                    summary.setWaitingForResource(summary.getWaitingForResource() + 1);
-                    break;
-                case PENDING:
-                    summary.setPending(summary.getPending() + 1);
-                    break;
-                case RUNNING:
-                    summary.setRunning(summary.getRunning() + 1);
-                    break;
-                case SETBACK:
-                    summary.setSetback(summary.getSetback() + 1);
-                    break;
-                case SUSPENDED:
-                    summary.setSuspended(summary.getSuspended() + 1);
-                    break;
+                if (compactView != Boolean.TRUE) {
+                    switch (oStateText) {
+                    case BLACKLIST:
+                        summary.setBlacklist(summary.getBlacklist() + 1);
+                        break;
+                    case JOB_CHAIN_STOPPED:
+                    case JOB_NOT_IN_PERIOD:
+                    case JOB_STOPPED:
+                    case NODE_DELAY:
+                    case NODE_STOPPED:
+                    case WAITING_FOR_AGENT:
+                    case WAITING_FOR_LOCK:
+                    case WAITING_FOR_PROCESS:
+                    case WAITING_FOR_TASK:
+                        summary.setWaitingForResource(summary.getWaitingForResource() + 1);
+                        break;
+                    case PENDING:
+                        summary.setPending(summary.getPending() + 1);
+                        break;
+                    case RUNNING:
+                        summary.setRunning(summary.getRunning() + 1);
+                        break;
+                    case SETBACK:
+                        summary.setSetback(summary.getSetback() + 1);
+                        break;
+                    case SUSPENDED:
+                        summary.setSuspended(summary.getSuspended() + 1);
+                        break;
+                    }
                 }
                 if (compact != null && compact) {
                     continue;
@@ -281,7 +294,7 @@ public class JobChainVolatile extends JobChainV {
             // node.setOrders(orders);
             Element jobElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "job");
             if (jobElem != null) {
-                JobVolatile jobV = new JobVolatile(jobElem, jocXmlCommand);
+                JobVolatile jobV = new JobVolatile(jobElem, jocXmlCommand, compactView);
                 JobChainNodeJobV job = new JobChainNodeJobV();
                 job.setPath(jobElem.getAttribute(WebserviceConstants.PATH));
                 job.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(jobElem));

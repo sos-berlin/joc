@@ -64,14 +64,14 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         this.jobsWithTempRunTime = jobsWithTempRunTime;
     }
     
-    public JobV getJobWithOrderQueue(String job, Boolean compact) throws Exception {
-        return getJob(job, compact, true);
+    public JobV getJobWithOrderQueue(String job, Boolean compact, Boolean compactView) throws Exception {
+        return getJob(job, compact, compactView, true);
     }
     
-    public JobV getJob(String job, Boolean compact, Boolean withOrderQueue) throws Exception {
+    public JobV getJob(String job, Boolean compact, Boolean compactView, Boolean withOrderQueue) throws Exception {
         executePostWithThrowBadRequestAfterRetry(createShowJobPostCommand(job, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job");
-        JobVolatile jobV = new JobVolatile(jobElem, this, withOrderQueue);
+        JobVolatile jobV = new JobVolatile(jobElem, this, compactView, withOrderQueue);
         jobV.setFields(compact, accessToken);
         jobV.setRunTimeIsTemporary(false);
         return jobV;
@@ -180,7 +180,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         Map<String, JobV> jobMap = new HashMap<String,JobV>();
         for (int i= 0; i < jobNodes.getLength(); i++) {
            Element jobElem = (Element) jobNodes.item(i);
-           JobVolatile jobV = new JobVolatile(jobElem, this);
+           JobVolatile jobV = new JobVolatile(jobElem, this, jobsFilter.getCompactView());
            jobV.setPath();
            if ("/scheduler_file_order_sink".equals(jobV.getPath())) {
               continue; 

@@ -17,6 +17,10 @@
     },
     "compact": {
       "$ref": "../common/compactParam-schema.json"
+    },
+    "compactView": {
+      "type": "boolean",
+  	  "default": false
     }
   }
 }

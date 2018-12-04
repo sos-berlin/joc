@@ -43,24 +43,27 @@ public class JobVolatileJson extends JobV {
     private final JsonObject overview;
     private final Boolean orderJob;
     private final Boolean withOrderQueue;
+    private final Boolean compactView;
     private JOCResourceImpl jocResourceImpl;
     private String accessToken = null;
     private JsonObject summary = null;
     
-    public JobVolatileJson(JsonObject job, JsonObject summary) {
+    public JobVolatileJson(JsonObject job, Boolean compactView, JsonObject summary) {
         this.job = job;
         this.overview = getOrderOverview();
         this.orderJob = this.overview.getBoolean("isOrderJob", false);
         this.withOrderQueue = false;
         this.summary = summary;
+        this.compactView = compactView;
     }
     
-    public JobVolatileJson(JsonObject job, Boolean withOrderQueue) {
+    public JobVolatileJson(JsonObject job, Boolean compactView, Boolean withOrderQueue) {
         this.job = job;
         this.overview = getOrderOverview();
         this.orderJob = this.overview.getBoolean("isOrderJob", false);
         this.withOrderQueue = withOrderQueue;
         this.summary = null;
+        this.compactView = compactView;
     }
     
     public boolean isOrderJob() {
@@ -308,7 +311,7 @@ public class JobVolatileJson extends JobV {
     }
     
     private void setSummary() throws JocException {
-        if (isOrderJob()) {
+        if (isOrderJob() && compactView != Boolean.TRUE) {
             JsonObject j = null;
             if (summary != null) {
                 j = summary.getJsonObject(this.getPath());
