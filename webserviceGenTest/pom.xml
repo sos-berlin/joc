@@ -84,7 +84,7 @@
                     <version>1.9.10</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.apache.commons</groupId>
+                    <groupId>commons-io</groupId>
                     <artifactId>commons-io</artifactId>
                 </dependency>
 				<dependency>
