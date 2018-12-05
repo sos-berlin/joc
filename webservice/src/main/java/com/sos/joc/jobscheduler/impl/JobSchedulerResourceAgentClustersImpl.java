@@ -43,6 +43,7 @@ import com.sos.joc.model.jobscheduler.AgentClusterState;
 import com.sos.joc.model.jobscheduler.AgentClusterStateText;
 import com.sos.joc.model.jobscheduler.AgentClusters;
 import com.sos.joc.model.jobscheduler.AgentOfCluster;
+import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
 
 @Path("jobscheduler")
@@ -71,7 +72,6 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
 				return jocDefaultResponse;
 			}
 
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			JOCJsonCommand command = new JOCJsonCommand(this);
 			command.setUriBuilderForProcessClasses();
 			// always false otherwise no agent info
@@ -91,7 +91,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
 			Set<String> agentSet = new HashSet<String>();
             Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
 			Set<AgentClusterVolatile> listAgentCluster = new HashSet<AgentClusterVolatile>();
-			connection.beginTransaction();
+			InventoryAgentsDBLayer agentLayer = null;
 
 			try {
 				JsonObject jsonObjectFromPost = command.getJsonObjectFromPostWithRetry(getServiceBody(null),
@@ -132,12 +132,16 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
 					tasks.add(new AgentVCallable(agent, new JOCJsonCommand(this), accessToken));
 				}
 				Map<String, AgentOfCluster> mapOfAgents = new HashMap<String, AgentOfCluster>();
+				Set<String> unreachableAgents = new HashSet<String>();
 				if (!tasks.isEmpty()) {
 					ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
 					try {
 						for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
 							try {
 								AgentOfCluster a = result.get();
+								if (a.getState().get_text() == JobSchedulerStateText.UNREACHABLE) {
+								    unreachableAgents.add(a.getUrl());
+								}
 								mapOfAgents.put(a.getUrl(), a);
 							} catch (ExecutionException e) {
 								if (e.getCause() instanceof JocException) {
@@ -150,6 +154,16 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
 					} finally {
 						executorService.shutdown();
 					}
+				}
+				if (!unreachableAgents.isEmpty()) {
+				    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+				    agentLayer = new InventoryAgentsDBLayer(connection); 
+				    List<AgentClusterMember> unreachableAgentClusterMembers = agentLayer.getInventoryAgentClusterMembersByUrls(dbItemInventoryInstance.getId(), unreachableAgents);
+				    if(unreachableAgentClusterMembers != null) {
+				        for (AgentClusterMember unreachableAgentClusterMember : unreachableAgentClusterMembers) {
+				            mapOfAgents.put(unreachableAgentClusterMember.getUrl(), unreachableAgentClusterMember);
+				        }
+				    }
 				}
 				List<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
 				for (AgentClusterVolatile agentClusterV : listAgentCluster) {
@@ -165,7 +179,8 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
 				entity.setAgentClusters(listOfAgentClusters);
 
 			} else {
-				InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(connection);
+			    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+				agentLayer = new InventoryAgentsDBLayer(connection);
 				List<AgentClusterPermanent> agentClusters = agentLayer
 						.getInventoryAgentClusters(dbItemInventoryInstance.getId(), agentClusterPaths);
 
@@ -182,13 +197,8 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
                     }
                     List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembersById(dbItemInventoryInstance.getId(),
                             agentCluster.getAgentClusterId());
-                    //int countRunningAgents = agentClusterMembers.stream().filter(p -> p.getState().getSeverity() == 0).mapToInt(e -> 1).sum();
-                    int countRunningAgents = 0;
-                    for (AgentClusterMember agentClusterMember : agentClusterMembers) {
-                        if (agentClusterMember.getState().getSeverity() == 0) {
-                            countRunningAgents++;
-                        }
-                    }
+                    int countRunningAgents = agentClusterMembers.stream().filter(p -> p.getState().getSeverity() == 0).mapToInt(e -> 1).sum();
+                    
                     NumOfAgentsInCluster numOfAgents = agentCluster.getNumOfAgents();
                     numOfAgents.setRunning(countRunningAgents);
                     AgentClusterState state = new AgentClusterState();

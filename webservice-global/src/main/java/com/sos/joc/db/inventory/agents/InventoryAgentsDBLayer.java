@@ -145,33 +145,30 @@ public class InventoryAgentsDBLayer extends DBLayer {
         }
     }
 
-    public List<AgentClusterMember> getInventoryAgentClusterMembers(Long instanceId, Set<Long> agentClusterIds)
+    public List<AgentClusterMember> getInventoryAgentClusterMembersByUrls(Long instanceId, Set<String> agentUrls)
             throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_CLUSTER_MEMBER);
-            sql.append(" (iacm.agentClusterId, iacm.url, iacm.ordering, iacm.modified, iai.version, iai.state, iai.startedAt, ");
-            sql.append("ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
-            sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, ");
+            sql.append(" (iai.url, iai.version, ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
             sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ");
             sql.append(DBITEM_INVENTORY_OPERATING_SYSTEMS).append(" ios ");
-            sql.append("where iacm.agentInstanceId = iai.id ");
-            sql.append("and iai.osId = ios.id ");
-            sql.append("and iacm.instanceId = :instanceId");
-            if (agentClusterIds != null && !agentClusterIds.isEmpty()) {
-                if (agentClusterIds.size() == 1) {
-                    sql.append(" and iacm.agentClusterId = :agentClusterId");
+            sql.append("where iai.osId = ios.id ");
+            sql.append("and iai.instanceId = :instanceId");
+            if (agentUrls != null && !agentUrls.isEmpty()) {
+                if (agentUrls.size() == 1) {
+                    sql.append(" and iai.url = :agentUrl");
                 } else {
-                    sql.append(" and iacm.agentClusterId in (:agentClusterId)");
+                    sql.append(" and iai.url in (:agentUrl)");
                 }
             }
             Query<AgentClusterMember> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            if (agentClusterIds != null && !agentClusterIds.isEmpty()) {
-                if (agentClusterIds.size() == 1) {
-                    query.setParameter("agentClusterId", agentClusterIds.iterator().next());
+            if (agentUrls != null && !agentUrls.isEmpty()) {
+                if (agentUrls.size() == 1) {
+                    query.setParameter("agentUrl", agentUrls.iterator().next());
                 } else {
-                    query.setParameterList("agentClusterId", agentClusterIds);
+                    query.setParameterList("agentUrl", agentUrls);
                 }
             }
             return getSession().getResultList(query);
