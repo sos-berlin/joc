@@ -263,23 +263,21 @@ public class JOCResourceImpl {
     }
 	
 	public boolean versionIsOlderThan(String version) {
-	    //TODO deactivated until JS-1793 is ready
-	    boolean hasSnapshot = dbItemInventoryInstance.getVersion().contains("-SNAPSHOT");
-	    String[] curVersions = dbItemInventoryInstance.getVersion().replaceFirst("-.*$", "").split("\\.");
-	    String[] versions = version.split("\\.");
-	    String curVersionsStr = curVersions[0];
-	    String versionsStr = versions[0];
-	    for (int i=1; i < curVersions.length; i++) {
-            curVersionsStr += curVersions[i].replaceFirst("^(\\d)$", "0$1");
+	    try {
+            String[] curVersions = dbItemInventoryInstance.getVersion().replaceFirst("-.*$", "").split("\\.");
+            String[] versions = version.split("\\.");
+            String curVersionsStr = curVersions[0];
+            String versionsStr = versions[0];
+            for (int i=1; i < curVersions.length; i++) {
+                curVersionsStr += curVersions[i].replaceFirst("^(\\d)$", "0$1");
+            }
+            for (int i=1; i < versions.length; i++) {
+                versionsStr += versions[i].replaceFirst("^(\\d)$", "0$1");
+            }
+            return (Integer.valueOf(curVersionsStr) < Integer.valueOf(versionsStr));
+        } catch (NumberFormatException e) {
+            return true;
         }
-        for (int i=1; i < versions.length; i++) {
-            versionsStr += versions[i].replaceFirst("^(\\d)$", "0$1");
-        }
-        Integer curI = Integer.valueOf(curVersionsStr);
-        if (hasSnapshot) {
-            curI++;
-        }
-        return (curI < Integer.valueOf(versionsStr));
     }
 
 	public String getBasicAuthorization() {

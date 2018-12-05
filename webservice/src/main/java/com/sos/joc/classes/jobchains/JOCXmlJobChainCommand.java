@@ -65,11 +65,12 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         return jobChainV;
     }
     
-    public List<JobChainV> getNestedJobChains() throws Exception {
+    public List<JobChainV> getNestedJobChains(Boolean compactView) throws Exception {
         if (nestedJobChains.size() == 0) {
             return null;
         }
         JobChainsFilter jobChainsFilter = new JobChainsFilter();
+        jobChainsFilter.setCompactView(compactView);
         StringBuilder xml = new StringBuilder();
         xml.append("<commands>");
         for (String jobChainPath : nestedJobChains) {
@@ -209,6 +210,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            }
            jobChainV.setFields(jobChainsFilter.getCompact());
            nestedJobChains.addAll(jobChainV.getNestedJobChains());
+           jobChainMap.put(jobChainV.getPath(), jobChainV);
            if (jobChainsFilter.getCompactView() == null || !jobChainsFilter.getCompactView()) {
                summaryTasks.add(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken));
            }

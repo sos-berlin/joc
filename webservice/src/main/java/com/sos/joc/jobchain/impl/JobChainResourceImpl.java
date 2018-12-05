@@ -38,7 +38,7 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
                 entity.setDeliveryDate(Date.from(Instant.now()));
                 entity.setJobChain(jocXmlCommand.getJobChain(jobChainPath, jobChainFilter.getCompact(), jobChainFilter.getCompactView(),
                         jobChainFilter.getMaxOrders()));
-                entity.setNestedJobChains(jocXmlCommand.getNestedJobChains());
+                entity.setNestedJobChains(jocXmlCommand.getNestedJobChains(jobChainFilter.getCompactView()));
             }
             entity.setDeliveryDate(Date.from(Instant.now()));
 
