@@ -1,7 +1,6 @@
 package com.sos.joc.documentation.impl;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.Date;
 import java.time.Instant;
 
@@ -28,9 +27,9 @@ import com.sos.joc.model.docu.DocumentationUrl;
 @Path("documentation")
 public class DocumentationShowResourceImpl extends JOCResourceImpl implements IDocumentationShowResource {
 
-    private static final String API_CALL_SHOW = "/documentation/show";
-    private static final String API_CALL_URL = "/documentation/url";
-    private static final String API_CALL_PREVIEW = "/documentation/preview";
+    private static final String API_CALL_SHOW = "./documentation/show";
+    private static final String API_CALL_URL = "./documentation/url";
+    private static final String API_CALL_PREVIEW = "./documentation/preview";
 
     @Override
     public JOCDefaultResponse show(String xAccessToken, String accessToken, String jobschedulerId, String path, String type) throws Exception {

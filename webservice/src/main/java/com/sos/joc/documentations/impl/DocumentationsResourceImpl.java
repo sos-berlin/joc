@@ -22,10 +22,10 @@ import com.sos.joc.model.docu.Documentation;
 import com.sos.joc.model.docu.Documentations;
 import com.sos.joc.model.docu.DocumentationsFilter;
 
-@Path("/documentations")
+@Path("documentations")
 public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocumentationsResource {
 
-    private static final String API_CALL = "/documentations";
+    private static final String API_CALL = "./documentations";
 
     @Override
     public JOCDefaultResponse postDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {

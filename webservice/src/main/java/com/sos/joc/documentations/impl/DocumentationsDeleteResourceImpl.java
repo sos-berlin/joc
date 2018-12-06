@@ -19,10 +19,10 @@ import com.sos.joc.documentations.resource.IDocumentationsDeleteResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.docu.DocumentationsFilter;
 
-@Path("/documentations")
+@Path("documentations")
 public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements IDocumentationsDeleteResource {
 
-    private static final String API_CALL = "/documentations/delete";
+    private static final String API_CALL = "./documentations/delete";
 
     @Override
     public JOCDefaultResponse deleteDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {

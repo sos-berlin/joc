@@ -23,7 +23,7 @@ import com.sos.joc.model.docu.UsedBy;
 @Path("documentation")
 public class DocumentationUsedResourceImpl extends JOCResourceImpl implements IDocumentationUsedResource {
 
-    private static final String API_CALL = "/documentation/used";
+    private static final String API_CALL = "./documentation/used";
 
     @Override
     public JOCDefaultResponse postDocumentationsUsed(String xAccessToken, DocumentationFilter filter) throws Exception {

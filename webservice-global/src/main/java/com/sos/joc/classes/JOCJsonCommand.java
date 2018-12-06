@@ -176,9 +176,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
     
     public static String urlEncodedPath(String value) {
-        UriBuilder uriBuilder = UriBuilder.fromPath("{path}");
-        URI uri = uriBuilder.buildFromEncoded(value);
-        return uri.toString();
+        return UriBuilder.fromPath("{path}").buildFromEncoded(value).toString();
     }
     
     public void addJobHistoryQuery(Integer limit) {

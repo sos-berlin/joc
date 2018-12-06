@@ -49,7 +49,7 @@ import com.sos.joc.model.docu.DocumentationImport;
 @Path("documentations")
 public class DocumentationsImportResourceImpl extends JOCResourceImpl implements IDocumentationsImportResource {
 
-    private static final String API_CALL = "/documentations/import";
+    private static final String API_CALL = "./documentations/import";
     private static final List<String> SUPPORTED_SUBTYPES = new ArrayList<String>(Arrays.asList("html", "xml", "xsl", "xsd", "javascript", "json",
             "css", "markdown", "gif", "jpeg", "png"));
     private static final List<String> SUPPORTED_IMAGETYPES = new ArrayList<String>(Arrays.asList("gif", "jpeg", "png"));

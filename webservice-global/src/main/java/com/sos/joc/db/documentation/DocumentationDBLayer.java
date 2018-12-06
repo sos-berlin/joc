@@ -279,7 +279,7 @@ public class DocumentationDBLayer extends DBLayer {
             DBInvalidDataException {
         try {
             StringBuilder hql = new StringBuilder();
-            hql.append("from ").append(DBITEM_DOCUMENTATION_USAGE).append(" du, ");
+            hql.append("select du from ").append(DBITEM_DOCUMENTATION_USAGE).append(" du, ");
             hql.append(DBITEM_DOCUMENTATION).append(" d");
             hql.append(" where du.documentationId = d.id");
             hql.append(" and d.schedulerId = :schedulerId");
