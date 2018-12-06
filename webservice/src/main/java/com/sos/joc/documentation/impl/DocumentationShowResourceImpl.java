@@ -121,7 +121,7 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
                 return jocDefaultResponse;
             }
 
-            checkRequiredParameter("path", documentationFilter.getPath());
+            checkRequiredParameter("documentation", documentationFilter.getPath());
 
             String entity = String.format(
                     "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='%s/%s%s'\" />%n</head>%n<body>%n</body>%n</html>",

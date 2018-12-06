@@ -3,7 +3,6 @@ package com.sos.joc.documentations.impl;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -102,16 +101,17 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
         List<DocumentationContent> contents = new ArrayList<DocumentationContent>();
         for (DBItemDocumentation doc : docs) {
             DocumentationContent content = null;
-            java.nio.file.Path path = Paths.get(doc.getDirectory(), doc.getName());
             if (doc.getContent() != null) {
-                content = new DocumentationContent(path.toString().replace('\\', '/'), doc.getContent().getBytes(Charsets.UTF_8));
+                content = new DocumentationContent(doc.getPath(), doc.getContent().getBytes(Charsets.UTF_8));
             } else {
                 DBItemDocumentationImage image = dbLayer.getDocumentationImage(doc.getImageId());
                 if (image != null) {
-                    content = new DocumentationContent(path.toString().replace('\\', '/'), image.getImage());
+                    content = new DocumentationContent(doc.getPath(), image.getImage());
                 }
             }
-            contents.add(content);
+            if (content != null) {
+                contents.add(content);
+            }
         }
         return contents;
     }
