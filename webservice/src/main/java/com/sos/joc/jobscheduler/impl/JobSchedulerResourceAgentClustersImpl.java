@@ -155,16 +155,24 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
 						executorService.shutdown();
 					}
 				}
-				if (!unreachableAgents.isEmpty()) {
-				    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-				    agentLayer = new InventoryAgentsDBLayer(connection); 
-				    List<AgentClusterMember> unreachableAgentClusterMembers = agentLayer.getInventoryAgentClusterMembersByUrls(dbItemInventoryInstance.getId(), unreachableAgents);
-				    if(unreachableAgentClusterMembers != null) {
-				        for (AgentClusterMember unreachableAgentClusterMember : unreachableAgentClusterMembers) {
-				            mapOfAgents.put(unreachableAgentClusterMember.getUrl(), unreachableAgentClusterMember);
-				        }
-				    }
-				}
+                if (!mapOfAgents.isEmpty()) {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                    agentLayer = new InventoryAgentsDBLayer(connection);
+
+                    if (!unreachableAgents.isEmpty()) {
+                        List<AgentClusterMember> unreachableAgentClusterMembers = agentLayer.getInventoryAgentClusterMembersByUrls(
+                                dbItemInventoryInstance.getId(), unreachableAgents);
+                        if (unreachableAgentClusterMembers != null) {
+                            for (AgentClusterMember unreachableAgentClusterMember : unreachableAgentClusterMembers) {
+                                mapOfAgents.put(unreachableAgentClusterMember.getUrl(), unreachableAgentClusterMember);
+                            }
+                        }
+                    }
+
+                    for (AgentOfCluster reachableAgent : mapOfAgents.values()) {
+                        agentLayer.updateInventoryAgentInstance(dbItemInventoryInstance.getId(), reachableAgent);
+                    }
+                }
 				List<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
 				for (AgentClusterVolatile agentClusterV : listAgentCluster) {
 					agentClusterV.setAgentsListAndState(mapOfAgents, jobSchedulerAgentClustersBody.getCompact());

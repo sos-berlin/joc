@@ -55,7 +55,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
 			if (!agentFilter.getAgents().isEmpty()) {
 				for (AgentUrl agentUrl : agentFilter.getAgents()) {
 					DBItemInventoryAgentInstance agentInstance = agentLayer
-							.getInventoryAgentInstances(agentUrl.getAgent(), instanceId);
+							.getInventoryAgentInstance(agentUrl.getAgent(), instanceId);
 					listOfAgents.add(processAgent(agentLayer, agentInstance));
 				}
 			} else {

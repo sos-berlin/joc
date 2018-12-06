@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
@@ -12,9 +14,12 @@ import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.jobscheduler.AgentOfCluster;
+import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 
 public class InventoryAgentsDBLayer extends DBLayer {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryAgentsDBLayer.class);
     private static final String AGENT_CLUSTER_MEMBER = AgentClusterMember.class.getName();
     private static final String AGENT_CLUSTER_P = AgentClusterPermanent.class.getName();
 
@@ -22,7 +27,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         super(connection);
     }
 
-    public DBItemInventoryAgentInstance getInventoryAgentInstances(String url, Long instanceId)
+    public DBItemInventoryAgentInstance getInventoryAgentInstance(String url, Long instanceId)
             throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -41,6 +46,29 @@ public class InventoryAgentsDBLayer extends DBLayer {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public void updateInventoryAgentInstance(Long instanceId, AgentOfCluster agent) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            if (agent.getState().get_text() != JobSchedulerStateText.UNKNOWN_AGENT) {
+                DBItemInventoryAgentInstance item = getInventoryAgentInstance(agent.getUrl(), instanceId);
+                if (item != null) {
+                    if (agent.getState().get_text() == JobSchedulerStateText.UNREACHABLE) {
+                        item.setStartedAt(null);
+                        item.setState(1);
+                    } else {
+                        item.setHostname(agent.getHost());
+                        item.setStartedAt(agent.getStartedAt());
+                        item.setState(0);
+                        item.setVersion(agent.getVersion());
+                    }
+                    item.setModified(agent.getSurveyDate());
+                    getSession().update(item);
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("Problem during update INVENTORY_AGENT_INSTANCES", ex);
         }
     }
 
@@ -181,16 +209,16 @@ public class InventoryAgentsDBLayer extends DBLayer {
 
     public List<AgentClusterMember> getInventoryAgentClusterMembersById(Long instanceId, Long agentClusterId)
             throws DBInvalidDataException, DBConnectionRefusedException {
-        try {
+        try { //TODO left outer join otherwise missing rows if iai.osId == 0
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_CLUSTER_MEMBER);
-            sql.append(" (iacm.agentClusterId, iacm.url, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ");
+            sql.append(" (iacm.agentClusterId, iacm.url, iai.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ");
             sql.append("ios.name, ios.architecture, ios.distribution) from ");
             sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, ");
-            sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ");
+            sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai left outer join ");
             sql.append(DBITEM_INVENTORY_OPERATING_SYSTEMS).append(" ios ");
+            sql.append("on iai.osId = ios.id ");
             sql.append("where iacm.agentInstanceId = iai.id ");
-            sql.append("and iai.osId = ios.id ");
             sql.append("and iacm.instanceId = :instanceId");
             if (agentClusterId != null) {
                 sql.append(" and iacm.agentClusterId = :agentClusterId");
