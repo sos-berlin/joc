@@ -212,7 +212,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         try { //TODO left outer join otherwise missing rows if iai.osId == 0
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_CLUSTER_MEMBER);
-            sql.append(" (iacm.agentClusterId, iacm.url, iai.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ");
+            sql.append(" (iacm.agentClusterId, iai.url, iai.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ");
             sql.append("ios.name, ios.architecture, ios.distribution) from ");
             sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, ");
             sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai left outer join ");
