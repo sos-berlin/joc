@@ -292,7 +292,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
         documentation.setSchedulerId(filter.getJobschedulerId());
         documentation.setDirectory(filter.getFolder());
         documentation.setName(filter.getFile());
-        documentation.setPath(filter.getFolder() + "/" +filter.getFile());
+        documentation.setPath((filter.getFolder() + "/" + filter.getFile()).replaceAll("//+", "/"));
         documentation.setCreated(Date.from(Instant.now()));
         documentation.setModified(documentation.getCreated());
         documentation.setType(mediaSubType);
@@ -307,7 +307,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
         documentation.setSchedulerId(filter.getJobschedulerId());
         documentation.setDirectory(filter.getFolder());
         documentation.setName(filter.getFile());
-        documentation.setPath(filter.getFolder() + "/" +filter.getFile());
+        documentation.setPath((filter.getFolder() + "/" + filter.getFile()).replaceAll("//+", "/"));
         documentation.setCreated(Date.from(Instant.now()));
         documentation.setModified(documentation.getCreated());
         documentation.setType(mediaSubType);
