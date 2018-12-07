@@ -2588,6 +2588,7 @@ traits:
       example: " "
       example200: " "
   /export:
+    get:
     type:
       postForDownload:
         description: Provides export file (zip) as download of documentations
@@ -2596,8 +2597,28 @@ traits:
         description3: " "
         description4: " "
         description5: " "
+        infoapi: ./documentation/export
         schema: !include schemas/docu/documentationsFilter-schema.json
         example: " "
+    /info:
+      type:
+        postJSON:
+          description: Temp. Filename for Export 
+          description1: !include documentation/docu/filteredByPaths.md
+          description2: !include documentation/common/folders.md
+          description3: " "
+          description4: " "
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: !include documentation/docu/exportInfo.md
+          schema: !include schemas/docu/documentationsFilter-schema.json
+          schema200: !include schemas/docu/exportInfo-schema.json
+          example: " "
+          example200: " "
   /import:
     type:
       postForUpload:

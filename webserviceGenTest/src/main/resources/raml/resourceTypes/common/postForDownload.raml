@@ -1,4 +1,32 @@
 type: error
+get?:
+  is: [ accessToken, jobschedulerMaster ]
+    
+  description: |
+    <h2><<description>></h2>
+    ___
+  queryParameters:
+    filename:
+      type: string
+      description: |
+        Name of a temp. file from <<infoapi>>/info api
+        This file will be responsed if exists
+      example: sos-download-5961566003164029224.tmp
+      required: true
+  responses:
+    200:
+      description: Content for download
+      headers:
+        Content-Disposition:
+          type: string
+          required: true
+          example: attachment;filename=xxx
+        Content-Type:
+          type: string
+          required: true
+          default: application/octet-stream
+      body:
+        application/octet-stream:
 post:
   description: |
     <h2><<description>></h2>
