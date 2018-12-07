@@ -63,12 +63,12 @@ public class DocumentationDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_DOCUMENTATION);
             sql.append(" where schedulerId = :schedulerId");
-            if (paths != null & !paths.isEmpty()) {
+            if (paths != null && !paths.isEmpty()) {
                 sql.append(" and path in (:paths)");
             }
             Query<DBItemDocumentation> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
-            if (paths != null & !paths.isEmpty()) {
+            if (paths != null && !paths.isEmpty()) {
                 query.setParameterList("paths", paths);
             }
             return getSession().getResultList(query);

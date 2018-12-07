@@ -60,18 +60,24 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
                 if (type.isEmpty()) {
                     type = MediaType.APPLICATION_OCTET_STREAM;
                 }
-                return JOCDefaultResponse.responseStatus200(dbItemImage.getImage(), getType(type));
+                jocDefaultResponse = JOCDefaultResponse.responseStatus200(dbItemImage.getImage(), getType(type));
 
             } else if (dbItem.getContent() != null && !dbItem.getContent().isEmpty()) {
                 if ("markdown".equals(type)) {
-                    return JOCDefaultResponse.responseStatus200(createHTMLfromMarkdown(dbItem), MediaType.TEXT_HTML);
+                    jocDefaultResponse = JOCDefaultResponse.responseStatus200(createHTMLfromMarkdown(dbItem), MediaType.TEXT_HTML);
                 } else {
-                    return JOCDefaultResponse.responseStatus200(dbItem.getContent(), getType(type));
+                    jocDefaultResponse = JOCDefaultResponse.responseStatus200(dbItem.getContent(), getType(type));
                 }
 
             } else {
                 throw new DBMissingDataException(errMessage);
             }
+
+            try { //simulates a touch
+                jobschedulerUser.resetTimeOut();
+            } catch (org.apache.shiro.session.InvalidSessionException e) {
+            }
+            return jocDefaultResponse;
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -117,7 +123,7 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
 
     private String createHTMLfromMarkdown(DBItemDocumentation dbItem) {
         String html = Processor.process(dbItem.getContent());
-        
+
         InputStream is = new ByteArrayInputStream(html.getBytes(Charsets.UTF_8));
         try {
             String media = URLConnection.guessContentTypeFromStream(is);
