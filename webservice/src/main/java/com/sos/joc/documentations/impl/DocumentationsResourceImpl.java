@@ -2,10 +2,14 @@ package com.sos.joc.documentations.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Path;
 
@@ -26,6 +30,7 @@ import com.sos.joc.model.docu.DocumentationsFilter;
 public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocumentationsResource {
 
     private static final String API_CALL = "./documentations";
+    private static final Set<String> ASSIGN_TYPES = new HashSet<String>(Arrays.asList("html", "xml", "pdf", "markdown"));
 
     @Override
     public JOCDefaultResponse postDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
@@ -41,16 +46,24 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             List<DBItemDocumentation> dbDocs = new ArrayList<DBItemDocumentation>();
+            Set<String> types = null;
+            if (filter.getTypes() != null && !filter.getTypes().isEmpty()) {
+                types = filter.getTypes().stream().map(String::toLowerCase).collect(Collectors.toSet());
+                if (types.contains("assigntypes")) {
+                    types.remove("assigntypes");
+                    types.addAll(ASSIGN_TYPES);
+                }
+            }
             if (filter.getDocumentations() != null && !filter.getDocumentations().isEmpty()) {
                 dbDocs = dbLayer.getDocumentations(filter.getJobschedulerId(), filter.getDocumentations());
             } else {
                 if (filter.getFolders() != null && !filter.getFolders().isEmpty()) {
                     for (Folder folder : filter.getFolders()) {
-                        dbDocs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), filter.getTypes(), folder.getFolder(), folder
+                        dbDocs.addAll(dbLayer.getDocumentations(filter.getJobschedulerId(), types, folder.getFolder(), folder
                                 .getRecursive()));
                     }
                 } else if (filter.getTypes() != null && !filter.getTypes().isEmpty()) {
-                    dbDocs = dbLayer.getDocumentations(filter.getJobschedulerId(), filter.getTypes(), null, false);
+                    dbDocs = dbLayer.getDocumentations(filter.getJobschedulerId(), types, null, false);
                 } else {
                     dbDocs = dbLayer.getDocumentations(filter.getJobschedulerId(), (List<String>) null);
                 }

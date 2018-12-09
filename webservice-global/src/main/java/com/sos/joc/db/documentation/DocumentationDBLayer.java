@@ -84,7 +84,7 @@ public class DocumentationDBLayer extends DBLayer {
         return getDocumentations(schedulerId, null, folder, false);
     }
 
-    public List<DBItemDocumentation> getDocumentations(String schedulerId, List<String> types, String folder, boolean recursive)
+    public List<DBItemDocumentation> getDocumentations(String schedulerId, Set<String> types, String folder, boolean recursive)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -116,7 +116,7 @@ public class DocumentationDBLayer extends DBLayer {
                 }
             }
             if (types != null && !types.isEmpty()) {
-                query.setParameterList("types", types.stream().map(String::toLowerCase).collect(Collectors.toList()));
+                query.setParameterList("types", types);
             }
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
