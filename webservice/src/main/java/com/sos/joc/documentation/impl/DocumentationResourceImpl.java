@@ -159,13 +159,21 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
         final String html = Processor.process(dbItem.getContent(), conf);
 
         boolean isCompleteHTML = false;
-        InputStream is = new ByteArrayInputStream(html.getBytes(Charsets.UTF_8));
+        InputStream is = null;
         try {
+            is = new ByteArrayInputStream(html.getBytes(Charsets.UTF_8));
             String media = URLConnection.guessContentTypeFromStream(is);
             if (media != null && media.contains("html")) {
                 isCompleteHTML = true; 
             }
         } catch (IOException e) {
+        } finally {
+            if (is != null) {
+              try {
+                is.close();
+            } catch (IOException e) {
+            }  
+            }
         }
 
         if (isCompleteHTML) {
