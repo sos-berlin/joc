@@ -301,6 +301,7 @@ public class JobChainVolatile extends JobChainV {
                 // JOC-89
                 jobV.setState(hasRunningOrWaitingOrder(ordersOfCurrentNode));
                 job.setState(jobV.getState());
+                job.setDocumentation(jocXmlCommand.getJobDocumentations().get(job.getPath()));
                 node.setJob(job);
             } else {
                 // ISSUE 131: If Job is missing do not throw NPE, rather set state to Severity -> 2, Text -> RESOURCE_IS_MISSING
@@ -310,6 +311,7 @@ public class JobChainVolatile extends JobChainV {
                 confStatus.setSeverity(2);
                 confStatus.setMessage(ConfigurationStateText.RESOURCE_IS_MISSING.toString());
                 job.setConfigurationStatus(confStatus);
+                job.setDocumentation(jocXmlCommand.getJobDocumentations().get(job.getPath()));
                 node.setJob(job);
             }
             node.setState(getNodeState(jobNodeElem));
@@ -321,6 +323,7 @@ public class JobChainVolatile extends JobChainV {
             JobChainNodeV node = new JobChainNodeV();
             JobChainNodeJobChainV jobChain = new JobChainNodeJobChainV();
             jobChain.setPath(jobChainNodeElem.getAttribute("job_chain"));
+            jobChain.setDocumentation(jocXmlCommand.getJobChainDocumentations().get(jobChain.getPath()));
             node.setJobChain(jobChain);
             node.setName(jobChainNodeElem.getAttribute("state"));
             node.setLevel(0);

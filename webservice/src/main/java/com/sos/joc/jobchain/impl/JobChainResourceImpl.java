@@ -5,11 +5,15 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JOCXmlJobChainCommand;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResource;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.jobChain.JobChainFilter;
 import com.sos.joc.model.jobChain.JobChainV200;
 
@@ -24,6 +28,7 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
     }
 
     public JOCDefaultResponse postJobChain(String accessToken, JobChainFilter jobChainFilter) throws Exception {
+        SOSHibernateSession session = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainFilter, accessToken, jobChainFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(jobChainFilter.getJobschedulerId(), accessToken).getJobChain().getView().isStatus());
@@ -35,6 +40,15 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
                 String jobChainPath = normalizePath(jobChainFilter.getJobChain());
 
                 JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
+                
+                if (jobChainFilter.getCompact() == Boolean.FALSE) {
+                    session = Globals.createSosHibernateStatelessConnection(API_CALL);
+                    DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(session);
+                    jocXmlCommand.setOrderDocumentations(dbDocLayer.getDocumentationPaths(jobChainFilter.getJobschedulerId(), JobSchedulerObjectType.ORDER));
+                    jocXmlCommand.setJobDocumentations(dbDocLayer.getDocumentationPaths(jobChainFilter.getJobschedulerId(), JobSchedulerObjectType.JOB));
+                    jocXmlCommand.setJobChainDocumentations(dbDocLayer.getDocumentationPaths(jobChainFilter.getJobschedulerId(), JobSchedulerObjectType.JOBCHAIN));
+                }
+                
                 entity.setDeliveryDate(Date.from(Instant.now()));
                 entity.setJobChain(jocXmlCommand.getJobChain(jobChainPath, jobChainFilter.getCompact(), jobChainFilter.getCompactView(),
                         jobChainFilter.getMaxOrders()));
@@ -48,6 +62,8 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(session);
         }
     }
 

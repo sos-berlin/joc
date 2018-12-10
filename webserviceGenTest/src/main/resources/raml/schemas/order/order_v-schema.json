@@ -142,6 +142,9 @@
     "runTimeIsTemporary": {
       "type": "boolean",
       "default": false
+    },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
     }
   }
 }

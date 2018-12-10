@@ -30,10 +30,10 @@ public class OrderResourceDocumentationImpl extends JOCResourceImpl implements I
     @Override
     public JOCDefaultResponse postDocumentation(String xAccessToken, String accessToken, String jobschedulerId, String jobChain, String orderId)
             throws Exception {
-        return postJobDocumentation(getAccessToken(xAccessToken, accessToken), jobschedulerId, jobChain, orderId);
+        return postDocumentation(getAccessToken(xAccessToken, accessToken), jobschedulerId, jobChain, orderId);
     }
 
-    public JOCDefaultResponse postJobDocumentation(String xAccessToken, String jobschedulerId, String jobChain, String orderId) throws Exception {
+    public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String jobChain, String orderId) throws Exception {
         SOSHibernateSession connection = null;
         try {
             String path = jobChain + "," + orderId;

@@ -51,6 +51,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
     private final String clusterMemberId;
     private final Boolean suppressJobSchedulerObjectNotExistException;
     private final Boolean checkOrderPathIsInFolder;
+    private final Map<String, String> orderDocumentations;
     private List<String> yadeJobs;
     private SOSHibernateSession connection = null;
 
@@ -67,6 +68,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = false;
         this.yadeJobs = null;
+        this.orderDocumentations = null;
     }
 
     public OrdersVCallable(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) {
@@ -82,6 +84,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = null;
         this.yadeJobs = null;
+        this.orderDocumentations = null;
     }
 
     public OrdersVCallable(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken, List<String> yadeJobs) {
@@ -97,9 +100,10 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = null;
         this.yadeJobs = yadeJobs;
+        this.orderDocumentations = null;
     }
 
-    public OrdersVCallable(JobChainVolatile jobChain, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public OrdersVCallable(JobChainVolatile jobChain, JOCJsonCommand jocJsonCommand, Map<String, String> orderDocumentations, String accessToken) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(jobChain.getPath());
         this.orders = o;
@@ -114,6 +118,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = jobChain.hasJobChainNodes();
         this.yadeJobs = null;
+        this.orderDocumentations = orderDocumentations;
     }
 
     public OrdersVCallable(OrderFilter order, JOCJsonCommand jocJsonCommand, String accessToken) {
@@ -132,6 +137,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.suppressJobSchedulerObjectNotExistException = order.getSuppressNotExistException();
         this.checkOrderPathIsInFolder = null;
         this.yadeJobs = null;
+        this.orderDocumentations = null;
     }
     
     public OrdersVCallable(OrderVolatile order, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
@@ -150,6 +156,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.suppressJobSchedulerObjectNotExistException = false;
         this.checkOrderPathIsInFolder = null;
         this.yadeJobs = null;
+        this.orderDocumentations = null;
     }
     
     public OrdersVCallable(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) {
@@ -165,6 +172,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = !("/".equals(folder.getFolder()));
         this.yadeJobs = null;
+        this.orderDocumentations = null;
     }
 
     public OrdersVCallable(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken, List<String> yadeJobs) {
@@ -180,6 +188,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = !("/".equals(folder.getFolder()));
         this.yadeJobs = yadeJobs;
+        this.orderDocumentations = null;
     }
 
     @Override
@@ -354,6 +363,9 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
             }
             order.setSurveyDate(surveyDate);
             order.setFields(usedNodes, usedTasks, compact);
+            if (orderDocumentations != null) {
+                order.setDocumentation(orderDocumentations.get(order.getPath()));
+            }
             if (yadeJobs != null && !yadeJobs.contains(order.getJob())) {
                 continue;
             }

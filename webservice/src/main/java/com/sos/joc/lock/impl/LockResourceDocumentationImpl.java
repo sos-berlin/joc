@@ -29,10 +29,10 @@ public class LockResourceDocumentationImpl extends JOCResourceImpl implements IL
 
     @Override
     public JOCDefaultResponse postDocumentation(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
-        return postJobDocumentation(getAccessToken(xAccessToken, accessToken), jobschedulerId, path);
+        return postDocumentation(getAccessToken(xAccessToken, accessToken), jobschedulerId, path);
     }
 
-    public JOCDefaultResponse postJobDocumentation(String xAccessToken, String jobschedulerId, String path) throws Exception {
+    public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) throws Exception {
         SOSHibernateSession connection = null;
         try {
             DocumentationShowFilter documentationFilter = new DocumentationShowFilter();

@@ -38,10 +38,46 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlJobChainCommand.class);
     private Set<String> nestedJobChains = new HashSet<String>();
     private String accessToken;
+    private Map<String,String> jobDocumentations = null;
+    private Map<String,String> jobChainDocumentations = null;
+    private Map<String,String> orderDocumentations = null;
     
     public JOCXmlJobChainCommand(JOCResourceImpl jocResourceImpl, String accessToken) {
         super(jocResourceImpl);
         this.accessToken = accessToken;
+    }
+    
+    public void setJobDocumentations(Map<String,String> jobDocumentations) {
+        this.jobDocumentations = jobDocumentations;
+    }
+    
+    public void setJobChainDocumentations(Map<String,String> jobChainDocumentations) {
+        this.jobChainDocumentations = jobChainDocumentations;
+    }
+    
+    public void setOrderDocumentations(Map<String,String> orderDocumentations) {
+        this.orderDocumentations = orderDocumentations;
+    }
+    
+    public Map<String,String> getJobDocumentations() {
+        if (this.jobDocumentations == null) {
+            return new HashMap<String, String>();
+        }
+        return this.jobDocumentations;
+    }
+    
+    public Map<String,String> getJobChainDocumentations() {
+        if (this.jobChainDocumentations == null) {
+            return new HashMap<String, String>();
+        }
+        return this.jobChainDocumentations;
+    }
+    
+    public Map<String,String> getOrderDocumentations() {
+        if (this.orderDocumentations == null) {
+            return new HashMap<String, String>();
+        }
+        return this.orderDocumentations;
     }
     
     public JobChainV getJobChain(String jobChain, Boolean compact, Boolean compactView, Integer maxOrders) throws Exception {
@@ -51,7 +87,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         jobChainV.setFields(compact);
         nestedJobChains.addAll(jobChainV.getNestedJobChains());
         if (((compact == null || !compact) && jobChainV.getNumOfOrders() > 0) || jobChainV.hasJobChainNodes()) {
-            OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken);
+            OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), getOrderDocumentations(), accessToken);
             Map<String, OrderVolatile> orders = ordersVCallable.call();
             if (jobChainV.hasJobChainNodes()) {
                 jobChainV.setOuterOrdersAndSummary(orders, maxOrders, compact);
@@ -215,7 +251,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                summaryTasks.add(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken));
            }
            if (!jobChainsFilter.getCompact() || jobChainV.hasJobChainNodes()) {
-               orderTasks.add(new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken)); 
+               orderTasks.add(new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), getOrderDocumentations(), accessToken)); 
            }
         }
         

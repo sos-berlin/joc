@@ -58,6 +58,9 @@
         },
         "configurationStatus": {
           "$ref": "../common/configurationStatus-schema.json"
+        },
+        "documentation": {
+          "$ref": "../common/path-schema.json"
         }
       }
     },
@@ -74,6 +77,9 @@
       ],
       "properties": {
         "path": {
+          "$ref": "../common/path-schema.json"
+        },
+        "documentation": {
           "$ref": "../common/path-schema.json"
         }
       }
