@@ -146,11 +146,7 @@ public class JocConfigurationDbLayer extends DBLayer {
     }
 
     public JocConfigurationDbItem getJocConfiguration(Long id) throws SOSHibernateException {
-        StringBuilder sql = new StringBuilder();
-        sql.append("from ").append(JOC_CONFIGURATION_DB_ITEM).append(" where id = :id");
-        Query<JocConfigurationDbItem> query = this.getSession().createQuery(sql.toString());
-        query.setParameter("id", id);
-        return this.getSession().getSingleResult(query);
+        return this.getSession().get(JocConfigurationDbItem.class, id);
     }
 
     public List<JocConfigurationDbItem> getJocConfigurations(final int limit) throws SOSHibernateException {

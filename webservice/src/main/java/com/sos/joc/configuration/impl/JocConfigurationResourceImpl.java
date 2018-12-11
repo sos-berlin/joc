@@ -86,7 +86,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 			checkRequiredParameter("account", configuration.getAccount());
 			checkRequiredParameter("configurationType", configuration.getConfigurationType().name());
 			checkRequiredParameter("configurationItem", configuration.getConfigurationItem());
-			if (configuration.getConfigurationType().name().equals(ConfigurationType.CUSTOMIZATION.name())) {
+			if (configuration.getConfigurationType() == ConfigurationType.CUSTOMIZATION) {
 				/** check save customization specific required parameters */
 				checkRequiredParameter("objectType", configuration.getObjectType().name());
 				checkRequiredParameter("name", configuration.getName());
@@ -103,20 +103,23 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 					throw new DBMissingDataException(
 							String.format("no entry found for configuration id: %d", configuration.getId()));
 				}
-			} else {
-				dbItem.setAccount(configuration.getAccount());
-				dbItem.setConfigurationType(configuration.getConfigurationType().name());
-				if (configuration.getObjectType() != null) {
-					dbItem.setObjectType(configuration.getObjectType().name());
-				}
-				dbItem.setName(configuration.getName());
-				dbItem.setConfigurationItem(configuration.getConfigurationItem());
-				dbItem.setInstanceId(dbItemInventoryInstance.getId());
-				dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
 			}
-
-			dbItem.setShared(configuration.getShared());
+			dbItem.setConfigurationType(configuration.getConfigurationType().name());
+			dbItem.setSchedulerId(configuration.getJobschedulerId());
+			dbItem.setInstanceId(dbItemInventoryInstance.getId());
+			dbItem.setName(configuration.getName());
+			dbItem.setAccount(configuration.getAccount());
+			if (configuration.getShared() == null) {
+			    dbItem.setShared(Boolean.FALSE); 
+			} else {
+			    dbItem.setShared(configuration.getShared());
+			}
 			dbItem.setConfigurationItem(configuration.getConfigurationItem());
+			if (configuration.getConfigurationType() == ConfigurationType.CUSTOMIZATION) {
+			    dbItem.setObjectType(configuration.getObjectType().name());
+			} else if (configuration.getObjectType() != null) {
+                dbItem.setObjectType(configuration.getObjectType().name());
+            }
 
 			/** check permissions */
 			boolean shareStatusMakePrivate = (dbItem != null && dbItem.getShared() && !configuration.getShared());
