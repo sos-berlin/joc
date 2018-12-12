@@ -1,7 +1,6 @@
 package com.sos.joc.classes;
 
 import java.io.StringWriter;
-import java.nio.file.Paths;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -40,6 +39,10 @@ public class JobSchedulerCommandFactory {
     private ObjectFactory objectFactory;
     private JAXBElement<?> jaxbElement;
     private Object command;
+    private String job = null;
+    private String jobChain = null;
+    private String orderId = null;
+    private String folder = null;
 
     public JobSchedulerCommandFactory() {
         objectFactory = new ObjectFactory();
@@ -53,18 +56,36 @@ public class JobSchedulerCommandFactory {
     public String getCommandName() {
         return command.getClass().getSimpleName();
     }
+    
+    public String getJob() {
+        return job;
+    }
+    
+    public String getJobChain() {
+        return jobChain;
+    }
+    
+    public String getOrderId() {
+        return orderId;
+    }
+    
+    public String getFolder() {
+        return folder;
+    }
 
     public boolean isPermitted(SOSPermissionCommands permissions, SOSShiroFolderPermissions sosShiroFolderPermissions) {
         if (command == null) {
             return false;
         }
 
-        String folder = "";
         boolean returnValue = false;
         
         switch (command.getClass().getSimpleName()) {
         case "Order":
-            folder = ((Order) command).getJobChain();
+            Order order = (Order) command;
+            jobChain = order.getJobChain();
+            orderId = order.getId(); 
+            folder = jobChain;
             returnValue = permissions.getJobChain().getExecute().isAddOrder();
             break;
         case "ShowJob":
@@ -73,7 +94,8 @@ public class JobSchedulerCommandFactory {
             break;
         case "JobChainNodeModify":
             JobChainNodeModify jobchainNodeModify = (JobChainNodeModify) command;
-            folder = jobchainNodeModify.getJobChain();
+            jobChain = jobchainNodeModify.getJobChain();
+            folder = jobChain;
 
             switch (jobchainNodeModify.getAction().value().toLowerCase()) {
             case "stop":
@@ -89,8 +111,9 @@ public class JobSchedulerCommandFactory {
             break;
         case "JobChainModify":
             JobChainModify jobchainModify = (JobChainModify) command;
-            folder = jobchainModify.getJobChain();
-
+            jobChain = jobchainModify.getJobChain();
+            folder = jobChain;
+            
             switch (jobchainModify.getState().toLowerCase()) {
             case "stopped":
                 returnValue = permissions.getJobChain().getExecute().isStop();
@@ -101,11 +124,13 @@ public class JobSchedulerCommandFactory {
             }
             break;
         case "JobWhy":
-            folder = ((JobWhy) command).getJob();
+            job = ((JobWhy) command).getJob();
+            folder = job;
             returnValue = permissions.getJob().getView().isStatus();
             break;
         case "KillTask":
-            folder = ((KillTask) command).getJob();
+            job = ((KillTask) command).getJob();
+            folder = job;
             returnValue = permissions.getJob().getExecute().isKill();
             break;
         case "LockRemove":
@@ -117,12 +142,16 @@ public class JobSchedulerCommandFactory {
             folder = modifyHotFolder.getFolder() + "/dummy";
 
             if (modifyHotFolder.getJob() != null) {
+                job = modifyHotFolder.getJob().getName();
                 returnValue = permissions.getJob().getChange().isHotFolder();
             } else if (modifyHotFolder.getJobChain() != null) {
+                jobChain = modifyHotFolder.getJobChain().getName();
                 returnValue = permissions.getJobChain().getChange().isHotFolder();
             } else if (modifyHotFolder.getLock() != null) {
                 returnValue = permissions.getLock().getChange().isHotFolder();
             } else if (modifyHotFolder.getOrder() != null) {
+                jobChain = modifyHotFolder.getOrder().getJobChain();
+                orderId = modifyHotFolder.getOrder().getId();
                 returnValue = permissions.getOrder().getChange().isHotFolder();
             } else if (modifyHotFolder.getProcessClass() != null) {
                 returnValue = permissions.getProcessClass().getChange().isHotFolder();
@@ -132,8 +161,9 @@ public class JobSchedulerCommandFactory {
             break;
         case "ModifyJob":
             ModifyJob modifyJob = (ModifyJob) command;
-            folder = modifyJob.getJob();
-
+            job = modifyJob.getJob();
+            folder = job;
+            
             switch (modifyJob.getCmd().toLowerCase()) {
             case "start":
             case "wake":
@@ -158,7 +188,9 @@ public class JobSchedulerCommandFactory {
             break;
         case "ModifyOrder":
             ModifyOrder modifyOrder = (ModifyOrder) command;
-            folder = modifyOrder.getJobChain();
+            jobChain = modifyOrder.getJobChain();
+            orderId = modifyOrder.getOrder();
+            folder = jobChain;
 
             if (modifyOrder.getEndState() != null) {
                 returnValue = permissions.getOrder().getChange().isStartAndEndNode();
@@ -214,11 +246,15 @@ public class JobSchedulerCommandFactory {
             returnValue = permissions.getProcessClass().getView().isStatus();
             break;
         case "RemoveJobChain":
-            folder = ((RemoveJobChain) command).getJobChain();
+            jobChain = ((RemoveJobChain) command).getJobChain();
+            folder = jobChain;
             returnValue = permissions.getJobChain().getExecute().isRemove();
             break;
         case "RemoveOrder":
-            folder = ((RemoveOrder) command).getJobChain();
+            RemoveOrder removeOrder = (RemoveOrder) command;
+            jobChain = removeOrder.getJobChain();
+            orderId = removeOrder.getOrder();
+            folder = jobChain;
             returnValue = permissions.getOrder().isDelete();
             break;
         case "ScheduleRemove":
@@ -258,7 +294,8 @@ public class JobSchedulerCommandFactory {
             returnValue = permissions.getJob().getView().isStatus();
             break;
         case "StartJob":
-            folder = ((StartJob) command).getJob();
+            job = ((StartJob) command).getJob();
+            folder = job;
             returnValue = permissions.getJob().getExecute().isStart();
             break;
         case "Terminate":
@@ -266,7 +303,9 @@ public class JobSchedulerCommandFactory {
             break;
         }
 
-        folder = Globals.getParent(folder);
+        if (folder != null) {
+            folder = Globals.getParent(folder);
+        }
         return (folder == null || folder.isEmpty() || sosShiroFolderPermissions.isPermittedForFolder(folder)) && returnValue;
     }
     

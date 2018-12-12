@@ -1,5 +1,8 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
@@ -62,6 +65,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
 
             String xml = "";
             boolean withAudit = false;
+            List<JobSchedulerCommandAudit> jobschedulerAudits = new ArrayList<JobSchedulerCommandAudit>();
             for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
                 
                 jobSchedulerCommandFactory = new JobSchedulerCommandFactory(jobschedulerCommand);
@@ -73,8 +77,10 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                     }
                 }
                 
+                boolean auditCommand = jobSchedulerCommandFactory.withAuditLog();
+                
                 if (!withAudit) {
-                    withAudit = jobSchedulerCommandFactory.withAuditLog();
+                    withAudit = auditCommand;
                 }
                 if (withAudit && missingAuditLogComment) {
                     throw new JocMissingCommentException();
@@ -82,23 +88,27 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                 
                 String xmlCommand = jobSchedulerCommandFactory.asXml();
                 xml = xml + xmlCommand;
+                
+                if (auditCommand) {
+                    jobschedulerAudits.add(new JobSchedulerCommandAudit(xmlCommand, jobSchedulerCommands, jobSchedulerCommandFactory));
+                }
             }
             if (!xml.startsWith("<params.get") && !xml.contains("param.get")) {
                 xml = "<commands>" + xml + "</commands>";
             }
-            JobSchedulerCommandAudit jobschedulerAudit = null;
             if (withAudit) {
-                jobschedulerAudit = new JobSchedulerCommandAudit(xml, jobSchedulerCommands);
-            }
-            if (jobschedulerAudit != null) {
-                logAuditMessage(jobschedulerAudit);
+                for (JobSchedulerCommandAudit jobschedulerAudit : jobschedulerAudits) {
+                    logAuditMessage(jobschedulerAudit); 
+                }
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jobSchedulerCommands.getUrl());
             jocXmlCommand.setBasicAuthorization(getBasicAuthorization());
             String answer = jocXmlCommand.executePost(xml, ResponseStream.TO_STRING, getAccessToken());
-            if (jobschedulerAudit != null) {
-                storeAuditLogEntry(jobschedulerAudit);
+            if (withAudit) {
+                for (JobSchedulerCommandAudit jobschedulerAudit : jobschedulerAudits) {
+                    storeAuditLogEntry(jobschedulerAudit); 
+                }
             }
 
             return JOCDefaultResponse.responseStatus200(answer, "application/xml");

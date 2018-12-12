@@ -1,10 +1,23 @@
 package com.sos.joc.classes.audit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.classes.JobSchedulerCommandFactory;
 import com.sos.joc.model.commands.JobschedulerCommands;
 
 public class JobSchedulerCommandAudit extends JobschedulerCommands implements IAuditLog {
 
+    @JsonIgnore
+    private String folder;
+    
+    @JsonIgnore
+    private String job;
+    
+    @JsonIgnore
+    private String jobChain;
+    
+    @JsonIgnore
+    private String orderId;
+    
     @JsonIgnore
     private String xml;
     
@@ -27,6 +40,26 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
             setUrl(jobSchedulerCommands.getUrl());
             getAddOrderOrCheckFoldersOrKillTask().addAll(jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask());
         }
+    }
+    
+    public JobSchedulerCommandAudit(String xml, JobschedulerCommands jobSchedulerCommands, JobSchedulerCommandFactory commandFactory) {
+        this.xml = xml;
+        if (jobSchedulerCommands != null) {
+            this.comment = jobSchedulerCommands.getComment();
+            this.ticketLink = jobSchedulerCommands.getTicketLink();
+            this.timeSpent = jobSchedulerCommands.getTimeSpent();
+            setJobschedulerId(jobSchedulerCommands.getJobschedulerId());
+            setUrl(jobSchedulerCommands.getUrl());
+            getAddOrderOrCheckFoldersOrKillTask().addAll(jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask());
+            setObject(commandFactory);
+        }
+    }
+    
+    private void setObject(JobSchedulerCommandFactory commandFactory) {
+        this.folder = commandFactory.getFolder();
+        this.job = commandFactory.getJob();
+        this.jobChain = commandFactory.getJobChain();
+        this.orderId = commandFactory.getOrderId();
     }
 
     @Override
@@ -51,25 +84,25 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
     @Override
     @JsonIgnore
     public String getFolder() {
-        return null;
+        return folder;
     }
 
     @Override
     @JsonIgnore
     public String getJob() {
-        return null;
+        return job;
     }
 
     @Override
     @JsonIgnore
     public String getJobChain() {
-        return null;
+        return jobChain;
     }
 
     @Override
     @JsonIgnore
     public String getOrderId() {
-        return null;
+        return orderId;
     }
 
     @Override
