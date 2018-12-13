@@ -83,9 +83,9 @@ public class DocumentationResourceImpl extends JOCResourceImpl implements IDocum
             return jocDefaultResponse;
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseHTMLStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+            return JOCDefaultResponse.responseHTMLStatusJSError(e, getJocError());
         } finally {
             Globals.disconnect(connection);
         }
