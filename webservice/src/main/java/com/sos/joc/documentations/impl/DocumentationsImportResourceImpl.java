@@ -288,7 +288,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                     continue;
                 }
                 String entryName = entry.getName().replace('\\', '/');
-                if (entryName.endsWith(DocumentationsExportResourceImpl.DEPLOY_USAGE_JSON) && !entryName.equals(
+                if (entryName.endsWith(DocumentationsExportResourceImpl.DEPLOY_USAGE_JSON) && !("/"+entryName).equals(
                         DocumentationsExportResourceImpl.DEPLOY_USAGE_JSON)) {
                     continue;
                 }
