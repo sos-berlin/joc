@@ -39,7 +39,7 @@ public class DocumentationUsedResourceImpl extends JOCResourceImpl implements ID
             UsedBy usedBy = new UsedBy();
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), normalizePath(filter
+            List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsages(filter.getJobschedulerId(), normalizePath(filter
                     .getDocumentation()));
             if (dbUsages != null && !dbUsages.isEmpty()) {
                 List<JobSchedulerObject> jobSchedulerObjects = new ArrayList<JobSchedulerObject>();

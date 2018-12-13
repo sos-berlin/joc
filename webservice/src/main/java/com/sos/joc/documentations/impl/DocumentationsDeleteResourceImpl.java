@@ -43,7 +43,7 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
             for (DBItemDocumentation dbDoc : docs) {
                 DeleteDocumentationAudit deleteAudit = new DeleteDocumentationAudit(filter, dbDoc.getPath(), dbDoc.getDirectory());
                 logAuditMessage(deleteAudit);
-                List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsage(filter.getJobschedulerId(), dbDoc.getId());
+                List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsages(filter.getJobschedulerId(), dbDoc.getId());
                 if (dbUsages != null && !dbUsages.isEmpty()) {
                     for (DBItemDocumentationUsage dbUsage : dbUsages) {
                         connection.delete(dbUsage);

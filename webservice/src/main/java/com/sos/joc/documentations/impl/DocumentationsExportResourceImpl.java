@@ -9,14 +9,24 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Charsets;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemDocumentation;
@@ -30,17 +40,23 @@ import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentations.resource.IDocumentationsExportResource;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.JobSchedulerObject;
+import com.sos.joc.model.docu.DeployDocumentation;
+import com.sos.joc.model.docu.DeployDocumentations;
 import com.sos.joc.model.docu.DocumentationsFilter;
 import com.sos.joc.model.docu.ExportInfo;
 
 @Path("documentations")
 public class DocumentationsExportResourceImpl extends JOCResourceImpl implements IDocumentationsExportResource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentationsExportResourceImpl.class);
     private static final String API_CALL = "./documentations/export";
+    public static final String DEPLOY_USAGE_JSON = "/sos-documentation-usages.json";
 
     @Override
     public JOCDefaultResponse postExportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
@@ -56,9 +72,7 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
             String targetFilename = "documentation_" + filter.getJobschedulerId() + ".zip";
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            List<DBItemDocumentation> docs = getDocsFromDb(dbLayer, filter);
-            final List<DocumentationContent> contents = mapToDocumentationContents(docs, dbLayer);
+            final List<DocumentationContent> contents = mapToDocumentationContents(filter, connection);
             StreamingOutput streamingOutput = new StreamingOutput() {
 
                 @Override
@@ -94,26 +108,6 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
         }
     }
 
-    private List<DocumentationContent> mapToDocumentationContents(List<DBItemDocumentation> docs, DocumentationDBLayer dbLayer)
-            throws DBConnectionRefusedException, DBInvalidDataException {
-        List<DocumentationContent> contents = new ArrayList<DocumentationContent>();
-        for (DBItemDocumentation doc : docs) {
-            DocumentationContent content = null;
-            if (doc.getContent() != null) {
-                content = new DocumentationContent(doc.getPath(), doc.getContent().getBytes(Charsets.UTF_8));
-            } else {
-                DBItemDocumentationImage image = dbLayer.getDocumentationImage(doc.getImageId());
-                if (image != null) {
-                    content = new DocumentationContent(doc.getPath(), image.getImage());
-                }
-            }
-            if (content != null) {
-                contents.add(content);
-            }
-        }
-        return contents;
-    }
-
     @Override
     public JOCDefaultResponse getExportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String filename)
             throws Exception {
@@ -121,8 +115,8 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
             xAccessToken = getAccessToken(xAccessToken, accessToken);
             ExportInfo file = new ExportInfo();
             file.setFilename(filename);
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, file, xAccessToken, jobschedulerId, getPermissonsJocCockpit(
-                    jobschedulerId, xAccessToken).getDocumentation().isExport());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, file, xAccessToken, jobschedulerId, getPermissonsJocCockpit(jobschedulerId,
+                    xAccessToken).getDocumentation().isExport());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -191,9 +185,7 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
             checkRequiredParameter("jobschedulerId", filter.getJobschedulerId());
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL + "/info");
-            DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            List<DBItemDocumentation> docs = getDocsFromDb(dbLayer, filter);
-            List<DocumentationContent> contents = mapToDocumentationContents(docs, dbLayer);
+            List<DocumentationContent> contents = mapToDocumentationContents(filter, connection);
 
             java.nio.file.Path path = Files.createTempFile("sos-download-", ".zip.tmp");
             zipOut = new ZipOutputStream(Files.newOutputStream(path));
@@ -229,8 +221,60 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
         }
     }
 
+    private List<DocumentationContent> mapToDocumentationContents(DocumentationsFilter filter, SOSHibernateSession connection)
+            throws DBConnectionRefusedException, DBInvalidDataException, JocMissingRequiredParameterException, JsonProcessingException,
+            DBMissingDataException {
+        DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
+        List<DBItemDocumentation> docs = getDocsFromDb(dbLayer, filter);
+        List<DocumentationContent> contents = new ArrayList<DocumentationContent>();
+        DocumentationContent usagesJson = getDeployUsageData(filter.getJobschedulerId(), dbLayer, docs.stream().collect(Collectors.mapping(
+                DBItemDocumentation::getPath, Collectors.toSet())));
+        if (usagesJson != null) {
+            contents.add(usagesJson);
+        }
+
+        for (DBItemDocumentation doc : docs) {
+            DocumentationContent content = null;
+            if (doc.getContent() != null) {
+                content = new DocumentationContent(doc.getPath(), doc.getContent().getBytes(Charsets.UTF_8));
+            } else {
+                DBItemDocumentationImage image = dbLayer.getDocumentationImage(doc.getImageId());
+                if (image != null) {
+                    content = new DocumentationContent(doc.getPath(), image.getImage());
+                }
+            }
+            if (content != null) {
+                contents.add(content);
+            }
+        }
+        return contents;
+    }
+    
+    private DocumentationContent getDeployUsageData(String jobschedulerId, DocumentationDBLayer dbLayer, Collection<String> docPaths)
+            throws DBConnectionRefusedException, DBInvalidDataException, JsonProcessingException {
+        try {
+            DeployDocumentations docUsages = new DeployDocumentations();
+            docUsages.setJobschedulerId(jobschedulerId);
+            List<DeployDocumentation> docUsageList = new ArrayList<DeployDocumentation>();
+            Map<String, List<JobSchedulerObject>> docUsageMap = dbLayer.getDocumentationUsages(jobschedulerId, docPaths);
+            for (Entry<String, List<JobSchedulerObject>> entry : docUsageMap.entrySet()) {
+                DeployDocumentation docUsage = new DeployDocumentation();
+                docUsage.setDocumentation(entry.getKey());
+                docUsage.setObjects(entry.getValue());
+                docUsageList.add(docUsage);
+            }
+            docUsages.setDocumentations(docUsageList);
+            ObjectMapper objMapper = new ObjectMapper();
+            objMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            return new DocumentationContent(DEPLOY_USAGE_JSON, objMapper.writeValueAsBytes(docUsages));
+        } catch (Exception e) {
+            LOGGER.warn("Problem at export documentation usages", e);
+            return null;
+        }
+    }
+
     private List<DBItemDocumentation> getDocsFromDb(DocumentationDBLayer dbLayer, DocumentationsFilter filter)
-            throws JocMissingRequiredParameterException, DBConnectionRefusedException, DBInvalidDataException {
+            throws JocMissingRequiredParameterException, DBConnectionRefusedException, DBInvalidDataException, DBMissingDataException {
         List<DBItemDocumentation> docs = new ArrayList<DBItemDocumentation>();
         if (filter.getDocumentations() != null && !filter.getDocumentations().isEmpty()) {
             docs = dbLayer.getDocumentations(filter.getJobschedulerId(), filter.getDocumentations());
@@ -240,6 +284,9 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
             }
         } else {
             throw new JocMissingRequiredParameterException("Neither 'documentations' nor 'folders' are specified!");
+        }
+        if (docs == null || docs.isEmpty()) {
+            throw new DBMissingDataException("No 'documentations' found!");
         }
         return docs;
     }

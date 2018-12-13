@@ -45,7 +45,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
 				return jocDefaultResponse;
 			}
 			
-		
+			checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			Globals.beginTransaction(connection);
 

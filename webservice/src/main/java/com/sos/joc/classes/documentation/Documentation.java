@@ -8,7 +8,6 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.reporting.db.DBItemDocumentation;
 import com.sos.jitl.reporting.db.DBItemDocumentationUsage;
 import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
-import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.documentation.DocumentationDBLayer;

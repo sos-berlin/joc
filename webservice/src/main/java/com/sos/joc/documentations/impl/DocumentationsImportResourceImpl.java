@@ -25,12 +25,16 @@ import javax.ws.rs.Path;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.reporting.db.DBItemDocumentation;
 import com.sos.jitl.reporting.db.DBItemDocumentationImage;
+import com.sos.jitl.reporting.db.DBItemDocumentationUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -44,16 +48,21 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.JocUnsupportedFileTypeException;
 import com.sos.joc.model.audit.AuditParams;
+import com.sos.joc.model.common.JobSchedulerObject;
+import com.sos.joc.model.docu.DeployDocumentation;
+import com.sos.joc.model.docu.DeployDocumentations;
 import com.sos.joc.model.docu.DocumentationImport;
 
 @Path("documentations")
 public class DocumentationsImportResourceImpl extends JOCResourceImpl implements IDocumentationsImportResource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentationsImportResourceImpl.class);
     private static final String API_CALL = "./documentations/import";
-    private static final List<String> SUPPORTED_SUBTYPES = new ArrayList<String>(Arrays.asList("html", "xml", "pdf", "xsl", "xsd", "javascript", "json",
-            "css", "markdown", "gif", "jpeg", "png"));
+    private static final List<String> SUPPORTED_SUBTYPES = new ArrayList<String>(Arrays.asList("html", "xml", "pdf", "xsl", "xsd", "javascript",
+            "json", "css", "markdown", "gif", "jpeg", "png"));
     private static final List<String> SUPPORTED_IMAGETYPES = new ArrayList<String>(Arrays.asList("pdf", "gif", "jpeg", "png"));
     private SOSHibernateSession connection = null;
+    private DeployDocumentations deployDocumentations = null;
 
     @Override
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String directory,
@@ -68,8 +77,8 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
         return postImportDocumentations(getAccessToken(xAccessToken, accessToken), jobschedulerId, directory, body, auditLog);
     }
 
-    public JOCDefaultResponse postImportDocumentations(String xAccessToken, String jobschedulerId, String directory, FormDataBodyPart body, AuditParams auditLog)
-            throws Exception {
+    public JOCDefaultResponse postImportDocumentations(String xAccessToken, String jobschedulerId, String directory, FormDataBodyPart body,
+            AuditParams auditLog) throws Exception {
 
         InputStream stream = null;
         try {
@@ -83,7 +92,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 filter.setFile(body.getContentDisposition().getFileName());
             }
             filter.setAuditLog(auditLog);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, jobschedulerId, getPermissonsJocCockpit(filter
                     .getJobschedulerId(), xAccessToken).getDocumentation().isImport());
             if (jocDefaultResponse != null) {
@@ -121,7 +130,11 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                         break;
                     }
                 }
-                saveOrUpdate(setDBItemDocumentation(IOUtils.toByteArray(stream), filter, supportedSubType.get()));
+                if (("/"+filter.getFile()).equals(DocumentationsExportResourceImpl.DEPLOY_USAGE_JSON)) {
+                    setDeployDocumentations(IOUtils.toByteArray(stream));
+                } else {
+                    saveOrUpdate(setDBItemDocumentation(IOUtils.toByteArray(stream), filter, supportedSubType.get()));
+                }
             } else if ("md".equals(extention) || "markdown".equals(extention)) {
                 byte[] b = IOUtils.toByteArray(stream);
                 if (isPlainText(b)) {
@@ -134,6 +147,8 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 throw new JocUnsupportedFileTypeException("Unsupported file type (" + mediaSubType + "), supported types are " + SUPPORTED_SUBTYPES
                         .toString());
             }
+            
+            deployDocumentations();
 
             storeAuditLogEntry(importAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
@@ -150,6 +165,51 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 }
             } catch (Exception e) {
             }
+        }
+    }
+
+    private void deployDocumentations() throws JocException {
+        if (deployDocumentations != null && deployDocumentations.getDocumentations() != null && !deployDocumentations.getDocumentations().isEmpty()) {
+            try {
+                if (connection == null) {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                }
+                DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
+                for (DeployDocumentation deployDocumentation : deployDocumentations.getDocumentations()) {
+                    if (deployDocumentation.getObjects() == null || deployDocumentation.getObjects().isEmpty()) {
+                       continue; 
+                    }
+                    Long documentationId = dbLayer.getDocumentationId(dbItemInventoryInstance.getSchedulerId(), deployDocumentation.getDocumentation());
+                    if (documentationId != null) {
+                        List<DBItemDocumentationUsage> oldUsages = dbLayer.getDocumentationUsages(dbItemInventoryInstance.getSchedulerId(), documentationId);
+                        for (JobSchedulerObject jsObj : deployDocumentation.getObjects()) {
+                            DBItemDocumentationUsage newUsage = new DBItemDocumentationUsage();
+                            newUsage.setDocumentationId(documentationId);
+                            newUsage.setObjectType(jsObj.getType().name());
+                            newUsage.setPath(jsObj.getPath());
+                            newUsage.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
+                            if (oldUsages.contains(newUsage)) {
+                               continue; 
+                            }
+                            newUsage.setCreated(Date.from(Instant.now()));
+                            newUsage.setModified(newUsage.getCreated());
+                            dbLayer.getSession().save(newUsage);
+                        }
+                    }
+                }
+            } catch (JocConfigurationException | DBConnectionRefusedException e) {
+                throw e;
+            } catch (Exception e) {
+                LOGGER.warn("Problem at import documentation usages", e);
+            }
+        }
+    }
+    
+    private void setDeployDocumentations(byte[] b) {
+        try {
+            deployDocumentations = new ObjectMapper().readValue(b, DeployDocumentations.class);
+        } catch (Exception e) {
+            LOGGER.warn("Problem at import documentation usages", e);
         }
     }
 
@@ -205,12 +265,15 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
 
     private String getExtensionFromFilename(String filename) {
         String extension = filename;
+        if (filename == null) {
+            return "";
+        }
         if (extension.contains(".")) {
             extension = extension.replaceFirst(".*\\.([^\\.]+)$", "$1");
         } else {
             extension = "";
         }
-        return extension;
+        return extension.toLowerCase();
     }
 
     private void readZipFileContent(InputStream inputStream, DocumentationImport filter) throws DBConnectionRefusedException, DBInvalidDataException,
@@ -224,14 +287,11 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 if (entry.isDirectory()) {
                     continue;
                 }
-                DBItemDocumentation documentation = new DBItemDocumentation();
-                documentation.setSchedulerId(filter.getJobschedulerId());
-                java.nio.file.Path targetFolder = Paths.get(filter.getFolder());
-                java.nio.file.Path complete = targetFolder.resolve(entry.getName().replace('\\', '/').replaceFirst("^/", ""));
-                documentation.setPath(complete.toString().replace('\\', '/'));
-                documentation.setDirectory(complete.getParent().toString().replace('\\', '/'));
-                documentation.setName(complete.getFileName().toString());
-                String fileExtension = getExtensionFromFilename(documentation.getName());
+                String entryName = entry.getName().replace('\\', '/');
+                if (entryName.endsWith(DocumentationsExportResourceImpl.DEPLOY_USAGE_JSON) && !entryName.equals(
+                        DocumentationsExportResourceImpl.DEPLOY_USAGE_JSON)) {
+                    continue;
+                }
                 ByteArrayOutputStream outBuffer = new ByteArrayOutputStream();
                 byte[] binBuffer = new byte[8192];
                 int binRead = 0;
@@ -239,6 +299,19 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                     outBuffer.write(binBuffer, 0, binRead);
                 }
                 byte[] bytes = outBuffer.toByteArray();
+
+                if (("/"+entryName).equals(DocumentationsExportResourceImpl.DEPLOY_USAGE_JSON)) {
+                    setDeployDocumentations(bytes);
+                    continue;
+                }
+                DBItemDocumentation documentation = new DBItemDocumentation();
+                documentation.setSchedulerId(filter.getJobschedulerId());
+                java.nio.file.Path targetFolder = Paths.get(filter.getFolder());
+                java.nio.file.Path complete = targetFolder.resolve(entryName.replaceFirst("^/", ""));
+                documentation.setPath(complete.toString().replace('\\', '/'));
+                documentation.setDirectory(complete.getParent().toString().replace('\\', '/'));
+                documentation.setName(complete.getFileName().toString());
+                String fileExtension = getExtensionFromFilename(documentation.getName());
                 boolean isPlainText = isPlainText(bytes);
                 final String guessedMediaType = guessContentTypeFromBytes(bytes, fileExtension, isPlainText);
                 if (guessedMediaType != null) {
@@ -343,6 +416,11 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                 case "txt":
                     media = "plain";
                     break;
+                case "html":
+                case "xhtml":
+                case "htm":
+                    media = "html";
+                    break;
                 }
             } else if (media != null && media.contains("xml")) {
                 switch (extension) {
@@ -355,6 +433,10 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                     break;
                 default:
                     media = "xml";
+                }
+            } else if (media == null && !isPlainText) {
+                if ("pdf".equals(extension)) {
+                    media = "pdf";
                 }
             }
             return media;
