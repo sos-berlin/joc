@@ -1,22 +1,17 @@
 package com.sos.joc.documentation.impl;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemDocumentationUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentation.resource.IDocumentationUsedResource;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.JobSchedulerObject;
-import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.docu.DocumentationFilter;
 import com.sos.joc.model.docu.UsedBy;
 
@@ -39,18 +34,7 @@ public class DocumentationUsedResourceImpl extends JOCResourceImpl implements ID
             UsedBy usedBy = new UsedBy();
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            List<DBItemDocumentationUsage> dbUsages = dbLayer.getDocumentationUsages(filter.getJobschedulerId(), normalizePath(filter
-                    .getDocumentation()));
-            if (dbUsages != null && !dbUsages.isEmpty()) {
-                List<JobSchedulerObject> jobSchedulerObjects = new ArrayList<JobSchedulerObject>();
-                for (DBItemDocumentationUsage dbUsage : dbUsages) {
-                    JobSchedulerObject jsObject = new JobSchedulerObject();
-                    jsObject.setPath(dbUsage.getPath());
-                    jsObject.setType(JobSchedulerObjectType.fromValue(dbUsage.getObjectType()));
-                    jobSchedulerObjects.add(jsObject);
-                }
-                usedBy.setObjects(jobSchedulerObjects);
-            }
+            usedBy.setObjects(dbLayer.getDocumentationUsages(dbItemInventoryInstance.getId(), filter.getJobschedulerId(), normalizePath(filter.getDocumentation())));
             usedBy.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(usedBy);
         } catch (JocException e) {

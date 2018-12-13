@@ -1,11 +1,13 @@
 package com.sos.joc.db.documentation;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.hibernate.criterion.MatchMode;
@@ -45,7 +47,7 @@ public class DocumentationDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
     public Long getDocumentationId(String schedulerId, String path) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -294,20 +296,76 @@ public class DocumentationDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemDocumentationUsage> getDocumentationUsages(String schedulerId, String path) throws DBConnectionRefusedException,
+    public List<JobSchedulerObject> getDocumentationUsages(Long instanceId, String schedulerId, String docPath) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             StringBuilder hql = new StringBuilder();
-            hql.append("select du from ").append(DBITEM_DOCUMENTATION_USAGE).append(" du, ");
+            hql.append("select new ").append(ObjectOfDocumentation.class.getName()).append("(du.path, du.objectType) from ");
+            hql.append(DBITEM_DOCUMENTATION_USAGE).append(" du, ");
             hql.append(DBITEM_DOCUMENTATION).append(" d");
             hql.append(" where du.documentationId = d.id");
             hql.append(" and d.schedulerId = :schedulerId");
             hql.append(" and d.path = :path");
 
-            Query<DBItemDocumentationUsage> query = getSession().createQuery(hql.toString());
+            Query<ObjectOfDocumentation> query = getSession().createQuery(hql.toString());
             query.setParameter("schedulerId", schedulerId);
-            query.setParameter("path", path);
-            return getSession().getResultList(query);
+            query.setParameter("path", docPath);
+            List<ObjectOfDocumentation> result = getSession().getResultList(query);
+            if (result == null || result.isEmpty()) {
+                return null;
+            }
+            Map<JobSchedulerObjectType, List<String>> dbUsages = result.stream().collect(Collectors.groupingBy(ObjectOfDocumentation::getType,
+                    Collectors.mapping(ObjectOfDocumentation::getPath, Collectors.toList())));
+            String hqlStr = "select name from %s where instanceId = :instanceId and name in (:paths)";
+            List<JobSchedulerObject> jsObjs = new ArrayList<JobSchedulerObject>();
+            for (Entry<JobSchedulerObjectType, List<String>> entry : dbUsages.entrySet()) {
+                String sql = null;
+                switch (entry.getKey()) {
+                case JOB:
+                    sql = String.format(hqlStr, DBITEM_INVENTORY_JOBS);
+                    break;
+                case JOBCHAIN:
+                    sql = String.format(hqlStr, DBITEM_INVENTORY_JOB_CHAINS);
+                    break;
+                case ORDER:
+                    sql = String.format(hqlStr, DBITEM_INVENTORY_ORDERS);
+                    break;
+                case NONWORKINGDAYSCALENDAR:
+                case WORKINGDAYSCALENDAR:
+                    sql = String.format("select name from %s where schedulerId = :schedulerId and name in (:paths)", DBITEM_CLUSTER_CALENDARS);
+                    break;
+                case PROCESSCLASS:
+                    sql = String.format(hqlStr, DBITEM_INVENTORY_PROCESS_CLASSES);
+                    break;
+                case LOCK:
+                    sql = String.format(hqlStr, DBITEM_INVENTORY_LOCKS);
+                    break;
+                case SCHEDULE:
+                    sql = String.format(hqlStr, DBITEM_INVENTORY_SCHEDULES);
+                    break;
+                default:
+                    break;
+                }
+                if (sql != null) {
+                    Query<String> query2 = getSession().createQuery(sql);
+                    if (entry.getKey() == JobSchedulerObjectType.NONWORKINGDAYSCALENDAR || entry.getKey() == JobSchedulerObjectType.WORKINGDAYSCALENDAR) {
+                        query2.setParameter("schedulerId", schedulerId);
+                    } else {
+                        query2.setParameter("instanceId", instanceId);
+                    }
+                    query2.setParameterList("paths", entry.getValue());
+                    List<String> paths = getSession().getResultList(query2);
+                    if (paths != null && !paths.isEmpty()) {
+                        for (String path : paths) {
+                            JobSchedulerObject jsObj = new JobSchedulerObject();
+                            jsObj.setPath(path);
+                            jsObj.setType(entry.getKey());
+                            jsObjs.add(jsObj);
+                        }
+                    }
+                }
+            }
+            return jsObjs;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -344,7 +402,7 @@ public class DocumentationDBLayer extends DBLayer {
             hql.append(DBITEM_DOCUMENTATION).append(" d");
             hql.append(" where du.documentationId = d.id");
             if (schedulerId != null && !schedulerId.isEmpty()) {
-                hql.append(" and du.schedulerId = :schedulerId");
+                hql.append(" and d.schedulerId = :schedulerId");
             }
             if (paths != null && !paths.isEmpty()) {
                 hql.append(" and d.path in (:paths)");
