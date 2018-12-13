@@ -45,7 +45,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
             + "<body>%n"
             + "  <div class=\"frame\">%n"
             + "    <div class=\"innerframe\">%n"
-            + "      <div class=\"code\">&#x26a0; %1$s<div>%n"
+            + "      <div class=\"code\">&#x26a0; %1$s</div>%n"
             + "      <div class=\"message\">%2$s</div>%n"
             + "    </div>%n"
             + "  </div>%n"
