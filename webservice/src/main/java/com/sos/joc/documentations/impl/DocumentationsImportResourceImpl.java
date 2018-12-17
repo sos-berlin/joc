@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -89,7 +90,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             }
             filter.setFolder(normalizeFolder(directory.replace('\\', '/')));
             if (body != null) {
-                filter.setFile(body.getContentDisposition().getFileName());
+                filter.setFile(URLDecoder.decode(body.getContentDisposition().getFileName(), "UTF-8"));
             }
             filter.setAuditLog(auditLog);
 
