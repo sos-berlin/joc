@@ -56,8 +56,12 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
             if (taskHistoryFilter.getMaxLastHistoryItems() == null) {
                 taskHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
+            boolean getJobHistoryFromXMLCommand = Globals.rollbackJobHistoryWithJSON;
+            if (!getJobHistoryFromXMLCommand) {
+                getJobHistoryFromXMLCommand = versionIsOlderThan("1.12.8");
+            }
             try {
-                if (versionIsOlderThan("1.12.8")) {
+                if (getJobHistoryFromXMLCommand) {
                     JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
                     String postCommand = jocXmlCommand.getShowJobCommand(normalizePath(taskHistoryFilter.getJob()), "task_history", null,
                             taskHistoryFilter.getMaxLastHistoryItems());

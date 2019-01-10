@@ -59,6 +59,7 @@ public class Globals {
     public static IniSecurityManagerFactory factory = null;
     public static long timeoutToDeleteTempFiles = 1000 * 60 * 3L;
     public static TimeZone jocTimeZone = TimeZone.getDefault();
+    public static boolean rollbackJobHistoryWithJSON = false;
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null) {
@@ -171,6 +172,7 @@ public class Globals {
         setJobSchedulerSocketTimeout();
         setHostnameVerification();
         setForceCommentsForAuditLog();
+        setRollbackJobHistoryWithJSON();
         setTrustStore();
         setTrustStoreType();
         setTrustStorePassword();
@@ -386,6 +388,14 @@ public class Globals {
         if (sosShiroProperties != null) {
             auditLogCommentsAreRequired = sosShiroProperties.getProperty("force_comments_for_audit_log", defaultForceCommentsForAuditLog);
             LOGGER.info("force comments for audit log = " + auditLogCommentsAreRequired);
+        }
+    }
+    
+    //rollback option for JS-1802; see https://sourceforge.net/p/jobscheduler/bugs/145/
+    private static void setRollbackJobHistoryWithJSON() {
+        boolean defaultRollbackJobHistoryWithJSON = false;
+        if (sosShiroProperties != null) {
+            rollbackJobHistoryWithJSON = sosShiroProperties.getProperty("disable_job_history_with_json", defaultRollbackJobHistoryWithJSON);
         }
     }
 
