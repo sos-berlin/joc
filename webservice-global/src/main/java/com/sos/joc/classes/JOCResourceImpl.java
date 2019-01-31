@@ -449,4 +449,6 @@ public class JOCResourceImpl {
     protected List<Folder> addPermittedFolder(List<Folder> folders) {
         return folderPermissions.getPermittedFolders(folders);
     }
+   
+ 
 }

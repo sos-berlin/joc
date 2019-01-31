@@ -56,7 +56,10 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
+            
+            folderPermissions = jobschedulerUser.getSosShiroCurrentUser().getSosShiroCalendarFolderPermissions();
+            folderPermissions.setSchedulerId(calendarsFilter.getJobschedulerId());
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
             CalendarUsageDBLayer dbCalendarLayer = new CalendarUsageDBLayer(connection);
@@ -65,7 +68,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
             boolean withFolderFilter = calendarsFilter.getFolders() != null && !calendarsFilter.getFolders().isEmpty();
             boolean hasPermission = true;
             List<Folder> folders = addPermittedFolder(calendarsFilter.getFolders());
-
+            
             if (calendarsFilter.getCalendars() != null && !calendarsFilter.getCalendars().isEmpty()) {
                 calendarsFilter.setRegex(null);
                 dbCalendars = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getSchedulerId(), new HashSet<String>(calendarsFilter.getCalendars()));

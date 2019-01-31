@@ -1,8 +1,9 @@
 package com.sos.auth.rest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.shiro.ShiroException;
 
@@ -30,7 +31,7 @@ public class SOSShiroCurrentUsersList {
 
     public void removeTimedOutUser(String user) {
 
-        ArrayList<String> toBeRemoved = new ArrayList<String>();
+        CopyOnWriteArrayList<String> toBeRemoved = new CopyOnWriteArrayList<String>();
 
         for (Map.Entry<String, SOSShiroCurrentUser> entry : currentUsers.entrySet()) {
             boolean found = user.equals(entry.getValue().getUsername());
@@ -45,11 +46,12 @@ public class SOSShiroCurrentUsersList {
                 }
             }
         }
-
-        for (String entry : toBeRemoved) {
-            currentUsers.remove(entry);
+        
+        Iterator<String> it = toBeRemoved.iterator();
+        while (it.hasNext()) {
+            currentUsers.remove(it.next()); 
         }
-
+         
     }
 
     public SOSShiroCurrentUserAnswer getUserByName(String user) {

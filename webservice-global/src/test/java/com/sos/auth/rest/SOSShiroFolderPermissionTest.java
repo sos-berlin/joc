@@ -1,5 +1,6 @@
 package com.sos.auth.rest;
 
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ public class SOSShiroFolderPermissionTest {
     public void testGetPermittedFolders() {
         
         SOSShiroFolderPermissions sosShiroFolderPermissions = new SOSShiroFolderPermissions();
-        sosShiroFolderPermissions.setFolders("", "/a/b/*, /a/c/d");
+        sosShiroFolderPermissions.setFolders("", "/*calendar/a/x/*, /a/b/*, /a/c/d");
         //sosShiroFolderPermissions.setFolders("", "/sos/dailyplan/*, /sos/housekeeping/*");
         
         Set<Folder> folders = new HashSet<Folder>();
@@ -23,6 +24,27 @@ public class SOSShiroFolderPermissionTest {
         f1.setRecursive(false);
         folders.add(f1);
         Set<Folder> permittedFolders = sosShiroFolderPermissions.getPermittedFolders(folders, sosShiroFolderPermissions.getListOfFolders());
+        for (Folder f: permittedFolders) {
+            java.nio.file.Path folderPath = Paths.get(f.getFolder());
+        }
+        assertEquals("testGetPermittedFolders", folders, permittedFolders);
+    }
+    
+    @Test
+    public void testGetPermittedFoldersWithFilter() {
+        
+        SOSShiroFolderPermissions sosShiroFolderPermissions = new SOSShiroFolderPermissions("calendar");
+        sosShiroFolderPermissions.setFolders("", "/*calendar/a/b/*, /a/c/d");
+        
+        Set<Folder> folders = new HashSet<Folder>();
+        Folder f1 = new Folder();
+        f1.setFolder("/a/b/c");
+        f1.setRecursive(false);
+        folders.add(f1);
+        Set<Folder> permittedFolders = sosShiroFolderPermissions.getPermittedFolders(folders, sosShiroFolderPermissions.getListOfFolders());
+        for (Folder f: permittedFolders) {
+            java.nio.file.Path folderPath = Paths.get(f.getFolder());
+        }
         
         assertEquals("testGetPermittedFolders", folders, permittedFolders);
     }

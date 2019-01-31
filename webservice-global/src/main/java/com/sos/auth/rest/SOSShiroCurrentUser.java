@@ -22,11 +22,6 @@ import com.sos.joc.classes.JOCJsonCommand;
 public class SOSShiroCurrentUser {
 
     private static final Logger LOGGER = Logger.getLogger(SOSShiroCurrentUser.class);
-
-    public SOSShiroFolderPermissions getSosShiroFolderPermissions() {
-        return sosShiroFolderPermissions;
-    }
-
     private Subject currentSubject;
     private String username;
     private String password;
@@ -39,6 +34,7 @@ public class SOSShiroCurrentUser {
     private Map<String, SOSPermissionJocCockpit> listOfSOSPermissionJocCockpit;
     private Map<String, SOSPermissionCommands> listOfSOSPermissionCommands;
     private SOSShiroFolderPermissions sosShiroFolderPermissions;
+    private SOSShiroFolderPermissions sosShiroCalendarFolderPermissions;
     private Set<JOCJsonCommand> jocJsonCommands;
     
     public SOSShiroCurrentUser(String username, String password) {
@@ -220,6 +216,7 @@ public class SOSShiroCurrentUser {
 
     public void initFolders() {
         sosShiroFolderPermissions = new SOSShiroFolderPermissions();
+        sosShiroCalendarFolderPermissions = new SOSShiroFolderPermissions("calendar");
     }
 
     public void addFolder(String role, String folders) {
@@ -239,6 +236,7 @@ public class SOSShiroCurrentUser {
         if (hasRole(role)) {
             LOGGER.debug(String.format("Adding folders %s for role %s", folders, role));
             sosShiroFolderPermissions.setFolders(jobSchedulerId, folders);
+            sosShiroCalendarFolderPermissions.setFolders(jobSchedulerId, folders);
         }
     }
 
@@ -257,5 +255,13 @@ public class SOSShiroCurrentUser {
 	public void setJocJsonCommands(Set<JOCJsonCommand> jocJsonCommands) {
 		this.jocJsonCommands = jocJsonCommands;
 	}
+	
+    public SOSShiroFolderPermissions getSosShiroFolderPermissions() {
+        return sosShiroFolderPermissions;
+    }
+    
+    public SOSShiroFolderPermissions getSosShiroCalendarFolderPermissions() {
+        return sosShiroCalendarFolderPermissions;
+    }
 
 }

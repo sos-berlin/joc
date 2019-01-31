@@ -87,7 +87,7 @@ public class CalendarUsedByWriter {
                         if (calendar != null) {
                             calendar.setBasedOn(null);
                             calendar.setType(null);
-                            //check if periods exist for working day caöendar
+                            //check if periods exist for working day calendar
                             calendarUsageDbItem.setConfiguration(om.writeValueAsString(calendar));
                         }
                         int index = dbCalendarUsage.indexOf(calendarUsageDbItem);

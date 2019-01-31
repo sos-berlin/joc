@@ -12,11 +12,17 @@ import com.sos.joc.model.common.Folder;
 public class SOSShiroFolderPermissions {
 
     private Map<String, Set<Folder>> listOfFoldersForInstance;
+    private String objectFilter = "";
     private String schedulerId;
     private boolean force = false;
 
     public SOSShiroFolderPermissions() {
         listOfFoldersForInstance = new HashMap<String, Set<Folder>>();
+    }
+
+    public SOSShiroFolderPermissions(String objectFilter) {
+        listOfFoldersForInstance = new HashMap<String, Set<Folder>>();
+        this.objectFilter = objectFilter;
     }
 
     private Set<Folder> getListOfFolders(String jobSchedulerId) {
@@ -50,7 +56,19 @@ public class SOSShiroFolderPermissions {
             Folder filterFolder = new Folder();
             filterFolder.setRecursive(f.endsWith("/*"));
             filterFolder.setFolder(normalizeFolder(f));
-            listOfFolders.add(filterFolder);
+            if (!objectFilter.isEmpty()) {
+                if (filterFolder.getFolder().startsWith("/*" + objectFilter)) {
+                    String g = filterFolder.getFolder();
+                    g = g.replaceFirst("/\\*" + objectFilter, "");
+                    filterFolder.setFolder(g);
+                    listOfFolders.add(filterFolder);
+                }
+            } else {
+                if (!filterFolder.getFolder().startsWith("/*" + objectFilter)) {
+                    listOfFolders.add(filterFolder);
+                }
+
+            }
         }
         listOfFoldersForInstance.put(jobSchedulerId, listOfFolders);
     }
@@ -62,7 +80,7 @@ public class SOSShiroFolderPermissions {
         }
         return folder;
     }
-    
+
     public List<Folder> getPermittedFolders(List<Folder> folders) {
         return getPermittedFolders(folders, getListOfFolders());
     }
@@ -82,7 +100,7 @@ public class SOSShiroFolderPermissions {
     public Set<Folder> getPermittedFolders(Set<Folder> folders) {
         return getPermittedFolders(folders, getListOfFolders());
     }
-    
+
     public Set<Folder> getPermittedFolders(Set<Folder> folders, Set<Folder> listOfFolders) {
         Set<Folder> permittedFolders = new HashSet<Folder>();
         if (folders != null && !folders.isEmpty()) {
@@ -119,7 +137,7 @@ public class SOSShiroFolderPermissions {
                         permittedFolders.add(f);
                     } else if (folder.getFolder().startsWith((f.getFolder() + "/").replaceAll("//+", "/"))) {
                         permittedFolders.add(folder);
-                    } 
+                    }
                 } else {
                     if (f.getFolder().equals(folder.getFolder())) {
                         permittedFolders.add(f);

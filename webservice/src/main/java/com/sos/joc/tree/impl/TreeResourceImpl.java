@@ -52,6 +52,13 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
 			}
 			SortedSet<String> folders = TreePermanent.initFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId(), dbItemInventoryInstance.getSchedulerId());
             folderPermissions.setForce(treeBody.getForce());
+            
+            
+            if (treeBody.getTypes().get(0) == JobSchedulerObjectType.WORKINGDAYSCALENDAR) {
+                folderPermissions = jobschedulerUser.getSosShiroCurrentUser().getSosShiroCalendarFolderPermissions();
+                folderPermissions.setSchedulerId(treeBody.getJobschedulerId());
+            }
+            
             Tree root = TreePermanent.getTree(folders, folderPermissions);
 
 			TreeView entity = new TreeView();
