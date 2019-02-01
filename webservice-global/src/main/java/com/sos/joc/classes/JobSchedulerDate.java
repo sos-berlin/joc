@@ -37,7 +37,14 @@ public class JobSchedulerDate {
     
     public static Date getDateFromISO8601String(String dateString) {
         Instant fromString = getInstantFromISO8601String(dateString);
-        return (fromString != null) ? Date.from(fromString) : null;
+        if (fromString != null) {
+            try {
+                return Date.from(fromString);
+            } catch (Exception e) {
+                LOGGER.warn(dateString, e);
+            }
+        }
+        return null;
     }
 
     public static Instant getInstantFromISO8601String(String dateString) {
@@ -54,7 +61,7 @@ public class JobSchedulerDate {
                 //better: dateString can have arbitrary offsets
                 //fromString = Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateString).getTimeInMillis());
                 // JobScheduler responses max or min time but means 'never'
-                if (fromString == null || fromString.getEpochSecond() == 0 || fromString.getEpochSecond() == Long.MAX_VALUE) {
+                if (fromString == null || fromString.getEpochSecond() <= 0 || fromString.getEpochSecond() >= Instant.MAX.getEpochSecond()) {
                     fromString = null;
                 }
             } catch (DateTimeParseException e) {
