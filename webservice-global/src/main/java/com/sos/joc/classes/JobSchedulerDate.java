@@ -61,7 +61,9 @@ public class JobSchedulerDate {
                 //better: dateString can have arbitrary offsets
                 //fromString = Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateString).getTimeInMillis());
                 // JobScheduler responses max or min time but means 'never'
-                if (fromString == null || fromString.getEpochSecond() <= 0 || fromString.getEpochSecond() >= Instant.MAX.getEpochSecond()) {
+                //if (fromString == null || fromString.getEpochSecond() <= 0 || fromString.getEpochSecond() >= Instant.MAX.getEpochSecond()) {
+                //highest date  in C++ (JobScheduler1) -> 2038-01-19 <=> (2^31)-1 
+                if (fromString == null || fromString.getEpochSecond() <= 0 || fromString.getEpochSecond() >= 2147483647L) {
                     fromString = null;
                 }
             } catch (DateTimeParseException e) {
