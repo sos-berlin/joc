@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.hibernate.query.Query;
 
@@ -87,18 +88,16 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append("select new ").append(ProcessClassJob.class.getName()).append(" (id, processClassName) from ");
             sql.append(DBITEM_INVENTORY_JOBS);
             sql.append(" where instanceId = :instanceId");
-            sql.append(" and processClassId != 0");
+            sql.append(" and processClassName != :processClassName");
             sql.append(" and isOrderJob = 1");
             Query<ProcessClassJob> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
+            query.setParameter("processClassName", DBLayer.DEFAULT_NAME);
             List<ProcessClassJob> result = getSession().getResultList(query);
-            Map<Long, String> processClassJobs = new HashMap<Long, String>();
             if (result != null) {
-                for (ProcessClassJob processClassJob : result) {
-                    processClassJobs.put(processClassJob.getId(), processClassJob.getProcessClassName());
-                }
+                return result.stream().collect(Collectors.toMap(ProcessClassJob::getId, ProcessClassJob::getProcessClassName));
             }
-            return processClassJobs;
+            return new HashMap<Long, String>();
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
