@@ -54,7 +54,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             folderPermissions.setForce(treeBody.getForce());
             
             
-            if (treeBody.getTypes().get(0) == JobSchedulerObjectType.WORKINGDAYSCALENDAR) {
+            if (treeBody.getTypes().size() > 0 && treeBody.getTypes().get(0) == JobSchedulerObjectType.WORKINGDAYSCALENDAR) {
                 folderPermissions = jobschedulerUser.getSosShiroCurrentUser().getSosShiroCalendarFolderPermissions();
                 folderPermissions.setSchedulerId(treeBody.getJobschedulerId());
             }
