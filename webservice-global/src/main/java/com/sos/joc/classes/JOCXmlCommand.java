@@ -90,18 +90,27 @@ public class JOCXmlCommand extends SOSXmlCommand {
     }
     
     public Date getSurveyDate() {
-        if (surveyDate == null || "".equals(surveyDate)) {
+        if (surveyDate == null) {
             try {
-                String surveyDateStr = getSosxml().selectSingleNodeValue("/spooler/answer/@time");
-                surveyDate = JobSchedulerDate.getDateFromISO8601String(surveyDateStr);
-                if(surveyDate == null) {
-                    surveyDate = Date.from(Instant.now()); 
-                }
+                surveyDate = Date.from(getSurveyInstant()); 
             } catch (Exception e) {
                 surveyDate = Date.from(Instant.now());
             }
         }
         return surveyDate;
+    }
+    
+    public Instant getSurveyInstant() {
+        Instant surveyInstant = null;
+        try {
+            String surveyDateStr = getSosxml().selectSingleNodeValue("/spooler/answer/@time");
+            surveyInstant = JobSchedulerDate.getInstantFromISO8601String(surveyDateStr);
+        } catch (Exception e) {
+        }
+        if (surveyInstant == null) {
+            surveyInstant = Instant.now();
+        }
+        return surveyInstant;
     }
     
     public URI getUriForJsonCommand() {
