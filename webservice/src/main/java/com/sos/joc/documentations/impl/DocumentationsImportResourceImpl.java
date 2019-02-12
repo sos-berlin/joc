@@ -44,6 +44,7 @@ import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentations.resource.IDocumentationsImportResource;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -198,7 +199,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
                         }
                     }
                 }
-            } catch (JocConfigurationException | DBConnectionRefusedException e) {
+            } catch (JocConfigurationException | DBOpenSessionException | DBConnectionRefusedException e) {
                 throw e;
             } catch (Exception e) {
                 LOGGER.warn("Problem at import documentation usages", e);
@@ -247,7 +248,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
     }
 
     private void saveOrUpdate(DBItemDocumentation doc) throws DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException,
-            JocConfigurationException {
+            JocConfigurationException, DBOpenSessionException {
         if (connection == null) {
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
         }
@@ -278,7 +279,7 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
     }
 
     private void readZipFileContent(InputStream inputStream, DocumentationImport filter) throws DBConnectionRefusedException, DBInvalidDataException,
-            SOSHibernateException, IOException, JocUnsupportedFileTypeException, JocConfigurationException {
+            SOSHibernateException, IOException, JocUnsupportedFileTypeException, JocConfigurationException, DBOpenSessionException {
         ZipInputStream zipStream = null;
         Set<DBItemDocumentation> documentations = new HashSet<DBItemDocumentation>();
         try {

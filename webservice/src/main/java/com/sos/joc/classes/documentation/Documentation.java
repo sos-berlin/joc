@@ -13,6 +13,7 @@ import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.CalendarType;
@@ -22,7 +23,7 @@ public class Documentation {
 
     public static void assignDocu(String jobschedulerId, String jsObjectPath, String docPath, JobSchedulerObjectType objType, String apiCall)
             throws JocMissingRequiredParameterException, JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException,
-            SOSHibernateException
+            SOSHibernateException, DBOpenSessionException
              {
         SOSHibernateSession connection = null;
         try {
@@ -61,7 +62,7 @@ public class Documentation {
     }
 
     public static void unassignDocu(String jobschedulerId, String jsObjectPath, JobSchedulerObjectType objType, String apiCall)
-            throws JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException {
+            throws JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException, DBOpenSessionException {
         SOSHibernateSession connection = null;
         try {
             connection = Globals.createSosHibernateStatelessConnection(apiCall);
