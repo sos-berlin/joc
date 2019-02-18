@@ -8,7 +8,7 @@
     "deliveryDate",
     "forceCommentsForAuditLog",
     "comments",
-    "hideMainMenu"
+    "showViews"
   ],
   "properties": {
     "deliveryDate": {
