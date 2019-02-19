@@ -1,0 +1,47 @@
+{
+  "title": "agent configuration",
+  "id": "schemas/agent/configuration",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.agent.AgentConfiguration",
+  "xmlElement": "process_class",
+  "type": "object",
+  "required": [
+    "maxProcesses"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "maxProcesses": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "select": {
+      "description": "first, next",
+      "type": "string"
+    },
+    "remoteScheduler": {
+      "type": "string"
+    },
+    "remoteSchedulers": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.agent.RemoteScheduler",
+        "type": "object",
+        "required": [
+          "remoteScheduler"
+        ],
+        "properties": {
+          "remoteScheduler": {
+            "type": "string"
+          },
+          "httpHeartbeatTimeout": {
+            "$ref": "../common/nonNegativeInteger-schema.json" 
+          },
+          "httpHeartbeatPeriod": {
+            "$ref": "../common/nonNegativeInteger-schema.json" 
+          }
+        }
+      }
+    }
+  }
+}

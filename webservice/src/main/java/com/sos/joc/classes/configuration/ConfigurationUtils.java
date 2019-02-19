@@ -1,5 +1,6 @@
 package com.sos.joc.classes.configuration;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 
@@ -99,6 +100,26 @@ public class ConfigurationUtils {
         } finally {
             try {
                 writer.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+    
+    public static byte[] getSourceXmlBytes(Node sourceNode) throws JobSchedulerBadRequestException {
+        if (sourceNode == null) {
+            throw new JobSchedulerBadRequestException("No configuration found.");
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.transform(new DOMSource(sourceNode), new StreamResult(out));
+            return out.toByteArray();
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(e);
+        } finally {
+            try {
+                out.close();
             } catch (Exception e) {
             }
         }

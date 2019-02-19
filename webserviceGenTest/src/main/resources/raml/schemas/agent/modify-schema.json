@@ -1,0 +1,20 @@
+{
+  "title": "agent modify",
+  "id": "schemas/agent/modify",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.agent.ModifyAgent",
+  "xmlElement": "modify_hot_folder",
+  "type": "object",
+  "required": [
+    "folder",
+    "processClass"
+  ],
+  "properties": {
+    "folder": {
+      "$ref": "../common/path-schema.json"
+    },
+    "processClass": {
+      "$ref": "configuration-schema.json"
+    }
+  }
+}

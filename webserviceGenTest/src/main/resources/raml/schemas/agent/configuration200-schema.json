@@ -1,0 +1,29 @@
+{
+  "title": "agent configuration",
+  "id": "schemas/agent/configuration200",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.agent.AgentConfiguration200",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "path",
+    "configuration"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "configurationDate": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "configuration": {
+      "$ref": "configuration-schema.json"
+    }
+  }
+}
