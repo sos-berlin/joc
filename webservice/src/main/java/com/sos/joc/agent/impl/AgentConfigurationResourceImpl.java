@@ -3,6 +3,7 @@ package com.sos.joc.agent.impl;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
@@ -10,6 +11,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.Globals;
 import com.sos.joc.agent.resource.IAgentConfigurationResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -17,6 +21,11 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBOpenSessionException;
+import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.agent.AgentConfiguration;
@@ -76,18 +85,25 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             if (agent == null) {
                 throw new JocMissingRequiredParameterException("undefined 'configuration'");
             }
-
+            if (agent.getRemoteSchedulers() != null && agent.getRemoteSchedulers().isEmpty()) {
+                agent.setRemoteSchedulers(null);
+            }
+            
             java.nio.file.Path path = Paths.get(configuration.getPath());
             agent.setName(path.getFileName().toString());
             
             ModifyAgent modifyAgent = new ModifyAgent();
             modifyAgent.setFolder(path.getParent().toString().replace('\\', '/'));
             modifyAgent.setProcessClass(agent);
-
+            
+            String command = new XmlMapper().writeValueAsString(modifyAgent).replaceAll("<remote_schedulers ", "<remote_scheduler ");
+            
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(new XmlMapper().writeValueAsString(modifyAgent), accessToken);
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
-            return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
+            updateOtherClusterMembers("save", command, configuration.getJobschedulerId());
+            
+            return null;
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -109,12 +125,45 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
             
+            updateOtherClusterMembers("delete", command, agentFilter.getJobschedulerId());
+            
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }
+    }
+    
+    private void updateOtherClusterMembers(String identifier, String command, String jobSchedulerId) throws JocConfigurationException,
+            DBOpenSessionException, DBInvalidDataException, DBConnectionRefusedException {
+        if (!"standalone".equals(dbItemInventoryInstance.getClusterType())) {
+            //ask db for other cluster members
+            SOSHibernateSession connection = null;
+            JOCXmlCommand jocXmlCommand = null;
+            try {
+                connection = Globals.createSosHibernateStatelessConnection(API_CALL + identifier);
+                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+                List<DBItemInventoryInstance> clusterMembers = dbLayer.getInventoryInstancesBySchedulerId(jobSchedulerId);
+                if (clusterMembers != null) {
+                    for (DBItemInventoryInstance clusterMember : clusterMembers) {
+                        if (dbItemInventoryInstance.getId() == clusterMember.getId()) {
+                            // current JobScheduler is already updated (see above)
+                            continue;
+                        }
+                        try {
+                            clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
+                            jocXmlCommand = new JOCXmlCommand(clusterMember);
+                            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, getAccessToken());
+                        } catch (Exception e) {
+                            //if error then store agent conf in db for inventory plugin
+                        }
+                    }
+                }
+            } finally {
+                Globals.disconnect(connection);
+            }
         }
     }
 

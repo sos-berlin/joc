@@ -106,15 +106,15 @@ public class ValidateXMLTest {
         String json = "{\"maxProcesses\":10,\"remoteSchedulers\":[{\"remoteScheduler\":\"http://127.0.0.2:5000\",\"httpHeartbeatTimeout\":15,\"httpHeartbeatPeriod\":10},{\"remoteScheduler\":\"http://127.0.0.2:5001\"}]}";
         ObjectMapper jsonMapper = new ObjectMapper();
         AgentConfiguration agent = jsonMapper.readValue(json, AgentConfiguration.class);
-        Path p = Paths.get("/agent/test");
+        Path p = Paths.get("/agents/test");
         agent.setName(p.getFileName().toString());
         ModifyAgent modifyAgent = new ModifyAgent();
         modifyAgent.setFolder(p.getParent().toString().replace('\\', '/'));
         modifyAgent.setProcessClass(agent);
         XmlMapper xmlMapper = new XmlMapper();
-        String xml = xmlMapper.writeValueAsString(modifyAgent);
+        String xml = xmlMapper.writeValueAsString(modifyAgent).replaceAll("<remote_schedulers ", "<remote_scheduler ");
         System.out.println(xml);
-        String expected = "<modify_hot_folder folder=\"/agents\"><process_class name=\"test\" max_processes=\"10\"><remote_schedulers><remote_schedulers remote_scheduler=\"http://127.0.0.2:5000\" http_heartbeat_timeout=\"15\" http_heartbeat_period=\"10\"/><remote_schedulers remote_scheduler=\"http://127.0.0.2:5001\"/></remote_schedulers></process_class></modify_hot_folder>";
+        String expected = "<modify_hot_folder folder=\"/agents\"><process_class name=\"test\" max_processes=\"10\"><remote_schedulers><remote_scheduler remote_scheduler=\"http://127.0.0.2:5000\" http_heartbeat_timeout=\"15\" http_heartbeat_period=\"10\"/><remote_scheduler remote_scheduler=\"http://127.0.0.2:5001\"/></remote_schedulers></process_class></modify_hot_folder>";
         Assert.assertEquals(expected, xml);
     }
     

@@ -413,6 +413,8 @@ public class SOSPermissionsCreator {
                     "sos:products:joc_cockpit:process_class:view:documentation"));
             sosPermissionJocCockpit.getProcessClass().setAssignDocumentation(haveRight(masterId,
                     "sos:products:joc_cockpit:process_class:assign_documentation"));
+            sosPermissionJocCockpit.getProcessClass().getChange().setHotFolder(haveRight(masterId,
+                    "sos:products:joc_cockpit:process_class:change:hot_folder"));
 
             sosPermissionJocCockpit.getSchedule().getView().setConfiguration(haveRight(masterId,
                     "sos:products:joc_cockpit:schedule:view:configuration"));
