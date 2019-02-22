@@ -189,7 +189,7 @@
 										<exclude>user/*.json</exclude>
 										<exclude>jobschedulerEvent/*.json</exclude>
 										<exclude>calendar/*.json</exclude>
-										<exclude>agent/*.json</exclude>
+										<exclude>agentCluster/*.json</exclude>
 									</excludes>
 								</configuration>
 								<goals>
@@ -243,7 +243,7 @@
 									<initializeCollections>false</initializeCollections>
 									<includeAdditionalProperties>false</includeAdditionalProperties>
 									<includes>
-										<include>agent/*.json</include>
+										<include>agentCluster/*.json</include>
 									</includes>
 								</configuration>
 								<goals>

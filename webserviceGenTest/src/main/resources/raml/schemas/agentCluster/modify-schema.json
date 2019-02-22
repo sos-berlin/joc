@@ -1,8 +1,8 @@
 {
-  "title": "agent modify",
-  "id": "schemas/agent/modify",
+  "title": "processClass modify",
+  "id": "schemas/agentCluster/modify",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.agent.ModifyAgent",
+  "javaType": "com.sos.joc.model.processClass.ModifyProcessClass",
   "xmlElement": "modify_hot_folder",
   "type": "object",
   "required": [

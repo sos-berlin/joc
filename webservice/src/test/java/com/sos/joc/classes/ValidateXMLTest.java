@@ -16,9 +16,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
-import com.sos.joc.model.agent.AgentConfiguration;
-import com.sos.joc.model.agent.ModifyAgent;
 import com.sos.joc.model.job.JobsV;
+import com.sos.joc.model.processClass.Configuration;
+import com.sos.joc.model.processClass.ModifyProcessClass;
 
 public class ValidateXMLTest {
     
@@ -93,7 +93,7 @@ public class ValidateXMLTest {
     public void xml2jsonTestWithAgentObject() throws JsonProcessingException, IOException {
         String xml = "<process_class  max_processes=\"10\"><remote_schedulers><remote_scheduler remote_scheduler=\"http://127.0.0.2:5000\" http_heartbeat_period=\"10\" http_heartbeat_timeout=\"15\"/><remote_scheduler remote_scheduler=\"http://127.0.0.2:5001\"/></remote_schedulers></process_class>";
         XmlMapper xmlMapper = new XmlMapper();
-        AgentConfiguration agent = xmlMapper.readValue(xml.getBytes(), AgentConfiguration.class);
+        Configuration agent = xmlMapper.readValue(xml.getBytes(), Configuration.class);
         ObjectMapper jsonMapper = new ObjectMapper();
         String json = jsonMapper.writeValueAsString(agent);
         System.out.println(json);
@@ -105,10 +105,10 @@ public class ValidateXMLTest {
     public void json2xmlTestWithAgentObject() throws JsonProcessingException, IOException {
         String json = "{\"maxProcesses\":10,\"remoteSchedulers\":[{\"remoteScheduler\":\"http://127.0.0.2:5000\",\"httpHeartbeatTimeout\":15,\"httpHeartbeatPeriod\":10},{\"remoteScheduler\":\"http://127.0.0.2:5001\"}]}";
         ObjectMapper jsonMapper = new ObjectMapper();
-        AgentConfiguration agent = jsonMapper.readValue(json, AgentConfiguration.class);
+        Configuration agent = jsonMapper.readValue(json, Configuration.class);
         Path p = Paths.get("/agents/test");
         agent.setName(p.getFileName().toString());
-        ModifyAgent modifyAgent = new ModifyAgent();
+        ModifyProcessClass modifyAgent = new ModifyProcessClass();
         modifyAgent.setFolder(p.getParent().toString().replace('\\', '/'));
         modifyAgent.setProcessClass(agent);
         XmlMapper xmlMapper = new XmlMapper();

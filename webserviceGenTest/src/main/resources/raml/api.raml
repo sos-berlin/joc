@@ -89,6 +89,7 @@ resourceTypes:
   - modifyJobChainNode: !include resourceTypes/jobChain/modifyNode.raml
   - modifyCalendar: !include resourceTypes/calendar/modify.raml
   - loginConfiguration: !include resourceTypes/configuration/login.raml
+  - editProcessClass: !include resourceTypes/processClass/edit.raml
   
 
 traits:
@@ -1903,7 +1904,41 @@ traits:
           schema: !include schemas/processClass/processClassDocuFilter-schema.json
           example: TODO
           audit: !include documentation/audit/auditLog.md
-
+  /read:
+    type:
+      postJSON:
+        description: read process class configuration
+        description1: !include documentation/processClass/processClassRequired.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: Returns the process class configuration in a Json representation
+        schema: !include schemas/processClass/processClassConfigurationFilter-schema.json
+        schema200: !include schemas/agentCluster/configurationEdit-schema.json
+        example: " "
+        example200: " "
+  /save:
+    type:
+      editProcessClass:
+        description: add or overwrite process class configuration
+        description1: |
+          <tr><td>``configuration``</td><td>required, object</td><td>JSON repesentation of a process class</td><td></td><td></td></tr>
+        schema: !include schemas/agentCluster/configurationEdit-schema.json
+        audit: !include documentation/audit/auditLog.md
+  /delete: 
+    type:
+      editProcessClass:
+        description: delete process class configuration
+        description1: " " 
+        schema: !include schemas/agentCluster/configurationEdit-schema.json 
+        audit: !include documentation/audit/auditLog.md    
+                   
 /plan:
   type:
     postJSON:

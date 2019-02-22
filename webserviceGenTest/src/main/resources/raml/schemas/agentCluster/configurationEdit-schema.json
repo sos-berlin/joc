@@ -1,12 +1,12 @@
 {
-  "title": "agent configuration",
-  "id": "schemas/agent/configuration200",
+  "title": "edit processClass configuration",
+  "id": "schemas/agentCluster/configurationEdit",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.agent.AgentConfiguration200",
+  "javaType": "com.sos.joc.model.processClass.ConfigurationEdit",
   "type": "object",
   "required": [
     "jobschedulerId",
-    "path",
+    "processClass",
     "configuration"
   ],
   "properties": {
@@ -19,11 +19,14 @@
     "jobschedulerId": {
       "type": "string"
     },
-    "path": {
+    "processClass": {
       "$ref": "../common/path-schema.json"
     },
     "configuration": {
       "$ref": "configuration-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
     }
   }
 }

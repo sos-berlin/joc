@@ -26,6 +26,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.MofifyProcessClassAudit;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.submissions.SubmissionsDBLayer;
@@ -35,41 +36,41 @@ import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.agent.AgentConfiguration;
-import com.sos.joc.model.agent.AgentConfiguration200;
-import com.sos.joc.model.agent.AgentConfigurationFilter;
-import com.sos.joc.model.agent.ModifyAgent;
+import com.sos.joc.model.processClass.Configuration;
+import com.sos.joc.model.processClass.ConfigurationEdit;
+import com.sos.joc.model.processClass.ModifyProcessClass;
+import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 
-@Path("agent")
+@Path("process_class")
 public class AgentConfigurationResourceImpl extends JOCResourceImpl implements IAgentConfigurationResource {
 
-    private static final String API_CALL = "./agent/";
+    private static final String API_CALL = "./process_class/";
     private static final String FILE_EXTENSION = ".process_class.xml";
 
     @Override
-    public JOCDefaultResponse readAgentConfiguration(String accessToken, AgentConfigurationFilter agentFilter) throws Exception {
+    public JOCDefaultResponse readAgentConfiguration(String accessToken, ProcessClassConfigurationFilter agentFilter) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "read", agentFilter, accessToken, agentFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken).getProcessClass().getView().isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("path", agentFilter.getPath());
+            checkRequiredParameter("processClass", agentFilter.getProcessClass());
 
-            AgentConfiguration200 entity = new AgentConfiguration200();
+            ConfigurationEdit entity = new ConfigurationEdit();
             entity.setJobschedulerId(agentFilter.getJobschedulerId());
-            entity.setPath(normalizePath(agentFilter.getPath()));
+            entity.setProcessClass(normalizePath(agentFilter.getProcessClass()));
 
-            String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']/source/process_class", entity.getPath());
+            String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']/source/process_class", entity.getProcessClass());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-            String command = jocXmlCommand.getShowStateCommand("folder process_class", "folders no_subfolders source", getParent(entity.getPath()));
+            String command = jocXmlCommand.getShowStateCommand("folder process_class", "folders no_subfolders source", getParent(entity.getProcessClass()));
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
             Node sourceNode = jocXmlCommand.getSosxml().selectSingleNode(xPath);
             Element fileBased = (Element) jocXmlCommand.getSosxml().selectSingleNode(sourceNode.getParentNode().getParentNode(), "file_based");
             if (fileBased != null) {
                 entity.setConfigurationDate(JobSchedulerDate.getDateFromISO8601String(fileBased.getAttribute("last_write_time")));
             }
-            entity.setConfiguration(new XmlMapper().readValue(ConfigurationUtils.getSourceXmlBytes(sourceNode), AgentConfiguration.class));
+            entity.setConfiguration(new XmlMapper().readValue(ConfigurationUtils.getSourceXmlBytes(sourceNode), Configuration.class));
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -81,15 +82,15 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
     }
 
     @Override
-    public JOCDefaultResponse saveAgentConfiguration(String accessToken, AgentConfiguration200 configuration) throws Exception {
+    public JOCDefaultResponse saveAgentConfiguration(String accessToken, ConfigurationEdit configuration) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "save", configuration, accessToken, configuration.getJobschedulerId(),
                     getPermissonsJocCockpit(configuration.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("path", configuration.getPath());
-            AgentConfiguration agent = configuration.getConfiguration();
+            checkRequiredParameter("processClass", configuration.getProcessClass());
+            Configuration agent = configuration.getConfiguration();
             if (agent == null) {
                 throw new JocMissingRequiredParameterException("undefined 'configuration'");
             }
@@ -97,20 +98,24 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
                 agent.setRemoteSchedulers(null);
             }
 
-            java.nio.file.Path path = Paths.get(configuration.getPath());
+            java.nio.file.Path path = Paths.get(configuration.getProcessClass());
             agent.setName(path.getFileName().toString());
 
-            ModifyAgent modifyAgent = new ModifyAgent();
+            ModifyProcessClass modifyAgent = new ModifyProcessClass();
             modifyAgent.setFolder(path.getParent().toString().replace('\\', '/'));
             modifyAgent.setProcessClass(agent);
+            
+            MofifyProcessClassAudit audit = new MofifyProcessClassAudit(configuration);
+            logAuditMessage(audit);
 
             String command = new XmlMapper().writeValueAsString(modifyAgent).replaceAll("<remote_schedulers ", "<remote_scheduler ");
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
+            storeAuditLogEntry(audit);
             updateAtOtherClusterMembers("save", command, configuration, agent);
-
+            
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -121,18 +126,23 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
     }
 
     @Override
-    public JOCDefaultResponse deleteAgentConfiguration(String accessToken, AgentConfigurationFilter agentFilter) throws Exception {
+    public JOCDefaultResponse deleteAgentConfiguration(String accessToken, ConfigurationEdit agentFilter) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "delete", agentFilter, accessToken, agentFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("path", agentFilter.getPath());
-            String command = XMLBuilder.create("process_class.remove").addAttribute("process_class", agentFilter.getPath()).asXML();
+            checkRequiredParameter("processClass", agentFilter.getProcessClass());
+            String command = XMLBuilder.create("process_class.remove").addAttribute("process_class", agentFilter.getProcessClass()).asXML();
+            
+            MofifyProcessClassAudit audit = new MofifyProcessClassAudit(agentFilter);
+            logAuditMessage(audit);
+            
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
+            storeAuditLogEntry(audit);
             deleteAtOtherClusterMembers("delete", command, agentFilter);
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
@@ -144,23 +154,25 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
         }
     }
 
-    private void deleteAtOtherClusterMembers(String identifier, String command, AgentConfigurationFilter agentFilter)
+    private void deleteAtOtherClusterMembers(String identifier, String command, ConfigurationEdit agentFilter)
             throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException, DBConnectionRefusedException {
+        
         if (!"standalone".equals(dbItemInventoryInstance.getClusterType())) {
             DBItemSubmittedObject dbItem = new DBItemSubmittedObject();
             dbItem.setSchedulerId(agentFilter.getJobschedulerId());
-            dbItem.setPath(agentFilter.getPath() + FILE_EXTENSION);
+            dbItem.setPath(agentFilter.getProcessClass() + FILE_EXTENSION);
             dbItem.setToDelete(true);
             updateOtherClusterMembers(identifier, command, dbItem);
         }
     }
 
-    private void updateAtOtherClusterMembers(String identifier, String command, AgentConfiguration200 configuration, AgentConfiguration agent)
+    private void updateAtOtherClusterMembers(String identifier, String command, ConfigurationEdit configuration, Configuration agent)
             throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException, DBConnectionRefusedException, JsonProcessingException {
+        
         if (!"standalone".equals(dbItemInventoryInstance.getClusterType())) {
             DBItemSubmittedObject dbItem = new DBItemSubmittedObject();
             dbItem.setSchedulerId(configuration.getJobschedulerId());
-            dbItem.setPath(configuration.getPath() + FILE_EXTENSION);
+            dbItem.setPath(configuration.getProcessClass() + FILE_EXTENSION);
             dbItem.setToDelete(false);
             agent.setName(null);
             ObjectMapper xmlMapper = new XmlMapper();
