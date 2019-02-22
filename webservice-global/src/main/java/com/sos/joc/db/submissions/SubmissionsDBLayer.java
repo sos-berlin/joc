@@ -61,15 +61,15 @@ public class SubmissionsDBLayer extends DBLayer {
         }
     }
 
-    public DBItemSubmittedObject getSubmittedObject(String jobschedulerId, String path) throws DBConnectionRefusedException,
+    public DBItemSubmittedObject getSubmittedObject(String schedulerId, String path) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_SUBMITTED_OBJECTS);
-            sql.append(" where jobschedulerId = :jobschedulerId");
+            sql.append(" where schedulerId = :schedulerId");
             sql.append(" and path = :path");
             Query<DBItemSubmittedObject> query = getSession().createQuery(sql.toString());
-            query.setParameter("jobschedulerId", jobschedulerId);
+            query.setParameter("schedulerId", schedulerId);
             query.setParameter("path", path);
             return getSession().getSingleResult(query);
         } catch (SOSHibernateInvalidSessionException ex) {

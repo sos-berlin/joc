@@ -12,6 +12,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -44,7 +45,6 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
     private static final String API_CALL = "./agent/";
     private static final String FILE_EXTENSION = ".process_class.xml";
-    private XmlMapper xmlMapper = new XmlMapper();
 
     @Override
     public JOCDefaultResponse readAgentConfiguration(String accessToken, AgentConfigurationFilter agentFilter) throws Exception {
@@ -69,13 +69,13 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             if (fileBased != null) {
                 entity.setConfigurationDate(JobSchedulerDate.getDateFromISO8601String(fileBased.getAttribute("last_write_time")));
             }
-            entity.setConfiguration(xmlMapper.readValue(ConfigurationUtils.getSourceXmlBytes(sourceNode), AgentConfiguration.class));
+            entity.setConfiguration(new XmlMapper().readValue(ConfigurationUtils.getSourceXmlBytes(sourceNode), AgentConfiguration.class));
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
@@ -104,18 +104,18 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             modifyAgent.setFolder(path.getParent().toString().replace('\\', '/'));
             modifyAgent.setProcessClass(agent);
 
-            String command = xmlMapper.writeValueAsString(modifyAgent).replaceAll("<remote_schedulers ", "<remote_scheduler ");
+            String command = new XmlMapper().writeValueAsString(modifyAgent).replaceAll("<remote_schedulers ", "<remote_scheduler ");
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
             updateAtOtherClusterMembers("save", command, configuration, agent);
 
-            return null;
+            return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
@@ -139,7 +139,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
@@ -163,6 +163,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             dbItem.setPath(configuration.getPath() + FILE_EXTENSION);
             dbItem.setToDelete(false);
             agent.setName(null);
+            ObjectMapper xmlMapper = new XmlMapper();
             xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, Boolean.TRUE);
             String agentXml = xmlMapper.writeValueAsString(agent).replaceAll("<remote_schedulers ", "<remote_scheduler ");
             //dbItem.setContent("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n\n" + agentXml);
@@ -200,7 +201,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
                         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, getAccessToken());
                     } catch (Exception e) {
                         // if error then store agent conf in db for inventory plugin
-                        if (agentIsUpdated) {
+                        if (!agentIsUpdated) {
                             dbItem = dbSubmissionsLayer.saveOrUpdateSubmittedObject(dbItem);
                             agentIsUpdated = true;
                         }
