@@ -32,7 +32,7 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    jobsFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
+                    jobsFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
