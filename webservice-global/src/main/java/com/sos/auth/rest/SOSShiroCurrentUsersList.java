@@ -1,14 +1,17 @@
 package com.sos.auth.rest;
 
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.shiro.ShiroException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SOSShiroCurrentUsersList {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSShiroCurrentUsersList.class);
     private static final String VALID = "valid";
     private static final String NOT_VALID = "not-valid";
     private Map<String, SOSShiroCurrentUser> currentUsers;
@@ -31,9 +34,11 @@ public class SOSShiroCurrentUsersList {
 
     public void removeTimedOutUser(String user) {
 
-        CopyOnWriteArrayList<String> toBeRemoved = new CopyOnWriteArrayList<String>();
+        ArrayList<String> toBeRemoved = new ArrayList<String>();
+        Map<String, SOSShiroCurrentUser> currentUsersShadow = new HashMap<String, SOSShiroCurrentUser>();
+        currentUsersShadow.putAll(currentUsers);
 
-        for (Map.Entry<String, SOSShiroCurrentUser> entry : currentUsers.entrySet()) {
+        for (Map.Entry<String, SOSShiroCurrentUser> entry : currentUsersShadow.entrySet()) {
             boolean found = user.equals(entry.getValue().getUsername());
             if (found) {
 
@@ -46,12 +51,18 @@ public class SOSShiroCurrentUsersList {
                 }
             }
         }
-        
+
         Iterator<String> it = toBeRemoved.iterator();
+        String accessToken = "";
         while (it.hasNext()) {
-            currentUsers.remove(it.next()); 
+            try {
+                accessToken = it.next();
+                currentUsers.remove(accessToken);
+            } catch (ConcurrentModificationException e) {
+                LOGGER.info("Removing timeouted user will be defered: " + accessToken);
+            }
         }
-         
+
     }
 
     public SOSShiroCurrentUserAnswer getUserByName(String user) {
