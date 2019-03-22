@@ -185,7 +185,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     }
     
     private List<JobChainV> getJobChains(String command, JobChainsFilter jobChainsFilter, String xPath) throws Exception {
-        executePostWithThrowBadRequestAfterRetry(command, accessToken);
+        executePostWithRetry(command, accessToken);
         NodeList jobChainNodes = getSosxml().selectNodeList(xPath);
         LOGGER.debug("..." + jobChainNodes.getLength() + " job chains found");
         
