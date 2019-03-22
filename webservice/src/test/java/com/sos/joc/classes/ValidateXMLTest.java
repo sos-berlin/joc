@@ -91,19 +91,20 @@ public class ValidateXMLTest {
     
     @Test
     public void xml2jsonTestWithAgentObject() throws JsonProcessingException, IOException {
-        String xml = "<process_class  max_processes=\"10\"><remote_schedulers><remote_scheduler remote_scheduler=\"http://127.0.0.2:5000\" http_heartbeat_period=\"10\" http_heartbeat_timeout=\"15\"/><remote_scheduler remote_scheduler=\"http://127.0.0.2:5001\"/></remote_schedulers></process_class>";
+        String xml = "<process_class  max_processes=\"10\" timeout=\"30\"><remote_schedulers select=\"first\"><remote_scheduler remote_scheduler=\"http://127.0.0.2:5000\" http_heartbeat_period=\"10\" http_heartbeat_timeout=\"15\"/><remote_scheduler remote_scheduler=\"http://127.0.0.2:5001\"/></remote_schedulers></process_class>";
         XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         Configuration agent = xmlMapper.readValue(xml.getBytes(), Configuration.class);
         ObjectMapper jsonMapper = new ObjectMapper();
         String json = jsonMapper.writeValueAsString(agent);
         System.out.println(json);
-        String expected = "{\"maxProcesses\":10,\"remoteSchedulers\":[{\"remoteScheduler\":\"http://127.0.0.2:5000\",\"httpHeartbeatTimeout\":15,\"httpHeartbeatPeriod\":10},{\"remoteScheduler\":\"http://127.0.0.2:5001\"}]}";
+        String expected = "{\"maxProcesses\":10,\"timeout\":30,\"remoteSchedulers\":{\"select\":\"first\",\"list\":[{\"remoteScheduler\":\"http://127.0.0.2:5000\",\"httpHeartbeatTimeout\":15,\"httpHeartbeatPeriod\":10},{\"remoteScheduler\":\"http://127.0.0.2:5001\"}]}}";
         Assert.assertEquals(expected, json);
     }
     
     @Test
     public void json2xmlTestWithAgentObject() throws JsonProcessingException, IOException {
-        String json = "{\"maxProcesses\":10,\"remoteSchedulers\":[{\"remoteScheduler\":\"http://127.0.0.2:5000\",\"httpHeartbeatTimeout\":15,\"httpHeartbeatPeriod\":10},{\"remoteScheduler\":\"http://127.0.0.2:5001\"}]}";
+        String json = "{\"maxProcesses\":10,\"timeout\":\"30\",\"remoteSchedulers\":{\"select\": \"first\", \"list\":[{\"remoteScheduler\":\"http://127.0.0.2:5000\",\"httpHeartbeatTimeout\":15,\"httpHeartbeatPeriod\":10},{\"remoteScheduler\":\"http://127.0.0.2:5001\"}]}}";
         ObjectMapper jsonMapper = new ObjectMapper();
         Configuration agent = jsonMapper.readValue(json, Configuration.class);
         Path p = Paths.get("/agents/test");
@@ -112,9 +113,9 @@ public class ValidateXMLTest {
         modifyAgent.setFolder(p.getParent().toString().replace('\\', '/'));
         modifyAgent.setProcessClass(agent);
         XmlMapper xmlMapper = new XmlMapper();
-        String xml = xmlMapper.writeValueAsString(modifyAgent).replaceAll("<remote_schedulers ", "<remote_scheduler ");
+        String xml = xmlMapper.writeValueAsString(modifyAgent);
         System.out.println(xml);
-        String expected = "<modify_hot_folder folder=\"/agents\"><process_class name=\"test\" max_processes=\"10\"><remote_schedulers><remote_scheduler remote_scheduler=\"http://127.0.0.2:5000\" http_heartbeat_timeout=\"15\" http_heartbeat_period=\"10\"/><remote_scheduler remote_scheduler=\"http://127.0.0.2:5001\"/></remote_schedulers></process_class></modify_hot_folder>";
+        String expected = "<modify_hot_folder folder=\"/agents\"><process_class name=\"test\" max_processes=\"10\" timeout=\"30\"><remote_schedulers select=\"first\"><remote_scheduler remote_scheduler=\"http://127.0.0.2:5000\" http_heartbeat_timeout=\"15\" http_heartbeat_period=\"10\"/><remote_scheduler remote_scheduler=\"http://127.0.0.2:5001\"/></remote_schedulers></process_class></modify_hot_folder>";
         Assert.assertEquals(expected, xml);
     }
     
