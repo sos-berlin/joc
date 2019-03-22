@@ -66,9 +66,6 @@ public class JacksonXMLAgentAnnotator extends AbstractAnnotator implements Annot
     }
 
     private String camelCaseToLowerUnderscore(String propertyName) {
-        if ("list".equals(propertyName)) {
-            return "remote_scheduler";
-        }
         return propertyName.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
     }
 
