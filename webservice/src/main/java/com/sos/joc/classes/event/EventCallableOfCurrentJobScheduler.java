@@ -229,91 +229,96 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                     continue;
                 } else if (eventType.equals("VariablesCustomEvent")) {
                     eventNotification = null;
-                    JsonObject variables = event.getJsonObject("variables");
-                    if (variables == null) {
-                        continue;
-                    }
-                    if (variables.containsKey("InventoryEventUpdateFinished")) {
-                        String[] eventKeyParts = eventKey.split(":", 2);
-                        eventSnapshot.setPath(eventKeyParts[1]);
-                        eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")));
-                        if (JobSchedulerObjectType.SCHEDULE == eventSnapshot.getObjectType()) {
-                            // JOC-242
-                            schedulePaths.add(eventSnapshot.getPath());
-                        }
-                        String FileBasedEventType = variables.getString("InventoryEventUpdateFinished", "FileBasedUpdated");
-                        switch (FileBasedEventType) {
-                        case "FileBasedUpdated":
-                            eventSnapshot.setEventType("FileBasedActivated");
-                            break;
-                        case "FileBasedRemoved":
-                            eventSnapshot.setEventType(FileBasedEventType);
-                            removedObjects.add(eventSnapshot.getPath() + "." + eventSnapshot.getObjectType().name());
-                            break;
-                        }
-
-                    } else if (variables.containsKey(CustomEventType.DailyPlanChanged.name())) {
-                        eventSnapshot.setEventType(CustomEventType.DailyPlanChanged.name());
+                    if ("InventoryInitialized".equals(eventKey)) {
+                        eventSnapshot.setEventType("InventoryInitialized");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
-                        eventSnapshot.setPath(eventSnapshot.getEventType());
-
-                    } else if (variables.containsKey(CustomEventType.ReportingChanged.name())) {
-                        switch (CustomEventTypeValue.valueOf(variables.getString(CustomEventType.ReportingChanged.name(), null))) {
-                        case order:
-                            eventSnapshot.setEventType(CustomEventType.ReportingChanged.name() + "Order");
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
-                            break;
-                        case standalone:
-                            eventSnapshot.setEventType(CustomEventType.ReportingChanged.name() + "Job");
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
-                            break;
-                        case order_standalone:
-                            eventSnapshot.setEventType(CustomEventType.ReportingChanged.name() + "Order");
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
-                            EventSnapshot eventSnapshot2 = new EventSnapshot();
-                            eventSnapshot2.setEventType(CustomEventType.ReportingChanged.name() + "Job");
-                            eventSnapshot2.setObjectType(JobSchedulerObjectType.JOB);
-                            eventSnapshot2.setPath(eventSnapshot2.getEventType());
-                            eventSnapshots.put(eventSnapshot2);
-                            break;
-                        }
-                        eventSnapshot.setPath(eventSnapshot.getEventType());
-                    } else if ("CalendarUsageUpdated".equals(eventKey)) {
-                        continue;
-                    } else if (eventKey.startsWith("Calendar")) {
-                        eventSnapshot.setEventType(eventKey); // CalendarUpdated, CalendarCreated, CalendarDeleted
-                        if (JobSchedulerObjectType.NONWORKINGDAYSCALENDAR.name().equals(variables.getString("objectType",
-                                JobSchedulerObjectType.WORKINGDAYSCALENDAR.name()))) {
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.NONWORKINGDAYSCALENDAR);
-                        } else {
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.WORKINGDAYSCALENDAR);
-                        }
-                        eventSnapshot.setPath(variables.getString("path", null));
-                        if (variables.getString("oldPath", null) != null) {
-                            eventSnapshot.setEventType("CalendarCreated");
-                            EventSnapshot eventSnapshot2 = new EventSnapshot();
-                            eventSnapshot2.setEventType("CalendarDeleted");
-                            eventSnapshot2.setObjectType(eventSnapshot.getObjectType());
-                            eventSnapshot2.setPath(variables.getString("oldPath", null));
-                            eventSnapshots.put(eventSnapshot2);
-                        }
-                    } else if (eventKey.startsWith("CustomEvent")) {
-                        eventSnapshot.setEventType(eventKey); // CustomEventAdded, CustomEventDeleted
-                        eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
-                        eventSnapshot.setPath(eventSnapshot.getEventType());
-                    } else if (eventKey.startsWith("YADE")) {
-                        if (eventKey.equals("YADETransferFinished")) {
-                            eventSnapshot.setEventType("YADETransferUpdated");
-                        } else {
-                            eventSnapshot.setEventType(eventKey); // YADETransferStarted, YADETransferUpdated, YADEFileStateChanged
-                        }
-                        eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
-                        //eventSnapshot.setPath(variables.getString("fileId", null));
-                        eventSnapshot.setPath(variables.getString("transferId", null));
+                        eventSnapshot.setPath("");
                     } else {
-                        continue;
-                    }
+                        JsonObject variables = event.getJsonObject("variables");
+                        if (variables == null) {
+                            continue;
+                        }
+                        if (variables.containsKey("InventoryEventUpdateFinished")) {
+                            String[] eventKeyParts = eventKey.split(":", 2);
+                            eventSnapshot.setPath(eventKeyParts[1]);
+                            eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")));
+                            if (JobSchedulerObjectType.SCHEDULE == eventSnapshot.getObjectType()) {
+                                // JOC-242
+                                schedulePaths.add(eventSnapshot.getPath());
+                            }
+                            String FileBasedEventType = variables.getString("InventoryEventUpdateFinished", "FileBasedUpdated");
+                            switch (FileBasedEventType) {
+                            case "FileBasedUpdated":
+                                eventSnapshot.setEventType("FileBasedActivated");
+                                break;
+                            case "FileBasedRemoved":
+                                eventSnapshot.setEventType(FileBasedEventType);
+                                removedObjects.add(eventSnapshot.getPath() + "." + eventSnapshot.getObjectType().name());
+                                break;
+                            }
 
+                        } else if (variables.containsKey(CustomEventType.DailyPlanChanged.name())) {
+                            eventSnapshot.setEventType(CustomEventType.DailyPlanChanged.name());
+                            eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
+                            eventSnapshot.setPath(eventSnapshot.getEventType());
+
+                        } else if (variables.containsKey(CustomEventType.ReportingChanged.name())) {
+                            switch (CustomEventTypeValue.valueOf(variables.getString(CustomEventType.ReportingChanged.name(), null))) {
+                            case order:
+                                eventSnapshot.setEventType(CustomEventType.ReportingChanged.name() + "Order");
+                                eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
+                                break;
+                            case standalone:
+                                eventSnapshot.setEventType(CustomEventType.ReportingChanged.name() + "Job");
+                                eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
+                                break;
+                            case order_standalone:
+                                eventSnapshot.setEventType(CustomEventType.ReportingChanged.name() + "Order");
+                                eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
+                                EventSnapshot eventSnapshot2 = new EventSnapshot();
+                                eventSnapshot2.setEventType(CustomEventType.ReportingChanged.name() + "Job");
+                                eventSnapshot2.setObjectType(JobSchedulerObjectType.JOB);
+                                eventSnapshot2.setPath(eventSnapshot2.getEventType());
+                                eventSnapshots.put(eventSnapshot2);
+                                break;
+                            }
+                            eventSnapshot.setPath(eventSnapshot.getEventType());
+                        } else if ("CalendarUsageUpdated".equals(eventKey)) {
+                            continue;
+                        } else if (eventKey.startsWith("Calendar")) {
+                            eventSnapshot.setEventType(eventKey); // CalendarUpdated, CalendarCreated, CalendarDeleted
+                            if (JobSchedulerObjectType.NONWORKINGDAYSCALENDAR.name().equals(variables.getString("objectType",
+                                    JobSchedulerObjectType.WORKINGDAYSCALENDAR.name()))) {
+                                eventSnapshot.setObjectType(JobSchedulerObjectType.NONWORKINGDAYSCALENDAR);
+                            } else {
+                                eventSnapshot.setObjectType(JobSchedulerObjectType.WORKINGDAYSCALENDAR);
+                            }
+                            eventSnapshot.setPath(variables.getString("path", null));
+                            if (variables.getString("oldPath", null) != null) {
+                                eventSnapshot.setEventType("CalendarCreated");
+                                EventSnapshot eventSnapshot2 = new EventSnapshot();
+                                eventSnapshot2.setEventType("CalendarDeleted");
+                                eventSnapshot2.setObjectType(eventSnapshot.getObjectType());
+                                eventSnapshot2.setPath(variables.getString("oldPath", null));
+                                eventSnapshots.put(eventSnapshot2);
+                            }
+                        } else if (eventKey.startsWith("CustomEvent")) {
+                            eventSnapshot.setEventType(eventKey); // CustomEventAdded, CustomEventDeleted
+                            eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
+                            eventSnapshot.setPath(eventSnapshot.getEventType());
+                        } else if (eventKey.startsWith("YADE")) {
+                            if (eventKey.equals("YADETransferFinished")) {
+                                eventSnapshot.setEventType("YADETransferUpdated");
+                            } else {
+                                eventSnapshot.setEventType(eventKey); // YADETransferStarted, YADETransferUpdated, YADEFileStateChanged
+                            }
+                            eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
+                            //eventSnapshot.setPath(variables.getString("fileId", null));
+                            eventSnapshot.setPath(variables.getString("transferId", null));
+                        } else {
+                            continue;
+                        }
+                    }
                 } else {
                     eventSnapshot.setPath(eventKey);
                     eventNotification.setPath(eventKey);
