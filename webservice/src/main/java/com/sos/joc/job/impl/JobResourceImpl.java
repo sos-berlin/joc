@@ -4,14 +4,19 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.classes.jobs.JobsVCallable;
+import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResource;
 import com.sos.joc.model.job.JobFilter;
+import com.sos.joc.model.job.JobStateText;
+import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.job.JobV200;
 
 @Path("job")
@@ -25,6 +30,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
 	}
 
 	public JOCDefaultResponse postJob(String accessToken, JobFilter jobFilter) throws Exception {
+	    SOSHibernateSession connection = null;
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
 					jobFilter.getJobschedulerId(),
@@ -35,18 +41,25 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
 			checkRequiredParameter("job", jobFilter.getJob());
 			String jobPath = normalizePath(jobFilter.getJob());
 			JobV200 entity = new JobV200();
+			JobV job = null;
 			
 			if (versionIsOlderThan("1.12.6")) {
 			    JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
-			    entity.setJob(jocXmlCommand.getJob(jobPath, jobFilter.getCompact(), jobFilter.getCompactView(), false));
+			    job = jocXmlCommand.getJob(jobPath, jobFilter.getCompact(), jobFilter.getCompactView(), false);
 			} else {
 			    JOCJsonCommand command = new JOCJsonCommand(this);
 	            command.setUriBuilderForJobs();
 	            command.addJobCompactQuery(jobFilter.getCompact());
 	            jobFilter.setJob(jobPath);
 	            JobsVCallable j = new JobsVCallable(jobFilter, command, accessToken, false, null);
-	            entity.setJob(j.getJob());
+	            job = j.getJob();
 			}
+			if (job != null && job.getState() != null && job.getState().get_text() == JobStateText.STOPPED) { //JOC-678
+			    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+	            AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
+	            job.getState().setManually(dbLayer.isManuallyStopped(jobFilter.getJobschedulerId(), job.getPath()));
+			}
+			entity.setJob(job);
 			entity.setDeliveryDate(new Date());
 			return JOCDefaultResponse.responseStatus200(entity);
 		} catch (JocException e) {
@@ -54,6 +67,8 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
 			return JOCDefaultResponse.responseStatusJSError(e);
 		} catch (Exception e) {
 			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		}
+		} finally {
+            Globals.disconnect(connection);
+        }
 	}
 }

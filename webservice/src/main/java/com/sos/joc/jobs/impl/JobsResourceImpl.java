@@ -16,17 +16,21 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SearchStringHelper;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.classes.jobs.JobVolatileJson;
 import com.sos.joc.classes.jobs.JobsVCallable;
+import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
+import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.JobsV;
@@ -42,7 +46,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
     }
 
     public JOCDefaultResponse postJobs(String accessToken, JobsFilter jobsFilter) throws Exception {
-        //SOSHibernateSession connection = null;
+        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     jobsFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
@@ -52,16 +56,16 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
             jobsFilter.setRegex(SearchStringHelper.getRegexValue(jobsFilter.getRegex()));
 
-            //connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            //InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
-            //List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
+            // connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            // InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
+            // List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
             JobsV entity = new JobsV();
             List<JobV> listOfJobs = null;
-            //JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
+            // JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
             List<JobPath> jobs = jobsFilter.getJobs();
             boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
-            
+
             if (versionIsOlderThan("1.12.6")) {
                 JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
 
@@ -83,7 +87,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 } else {
                     listOfJobs = jocXmlCommand.getJobsFromShowState(jobsFilter);
                 }
-                
+
             } else {
                 JsonObject summary = null;
                 if ((jobsFilter.getIsOrderJob() == null || jobsFilter.getIsOrderJob()) && jobsFilter.getCompactView() != Boolean.TRUE) {
@@ -92,13 +96,13 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                     jocSummaryCommand.addOrderStatisticsQuery(false);
                     summary = jocSummaryCommand.getJsonObjectFromPostWithRetry(getServiceBody("/"), accessToken);
                 }
-                
+
                 JOCJsonCommand command = new JOCJsonCommand(this);
                 command.setUriBuilderForJobs();
                 command.addJobCompactQuery(jobsFilter.getCompact());
                 Map<String, JobVolatileJson> listJobs = new HashMap<String, JobVolatileJson>();
                 List<JobsVCallable> tasks = new ArrayList<JobsVCallable>();
-                
+
                 if (jobs != null && !jobs.isEmpty()) {
                     Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                     for (JobPath job : jobs) {
@@ -120,7 +124,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                     JobsVCallable callable = new JobsVCallable(rootFolder, jobsFilter, command, accessToken, summary);
                     listJobs.putAll(callable.call());
                 }
-                
+
                 if (tasks != null && !tasks.isEmpty()) {
                     ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
                     try {
@@ -139,10 +143,18 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                         executorService.shutdown();
                     }
                 }
-                
+
                 listOfJobs = new ArrayList<JobV>(listJobs.values());
             }
-            
+
+            // JOC-678
+            if (listOfJobs != null && listOfJobs.stream().filter(j -> j.getState() != null && j.getState().get_text() == JobStateText.STOPPED)
+                    .findAny().isPresent()) {
+                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                final AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
+                listOfJobs.stream().filter(j -> j.getState() != null && j.getState().get_text() == JobStateText.STOPPED).forEach(j -> j.getState()
+                        .setManually(dbLayer.isManuallyStopped(jobsFilter.getJobschedulerId(), j.getPath())));
+            }
             entity.setJobs(listOfJobs);
             entity.setDeliveryDate(new Date());
 
@@ -153,11 +165,11 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        //} finally {
-            //Globals.disconnect(connection);
+        } finally {
+            Globals.disconnect(connection);
         }
     }
-    
+
     private String getServiceBody(String path) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("path", path);

@@ -23,11 +23,13 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
+import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderPath;
+import com.sos.joc.model.order.OrderStateText;
 import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersV;
@@ -43,17 +45,16 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
         return postOrders(getAccessToken(xAccessToken, accessToken), ordersBody);
     }
 
-	public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
-		SOSHibernateSession connection = null;
-		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersBody, accessToken,
-					ordersBody.getJobschedulerId(), getPermissonsJocCockpit(ordersBody.getJobschedulerId(), accessToken)
-							.getOrder().getView().isStatus());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
-			ordersBody.setRegex(SearchStringHelper.getRegexValue(ordersBody.getRegex()));
-			
+    public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
+        SOSHibernateSession connection = null;
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersBody, accessToken, ordersBody.getJobschedulerId(), getPermissonsJocCockpit(
+                    ordersBody.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            ordersBody.setRegex(SearchStringHelper.getRegexValue(ordersBody.getRegex()));
+
             // TODO date post body parameters are not yet considered
             JOCJsonCommand command = new JOCJsonCommand(this);
             command.setUriBuilderForOrders();
@@ -66,7 +67,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
             if (orders != null && !orders.isEmpty()) {
@@ -100,47 +101,57 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                 }
             }
 
-			if (!ordersLists.isEmpty()) {
-				for (OrdersPerJobChain opj : ordersLists.values()) {
-					tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken));
-				}
+            if (!ordersLists.isEmpty()) {
+                for (OrdersPerJobChain opj : ordersLists.values()) {
+                    tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken));
+                }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 // no permission
-			} else if (folders != null && !folders.isEmpty()) {
-				for (Folder folder : folders) {
-					folder.setFolder(normalizeFolder(folder.getFolder()));
-					tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken));
-				}
-			} else {
-				Folder rootFolder = new Folder();
-				rootFolder.setFolder("/");
-				rootFolder.setRecursive(true);
-				OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken);
-				listOrders.putAll(callable.call());
-			}
+            } else if (folders != null && !folders.isEmpty()) {
+                for (Folder folder : folders) {
+                    folder.setFolder(normalizeFolder(folder.getFolder()));
+                    tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken));
+                }
+            } else {
+                Folder rootFolder = new Folder();
+                rootFolder.setFolder("/");
+                rootFolder.setRecursive(true);
+                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken);
+                listOrders.putAll(callable.call());
+            }
 
-			if (tasks != null && !tasks.isEmpty()) {
-				ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-				try {
-					for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
-						try {
-							listOrders.putAll(result.get());
-						} catch (ExecutionException e) {
-							if (e.getCause() instanceof JocException) {
-								throw (JocException) e.getCause();
-							} else {
-								throw (Exception) e.getCause();
-							}
-						}
-					}
-				} finally {
-					executorService.shutdown();
-				}
-			}
+            if (tasks != null && !tasks.isEmpty()) {
+                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                try {
+                    for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
+                        try {
+                            listOrders.putAll(result.get());
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
+                            }
+                        }
+                    }
+                } finally {
+                    executorService.shutdown();
+                }
+            }
 
             OrdersV entity = new OrdersV();
             List<OrderV> permittedOrders = new ArrayList<OrderV>(listOrders.values());
 
+            // JOC-678
+            if (permittedOrders != null) {
+                final AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
+                permittedOrders.stream().filter(o -> o.getProcessingState() != null && o.getProcessingState().get_text() == OrderStateText.SUSPENDED)
+                        .forEach(o -> o.getProcessingState().setManually(dbLayer.isManuallySuspended(ordersBody.getJobschedulerId(), o.getJobChain(),
+                                o.getOrderId())));
+                permittedOrders.stream().filter(o -> o.getProcessingState() != null && o.getProcessingState()
+                        .get_text() == OrderStateText.JOB_STOPPED).forEach(o -> o.getProcessingState().setManually(dbLayer.isManuallyStopped(
+                                ordersBody.getJobschedulerId(), o.getJob())));
+            }
             entity.setOrders(permittedOrders);
             entity.setDeliveryDate(Date.from(Instant.now()));
 

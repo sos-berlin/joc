@@ -262,6 +262,7 @@ public class OrderVolatile extends OrderV {
         case SUSPENDED:
             processingFilterState = OrderStateFilter.SUSPENDED;
             getProcessingState().setSeverity(5);
+            getProcessingState().setManually(false);
             break;
         case WAITING_FOR_AGENT:
         case JOB_CHAIN_STOPPED:

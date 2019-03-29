@@ -15,6 +15,9 @@
     },
     "_text": {
       "$ref": "jobStateText-schema.json"
+    },
+    "manually": {
+      "type": "boolean"
     }
   }
 }

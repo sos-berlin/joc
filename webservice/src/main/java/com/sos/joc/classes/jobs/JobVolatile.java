@@ -230,10 +230,13 @@ public class JobVolatile extends JobV {
         case PENDING:
             state.setSeverity(1);
             break;
+        case STOPPED:
+            state.setSeverity(2);
+            state.setManually(false);
+            break;
         case NOT_INITIALIZED:
         case WAITING_FOR_AGENT:
         case STOPPING:
-        case STOPPED:
         case ERROR:
             state.setSeverity(2);
             break;

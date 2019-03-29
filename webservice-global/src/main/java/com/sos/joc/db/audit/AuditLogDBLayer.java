@@ -1,5 +1,6 @@
 package com.sos.joc.db.audit;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 import javax.persistence.TemporalType;
@@ -146,6 +147,52 @@ public class AuditLogDBLayer extends DBLayer {
 
     public List<DBItemAuditLog> getAuditLogs(AuditLogDBFilter auditLogDBFilter) throws DBConnectionRefusedException, DBInvalidDataException {
         return getAuditLogs(auditLogDBFilter, null);
+    }
+
+    public boolean isManuallySuspended(String schedulerId, String jobChain, String orderId) {
+        if (schedulerId == null || jobChain == null || jobChain == orderId) {
+            return false;
+        }
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select request from ").append(DBItemAuditLog);
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and jobChain = :jobChain");
+            sql.append(" and orderId = :orderId");
+            sql.append(" and request in ('./orders/start','./orders/resume','./orders/reset','./orders/suspend')");
+            sql.append(" order by id desc");
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setMaxResults(1);
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("jobChain", jobChain);
+            query.setParameter("orderId", orderId);
+            String lastRelevantRequest = getSession().getSingleResult(query);
+            return lastRelevantRequest != null && !lastRelevantRequest.isEmpty() && "suspend".equals(Paths.get(lastRelevantRequest).getFileName().toString());
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+    
+    public boolean isManuallyStopped(String schedulerId, String job) {
+        if (schedulerId == null || job == null) {
+            return false;
+        }
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select request from ").append(DBItemAuditLog);
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and job = :job");
+            sql.append(" and request in ('./jobs/start','./jobs/stop','./jobs/unstop')");
+            sql.append(" order by id desc");
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setMaxResults(1);
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("job", job);
+            String lastRelevantRequest = getSession().getSingleResult(query);
+            return lastRelevantRequest != null && !lastRelevantRequest.isEmpty() && "stop".equals(Paths.get(lastRelevantRequest).getFileName().toString());
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
 }
