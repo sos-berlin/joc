@@ -1,6 +1,5 @@
 package com.sos.joc.db.audit;
 
-import java.nio.file.Paths;
 import java.util.List;
 
 import javax.persistence.TemporalType;
@@ -166,8 +165,7 @@ public class AuditLogDBLayer extends DBLayer {
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("jobChain", jobChain);
             query.setParameter("orderId", orderId);
-            String lastRelevantRequest = getSession().getSingleResult(query);
-            return lastRelevantRequest != null && !lastRelevantRequest.isEmpty() && "suspend".equals(Paths.get(lastRelevantRequest).getFileName().toString());
+            return "./orders/suspend".equals(getSession().getSingleResult(query));
         } catch (Exception ex) {
             return false;
         }
@@ -188,8 +186,7 @@ public class AuditLogDBLayer extends DBLayer {
             query.setMaxResults(1);
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("job", job);
-            String lastRelevantRequest = getSession().getSingleResult(query);
-            return lastRelevantRequest != null && !lastRelevantRequest.isEmpty() && "stop".equals(Paths.get(lastRelevantRequest).getFileName().toString());
+            return "./jobs/stop".equals(getSession().getSingleResult(query));
         } catch (Exception ex) {
             return false;
         }

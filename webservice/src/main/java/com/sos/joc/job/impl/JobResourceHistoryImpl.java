@@ -1,13 +1,14 @@
 package com.sos.joc.job.impl;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
@@ -23,6 +24,7 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.job.resource.IJobResourceHistory;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.HistoryState;
@@ -107,36 +109,10 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
                     }
                 } else {
                     JOCJsonCommand command = new JOCJsonCommand(this);
-                    URI uri = command.getUriForJobPathAsUrlParam(taskHistoryFilter.getJob(), taskHistoryFilter.getMaxLastHistoryItems());
-                    JsonArray json = command.getJsonObjectFromGetWithRetry(uri, accessToken);
-                    for (JsonObject item : json.getValuesAs(JsonObject.class)) {
-                        TaskHistoryItem history = new TaskHistoryItem();
-                        history.setAgent(item.getString("agentUri", null));
-                        history.setClusterMember(item.getString("clusterMemberId", null));
-                        history.setEndTime(JobSchedulerDate.getDateFromISO8601String(item.getString("endedAt", null)));
-                        history.setError(getErr(item.getJsonObject("error")));
-                        history.setExitCode(item.getInt("returnCode", Integer.MIN_VALUE));
-                        if (history.getExitCode() == Integer.MIN_VALUE) {
-                            history.setExitCode(null);
-                        }
-                        history.setJob(item.getString("jobPath", null));
-                        history.setStartTime(JobSchedulerDate.getDateFromISO8601String(item.getString("startedAt", null)));
-                        history.setSteps(item.getInt("stepCount", 1));
-                        history.setTaskId(item.getString("taskId", null));
-                        HistoryState state = new HistoryState();
-                        if (history.getEndTime() == null) {
-                            state.setSeverity(1);
-                            state.set_text(HistoryStateText.INCOMPLETE);
-                        } else if (history.getExitCode() != null && history.getExitCode() == 0) {
-                            state.setSeverity(0);
-                            state.set_text(HistoryStateText.SUCCESSFUL);
-                        } else {
-                            state.setSeverity(2);
-                            state.set_text(HistoryStateText.FAILED);
-                        }
-                        history.setState(state);
-                        listOfHistory.add(history);
-                    }
+                    command.setUriBuilderForJobs();
+                    command.addJobHistoryQuery(taskHistoryFilter.getMaxLastHistoryItems());
+                    JsonArray json = command.getJsonObjectFromPostWithRetry(getServiceBody(taskHistoryFilter.getJob()), accessToken);
+                    json.stream().forEach(i -> listOfHistory.add(getHistoryItem((JsonObject) i)));
                 }
             } catch (JobSchedulerConnectionRefusedException e) {
                 connection = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -206,5 +182,41 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
             return err;
         }
         return null;
+    }
+    
+    private String getServiceBody(String job) throws JocMissingRequiredParameterException {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("path", job);
+
+        return builder.build().toString();
+    }
+    
+    private TaskHistoryItem getHistoryItem(JsonObject item) {
+        TaskHistoryItem history = new TaskHistoryItem();
+        history.setAgent(item.getString("agentUri", null));
+        history.setClusterMember(item.getString("clusterMemberId", null));
+        history.setEndTime(JobSchedulerDate.getDateFromISO8601String(item.getString("endedAt", null)));
+        history.setError(getErr(item.getJsonObject("error")));
+        history.setExitCode(item.getInt("returnCode", Integer.MIN_VALUE));
+        if (history.getExitCode() == Integer.MIN_VALUE) {
+            history.setExitCode(null);
+        }
+        history.setJob(item.getString("jobPath", null));
+        history.setStartTime(JobSchedulerDate.getDateFromISO8601String(item.getString("startedAt", null)));
+        history.setSteps(item.getInt("stepCount", 1));
+        history.setTaskId(item.getString("taskId", null));
+        HistoryState state = new HistoryState();
+        if (history.getEndTime() == null) {
+            state.setSeverity(1);
+            state.set_text(HistoryStateText.INCOMPLETE);
+        } else if (history.getExitCode() != null && history.getExitCode() == 0) {
+            state.setSeverity(0);
+            state.set_text(HistoryStateText.SUCCESSFUL);
+        } else {
+            state.setSeverity(2);
+            state.set_text(HistoryStateText.FAILED);
+        }
+        history.setState(state);
+        return history;
     }
 }
