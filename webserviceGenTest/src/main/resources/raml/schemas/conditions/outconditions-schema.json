@@ -1,0 +1,29 @@
+{
+	"title": "Out-Conditions",
+	"id": "schemas/conditions/outconditions",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "List of all out Conditions",
+	"javaType": "com.sos.joc.model.conditions.OutConditions",
+	"type": "object",
+	"required": [
+		"deliveryDate"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"masterId": {
+			"type": "string"
+		},
+		"job": {
+			"$ref": "../common/path-schema.json"
+		},
+		"outconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "outcondition-schema.json"
+			}
+		} 
+	}
+}
+      

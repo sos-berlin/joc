@@ -68,6 +68,7 @@ public class Globals {
                 sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getYadeClassMapping());
+                sosHibernateFactory.addClassMapping(com.sos.eventhandlerservice.classes.Constants.getConditionsClassMapping());
                 sosHibernateFactory.setAutoCommit(true);
                 sosHibernateFactory.build();
             } catch (SOSHibernateConfigurationException | SOSHibernateFactoryBuildException e) {

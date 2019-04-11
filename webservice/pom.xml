@@ -34,6 +34,11 @@
 	<dependencies>
 		<!-- SOS DEPENDENCIES -->
 		<dependency>
+			<groupId>com.sos-berlin.jitl</groupId>
+			<artifactId>sos-conditions</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-util</artifactId>
 			<version>${project.version}</version>
@@ -87,7 +92,7 @@
 					<artifactId>servlet-api</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>javax.ws.rs</groupId>
+					<groupId></groupId>
 					<artifactId>jsr311-api</artifactId>
 				</exclusion>
 			</exclusions>
@@ -212,14 +217,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.rjeschke</groupId>
-            <artifactId>txtmark</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.rjeschke</groupId>
+			<artifactId>txtmark</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

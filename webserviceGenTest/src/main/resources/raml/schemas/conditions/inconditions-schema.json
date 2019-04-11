@@ -1,0 +1,26 @@
+{
+	"title": "In-Conditions",
+	"id": "schemas/conditions/inconditions",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "List of all In Conditions",
+	"javaType": "com.sos.joc.model.conditions.InConditions",
+	"type": "object",
+	"required": [
+		"deliveryDate"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"masterId":{"type":"string"},
+		"job": {
+			"$ref": "../common/path-schema.json"
+		},
+		"inconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "incondition-schema.json"
+			}
+		} 
+	}
+}

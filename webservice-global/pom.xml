@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -27,12 +28,16 @@
 	</dependencyManagement>
 
 	<dependencies>
-	    <dependency>
+		<dependency>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-json</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.sos-berlin.jitl</groupId>
+			<artifactId>sos-conditions</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-exceptions</artifactId>
@@ -73,11 +78,11 @@
 			</exclusions>
 		</dependency>
 
-        <dependency>
-            <groupId>com.sos-berlin.jade</groupId>
-            <artifactId>jade-db-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>com.sos-berlin.jade</groupId>
+			<artifactId>jade-db-utils</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- 3RD PARTY DEPENDENCIES -->
 		<dependency>
@@ -196,6 +201,6 @@
 			<artifactId>mariadb-java-client</artifactId>
 			<scope>test</scope>
 		</dependency>
-	            
+
 	</dependencies>
 </project>

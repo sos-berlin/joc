@@ -1,0 +1,25 @@
+{
+	"title": "In-Condition",
+	"id": "schemas/conditions/incondition",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "In Condition",
+	"javaType": "com.sos.joc.model.conditions.InCondition",
+	"type": "object",
+	"required": [
+		"deliveryDate"
+	],
+	"properties": {
+		"id": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
+		"conditionExpression": {
+			"$ref": "condition_expression-schema.json"
+		},
+		"inconditionCommands": {
+			"type": "array",
+			"items": {
+				"$ref": "incondition_command-schema.json"
+			}
+		}
+	}
+}
