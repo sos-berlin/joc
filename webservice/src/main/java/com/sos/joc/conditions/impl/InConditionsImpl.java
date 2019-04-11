@@ -56,7 +56,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             filterInConditions.setJob(jobFilterSchema.getJob());
             filterInConditions.setMasterId(jobFilterSchema.getJobschedulerId());
 
-            JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession);
+            JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken);
             jsConditionResolver.initEvents();
 
             List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);

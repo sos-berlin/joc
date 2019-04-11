@@ -57,7 +57,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             filterOutConditions.setJob(jobFilterSchema.getJob());
             filterOutConditions.setMasterId(jobFilterSchema.getJobschedulerId());
 
-            JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession);
+            JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken);
             jsConditionResolver.initEvents();
 
             List<DBItemOutConditionWithEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
