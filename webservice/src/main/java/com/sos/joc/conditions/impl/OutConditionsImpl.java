@@ -78,6 +78,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                     conditionExpression.setValue(jsConditionResolver.validate(null, jsOutCondition));
                     conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                     outCondition.setConditionExpression(conditionExpression);
+                    outCondition.setWorkflow(jsOutCondition.getWorkflow());
                     outCondition.setId(jsOutCondition.getId());
                     for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
                         OutConditionEvent outConditionEvent = new OutConditionEvent();

@@ -12,6 +12,9 @@
 		"id": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
+		"workflow": {
+			"type": "string"
+		},
 		"conditionExpression": {
 			"$ref": "condition_expression-schema.json"
 		},

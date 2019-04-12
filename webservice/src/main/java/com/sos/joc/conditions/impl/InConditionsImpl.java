@@ -77,6 +77,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                     conditionExpression.setValue(jsConditionResolver.validate(null, jsInCondition));
                     conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                     inCondition.setConditionExpression(conditionExpression);
+                    inCondition.setWorkflow(jsInCondition.getWorkflow());
                     inCondition.setId(jsInCondition.getId());
                     for (JSInConditionCommand jsInConditionCommand : jsInCondition.getListOfInConditionCommand()) {
                         InConditionCommand inConditionCommand = new InConditionCommand();
