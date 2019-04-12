@@ -69,24 +69,25 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             InConditions inConditions = new InConditions();
             inConditions.setJob(jsJobConditionKey.getJob());
             inConditions.setMasterId(jsJobConditionKey.getMasterId());
-            for (JSInCondition jsInCondition : jsJobInConditions.getInConditions(jsJobConditionKey).getListOfInConditions().values()) {
-                InCondition inCondition = new InCondition();
-                ConditionExpression conditionExpression = new ConditionExpression();
-                conditionExpression.setExpression(jsInCondition.getExpression());
-                conditionExpression.setValue(jsConditionResolver.validate(null,jsInCondition));
-                conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
-                inCondition.setConditionExpression(conditionExpression);
-                inCondition.setId(jsInCondition.getId());
-                for (JSInConditionCommand jsInConditionCommand : jsInCondition.getListOfInConditionCommand()) {
-                    InConditionCommand inConditionCommand = new InConditionCommand();
-                    inConditionCommand.setCommand(jsInConditionCommand.getCommand());
-                    inConditionCommand.setCommandParam(jsInConditionCommand.getCommandParam());
-                    inConditionCommand.setId(jsInConditionCommand.getId());
-                    inCondition.getInconditionCommands().add(inConditionCommand);
+            if (jsJobInConditions.getInConditions(jsJobConditionKey) != null) {
+                for (JSInCondition jsInCondition : jsJobInConditions.getInConditions(jsJobConditionKey).getListOfInConditions().values()) {
+                    InCondition inCondition = new InCondition();
+                    ConditionExpression conditionExpression = new ConditionExpression();
+                    conditionExpression.setExpression(jsInCondition.getExpression());
+                    conditionExpression.setValue(jsConditionResolver.validate(null, jsInCondition));
+                    conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
+                    inCondition.setConditionExpression(conditionExpression);
+                    inCondition.setId(jsInCondition.getId());
+                    for (JSInConditionCommand jsInConditionCommand : jsInCondition.getListOfInConditionCommand()) {
+                        InConditionCommand inConditionCommand = new InConditionCommand();
+                        inConditionCommand.setCommand(jsInConditionCommand.getCommand());
+                        inConditionCommand.setCommandParam(jsInConditionCommand.getCommandParam());
+                        inConditionCommand.setId(jsInConditionCommand.getId());
+                        inCondition.getInconditionCommands().add(inConditionCommand);
+                    }
+                    inConditions.getInconditions().add(inCondition);
                 }
-                inConditions.getInconditions().add(inCondition);
             }
-
 
             inConditions.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(inConditions);

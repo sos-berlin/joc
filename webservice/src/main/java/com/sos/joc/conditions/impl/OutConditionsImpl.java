@@ -70,23 +70,24 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             OutConditions outConditions = new OutConditions();
             outConditions.setJob(jsJobConditionKey.getJob());
             outConditions.setMasterId(jsJobConditionKey.getMasterId());
-            for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
-                OutCondition outCondition = new OutCondition();
-                ConditionExpression conditionExpression = new ConditionExpression();
-                conditionExpression.setExpression(jsOutCondition.getExpression());
-                conditionExpression.setValue(jsConditionResolver.validate(null,jsOutCondition));
-                conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
-                outCondition.setConditionExpression(conditionExpression);
-                outCondition.setId(jsOutCondition.getId());
-                for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
-                    OutConditionEvent outConditionEvent = new OutConditionEvent();
-                    outConditionEvent.setEvent(jsOutConditionEvent.getEvent());
-                    outConditionEvent.setId(jsOutConditionEvent.getId());
-                    outCondition.getOutconditionEvents().add(outConditionEvent);
+            if (jsJobOutConditions.getOutConditions(jsJobConditionKey) != null) {
+                for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
+                    OutCondition outCondition = new OutCondition();
+                    ConditionExpression conditionExpression = new ConditionExpression();
+                    conditionExpression.setExpression(jsOutCondition.getExpression());
+                    conditionExpression.setValue(jsConditionResolver.validate(null, jsOutCondition));
+                    conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
+                    outCondition.setConditionExpression(conditionExpression);
+                    outCondition.setId(jsOutCondition.getId());
+                    for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
+                        OutConditionEvent outConditionEvent = new OutConditionEvent();
+                        outConditionEvent.setEvent(jsOutConditionEvent.getEvent());
+                        outConditionEvent.setId(jsOutConditionEvent.getId());
+                        outCondition.getOutconditionEvents().add(outConditionEvent);
+                    }
+                    outConditions.getOutconditions().add(outCondition);
                 }
-                outConditions.getOutconditions().add(outCondition);
             }
-
 
             outConditions.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(outConditions);
