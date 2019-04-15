@@ -36,7 +36,11 @@ public class SOSShiroCurrentUsersList {
 
         ArrayList<String> toBeRemoved = new ArrayList<String>();
         Map<String, SOSShiroCurrentUser> currentUsersShadow = new HashMap<String, SOSShiroCurrentUser>();
-        currentUsersShadow.putAll(currentUsers);
+        try {
+            currentUsersShadow.putAll(currentUsers);
+        } catch (ConcurrentModificationException e) {
+            LOGGER.info("Removing expiring sessions will be deferred");
+        }
 
         for (Map.Entry<String, SOSShiroCurrentUser> entry : currentUsersShadow.entrySet()) {
             boolean found = user.equals(entry.getValue().getUsername());
@@ -59,7 +63,7 @@ public class SOSShiroCurrentUsersList {
                 accessToken = it.next();
                 currentUsers.remove(accessToken);
             } catch (ConcurrentModificationException e) {
-                LOGGER.info("Removing timeouted user will be defered: " + accessToken);
+                LOGGER.info("Removing expiring sessions will be deferred: " + accessToken);
             }
         }
 
