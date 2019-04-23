@@ -318,7 +318,7 @@ public class JOCResourceImpl {
         return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, jocError));
     }
 
-	private void initLogging(String request, Object body) {
+	public void initLogging(String request, Object body) {
 		String user;
 		try {
 			user = jobschedulerUser.getSosShiroCurrentUser().getUsername().trim();
