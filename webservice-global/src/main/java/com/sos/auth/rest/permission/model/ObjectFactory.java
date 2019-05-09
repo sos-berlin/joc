@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2018.11.30 um 11:12:23 AM CET 
+// Generiert: 2019.05.08 um 10:32:37 AM CEST 
 //
 
 
@@ -55,6 +55,22 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpit createSOSPermissionJocCockpit() {
         return new SOSPermissionJocCockpit();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.Condition }
+     * 
+     */
+    public SOSPermissionJocCockpit.Condition createSOSPermissionJocCockpitCondition() {
+        return new SOSPermissionJocCockpit.Condition();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.Condition.Change }
+     * 
+     */
+    public SOSPermissionJocCockpit.Condition.Change createSOSPermissionJocCockpitConditionChange() {
+        return new SOSPermissionJocCockpit.Condition.Change();
     }
 
     /**
@@ -431,6 +447,22 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpitMasters createSOSPermissionJocCockpitMasters() {
         return new SOSPermissionJocCockpitMasters();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.Condition.View }
+     * 
+     */
+    public SOSPermissionJocCockpit.Condition.View createSOSPermissionJocCockpitConditionView() {
+        return new SOSPermissionJocCockpit.Condition.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.Condition.Change.Events }
+     * 
+     */
+    public SOSPermissionJocCockpit.Condition.Change.Events createSOSPermissionJocCockpitConditionChangeEvents() {
+        return new SOSPermissionJocCockpit.Condition.Change.Events();
     }
 
     /**

@@ -15,6 +15,9 @@
 		"workflow": {
 			"type": "string"
 		},
+		"consumed": {
+			"type": "boolean"
+		},
 		"conditionExpression": {
 			"$ref": "condition_expression-schema.json"
 		},

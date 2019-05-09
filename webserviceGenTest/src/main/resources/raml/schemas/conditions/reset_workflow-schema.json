@@ -1,0 +1,26 @@
+{
+	"title": "Reset Workflow",
+	"id": "schemas/conditions/resetworkflow",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Reset Workflow, unconsume expressions",
+	"javaType": "com.sos.joc.model.conditions.ResetWorkflow",
+	"type": "object",
+	"required": [
+		"deliveryDate"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"masterId": {
+			"type": "string"
+		},
+		"job": {
+			"$ref": "../common/path-schema.json"
+		},
+		"workflow": {
+			"type": "string"
+		}
+	}
+}
+      
