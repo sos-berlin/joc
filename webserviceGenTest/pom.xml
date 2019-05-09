@@ -222,7 +222,7 @@
 									<removeOldOutput>false</removeOldOutput>
 									<annotationStyle>jackson2</annotationStyle>
 									<propertyWordDelimiters>- </propertyWordDelimiters>
-									<includeAdditionalProperties>false</includeAdditionalProperties>
+									<includeAdditionalProperties>true</includeAdditionalProperties>
 									<includes>
 										<include>jobschedulerEvent/*.json</include>
 									</includes>

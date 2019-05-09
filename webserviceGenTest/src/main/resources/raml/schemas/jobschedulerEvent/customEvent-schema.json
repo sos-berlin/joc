@@ -17,12 +17,11 @@
     },
     "variables": {
       "javaType": "com.sos.jobscheduler.model.event.CustomEventVariables",
-      "type": "object",
-      "properties": {
-        "source": {
-          "type": "string"
-        }
-      }
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
     }
-  }
+  },
+  "additionalProperties": false
 }
