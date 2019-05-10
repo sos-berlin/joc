@@ -13,7 +13,7 @@ import com.sos.joc.model.conditions.ResetWorkflow;
 public interface IResetWorkflowResource {
 
     @POST
-    @Path("conditions")
+    @Path("resetworkflow")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse resetWorkflow(            

@@ -17,7 +17,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.conditions.ResetWorkflow;
 import com.sos.xml.SOSXmlCommand.ResponseStream;
 
-@Path("resetworkflow")
+@Path("conditions")
 public class ResetWorkflowImpl extends JOCResourceImpl implements IResetWorkflowResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResetWorkflowImpl.class);

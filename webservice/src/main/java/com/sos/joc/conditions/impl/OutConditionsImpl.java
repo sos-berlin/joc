@@ -14,6 +14,7 @@ import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.eventhandlerservice.db.FilterOutConditions;
 import com.sos.eventhandlerservice.resolver.JSCondition;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
+import com.sos.eventhandlerservice.resolver.JSEventKey;
 import com.sos.eventhandlerservice.resolver.JSJobConditionKey;
 import com.sos.eventhandlerservice.resolver.JSJobOutConditions;
 import com.sos.eventhandlerservice.resolver.JSOutCondition;
@@ -70,7 +71,12 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             OutConditions outConditions = new OutConditions();
             outConditions.setJob(jsJobConditionKey.getJob());
             outConditions.setMasterId(jsJobConditionKey.getMasterId());
+
             if (jsJobOutConditions.getOutConditions(jsJobConditionKey) != null) {
+            
+                JSEventKey jsEventKey = new JSEventKey();
+                jsEventKey.setSession("now");
+                
                 for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
                     OutCondition outCondition = new OutCondition();
                     ConditionExpression conditionExpression = new ConditionExpression();
@@ -83,6 +89,8 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                     for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
                         OutConditionEvent outConditionEvent = new OutConditionEvent();
                         outConditionEvent.setEvent(jsOutConditionEvent.getEvent());
+                        jsEventKey.setEvent(jsOutConditionEvent.getEvent());
+                        outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey));
                         outConditionEvent.setId(jsOutConditionEvent.getId());
                         outCondition.getOutconditionEvents().add(outConditionEvent);
                     }
@@ -99,7 +107,6 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-
             Globals.disconnect(sosHibernateSession);
         }
     }
