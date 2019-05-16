@@ -1,0 +1,20 @@
+{
+	"title": "Check Conditions",
+	"id": "schemas/conditions/check",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Reset Workflow, unconsume expressions",
+	"javaType": "com.sos.joc.model.conditions.ConditionCheck",
+	"type": "object",
+	"required": [
+		"deliveryDate"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"masterId": {
+			"type": "string"
+		}
+	}
+}
+      

@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.eventhandlerservice.db.DBItemOutConditionWithEvent;
 import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.eventhandlerservice.db.FilterOutConditions;
-import com.sos.eventhandlerservice.resolver.JSCondition;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
 import com.sos.eventhandlerservice.resolver.JSEventKey;
 import com.sos.eventhandlerservice.resolver.JSJobConditionKey;
@@ -34,7 +33,6 @@ import com.sos.joc.model.job.JobFilter;
 @Path("conditions")
 public class OutConditionsImpl extends JOCResourceImpl implements IOutConditionsResource {
 
-    private static final String OUT = "out";
     private static final Logger LOGGER = LoggerFactory.getLogger(OutConditionsImpl.class);
     private static final String API_CALL = "./conditions/job_out_conditions";
 
@@ -90,7 +88,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                         OutConditionEvent outConditionEvent = new OutConditionEvent();
                         outConditionEvent.setEvent(jsOutConditionEvent.getEvent());
                         jsEventKey.setEvent(jsOutConditionEvent.getEvent());
-                        outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey));
+                        outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey, outCondition.getWorkflow()));
                         outConditionEvent.setId(jsOutConditionEvent.getId());
                         outCondition.getOutconditionEvents().add(outConditionEvent);
                     }
