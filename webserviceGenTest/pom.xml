@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.sos-berlin</groupId>
 		<artifactId>joc</artifactId>
-		<version>1.12.9-SNAPSHOT</version>
+		<version>1.12.10-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.sos-berlin.joc</groupId>
@@ -222,7 +222,7 @@
 									<removeOldOutput>false</removeOldOutput>
 									<annotationStyle>jackson2</annotationStyle>
 									<propertyWordDelimiters>- </propertyWordDelimiters>
-									<includeAdditionalProperties>false</includeAdditionalProperties>
+									<includeAdditionalProperties>true</includeAdditionalProperties>
 									<includes>
 										<include>jobschedulerEvent/*.json</include>
 									</includes>

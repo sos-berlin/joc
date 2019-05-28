@@ -5,6 +5,8 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sos.classes.CustomEventsUtil;
 import com.sos.eventhandlerservice.db.DBLayerInConditions;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
@@ -13,6 +15,8 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.conditions.resource.IEditInConditionsResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.conditions.InConditions;
+
+import sos.scheduler.job.JobSchedulerEventJob;
 
 @Path("conditions/edit")
 public class EditInConditionsImpl extends JOCResourceImpl implements IEditInConditionsResource {
@@ -26,7 +30,7 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, inConditions, accessToken, inConditions.getMasterId(), getPermissonsJocCockpit(
-                    inConditions.getMasterId(), accessToken).getEvent().getView().isStatus());
+                    inConditions.getMasterId(), accessToken).getCondition().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -36,7 +40,7 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
             sosHibernateSession.beginTransaction();
             dbLayerInConditions.deleteInsert(inConditions);
             sosHibernateSession.commit();
-            // Hier nun Ereignis erzeugen, damit die geänderten Daten im Service neu eingelesen werden.
+            notifyEventHandler(accessToken);
 
             return JOCDefaultResponse.responseStatus200(inConditions);
 
@@ -51,4 +55,11 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
         }
     }
 
+    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException{
+        CustomEventsUtil customEventsUtil = new CustomEventsUtil(EditInConditionsImpl.class.getName());
+        customEventsUtil.addEvent("InitConditionResolver");
+        String notifyCommand = customEventsUtil.getEventCommandAsXml();
+        com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
+        jocXmlCommand.executePost(notifyCommand, accessToken);
+    }
 }

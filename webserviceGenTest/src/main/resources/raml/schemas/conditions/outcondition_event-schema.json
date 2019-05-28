@@ -14,6 +14,9 @@
     "event": {
       "type": "string"
     },
+    "exists": {
+      "type": "boolean"
+    },
     "workflow": {
       "type": "string"
     }

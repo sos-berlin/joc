@@ -5,6 +5,8 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sos.classes.CustomEventsUtil;
 import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
@@ -26,7 +28,7 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, outConditions, accessToken, outConditions.getMasterId(), getPermissonsJocCockpit(
-                    outConditions.getMasterId(), accessToken).getEvent().getView().isStatus());
+                    outConditions.getMasterId(), accessToken).getCondition().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -37,8 +39,7 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
             sosHibernateSession.beginTransaction();
             dbLayerOutConditions.deleteInsert(outConditions);
             sosHibernateSession.commit();
-            // Hier nun Ereignis erzeugen, damit die geänderten Daten im Service neu eingelesen werden.
-
+            notifyEventHandler(accessToken);
             return JOCDefaultResponse.responseStatus200(outConditions);
 
         } catch (JocException e) {
@@ -52,4 +53,11 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
         }
     }
 
+    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException{
+        CustomEventsUtil customEventsUtil = new CustomEventsUtil(EditOutConditionsImpl.class.getName());
+        customEventsUtil.addEvent("InitConditionResolver");
+        String notifyCommand = customEventsUtil.getEventCommandAsXml();
+        com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
+        jocXmlCommand.executePost(notifyCommand, accessToken);
+    }
 }

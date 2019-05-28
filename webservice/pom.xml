@@ -34,7 +34,7 @@
 	<dependencies>
 		<!-- SOS DEPENDENCIES -->
 		<dependency>
-			<groupId>com.sos-berlin.jitl</groupId>
+			<groupId>com.sos-berlin.jobscheduler</groupId>
 			<artifactId>sos-conditions</artifactId>
 			<version>${project.version}</version>
 		</dependency>

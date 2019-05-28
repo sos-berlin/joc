@@ -5,7 +5,7 @@ import java.util.Date;
 public class JobSchedulerNoResponseException extends JocException {
     
     private static final long serialVersionUID = 1L;
-    private static final String ERROR_CODE = "JOC-401";
+    private static final String ERROR_CODE = "JOC-411";
     private Date surveyDate = null;
 
     public JobSchedulerNoResponseException() {

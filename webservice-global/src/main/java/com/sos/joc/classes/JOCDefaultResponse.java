@@ -237,6 +237,8 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (mediaType.contains(MediaType.TEXT_HTML)) {
             String entityStr = String.format(ERROR_HTML, entity.getError().getCode(), StringEscapeUtils.escapeHtml4(entity.getError().getMessage()));
             responseBuilder.entity(entityStr);
+        } else if (mediaType.contains(MediaType.TEXT_PLAIN)) {
+            responseBuilder.entity(entity.getError().getMessage());
         } else {
             responseBuilder.entity(entity);
         }

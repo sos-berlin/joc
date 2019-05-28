@@ -1,11 +1,9 @@
 package com.sos.patch;
 
-import static java.nio.file.StandardCopyOption.*;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.IOException;
 import java.nio.file.CopyOption;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitOption;
@@ -21,9 +19,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumSet;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-
+@Ignore
 public class TestExecutePatch {
 
     private static final String JOC_WAR_FILE_NAME = "joc.war";
@@ -35,6 +34,7 @@ public class TestExecutePatch {
     private static CopyOption[] COPYOPTIONS = new StandardCopyOption[] { 
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING };
 
+    @Ignore
     @Test
     public void testPaths(){
         Path warFilePath = Paths.get("C:/sp/joc-1.11.x-SNAPSHOT/base/webapps/joc.war");
@@ -50,6 +50,7 @@ public class TestExecutePatch {
         }
     }
     
+    @Ignore
     @Test
     public void testPathsFromZip(){
         Path warFilePath = Paths.get("C:/sp/joc-1.11.x-SNAPSHOT/base/webapps/joc.war");
@@ -99,6 +100,7 @@ public class TestExecutePatch {
         }
     }
     
+    @Ignore
     @Test
     public void copyZipFileSystem() {
         Path warFilePath = Paths.get("C:/sp/joc-1.11.x-SNAPSHOT/base/webapps/joc.war");
@@ -149,6 +151,7 @@ public class TestExecutePatch {
         
     }
     
+    @Ignore
     @Test
     public void testWalkFileTreeExceptions() throws IOException {
         EnumSet<FileVisitOption> options = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
