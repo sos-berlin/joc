@@ -19,6 +19,8 @@ import com.sos.eventhandlerservice.resolver.JSJobOutConditions;
 import com.sos.eventhandlerservice.resolver.JSOutCondition;
 import com.sos.eventhandlerservice.resolver.JSOutConditionEvent;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemReportTask;
+import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -48,6 +50,17 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
+            ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(sosHibernateSession);
+            reportTaskExecutionsDBLayer.getFilter().setSortMode("desc");
+            reportTaskExecutionsDBLayer.getFilter().setOrderCriteria("endTime");
+            reportTaskExecutionsDBLayer.getFilter().addJobPath(jobFilterSchema.getJob());
+            reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobFilterSchema.getJobschedulerId());
+            DBItemReportTask dbItemReportTask = reportTaskExecutionsDBLayer.getHistoryItem();
+            Integer exit = null;
+            if (dbItemReportTask != null) {
+                exit = dbItemReportTask.getExitCode();
+            }
+
             checkRequiredParameter("job", jobFilterSchema.getJob());
             checkRequiredParameter("jobschedulerId", jobFilterSchema.getJobschedulerId());
 
@@ -71,15 +84,15 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             outConditions.setMasterId(jsJobConditionKey.getMasterId());
 
             if (jsJobOutConditions.getOutConditions(jsJobConditionKey) != null) {
-            
+
                 JSEventKey jsEventKey = new JSEventKey();
                 jsEventKey.setSession("now");
-                
+
                 for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
                     OutCondition outCondition = new OutCondition();
                     ConditionExpression conditionExpression = new ConditionExpression();
                     conditionExpression.setExpression(jsOutCondition.getExpression());
-                    conditionExpression.setValue(jsConditionResolver.validate(null, jsOutCondition));
+                    conditionExpression.setValue(jsConditionResolver.validate(exit, jsOutCondition));
                     conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                     outCondition.setConditionExpression(conditionExpression);
                     outCondition.setWorkflow(jsOutCondition.getWorkflow());
