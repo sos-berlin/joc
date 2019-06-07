@@ -27,10 +27,12 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.conditions.resource.IOutConditionsResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.conditions.ConditionExpression;
+import com.sos.joc.model.conditions.JobOutCondition;
 import com.sos.joc.model.conditions.OutCondition;
 import com.sos.joc.model.conditions.OutConditionEvent;
 import com.sos.joc.model.conditions.OutConditions;
-import com.sos.joc.model.job.JobFilter;
+import com.sos.joc.model.job.JobPath;
+import com.sos.joc.model.job.JobsFilter;
 
 @Path("conditions")
 public class OutConditionsImpl extends JOCResourceImpl implements IOutConditionsResource {
@@ -39,7 +41,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
     private static final String API_CALL = "./conditions/job_out_conditions";
 
     @Override
-    public JOCDefaultResponse getJobOutConditions(String accessToken, JobFilter jobFilterSchema) throws Exception {
+    public JOCDefaultResponse getJobOutConditions(String accessToken, JobsFilter jobFilterSchema) throws Exception {
         SOSHibernateSession sosHibernateSession = null;
         try {
 
@@ -50,65 +52,70 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(sosHibernateSession);
-            reportTaskExecutionsDBLayer.getFilter().setSortMode("desc");
-            reportTaskExecutionsDBLayer.getFilter().setOrderCriteria("endTime");
-            reportTaskExecutionsDBLayer.getFilter().addJobPath(jobFilterSchema.getJob());
-            reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobFilterSchema.getJobschedulerId());
-            DBItemReportTask dbItemReportTask = reportTaskExecutionsDBLayer.getHistoryItem();
-            Integer exit = null;
-            if (dbItemReportTask != null) {
-                exit = dbItemReportTask.getExitCode();
-            }
-
-            checkRequiredParameter("job", jobFilterSchema.getJob());
             checkRequiredParameter("jobschedulerId", jobFilterSchema.getJobschedulerId());
-
-            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
-            FilterOutConditions filterOutConditions = new FilterOutConditions();
-            filterOutConditions.setJob(jobFilterSchema.getJob());
-            filterOutConditions.setMasterId(jobFilterSchema.getJobschedulerId());
-
-            JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken);
-            jsConditionResolver.initEvents();
-
-            List<DBItemOutConditionWithEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
-            JSJobOutConditions jsJobOutConditions = new JSJobOutConditions();
-            jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
-            JSJobConditionKey jsJobConditionKey = new JSJobConditionKey();
-            jsJobConditionKey.setJob(jobFilterSchema.getJob());
-            jsJobConditionKey.setMasterId(jobFilterSchema.getJobschedulerId());
+            checkRequiredParameter("job", jobFilterSchema.getJobs());
 
             OutConditions outConditions = new OutConditions();
-            outConditions.setJob(jsJobConditionKey.getJob());
-            outConditions.setMasterId(jsJobConditionKey.getMasterId());
+            outConditions.setMasterId(jobFilterSchema.getJobschedulerId());
 
-            if (jsJobOutConditions.getOutConditions(jsJobConditionKey) != null) {
+            for (JobPath job : jobFilterSchema.getJobs()) {
 
-                JSEventKey jsEventKey = new JSEventKey();
-                jsEventKey.setSession("now");
-
-                for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
-                    OutCondition outCondition = new OutCondition();
-                    ConditionExpression conditionExpression = new ConditionExpression();
-                    conditionExpression.setExpression(jsOutCondition.getExpression());
-                    conditionExpression.setValue(jsConditionResolver.validate(exit, jsOutCondition));
-                    conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
-                    outCondition.setConditionExpression(conditionExpression);
-                    outCondition.setWorkflow(jsOutCondition.getWorkflow());
-                    outCondition.setId(jsOutCondition.getId());
-                    for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
-                        OutConditionEvent outConditionEvent = new OutConditionEvent();
-                        outConditionEvent.setEvent(jsOutConditionEvent.getEvent());
-                        jsEventKey.setEvent(jsOutConditionEvent.getEvent());
-                        outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey, outCondition.getWorkflow()));
-                        outConditionEvent.setId(jsOutConditionEvent.getId());
-                        outCondition.getOutconditionEvents().add(outConditionEvent);
-                    }
-                    outConditions.getOutconditions().add(outCondition);
+                JobOutCondition jobOutCondition = new JobOutCondition();
+                ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(sosHibernateSession);
+                reportTaskExecutionsDBLayer.getFilter().setSortMode("desc");
+                reportTaskExecutionsDBLayer.getFilter().setOrderCriteria("endTime");
+                reportTaskExecutionsDBLayer.getFilter().addJobPath(job.getJob());
+                reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobFilterSchema.getJobschedulerId());
+                DBItemReportTask dbItemReportTask = reportTaskExecutionsDBLayer.getHistoryItem();
+                Integer exit = null;
+                if (dbItemReportTask != null) {
+                    exit = dbItemReportTask.getExitCode();
                 }
-            }
 
+                DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+                FilterOutConditions filterOutConditions = new FilterOutConditions();
+                filterOutConditions.setJob(job.getJob());
+                filterOutConditions.setMasterId(jobFilterSchema.getJobschedulerId());
+
+                JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken);
+                jsConditionResolver.initEvents();
+
+                List<DBItemOutConditionWithEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
+                JSJobOutConditions jsJobOutConditions = new JSJobOutConditions();
+                jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
+                JSJobConditionKey jsJobConditionKey = new JSJobConditionKey();
+                jsJobConditionKey.setJob(job.getJob());
+                jsJobConditionKey.setMasterId(jobFilterSchema.getJobschedulerId());
+
+                jobOutCondition.setJob(job.getJob());
+
+                if (jsJobOutConditions.getOutConditions(jsJobConditionKey) != null) {
+
+                    JSEventKey jsEventKey = new JSEventKey();
+                    jsEventKey.setSession("now");
+
+                    for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
+                        OutCondition outCondition = new OutCondition();
+                        ConditionExpression conditionExpression = new ConditionExpression();
+                        conditionExpression.setExpression(jsOutCondition.getExpression());
+                        conditionExpression.setValue(jsConditionResolver.validate(exit, jsOutCondition));
+                        conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
+                        outCondition.setConditionExpression(conditionExpression);
+                        outCondition.setWorkflow(jsOutCondition.getWorkflow());
+                        outCondition.setId(jsOutCondition.getId());
+                        for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
+                            OutConditionEvent outConditionEvent = new OutConditionEvent();
+                            outConditionEvent.setEvent(jsOutConditionEvent.getEvent());
+                            jsEventKey.setEvent(jsOutConditionEvent.getEvent());
+                            outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey, outCondition.getWorkflow()));
+                            outConditionEvent.setId(jsOutConditionEvent.getId());
+                            outCondition.getOutconditionEvents().add(outConditionEvent);
+                        }
+                        jobOutCondition.getOutconditions().add(outCondition);
+                    }
+                }
+                outConditions.getJobsOutconditions().add(jobOutCondition);
+            }
             outConditions.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(outConditions);
 

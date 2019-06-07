@@ -12,15 +12,14 @@
 		"deliveryDate": {
 			"$ref": "../common/deliveryDate-schema.json"
 		},
-		"masterId":{"type":"string"},
-		"job": {
-			"$ref": "../common/path-schema.json"
+		"masterId": {
+			"type": "string"
 		},
-		"inconditions": {
+		"jobsInconditions": {
 			"type": "array",
 			"items": {
-				"$ref": "incondition-schema.json"
+				"$ref": "jobIncondition-schema.json"
 			}
-		} 
+		}
 	}
 }

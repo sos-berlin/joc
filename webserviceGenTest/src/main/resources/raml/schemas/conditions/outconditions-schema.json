@@ -2,7 +2,7 @@
 	"title": "Out-Conditions",
 	"id": "schemas/conditions/outconditions",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"description": "List of all out Conditions",
+	"description": "List of all Out Conditions",
 	"javaType": "com.sos.joc.model.conditions.OutConditions",
 	"type": "object",
 	"required": [
@@ -15,15 +15,11 @@
 		"masterId": {
 			"type": "string"
 		},
-		"job": {
-			"$ref": "../common/path-schema.json"
-		},
-		"outconditions": {
+		"jobsOutconditions": {
 			"type": "array",
 			"items": {
-				"$ref": "outcondition-schema.json"
+				"$ref": "jobOutcondition-schema.json"
 			}
-		} 
+		}
 	}
 }
-      
