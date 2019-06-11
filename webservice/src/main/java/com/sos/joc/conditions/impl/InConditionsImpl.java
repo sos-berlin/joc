@@ -22,6 +22,7 @@ import com.sos.eventhandlerservice.resolver.JSInConditionCommand;
 import com.sos.eventhandlerservice.resolver.JSJobConditionKey;
 import com.sos.eventhandlerservice.resolver.JSJobInConditions;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -75,7 +76,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 filterInConditions.setMasterId(jobFilterSchema.getJobschedulerId());
                 filterInConditions.setJob(job.getJob());
 
-                JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken);
+                JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken, this.getCommandUrl());
                 jsConditionResolver.initEvents();
 
                 List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
@@ -90,7 +91,8 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                     dbItemInCondition.setConsumed((mapOfConsumedInCondition.get(dbItemInCondition.getDbItemInCondition().getId()) != null));
                 }
 
-                JSJobInConditions jsJobInConditions = new JSJobInConditions();
+                EventHandlerSettings settings = new EventHandlerSettings();
+                JSJobInConditions jsJobInConditions = new JSJobInConditions(settings);
                 jsJobInConditions.setListOfJobInConditions(listOfInConditions);
                 JSJobConditionKey jsJobConditionKey = new JSJobConditionKey();
                 jsJobConditionKey.setJob(job.getJob());
