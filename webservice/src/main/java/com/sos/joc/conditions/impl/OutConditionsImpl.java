@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.db.DBItemOutConditionWithEvent;
 import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.eventhandlerservice.db.FilterOutConditions;
@@ -92,7 +93,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 if (jsJobOutConditions.getOutConditions(jsJobConditionKey) != null) {
 
                     JSEventKey jsEventKey = new JSEventKey();
-                    jsEventKey.setSession("now");
+                    jsEventKey.setSession(Constants.getSession());
 
                     for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
                         OutCondition outCondition = new OutCondition();

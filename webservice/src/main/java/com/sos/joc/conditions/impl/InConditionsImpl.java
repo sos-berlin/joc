@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.db.DBItemConsumedInCondition;
 import com.sos.eventhandlerservice.db.DBItemInConditionWithCommand;
 import com.sos.eventhandlerservice.db.DBLayerConsumedInConditions;
@@ -54,7 +55,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            checkRequiredParameter("job", jobFilterSchema.getJobs());
+            checkRequiredParameter("jobs", jobFilterSchema.getJobs());
             checkRequiredParameter("jobschedulerId", jobFilterSchema.getJobschedulerId());
 
             InConditions inConditions = new InConditions();
@@ -71,7 +72,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
                 filterConsumedInConditions.setMasterId(jobFilterSchema.getJobschedulerId());
                 filterConsumedInConditions.setJob(job.getJob());
-                filterConsumedInConditions.setSession("now");
+                filterConsumedInConditions.setSession(Constants.getSession());
 
                 filterInConditions.setMasterId(jobFilterSchema.getJobschedulerId());
                 filterInConditions.setJob(job.getJob());

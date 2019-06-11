@@ -254,6 +254,11 @@ public class JOCResourceImpl {
 		return dbItemInventoryInstance.getUrl();
 	}
 	
+	public String getCommandUrl() {
+        return dbItemInventoryInstance.getCommandUrl();
+    }
+    
+	
 	public String getVersion() {
         return dbItemInventoryInstance.getVersion();
     }

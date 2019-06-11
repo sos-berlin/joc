@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import org.apache.xalan.xsltc.compiler.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             FilterEvents filter = new FilterEvents();
             filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
-            filter.setSession(conditionEventsFilter.getSession());
+
+            if (conditionEventsFilter.getSession() == null || conditionEventsFilter.getSession().isEmpty()) {
+                filter.setSession(com.sos.eventhandlerservice.classes.Constants.getSession());
+            } else {
+                filter.setSession(conditionEventsFilter.getSession());
+
+            }
+
             filter.setWorkflow(conditionEventsFilter.getWorkflow());
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
 
@@ -81,14 +89,17 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
             if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession("now");
+                conditionEvent.setSession(com.sos.eventhandlerservice.classes.Constants.getSession());
+            } else {
+                conditionEvent.setSession(conditionEvent.getSession());
             }
 
-            this.checkRequiredParameter("masterId",conditionEvent.getMasterId());
-            this.checkRequiredParameter("workflow",conditionEvent.getWorkflow());
-            this.checkRequiredParameter("outConditionId",conditionEvent.getOutConditionId());
-            this.checkRequiredParameter("event",conditionEvent.getEvent());
+            this.checkRequiredParameter("masterId", conditionEvent.getMasterId());
+            this.checkRequiredParameter("workflow", conditionEvent.getWorkflow());
+            this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
+            this.checkRequiredParameter("event", conditionEvent.getEvent());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
@@ -129,19 +140,19 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("masterId",conditionEvent.getMasterId());
-            this.checkRequiredParameter("workflow",conditionEvent.getWorkflow());
-            this.checkRequiredParameter("outConditionId",conditionEvent.getOutConditionId());
-            this.checkRequiredParameter("event",conditionEvent.getEvent());
+            this.checkRequiredParameter("masterId", conditionEvent.getMasterId());
+            this.checkRequiredParameter("workflow", conditionEvent.getWorkflow());
+            this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
+            this.checkRequiredParameter("event", conditionEvent.getEvent());
 
-            
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession("now");
+                conditionEvent.setSession(com.sos.eventhandlerservice.classes.Constants.getSession());
+            } else {
+                conditionEvent.setSession(conditionEvent.getSession());
             }
-            
-            
+
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             FilterEvents filter = new FilterEvents();
             filter.setEvent(conditionEvent.getEvent());
