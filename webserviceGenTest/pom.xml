@@ -169,6 +169,30 @@
 								<groupId>com.fasterxml.jackson.dataformat</groupId>
 								<artifactId>jackson-dataformat-xml</artifactId>
 								<version>${jackson.version}</version>
+								<exclusions>
+									<exclusion>
+										<groupId>javax.servlet</groupId>
+										<artifactId>servlet-api</artifactId>
+									</exclusion>
+									<exclusion>
+										<groupId>com.fasterxml.woodstox</groupId>
+										<artifactId>woodstox-core</artifactId>
+									</exclusion>
+									<exclusion>
+										<groupId>org.codehaus.woodstox</groupId>
+										<artifactId>stax2-api</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+							<dependency>
+								<groupId>com.fasterxml.woodstox</groupId>
+								<artifactId>woodstox-core</artifactId>
+								<version>${woodstox.version}</version>
+							</dependency>
+							<dependency>
+								<groupId>org.codehaus.woodstox</groupId>
+								<artifactId>stax2-api</artifactId>
+								<version>${stax2.version}</version>
 							</dependency>
 						</dependencies>
 						
@@ -292,6 +316,14 @@
 				<dependency>
 					<groupId>com.fasterxml.jackson.dataformat</groupId>
 					<artifactId>jackson-dataformat-xml</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>com.fasterxml.woodstox</groupId>
+					<artifactId>woodstox-core</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>org.codehaus.woodstox</groupId>
+					<artifactId>stax2-api</artifactId>
 				</dependency>
 				<dependency>
     		       <groupId>org.glassfish.jersey.media</groupId>
