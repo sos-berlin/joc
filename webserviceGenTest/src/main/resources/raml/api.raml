@@ -135,6 +135,49 @@ traits:
 
 /security/logout:
   type: logout
+  
+/security_configuration/read:
+  type:
+    postJSONWithoutJSId:
+      description: Reads security configuration from shiro.ini
+      description1: " "
+      description2: " "
+      description3: " "
+      description4: " "
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: " "
+      schema200: !include schemas/security/security-configuration-schema.json
+      example200: " "
+      
+/security_configuration/write:
+  type:
+    postJSONWithoutJSId:
+      description: Writes security configuration into shiro.ini
+      description1: !include documentation/security/main.md
+      description2: !include documentation/security/users.md
+      description3: !include documentation/security/roles.md
+      description4: " "
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: " "
+      schema200: !include schemas/security/security-configuration-schema.json
+      example200: " "
+  post:
+    body:
+      application/json:
+        schema: !include schemas/security/security-configuration-schema.json
+        example: " "
+      
+    
 
 #TODO settings on server, not in cookies
 #/settings:

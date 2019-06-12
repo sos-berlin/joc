@@ -1,5 +1,5 @@
 {
-	"title": "security_configuration",
+	"title": "loginLogo",
 	"id": "schemas/user/loginLogo",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"javaType": "com.sos.joc.model.configuration.LoginLogo",
