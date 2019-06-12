@@ -1,5 +1,8 @@
 package com.sos.joc.conditions.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
@@ -25,35 +28,36 @@ public class ResetWorkflowImpl extends JOCResourceImpl implements IResetWorkflow
 
     @Override
     public JOCDefaultResponse resetWorkflow(String accessToken, ResetWorkflow resetWorkflow) throws Exception {
-         try {
- 
+        try {
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetWorkflow, accessToken, resetWorkflow.getMasterId(), getPermissonsJocCockpit(
                     resetWorkflow.getMasterId(), accessToken).getCondition().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            notifyEventHandler(accessToken,resetWorkflow);
- 
+            notifyEventHandler(accessToken, resetWorkflow);
+
             return JOCDefaultResponse.responseStatus200(resetWorkflow);
 
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-           
+
         }
     }
 
-    private String notifyEventHandler(String accessToken, ResetWorkflow resetWorkflow) throws JsonProcessingException, JocException{
+    private String notifyEventHandler(String accessToken, ResetWorkflow resetWorkflow) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetWorkflowImpl.class.getName());
-        CustomEvent customEvent = customEventsUtil.createEvent("ResetConditionResolver");
-        customEvent.getVariables().setAdditionalProperty("workflow",resetWorkflow.getWorkflow());
-        customEvent.getVariables().setAdditionalProperty("job",resetWorkflow.getJob());
-        customEventsUtil.addEvent(customEvent);
-        
+
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("job", resetWorkflow.getJob());
+        parameters.put("session", com.sos.eventhandlerservice.classes.Constants.getSession());
+        parameters.put("workflow", resetWorkflow.getWorkflow());
+
+        customEventsUtil.addEvent("ResetConditionResolver", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
         return jocXmlCommand.executePost(notifyCommand, accessToken);
     }
- 
-    
+
 }
