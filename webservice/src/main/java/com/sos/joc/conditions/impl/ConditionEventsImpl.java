@@ -1,11 +1,12 @@
 package com.sos.joc.conditions.impl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import org.apache.xalan.xsltc.compiler.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,25 +101,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             this.checkRequiredParameter("workflow", conditionEvent.getWorkflow());
             this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());
+            
+            FilterEvents filter = new FilterEvents();
+            filter.setEvent(conditionEvent.getEvent());
+            filter.setSession(conditionEvent.getSession());
+            filter.setWorkflow(conditionEvent.getWorkflow());
+            filter.setOutConditionId(conditionEvent.getOutConditionId());
 
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            sosHibernateSession.setAutoCommit(false);
-
-            DBItemEvent itemEvent = new DBItemEvent();
-            itemEvent.setCreated(new Date());
-            itemEvent.setEvent(conditionEvent.getEvent());
-            itemEvent.setSession(conditionEvent.getSession());
-            itemEvent.setOutConditionId(conditionEvent.getOutConditionId());
-            itemEvent.setWorkflow(conditionEvent.getWorkflow());
-
-            sosHibernateSession.beginTransaction();
-            dbLayerEvents.store(itemEvent);
-            sosHibernateSession.commit();
-
-            Globals.commit(sosHibernateSession);
-            notifyEventHandler(accessToken);
+            notifyEventHandler(accessToken, "AddEvent", filter);
             return JOCDefaultResponse.responseStatus200(conditionEvent);
 
         } catch (Exception e) {
@@ -145,28 +135,18 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());
 
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
-
             if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
                 conditionEvent.setSession(com.sos.eventhandlerservice.classes.Constants.getSession());
             } else {
                 conditionEvent.setSession(conditionEvent.getSession());
             }
 
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             FilterEvents filter = new FilterEvents();
             filter.setEvent(conditionEvent.getEvent());
             filter.setSession(conditionEvent.getSession());
             filter.setWorkflow(conditionEvent.getWorkflow());
 
-            sosHibernateSession.setAutoCommit(false);
-
-            sosHibernateSession.beginTransaction();
-            dbLayerEvents.delete(filter);
-            sosHibernateSession.commit();
-
-            Globals.commit(sosHibernateSession);
-            notifyEventHandler(accessToken);
+            notifyEventHandler(accessToken, "RemoveEvent", filter);
             return JOCDefaultResponse.responseStatus200(conditionEvent);
 
         } catch (Exception e) {
@@ -176,9 +156,16 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         }
     }
 
-    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken, String eventKey, FilterEvents filter) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(EditOutConditionsImpl.class.getName());
-        customEventsUtil.addEvent("InitConditionResolver");
+        Map<String, String> parameters = new HashMap<String, String>();
+        if (filter != null) {
+            parameters.put("outConditionId", String.valueOf(filter.getOutConditionId()));
+            parameters.put("event", filter.getEvent());
+            parameters.put("session", filter.getSession());
+            parameters.put("workflow", filter.getWorkflow());
+        }
+        customEventsUtil.addEvent(eventKey, parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
         jocXmlCommand.executePost(notifyCommand, accessToken);
