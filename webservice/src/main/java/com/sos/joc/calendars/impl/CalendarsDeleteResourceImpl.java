@@ -120,7 +120,9 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
                 sendEvent(calendarDbItem, accessToken);
 
                 CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(calendarDbLayer.getSession());
-                List<DBItemInventoryClusterCalendarUsage> usages = calendarUsageDbLayer.getCalendarUsages(new CalendarUsageFilter());
+                CalendarUsageFilter calUsageFilter = new CalendarUsageFilter();
+                calUsageFilter.setCalendarId(calendarDbItem.getId());
+                List<DBItemInventoryClusterCalendarUsage> usages = calendarUsageDbLayer.getCalendarUsages(calUsageFilter);
                 if (usages != null) {
                     for (DBItemInventoryClusterCalendarUsage usage : usages) {
                         calendarUsageDbLayer.deleteCalendarUsage(usage);
