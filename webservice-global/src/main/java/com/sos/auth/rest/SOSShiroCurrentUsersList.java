@@ -55,7 +55,7 @@ public class SOSShiroCurrentUsersList {
                 }
             }
         }
-
+        
         Iterator<String> it = toBeRemoved.iterator();
         String accessToken = "";
         while (it.hasNext()) {
