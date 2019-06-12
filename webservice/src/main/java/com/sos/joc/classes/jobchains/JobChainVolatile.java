@@ -1,5 +1,6 @@
 package com.sos.joc.classes.jobchains;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -270,6 +271,7 @@ public class JobChainVolatile extends JobChainV {
         setFileOrderSources(getFileWatchingNodeVSchema());
         setNodes(new ArrayList<JobChainNodeV>());
         setBlacklist(getBlacklist(blacklist));
+        Instant instant = jocXmlCommand.getSurveyInstant();
         for (int i = 0; i < jobNodes.getLength(); i++) {
             Element jobNodeElem = (Element) jobNodes.item(i);
             JobChainNodeV node = new JobChainNodeV();
@@ -286,7 +288,7 @@ public class JobChainVolatile extends JobChainV {
                 job.setPath(jobElem.getAttribute(WebserviceConstants.PATH));
                 job.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(jobElem));
                 // JOC-89
-                jobV.setState(hasRunningOrWaitingOrder(ordersOfCurrentNode));
+                jobV.setState(hasRunningOrWaitingOrder(ordersOfCurrentNode, instant));
                 job.setState(jobV.getState());
                 node.setJob(job);
             } else {
@@ -316,7 +318,7 @@ public class JobChainVolatile extends JobChainV {
         }
     }
 
-    private boolean hasRunningOrWaitingOrder(NodeList orders) throws Exception {
+    private boolean hasRunningOrWaitingOrder(NodeList orders, Instant surveyDate) throws Exception {
 
         // TODO maybe use JsonApi
         if (orders == null) {
@@ -330,10 +332,24 @@ public class JobChainVolatile extends JobChainV {
             if (order.hasAttribute("setback") || order.hasAttribute("suspended") || !order.hasAttribute("touched")) {
                 // that's not exact, orders are untouched too, if they
                 // waitingForResource at the first node
+                if (!order.hasAttribute("touched") && nextStartTimeIsUndefinedOrInThePast(order, surveyDate)) {
+                    return true;
+                }
                 continue;
             } else {
                 return true;
             }
+        }
+        return false;
+    }
+    
+    private boolean nextStartTimeIsUndefinedOrInThePast(Element order, Instant surveyDate) {
+        if (!order.hasAttribute("next_start_time")) {
+            return true;
+        }
+        Instant i = JobSchedulerDate.getInstantFromISO8601String(order.getAttribute("next_start_time"));
+        if (i != null && i.isBefore(surveyDate)) {
+            return true; 
         }
         return false;
     }

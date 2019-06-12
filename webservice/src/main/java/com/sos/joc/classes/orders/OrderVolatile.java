@@ -139,7 +139,17 @@ public class OrderVolatile extends OrderV {
                 setSeverity(OrderStateText.PENDING);
                 break;
             case "Setback":
-                setSeverity(OrderStateText.SETBACK);
+                if (this.getSetback() != null) {
+                    setSeverity(OrderStateText.SETBACK);
+                } else {
+                    if (usedNodes != null && usedNodes.getNode(getJobChain(), getState()) != null) {
+                        if (usedNodes.getNode(getJobChain(), getState()).isStopped()) {
+                            setSeverity(OrderStateText.NODE_STOPPED); 
+                        } else if (usedNodes.getNode(getJobChain(), getState()).isWaitingForJob()) {
+                            isWaitingForJob = true; 
+                        }
+                    }
+                }
                 break;
             case "InTaskProcess":
             case "OccupiedByClusterMember":
