@@ -16,8 +16,6 @@ import com.sos.joc.conditions.resource.IEditInConditionsResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.conditions.InConditions;
 
-import sos.scheduler.job.JobSchedulerEventJob;
-
 @Path("conditions/edit")
 public class EditInConditionsImpl extends JOCResourceImpl implements IEditInConditionsResource {
 
@@ -55,7 +53,7 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
         }
     }
 
-    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException{
+    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(EditInConditionsImpl.class.getName());
         customEventsUtil.addEvent("InitConditionResolver");
         String notifyCommand = customEventsUtil.getEventCommandAsXml();

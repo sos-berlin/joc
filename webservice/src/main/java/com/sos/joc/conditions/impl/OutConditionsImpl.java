@@ -108,7 +108,8 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             OutConditionEvent outConditionEvent = new OutConditionEvent();
                             outConditionEvent.setEvent(jsOutConditionEvent.getEvent());
                             jsEventKey.setEvent(jsOutConditionEvent.getEvent());
-                            outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey, outCondition.getWorkflow()));
+                            outConditionEvent.setExistsInWorkflow(jsConditionResolver.eventExist(jsEventKey, outCondition.getWorkflow()));
+                            outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey, ""));
                             outConditionEvent.setId(jsOutConditionEvent.getId());
                             outCondition.getOutconditionEvents().add(outConditionEvent);
                         }

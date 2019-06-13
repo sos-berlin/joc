@@ -17,6 +17,9 @@
     "exists": {
       "type": "boolean"
     },
+    "existsInWorkflow": {
+      "type": "boolean"
+    },
     "workflow": {
       "type": "string"
     }
