@@ -1,0 +1,20 @@
+{
+	"title": "Start Resolver",
+	"id": "schemas/conditions/start_resolver",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Start Resolver",
+	"javaType": "com.sos.joc.model.conditions.StartResolver",
+	"type": "object",
+	"required": [
+		"deliveryDate"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"masterId": {
+			"type": "string"
+		} 
+	}
+}
+      
