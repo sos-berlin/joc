@@ -14,7 +14,7 @@ import com.sos.joc.model.conditions.ConditionEventsFilter;
 public interface IConditionEventsResource {
 
     @POST
-    @Path("events")
+    @Path("eventlist")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse getEvents(            
