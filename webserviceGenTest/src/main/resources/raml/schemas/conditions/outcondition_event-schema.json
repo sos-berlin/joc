@@ -11,6 +11,9 @@
     "id": {
       "$ref": "../common/nonNegativeLong-schema.json"
     },
+    "command": {
+      "type": "string"
+    }, 
     "event": {
       "type": "string"
     },
