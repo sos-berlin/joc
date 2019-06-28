@@ -19,7 +19,6 @@ import com.sos.eventhandlerservice.resolver.JSJobConditionKey;
 import com.sos.eventhandlerservice.resolver.JSJobOutConditions;
 import com.sos.eventhandlerservice.resolver.JSOutCondition;
 import com.sos.eventhandlerservice.resolver.JSOutConditionEvent;
-import com.sos.eventhandlerservice.resolver.JSOutConditionEvent.OutConditionEventCommand;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemReportTask;
 import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
@@ -110,7 +109,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             outConditionEvent.setEvent(jsOutConditionEvent.getEventValue());
                             outConditionEvent.setCommand(jsOutConditionEvent.getCommand());
                             jsEventKey.setEvent(jsOutConditionEvent.getEvent());
-                            if (OutConditionEventCommand.create.name().equals(jsOutConditionEvent.getCommand())) {
+                            if (jsOutConditionEvent.isCreateCommand()) {
                                 outConditionEvent.setExistsInWorkflow(jsConditionResolver.eventExist(jsEventKey, outCondition.getWorkflow()));
                                 outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey, ""));
                             }else {
