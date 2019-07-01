@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.eventhandlerservice.db.DBItemEvent;
+import com.sos.eventhandlerservice.db.DBItemOutCondition;
 import com.sos.eventhandlerservice.db.DBLayerEvents;
+import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.eventhandlerservice.db.FilterEvents;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
@@ -45,6 +47,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             FilterEvents filter = new FilterEvents();
             filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
 
@@ -57,18 +60,22 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
             filter.setWorkflow(conditionEventsFilter.getWorkflow());
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
-
             ConditionEvents conditionEvents = new ConditionEvents();
             conditionEvents.setDeliveryDate(new Date());
-            conditionEvents.setSession(conditionEventsFilter.getSession());
+            conditionEvents.setSession(filter.getSession());
 
             for (DBItemEvent dbItemEvent : listOfEvents) {
                 ConditionEvent conditionEvent = new ConditionEvent();
-                conditionEvent.setEvent(dbItemEvent.getEvent());
-                conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
-                conditionEvent.setSession(dbItemEvent.getSession());
-                conditionEvent.setWorkflow(dbItemEvent.getWorkflow());
-                conditionEvents.getConditionEvents().add(conditionEvent);
+                DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
+                if (dbItemOutCondition != null) {
+                    conditionEvent.setEvent(dbItemEvent.getEvent());
+                    conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
+
+                    conditionEvent.setSession(dbItemEvent.getSession());
+                    conditionEvent.setWorkflow(dbItemEvent.getWorkflow());
+                    conditionEvent.setPath(dbItemOutCondition.getPath());
+                    conditionEvents.getConditionEvents().add(conditionEvent);
+                }
             }
             return JOCDefaultResponse.responseStatus200(conditionEvents);
 
@@ -101,7 +108,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             this.checkRequiredParameter("workflow", conditionEvent.getWorkflow());
             this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());
-            
+
             FilterEvents filter = new FilterEvents();
             filter.setEvent(conditionEvent.getEvent());
             filter.setSession(conditionEvent.getSession());
