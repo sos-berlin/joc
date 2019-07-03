@@ -70,11 +70,13 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 if (dbItemOutCondition != null) {
                     conditionEvent.setEvent(dbItemEvent.getEvent());
                     conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
-
                     conditionEvent.setSession(dbItemEvent.getSession());
                     conditionEvent.setWorkflow(dbItemEvent.getWorkflow());
                     conditionEvent.setPath(dbItemOutCondition.getPath());
-                    conditionEvents.getConditionEvents().add(conditionEvent);
+                    if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getPath().equals(
+                            conditionEventsFilter.getPath())) {
+                        conditionEvents.getConditionEvents().add(conditionEvent);
+                    }
                 }
             }
             return JOCDefaultResponse.responseStatus200(conditionEvents);
