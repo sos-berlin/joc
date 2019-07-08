@@ -4,7 +4,7 @@ package com.sos.joc.exceptions;
 public class DBOpenSessionException extends JocException {
     
     private static final long serialVersionUID = 1L;
-    private static final String ERROR_CODE = "JOC-410";
+    private static final String ERROR_CODE = "JOC-421";
 
     public DBOpenSessionException() {
     }
