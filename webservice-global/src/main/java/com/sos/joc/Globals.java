@@ -28,9 +28,8 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.JocWebserviceDataContainer;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocConfigurationException;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 
 public class Globals {
@@ -61,7 +60,7 @@ public class Globals {
     public static TimeZone jocTimeZone = TimeZone.getDefault();
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
-        if (sosHibernateFactory == null) {
+        if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {
             try {
                 String confFile = getHibernateConfFile(null);
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
@@ -84,7 +83,7 @@ public class Globals {
         }
         SOSHibernateFactory sosHibernateFactory = sosSchedulerHibernateFactories.get(schedulerId);
 
-        if (sosHibernateFactory == null) {
+        if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {
             try {
                 String confFile = getHibernateConfFile(schedulerId);
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
@@ -101,24 +100,13 @@ public class Globals {
     }
 
     public static SOSHibernateSession createSosHibernateStatelessConnection(String identifier) throws JocConfigurationException,
-            DBConnectionRefusedException {
-        if (sosHibernateFactory == null) {
-            getHibernateFactory();
-        }
+            DBOpenSessionException {
         try {
-            if (sosHibernateFactory == null) {
-                JocError error = new JocError();
-                error.setCode("");
-                error.setMessage("Could not create sosHibernateFactory");
-                throw new JocException(error);
-            }
+            getHibernateFactory();
             SOSHibernateSession sosHibernateSession = sosHibernateFactory.openStatelessSession(identifier);
             return sosHibernateSession;
         } catch (SOSHibernateOpenSessionException e) {
-            throw new DBConnectionRefusedException(e);
-        } catch (JocException ee) {
-            throw new DBConnectionRefusedException(ee);
-
+            throw new DBOpenSessionException(e);
         }
     }
 
