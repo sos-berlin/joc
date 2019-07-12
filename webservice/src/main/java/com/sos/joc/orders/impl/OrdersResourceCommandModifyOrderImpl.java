@@ -10,14 +10,19 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.jitl.reporting.db.DBItemJocStartedOrders;
 import com.sos.jobscheduler.model.event.CalendarEvent;
 import com.sos.jobscheduler.model.event.CalendarObjectType;
+import com.sos.jobscheduler.model.event.CustomEvent;
+import com.sos.jobscheduler.model.event.CustomEventVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -28,6 +33,7 @@ import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.classes.configuration.JSObjectConfiguration;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
+import com.sos.joc.db.audit.StartedOrdersDBLayer;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
@@ -35,6 +41,7 @@ import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -49,9 +56,11 @@ import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
 public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
 
     private static String API_CALL = "./orders/";
+    private ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private SOSHibernateSession session = null;
     private InventoryJobChainsDBLayer dbJobChainLayer = null;
+    private StartedOrdersDBLayer startedOrdersDbLayer = null;
     private InventoryOrdersDBLayer dbOrderLayer = null;
 
     @Override
@@ -304,7 +313,11 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 break;
             }
             if (!"set_run_time".equals(command)) {
+                xml = addOrderStartedEvent(order, xml, command);
                 jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            }
+            if ("start".equals(command)) {
+                savePlannedStartOfOrder(order);
             }
             storeAuditLogEntry(orderAudit);
 
@@ -331,13 +344,17 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             }
             
             List<DBItemInventoryInstance> clusterMembers = null;
-            if ("set_run_time".equals(command) && session == null) {
+            if (session == null && ("set_run_time".equals(command) || "start".equals(command))) {
                 session = Globals.createSosHibernateStatelessConnection(API_CALL);
-
+            }
+            if ("set_run_time".equals(command)) {
                 if ("active".equals(dbItemInventoryInstance.getClusterType())) {
                     InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(session);
                     clusterMembers = instanceLayer.getInventoryInstancesBySchedulerId(modifyOrders.getJobschedulerId());
                 }
+            }
+            if ("start".equals(command)) {
+                startedOrdersDbLayer = new StartedOrdersDBLayer(session);
             }
             
             for (ModifyOrder order : modifyOrders.getOrders()) {
@@ -405,6 +422,37 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
         }
+    }
+    
+    private void savePlannedStartOfOrder(ModifyOrder order) throws JobSchedulerBadRequestException, DBConnectionRefusedException,
+            DBInvalidDataException {
+        String plannedStart = JobSchedulerDate.getAtInUTCISO8601(order.getAt(), order.getTimeZone());
+        DBItemJocStartedOrders startedOrdersDbItem = new DBItemJocStartedOrders();
+        startedOrdersDbItem.setId(null);
+        startedOrdersDbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
+        startedOrdersDbItem.setJobChain(order.getJobChain());
+        startedOrdersDbItem.setOrderId(order.getOrderId());
+        startedOrdersDbItem.setPlannedStart(Date.from(Instant.parse(plannedStart)));
+        startedOrdersDbLayer.save(startedOrdersDbItem);
+    }
+    
+    private XMLBuilder addOrderStartedEvent(ModifyOrder order, XMLBuilder xml, String command) {
+        if ("start".equals(command) || "resume".equals(command)) {
+            CustomEvent customEvt = new CustomEvent();
+            customEvt.setKey("OrderStarted");
+            CustomEventVariables vars = new CustomEventVariables();
+            vars.setAdditionalProperty("jobChain", order.getJobChain());
+            vars.setAdditionalProperty("orderId", order.getOrderId());
+            customEvt.setVariables(vars);
+            try {
+                XMLBuilder commands = new XMLBuilder("commands");
+                commands.add(xml.getRoot());
+                commands.addElement("publish_event").addText(objectMapper.writeValueAsString(customEvt));
+                return commands;
+            } catch (Exception e) {
+            }
+        }
+        return xml;
     }
 
 }

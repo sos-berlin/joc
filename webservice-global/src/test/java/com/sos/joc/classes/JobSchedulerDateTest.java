@@ -1,5 +1,9 @@
 package com.sos.joc.classes;
 
+import static org.junit.Assert.assertEquals;
+
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -79,7 +83,30 @@ public class JobSchedulerDateTest {
         System.out.println(JobSchedulerDate.getDateTo("-1h", null));
         System.out.println(JobSchedulerDate.getDateFrom("-10s", null));
         System.out.println(JobSchedulerDate.getDateTo("-10s", null));
-        
     }
+    
+    @Test
+    public void testGetAtInUTCISO8601() throws Exception {
+        String atTimeZone = "Europe/Berlin";
+        String atDate = "2019-07-12 11:00";
+        String atDate2 = "now + 01:00";
+        String result = JobSchedulerDate.getAtInUTCISO8601(atDate, atTimeZone);
+        //System.out.println(result);
+        assertEquals("testGetAtInUTCISO8601-1", "2019-07-12T09:00:00Z", result);
+        result = JobSchedulerDate.getAtInUTCISO8601(atDate2, atTimeZone);
+        //System.out.println(result);
+        Calendar now = Calendar.getInstance();
+        now.set(Calendar.MILLISECOND, 0);
+        now.set(Calendar.SECOND, 0);
+        now.set(Calendar.MINUTE, 0);
+        now.add(Calendar.HOUR_OF_DAY, 1);
+        Calendar resultCal = Calendar.getInstance();
+        resultCal.setTime(Date.from(Instant.parse(result)));
+        resultCal.set(Calendar.MILLISECOND, 0);
+        resultCal.set(Calendar.SECOND, 0);
+        resultCal.set(Calendar.MINUTE, 0);
+        assertEquals("testGetAtInUTCISO8601-2", now, resultCal);
+    }
+    
 
 }

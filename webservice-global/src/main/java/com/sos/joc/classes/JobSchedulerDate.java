@@ -114,6 +114,49 @@ public class JobSchedulerDate {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return formatter.format(ZonedDateTime.of(LocalDateTime.parse(at, formatter), ZoneId.of(userTimezone)).withZoneSameInstant(ZoneId.of(jobSchedulerTimezone)));
     }
+    
+    public static String getAtInUTCISO8601(String at, String userTimezone) throws JobSchedulerBadRequestException {
+        if(at == null || at.toLowerCase().contains("now")) {
+            return getAtWithNowInUTCISO8601(at, userTimezone);
+        }
+        return getAtWithoutNowInUTCISO8601(at, userTimezone);
+    }
+    
+    public static String getAtWithNowInUTCISO8601(String at, String userTimezone) throws JobSchedulerBadRequestException {
+        if (at == null || !at.trim().toLowerCase().matches("now|now\\s*\\+\\s*(\\d+|\\d{2}:\\d{2}(:\\d{2})?)")) {
+            throw new JobSchedulerBadRequestException(String.format("formats 'now', 'now + HH:mm:[ss]' or 'now + SECONDS' expected for \"Start time\": %1$s", at));
+        }
+        
+        String[] nowPlusParts = at.trim().toLowerCase().replaceFirst("^now(\\s*\\+\\s*)?", "").split(":");
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(userTimezone));
+        now = now.withNano(0);
+        if (nowPlusParts.length == 1) { //+ SECONDS
+            now = now.plusSeconds(Long.valueOf(nowPlusParts[0]));
+        } else { //+ HH:mm:[ss]
+            now = now.plusHours(Long.valueOf(nowPlusParts[0]));
+            now = now.plusMinutes(Long.valueOf(nowPlusParts[1]));
+            if (nowPlusParts.length == 3) {
+                now = now.plusSeconds(Long.valueOf(nowPlusParts[2]));
+            }
+        }
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+        return formatter.format(ZonedDateTime.of(now, ZoneId.of(userTimezone)).withZoneSameInstant(ZoneId.of("UTC")));
+    }
+    
+    public static String getAtWithoutNowInUTCISO8601(String at, String userTimezone) throws JobSchedulerBadRequestException {
+        if (at != null) {
+            at = at.trim();
+        }
+        if (at != null && at.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}")) {
+            at += ":00";
+        }
+        if (at == null || !at.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) {
+            throw new JobSchedulerBadRequestException(String.format("formats 'now', 'now + HH:mm:[ss]' or 'now + SECONDS' expected for \"Start time\": %1$s", at));
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        return formatter.format(ZonedDateTime.of(LocalDateTime.parse(at.replace(' ', 'T'), formatter), ZoneId.of(userTimezone)).withZoneSameInstant(ZoneId.of("UTC"))) + "Z";
+    }
    
     private static Instant getInstantFromDateStr(String dateStr, boolean dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {
         Pattern offsetPattern = Pattern.compile("(\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(?:\\.\\d+)?|(?:\\s*[+-]?\\d+\\s*[smhdwMy])+)([+-][0-9:]+|Z)?$");

@@ -9,6 +9,9 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemJocStartedOrders;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -16,8 +19,14 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
+import com.sos.joc.db.audit.StartedOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBOpenSessionException;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
@@ -35,6 +44,8 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     private static final String API_CALL = "./orders/add";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private List<OrderPath200> orderPaths = new ArrayList<OrderPath200>();
+    private SOSHibernateSession session = null;
+    private StartedOrdersDBLayer startedOrdersDbLayer = null;
 
     @Override
     public JOCDefaultResponse postOrdersAdd(String xAccessToken, String accessToken, ModifyOrders modifyOrders) throws Exception {
@@ -75,12 +86,15 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(session);
         }
     }
 
     private void executeAddOrderCommand(ModifyOrder order, ModifyOrders modifyOrders) {
 
         try {
+            String plannedStart = null;
             if (order.getParams() != null && order.getParams().isEmpty()) {
                 order.setParams(null);
             }
@@ -106,6 +120,10 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 } else {
                     xml.addAttribute("at", JobSchedulerDate.getAtInJobSchedulerTimezone(order.getAt(), order.getTimeZone(), dbItemInventoryInstance
                             .getTimeZone()));
+                }
+                try {
+                    plannedStart = JobSchedulerDate.getAtInUTCISO8601(order.getAt(), order.getTimeZone());
+                } catch (Exception e) {
                 }
             }
             if (order.getEndState() != null && !"".equals(order.getEndState())) {
@@ -149,6 +167,8 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                     orderPath.setOrderId(null);
                 }
             }
+
+            savePlannedStartOfOrder(orderAudit, plannedStart);
             storeAuditLogEntry(orderAudit);
             orderPaths.add(orderPath);
         } catch (JocException e) {
@@ -170,5 +190,22 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         paramsElem.addElement("param").addAttribute("name", "SCHEDULER_JOC_USER_ACCOUNT").addAttribute("value", getJobschedulerUser()
                 .getSosShiroCurrentUser().getUsername());
         return paramsElem;
+    }
+
+    private void savePlannedStartOfOrder(ModifyOrder order, String plannedStart) throws JobSchedulerBadRequestException,
+            DBConnectionRefusedException, DBInvalidDataException, JocConfigurationException, DBOpenSessionException {
+        if (plannedStart != null && order.getOrderId() != null && !order.getOrderId().isEmpty()) {
+            DBItemJocStartedOrders startedOrdersDbItem = new DBItemJocStartedOrders();
+            startedOrdersDbItem.setId(null);
+            startedOrdersDbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
+            startedOrdersDbItem.setJobChain(order.getJobChain());
+            startedOrdersDbItem.setOrderId(order.getOrderId());
+            startedOrdersDbItem.setPlannedStart(Date.from(Instant.parse(plannedStart)));
+            if (session == null) {
+                session = Globals.createSosHibernateStatelessConnection(API_CALL);
+                startedOrdersDbLayer = new StartedOrdersDBLayer(session);
+            }
+            startedOrdersDbLayer.save(startedOrdersDbItem);
+        }
     }
 }
