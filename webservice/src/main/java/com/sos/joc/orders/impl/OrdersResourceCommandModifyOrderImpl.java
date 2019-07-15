@@ -10,8 +10,7 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
@@ -56,7 +55,6 @@ import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
 public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
 
     private static String API_CALL = "./orders/";
-    private ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private SOSHibernateSession session = null;
     private InventoryJobChainsDBLayer dbJobChainLayer = null;
@@ -313,9 +311,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 break;
             }
             if (!"set_run_time".equals(command)) {
-                xml = addOrderStartedEvent(order, xml, command);
                 jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
             }
+            sendOrderStartedEvent(order, command);;
             if ("start".equals(command)) {
                 savePlannedStartOfOrder(order);
             }
@@ -436,23 +434,15 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         startedOrdersDbLayer.save(startedOrdersDbItem);
     }
     
-    private XMLBuilder addOrderStartedEvent(ModifyOrder order, XMLBuilder xml, String command) {
+    private void sendOrderStartedEvent(ModifyOrder order, String command) throws JsonProcessingException, JocException {
         if ("start".equals(command) || "resume".equals(command)) {
             CustomEvent customEvt = new CustomEvent();
             customEvt.setKey("OrderStarted");
             CustomEventVariables vars = new CustomEventVariables();
-            vars.setAdditionalProperty("jobChain", order.getJobChain());
-            vars.setAdditionalProperty("orderId", order.getOrderId());
+            vars.setAdditionalProperty("path", order.getJobChain() + "," + order.getOrderId());
             customEvt.setVariables(vars);
-            try {
-                XMLBuilder commands = new XMLBuilder("commands");
-                commands.add(xml.getRoot());
-                commands.addElement("publish_event").addText(objectMapper.writeValueAsString(customEvt));
-                return commands;
-            } catch (Exception e) {
-            }
+            SendCalendarEventsUtil.sendEvent(customEvt, dbItemInventoryInstance, getAccessToken());
         }
-        return xml;
     }
 
 }
