@@ -85,24 +85,28 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl
 					}
 					tasks.add(new JobSchedulerVCallable(setMappedUrl(instance), accessToken));
 				}
-				if (!tasks.isEmpty()) {
-					ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-					try {
-						for (Future<JobSchedulerV> result : executorService.invokeAll(tasks)) {
-							try {
-								masters.add(result.get());
-							} catch (ExecutionException e) {
-								if (e.getCause() instanceof JocException) {
-									throw (JocException) e.getCause();
-								} else {
-									throw (Exception) e.getCause();
-								}
-							}
-						}
-					} finally {
-						executorService.shutdown();
-					}
-				} else {
+                if (!tasks.isEmpty()) {
+                    if (tasks.size() == 1) {
+                        masters.add(tasks.get(0).call());
+                    } else {
+                        ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                        try {
+                            for (Future<JobSchedulerV> result : executorService.invokeAll(tasks)) {
+                                try {
+                                    masters.add(result.get());
+                                } catch (ExecutionException e) {
+                                    if (e.getCause() instanceof JocException) {
+                                        throw (JocException) e.getCause();
+                                    } else {
+                                        throw (Exception) e.getCause();
+                                    }
+                                }
+                            }
+                        } finally {
+                            executorService.shutdown();
+                        }
+                    }
+                } else {
 					if (curJobSchedulerId.isEmpty()) {
 						return accessDeniedResponse();
 					}

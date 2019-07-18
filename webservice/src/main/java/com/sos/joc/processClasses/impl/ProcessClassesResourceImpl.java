@@ -86,22 +86,26 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                         .getIsAgentCluster(), command, accessToken, jobViewStatusEnabled);
                 listProcessClasses = callable.getProcessClasses();
             }
-            if (tasks.size() > 0) {
-                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-                try {
-                    for (Future<List<ProcessClassV>> result : executorService.invokeAll(tasks)) {
-                        try {
-                            listProcessClasses.addAll(result.get());
-                        } catch (ExecutionException e) {
-                            if (e.getCause() instanceof JocException) {
-                                throw (JocException) e.getCause();
-                            } else {
-                                throw (Exception) e.getCause();
+            if (!tasks.isEmpty()) {
+                if (tasks.size() == 1) {
+                    listProcessClasses = tasks.get(0).call();
+                } else {
+                    ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                    try {
+                        for (Future<List<ProcessClassV>> result : executorService.invokeAll(tasks)) {
+                            try {
+                                listProcessClasses.addAll(result.get());
+                            } catch (ExecutionException e) {
+                                if (e.getCause() instanceof JocException) {
+                                    throw (JocException) e.getCause();
+                                } else {
+                                    throw (Exception) e.getCause();
+                                }
                             }
                         }
+                    } finally {
+                        executorService.shutdown();
                     }
-                } finally {
-                    executorService.shutdown();
                 }
             }
 

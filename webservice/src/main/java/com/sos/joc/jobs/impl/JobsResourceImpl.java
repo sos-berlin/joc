@@ -126,21 +126,25 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 }
 
                 if (tasks != null && !tasks.isEmpty()) {
-                    ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-                    try {
-                        for (Future<Map<String, JobVolatileJson>> result : executorService.invokeAll(tasks)) {
-                            try {
-                                listJobs.putAll(result.get());
-                            } catch (ExecutionException e) {
-                                if (e.getCause() instanceof JocException) {
-                                    throw (JocException) e.getCause();
-                                } else {
-                                    throw (Exception) e.getCause();
+                    if (tasks.size() == 1) {
+                        listJobs = tasks.get(0).call();
+                    } else {
+                        ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                        try {
+                            for (Future<Map<String, JobVolatileJson>> result : executorService.invokeAll(tasks)) {
+                                try {
+                                    listJobs.putAll(result.get());
+                                } catch (ExecutionException e) {
+                                    if (e.getCause() instanceof JocException) {
+                                        throw (JocException) e.getCause();
+                                    } else {
+                                        throw (Exception) e.getCause();
+                                    }
                                 }
                             }
+                        } finally {
+                            executorService.shutdown();
                         }
-                    } finally {
-                        executorService.shutdown();
                     }
                 }
 

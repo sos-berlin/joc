@@ -95,22 +95,27 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         }
         Map<String, AgentOfCluster> mapOfAgents = new HashMap<String, AgentOfCluster>();
         if (!tasks.isEmpty()) {
-            ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size())); // max. 10;
-            try {
-                for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
-                    try {
-                        AgentOfCluster a = result.get();
-                        mapOfAgents.put(a.getUrl(), a);
-                    } catch (ExecutionException e) {
-                        if (e.getCause() instanceof JocException) {
-                            throw (JocException) e.getCause();
-                        } else {
-                            throw (Exception) e.getCause();
+            if (tasks.size() == 1) {
+                AgentOfCluster a = tasks.get(0).call();
+                mapOfAgents.put(a.getUrl(), a);
+            } else {
+                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size())); // max. 10;
+                try {
+                    for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
+                        try {
+                            AgentOfCluster a = result.get();
+                            mapOfAgents.put(a.getUrl(), a);
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
+                            }
                         }
                     }
+                } finally {
+                    executorService.shutdown();
                 }
-            } finally {
-                executorService.shutdown();
             }
         }
         List<AgentCluster> listAgentClusterV = new ArrayList<AgentCluster>();
@@ -140,22 +145,27 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         }
         Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();
         if (!tasks.isEmpty()) {
-            ExecutorService executorService = Executors.newFixedThreadPool(Math.min(5, tasks.size()));
-            try {
-                for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
-                    try {
-                        AgentOfCluster a = result.get();
-                        mapOfAgents.put(a.getUrl(), a);
-                    } catch (ExecutionException e) {
-                        if (e.getCause() instanceof JocException) {
-                            throw (JocException) e.getCause();
-                        } else {
-                            throw (Exception) e.getCause();
+            if (tasks.size() == 1) {
+                AgentOfCluster a = tasks.get(0).call();
+                mapOfAgents.put(a.getUrl(), a);
+            } else {
+                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(5, tasks.size()));
+                try {
+                    for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
+                        try {
+                            AgentOfCluster a = result.get();
+                            mapOfAgents.put(a.getUrl(), a);
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
+                            }
                         }
                     }
+                } finally {
+                    executorService.shutdown();
                 }
-            } finally {
-                executorService.shutdown();
             }
         }
         agentClusterV.setFields(mapOfAgents, agentClusterBody.getCompact());

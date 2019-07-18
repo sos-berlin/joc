@@ -133,28 +133,36 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
 				}
 				Map<String, AgentOfCluster> mapOfAgents = new HashMap<String, AgentOfCluster>();
 				Set<String> unreachableAgents = new HashSet<String>();
-				if (!tasks.isEmpty()) {
-					ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-					try {
-						for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
-							try {
-								AgentOfCluster a = result.get();
-								if (a.getState().get_text() == JobSchedulerStateText.UNREACHABLE) {
-								    unreachableAgents.add(a.getUrl());
-								}
-								mapOfAgents.put(a.getUrl(), a);
-							} catch (ExecutionException e) {
-								if (e.getCause() instanceof JocException) {
-									throw (JocException) e.getCause();
-								} else {
-									throw (Exception) e.getCause();
-								}
-							}
-						}
-					} finally {
-						executorService.shutdown();
-					}
-				}
+                if (!tasks.isEmpty()) {
+                    if (tasks.size() == 1) {
+                        AgentOfCluster a = tasks.get(0).call();
+                        if (a.getState().get_text() == JobSchedulerStateText.UNREACHABLE) {
+                            unreachableAgents.add(a.getUrl());
+                        }
+                        mapOfAgents.put(a.getUrl(), a);
+                    } else {
+                        ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                        try {
+                            for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
+                                try {
+                                    AgentOfCluster a = result.get();
+                                    if (a.getState().get_text() == JobSchedulerStateText.UNREACHABLE) {
+                                        unreachableAgents.add(a.getUrl());
+                                    }
+                                    mapOfAgents.put(a.getUrl(), a);
+                                } catch (ExecutionException e) {
+                                    if (e.getCause() instanceof JocException) {
+                                        throw (JocException) e.getCause();
+                                    } else {
+                                        throw (Exception) e.getCause();
+                                    }
+                                }
+                            }
+                        } finally {
+                            executorService.shutdown();
+                        }
+                    }
+                }
                 if (!mapOfAgents.isEmpty()) {
                     connection = Globals.createSosHibernateStatelessConnection(API_CALL);
                     agentLayer = new InventoryAgentsDBLayer(connection);

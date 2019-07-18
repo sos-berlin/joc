@@ -121,21 +121,25 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             }
 
             if (tasks != null && !tasks.isEmpty()) {
-                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-                try {
-                    for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
-                        try {
-                            listOrders.putAll(result.get());
-                        } catch (ExecutionException e) {
-                            if (e.getCause() instanceof JocException) {
-                                throw (JocException) e.getCause();
-                            } else {
-                                throw (Exception) e.getCause();
+                if (tasks.size() == 1) {
+                    listOrders = tasks.get(0).call();
+                } else {
+                    ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                    try {
+                        for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
+                            try {
+                                listOrders.putAll(result.get());
+                            } catch (ExecutionException e) {
+                                if (e.getCause() instanceof JocException) {
+                                    throw (JocException) e.getCause();
+                                } else {
+                                    throw (Exception) e.getCause();
+                                }
                             }
                         }
+                    } finally {
+                        executorService.shutdown();
                     }
-                } finally {
-                    executorService.shutdown();
                 }
             }
 
