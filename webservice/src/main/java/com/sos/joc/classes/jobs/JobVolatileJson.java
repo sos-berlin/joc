@@ -50,7 +50,7 @@ public class JobVolatileJson extends JobV {
     
     public JobVolatileJson(JsonObject job, Boolean compactView, JsonObject summary) {
         this.job = job;
-        this.overview = getOrderOverview();
+        this.overview = getJobOverview();
         this.orderJob = this.overview.getBoolean("isOrderJob", false);
         this.withOrderQueue = false;
         this.summary = summary;
@@ -59,7 +59,7 @@ public class JobVolatileJson extends JobV {
     
     public JobVolatileJson(JsonObject job, Boolean compactView, Boolean withOrderQueue) {
         this.job = job;
-        this.overview = getOrderOverview();
+        this.overview = getJobOverview();
         this.orderJob = this.overview.getBoolean("isOrderJob", false);
         this.withOrderQueue = withOrderQueue;
         this.summary = null;
@@ -136,7 +136,7 @@ public class JobVolatileJson extends JobV {
     }
     
     //JOC-89, order job is pending for some states if node doesn't have a running order
-    public void setState(boolean hasRunningOrWaitingOrder) throws Exception {
+    public void setState(boolean hasRunningOrWaitingOrder) {
         if (getState() == null) {
             setState();
         }
@@ -346,7 +346,7 @@ public class JobVolatileJson extends JobV {
         }
     }
     
-    private JsonObject getOrderOverview() {
+    private JsonObject getJobOverview() {
         return job.containsKey("overview") ? job.getJsonObject("overview") : job;
     }
 }

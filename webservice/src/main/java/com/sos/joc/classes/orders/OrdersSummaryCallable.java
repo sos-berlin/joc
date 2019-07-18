@@ -10,12 +10,15 @@ import javax.json.JsonObjectBuilder;
 
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.jobchains.JobChainVolatile;
+import com.sos.joc.classes.jobchains.JobChainVolatileJson;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrdersSummary;
 
 public class OrdersSummaryCallable implements Callable<Map<String, JobChainVolatile>> {
 
     private final JobChainVolatile jobChain;
+    private final JobChainVolatileJson jobChainJson;
     private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
 
@@ -23,31 +26,46 @@ public class OrdersSummaryCallable implements Callable<Map<String, JobChainVolat
         JobChainVolatile jobC = new JobChainVolatile();
         jobC.setPath("/");
         this.jobChain = jobC;
+        this.jobChainJson = null;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
 
     public OrdersSummaryCallable(JobChainVolatile jobChain, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.jobChain = jobChain;
+        this.jobChainJson = null;
+        this.jocJsonCommand = jocJsonCommand;
+        this.accessToken = accessToken;
+    }
+
+    public OrdersSummaryCallable(JobChainVolatileJson jobChain, JOCJsonCommand jocJsonCommand, String accessToken) {
+        this.jobChain = null;
+        this.jobChainJson = jobChain;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
 
     @Override
-    public Map<String, JobChainVolatile> call() throws Exception {
+    public Map<String, JobChainVolatile> call() throws JocException {
         return callOrdersSummary();
     }
 
-    public OrdersSummary getOrdersSummary() throws Exception {
+    public OrdersSummary getOrdersSummary() throws JocException {
         try {
-            return getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChain.getPath()), accessToken));
+            if (jobChain != null) {
+                return getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChain.getPath()), accessToken));
+            } else if (jobChainJson != null) {
+                return getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChainJson.getPath()), accessToken));
+            } else {
+                return getOrdersSummary(null);
+            }
         } catch (JobSchedulerBadRequestException e) {
             //LOGGER.warn("", e);
             return getOrdersSummary(null);
         }
     }
 
-    private Map<String, JobChainVolatile> callOrdersSummary() throws Exception {
+    private Map<String, JobChainVolatile> callOrdersSummary() throws JocException {
         Map<String, JobChainVolatile> summaryMap = new HashMap<String, JobChainVolatile>();
         try {
             jobChain.setOrdersSummary(getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChain.getPath()), accessToken)));

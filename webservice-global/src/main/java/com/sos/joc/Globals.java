@@ -59,6 +59,7 @@ public class Globals {
     public static long timeoutToDeleteTempFiles = 1000 * 60 * 3L;
     public static TimeZone jocTimeZone = TimeZone.getDefault();
     public static boolean rollbackJobHistoryWithJSON = false;
+    public static boolean rollbackJobChainWithJSON = false;
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {
@@ -162,6 +163,7 @@ public class Globals {
         setHostnameVerification();
         setForceCommentsForAuditLog();
         setRollbackJobHistoryWithJSON();
+        setRollbackJobChainyWithJSON();
         setTrustStore();
         setTrustStoreType();
         setTrustStorePassword();
@@ -385,6 +387,14 @@ public class Globals {
         boolean defaultRollbackJobHistoryWithJSON = false;
         if (sosShiroProperties != null) {
             rollbackJobHistoryWithJSON = sosShiroProperties.getProperty("disable_job_history_with_json", defaultRollbackJobHistoryWithJSON);
+        }
+    }
+    
+    //rollback option for JS-1795
+    private static void setRollbackJobChainyWithJSON() {
+        boolean defaultRollbackJobChainWithJSON = false;
+        if (sosShiroProperties != null) {
+            rollbackJobChainWithJSON = sosShiroProperties.getProperty("disable_jobchain_with_json", defaultRollbackJobChainWithJSON);
         }
     }
 

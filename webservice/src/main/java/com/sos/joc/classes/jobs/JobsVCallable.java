@@ -69,6 +69,19 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         this.summary = summary;
     }
     
+    public JobsVCallable(String job, JOCJsonCommand jocJsonCommand, String accessToken) {
+        this.job = job;
+        this.folder = null;
+        this.jobsBody = null;
+        this.compact = true;
+        this.compactView = true;
+        this.jocJsonCommand = jocJsonCommand;
+        this.accessToken = accessToken;
+        this.suppressJobSchedulerObjectNotExistException = true;
+        this.withOrderQueue = false;
+        this.summary = null;
+    }
+    
     public JobsVCallable(Folder folder, JobsFilter jobs, JOCJsonCommand jocJsonCommand, String accessToken, JsonObject summary) {
         this.job = null;
         this.folder = folder;

@@ -102,6 +102,9 @@ public class ConfigurationStatus {
      * @return ConfigurationStatusSchema
      */
     public static ConfigurationState getConfigurationStatus(JsonArray obstacles) {
+        if (obstacles == null) {
+            return null;
+        }
         try {
             Optional<JsonValue> fileBasedObstacleItem = obstacles.stream().filter(p -> "fileBasedObstacles".equalsIgnoreCase(((JsonObject) p).getString("TYPE"))).findFirst();
             if (!fileBasedObstacleItem.isPresent()) {

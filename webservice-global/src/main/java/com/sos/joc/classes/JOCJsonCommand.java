@@ -122,6 +122,14 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         setUriBuilder(url, MASTER_API_PATH + "job");
     }
     
+    public void setUriBuilderForJobChains() {
+        setUriBuilderForJobChains(url);
+    }
+    
+    public void setUriBuilderForJobChains(String url) {
+        setUriBuilder(url, MASTER_API_PATH + "jobChain");
+    }
+    
     public URI getUriForJobPathAsUrlParam(String jobPath, Integer limit) {
         uriBuilder = UriBuilder.fromPath(url);
         uriBuilder.path(MASTER_API_PATH + "job/{path}");
@@ -193,6 +201,11 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     
     public void addJobCompactQuery(boolean compact) {
         String returnQuery = (compact) ? "JobOverview" : "JobDetailed";
+        uriBuilder.queryParam("return", returnQuery);
+    }
+    
+    public void addJobChainCompactQuery(boolean compact) {
+        String returnQuery = (compact) ? "JobChainOverview" : "JobChainDetailed";
         uriBuilder.queryParam("return", returnQuery);
     }
 
