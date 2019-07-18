@@ -110,9 +110,9 @@ public class JocServletContainer extends ServletContainer {
     }
 
     private void cleanupCurrentDeployedFolderExceptJars(final Path currentDeployFolder) throws IOException {
-        final Path libDir = currentDeployFolder.resolve("webapps/WEB-INF/lib");
-        final List<Path> libDirAndParents = Arrays.asList(currentDeployFolder, currentDeployFolder.resolve("webapps"), currentDeployFolder.resolve(
-                "webapps/WEB-INF"), libDir);
+        final Path libDir = currentDeployFolder.resolve("webapp/WEB-INF/lib");
+        final List<Path> libDirAndParents = Arrays.asList(currentDeployFolder, currentDeployFolder.resolve("webapp"), currentDeployFolder.resolve(
+                "webapp/WEB-INF"), libDir);
         Predicate<Path> exceptJars = f -> !libDirAndParents.contains(f) && !f.startsWith(libDir);
         Files.walk(currentDeployFolder).sorted(Comparator.reverseOrder()).filter(exceptJars).forEach(f -> {
             try {
