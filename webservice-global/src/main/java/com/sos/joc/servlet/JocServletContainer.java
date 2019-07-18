@@ -1,5 +1,15 @@
 package com.sos.joc.servlet;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import javax.servlet.ServletException;
 
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -42,6 +52,47 @@ public class JocServletContainer extends ServletContainer {
 				}
 			}
 		}
+		
+		try {
+		    cleanupDeployedFolders();
+		} catch (Exception e) {
+		    LOGGER.warn("cleanup deployed files: ", e);
+        }
 	}
+	
+    private void cleanupDeployedFolders() throws IOException {
+        if (System.getProperty("os.name").toString().startsWith("Windows")) {
+            final Path deployParentDir = Paths.get(System.getProperty("java.io.tmpdir").toString());
+            final Pattern pattern = Pattern.compile("^jetty-\\d{1,3}(\\.\\d{1,3}){3}-\\d{1,5}-joc.war-_joc-.+\\.dir$");
+            final Set<Path> deployedFolders = Files.list(deployParentDir).filter(p -> pattern.matcher(p.getFileName().toString()).find()).collect(
+                    Collectors.toSet());
+            if (deployedFolders != null && deployedFolders.size() > 1) {
+                final Optional<Path> currentDeployFolder = deployedFolders.stream().max((i, j) -> {
+                    try {
+                        return Files.getLastModifiedTime(i).compareTo(Files.getLastModifiedTime(j));
+                    } catch (IOException e) {
+                        return 0;
+                    }
+                });
+                if (currentDeployFolder.isPresent()) {
+                    for (Path deployedFolder : deployedFolders) {
+                        if (deployedFolder.equals(currentDeployFolder.get())) {
+                            continue;
+                        }
+                        Files.walk(deployedFolder).sorted(Comparator.reverseOrder()).forEach(f -> {
+                            try {
+                                Files.deleteIfExists(f);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                                //LOGGER.warn("cleanup deployed files: ", e);
+                            }
+                        });
+                    }
+                } else {
+                    LOGGER.warn("cleanup deployed files: couldn't determine current deploy folder");
+                }
+            }
+        }
+    }
 
 }
