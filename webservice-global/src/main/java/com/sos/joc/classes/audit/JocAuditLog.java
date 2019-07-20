@@ -65,7 +65,7 @@ public class JocAuditLog {
         }
     }
 
-    public void storeAuditLogEntry(IAuditLog body) {
+    public DBItemAuditLog storeAuditLogEntry(IAuditLog body) {
         if (body != null) {
             String jobSchedulerId = body.getJobschedulerId();
             if (jobSchedulerId == null || jobSchedulerId.isEmpty()) {
@@ -89,12 +89,14 @@ public class JocAuditLog {
             try {
                 connection = Globals.createSosHibernateStatelessConnection("storeAuditLogEntry");
                 connection.save(auditLogToDb);
+                return auditLogToDb;
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             } finally {
                 Globals.disconnect(connection);
             }
         }
+        return null;
     }
     
     private String getJsonString(IAuditLog body) {

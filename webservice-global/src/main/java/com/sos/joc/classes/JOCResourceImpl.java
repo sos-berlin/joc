@@ -21,6 +21,7 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.dailyplan.db.Calendar2DB;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.jitl.dailyplan.job.CreateDailyPlanOptions;
+import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
@@ -230,13 +231,13 @@ public class JOCResourceImpl {
 		jocAuditLog.logAuditMessage(body);
 	}
 
-	public void storeAuditLogEntry(IAuditLog body) {
+	public DBItemAuditLog storeAuditLogEntry(IAuditLog body) {
 		try {
 			jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession()
 					.setAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY, true);
 		} catch (Exception e) {
 		}
-		jocAuditLog.storeAuditLogEntry(body);
+		return jocAuditLog.storeAuditLogEntry(body);
 	}
 
 	public String getJsonString(Object body) {
