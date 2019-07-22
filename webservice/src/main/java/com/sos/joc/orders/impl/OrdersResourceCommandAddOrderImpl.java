@@ -13,6 +13,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
+import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -46,6 +47,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private List<OrderPath200> orderPaths = new ArrayList<OrderPath200>();
     private SOSHibernateSession session = null;
+    private DBLayerReporting dbLayerReporting = null;
 
     @Override
     public JOCDefaultResponse postOrdersAdd(String xAccessToken, String accessToken, ModifyOrders modifyOrders) throws Exception {
@@ -206,6 +208,16 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 orderId = ".";
             }
             try {
+                if (dbLayerReporting == null) {
+                    dbLayerReporting = new DBLayerReporting(session);
+                }
+                Long duration = 30L;
+                if (!orderId.equals(".")) {
+                    try {
+                        duration = dbLayerReporting.getOrderEstimatedDuration(order.getJobChain(), order.getOrderId(), 30);
+                    } catch (Exception e) {
+                    }
+                }
                 DailyPlanDBItem dailyPlanDbItem = new DailyPlanDBItem();
                 dailyPlanDbItem.setId(null);
                 dailyPlanDbItem.setAuditLogId(auditLogId);
@@ -217,7 +229,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 dailyPlanDbItem.setCreated(dailyPlanDbItem.getModified());
                 dailyPlanDbItem.setOrderId(orderId);
                 dailyPlanDbItem.setPlannedStart(Date.from(Instant.parse(plannedStart)));
-                dailyPlanDbItem.setExpectedEnd(dailyPlanDbItem.getPlannedStart());
+                dailyPlanDbItem.setExpectedEnd(new Date(dailyPlanDbItem.getPlannedStart().getTime() + duration));
                 dailyPlanDbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
                 dailyPlanDbItem.setStartStart(false);
                 dailyPlanDbItem.setState("PLANNED");
@@ -240,6 +252,9 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         try {
             if (session == null) {
                 session = Globals.createSosHibernateStatelessConnection(API_CALL);
+            }
+            if (dbLayerReporting == null) {
+                dbLayerReporting = new DBLayerReporting(session);
             }
             if (dailyPlanDBItem != null) {
                 dailyPlanDBItem.setOrderId(orderId);

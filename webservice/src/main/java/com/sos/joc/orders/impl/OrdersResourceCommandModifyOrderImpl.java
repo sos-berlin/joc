@@ -19,6 +19,7 @@ import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.jobscheduler.model.event.CalendarEvent;
 import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.jobscheduler.model.event.CustomEvent;
@@ -59,6 +60,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private SOSHibernateSession session = null;
     private InventoryJobChainsDBLayer dbJobChainLayer = null;
     private InventoryOrdersDBLayer dbOrderLayer = null;
+    private DBLayerReporting dbLayerReporting = null;
 
     @Override
     public JOCDefaultResponse postOrdersStart(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
@@ -427,6 +429,14 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             if (timeZone == null || timeZone.isEmpty()) {
                 timeZone = dbItemInventoryInstance.getTimeZone();
             }
+            if (dbLayerReporting == null) {
+                dbLayerReporting = new DBLayerReporting(session);
+            }
+            Long duration = 30L;
+            try {
+                duration = dbLayerReporting.getOrderEstimatedDuration(order.getJobChain(), order.getOrderId(), 30);
+            } catch (Exception e) {
+            }
             String plannedStart = JobSchedulerDate.getAtInUTCISO8601(order.getAt(), timeZone);
             DailyPlanDBItem dailyPlanDbItem = new DailyPlanDBItem();
             dailyPlanDbItem.setId(null);
@@ -439,7 +449,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             dailyPlanDbItem.setCreated(dailyPlanDbItem.getModified());
             dailyPlanDbItem.setOrderId(order.getOrderId());
             dailyPlanDbItem.setPlannedStart(Date.from(Instant.parse(plannedStart)));
-            dailyPlanDbItem.setExpectedEnd(dailyPlanDbItem.getPlannedStart());
+            dailyPlanDbItem.setExpectedEnd(new Date(dailyPlanDbItem.getPlannedStart().getTime() + duration));
             dailyPlanDbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
             dailyPlanDbItem.setStartStart(false);
             dailyPlanDbItem.setState("PLANNED");

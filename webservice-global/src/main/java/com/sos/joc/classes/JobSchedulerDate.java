@@ -131,11 +131,13 @@ public class JobSchedulerDate {
         LocalDateTime now = LocalDateTime.now(ZoneId.of(userTimezone));
         now = now.withNano(0);
         if (nowPlusParts.length == 1) { //+ SECONDS
-            now = now.plusSeconds(Long.valueOf(nowPlusParts[0]));
+            if (!nowPlusParts[0].isEmpty()) {
+                now = now.plusSeconds(Long.valueOf(nowPlusParts[0]));
+            }
         } else { //+ HH:mm:[ss]
             now = now.plusHours(Long.valueOf(nowPlusParts[0]));
             now = now.plusMinutes(Long.valueOf(nowPlusParts[1]));
-            if (nowPlusParts.length == 3) {
+            if (nowPlusParts.length == 3 && !nowPlusParts[2].isEmpty()) {
                 now = now.plusSeconds(Long.valueOf(nowPlusParts[2]));
             }
         }
