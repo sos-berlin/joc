@@ -169,7 +169,7 @@ public class JobChainsVCallable implements Callable<Map<String, JobChainVolatile
             if (withOrders) {
                 OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), orderDocumentations, accessToken);
                 orders = ordersVCallable.call().values();
-            } else {
+            } else if (groupedOrders != null) {
                 orders = groupedOrders.get(jobChainV.getPath());
             }
         }
