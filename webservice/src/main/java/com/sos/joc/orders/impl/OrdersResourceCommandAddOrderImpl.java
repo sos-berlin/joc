@@ -8,8 +8,10 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 import org.dom4j.Element;
+import org.hibernate.exception.ConstraintViolationException;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
@@ -157,28 +159,32 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             }
             
             DBItemAuditLog auditLogDbItem = storeAuditLogEntry(orderAudit);
-            DailyPlanDBItem dailyPlanDBItem = savePlannedStartOfOrder(order, plannedStart, auditLogDbItem.getId());
-            
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            DailyPlanDBItem dailyPlanDBItem = null;
+            try {
+                dailyPlanDBItem = savePlannedStartOfOrder(order, plannedStart, auditLogDbItem.getId());
+            } finally {
+                
+                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+                jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+                
+                OrderPath200 orderPath = new OrderPath200();
+                orderPath.setSurveyDate(jocXmlCommand.getSurveyDate());
+                orderPath.setJobChain(order.getJobChain());
 
-            OrderPath200 orderPath = new OrderPath200();
-            orderPath.setSurveyDate(jocXmlCommand.getSurveyDate());
-            orderPath.setJobChain(order.getJobChain());
-
-            if (order.getOrderId() == null || order.getOrderId().isEmpty()) {
-                try {
-                    order.setOrderId(jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ok/order/@id"));
-                    if (order.getOrderId() != null && !order.getOrderId().isEmpty()) {
-                        updatePlannedStartOfOrder(order.getOrderId(), auditLogDbItem, dailyPlanDBItem);
+                if (order.getOrderId() == null || order.getOrderId().isEmpty()) {
+                    try {
+                        order.setOrderId(jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ok/order/@id"));
+                        if (order.getOrderId() != null && !order.getOrderId().isEmpty()) {
+                            updatePlannedStartOfOrder(order.getOrderId(), auditLogDbItem, dailyPlanDBItem);
+                        }
+                        orderPath.setOrderId(order.getOrderId());
+                    } catch (Exception e) {
+                        orderPath.setOrderId(null);
                     }
-                    orderPath.setOrderId(order.getOrderId());
-                } catch (Exception e) {
-                    orderPath.setOrderId(null);
                 }
+                orderPaths.add(orderPath);
             }
             
-            orderPaths.add(orderPath);
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), order));
         } catch (Exception e) {
@@ -208,6 +214,9 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 orderId = ".";
             }
             try {
+                if (session == null) {
+                    session = Globals.createSosHibernateStatelessConnection(API_CALL);
+                }
                 if (dbLayerReporting == null) {
                     dbLayerReporting = new DBLayerReporting(session);
                 }
@@ -223,7 +232,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 dailyPlanDbItem.setAuditLogId(auditLogId);
                 dailyPlanDbItem.setIsAssigned(false);
                 dailyPlanDbItem.setIsLate(false);
-                dailyPlanDbItem.setJob(".");
+                dailyPlanDbItem.setJob("..");
                 dailyPlanDbItem.setJobChain(order.getJobChain());
                 dailyPlanDbItem.setModified(new Date());
                 dailyPlanDbItem.setCreated(dailyPlanDbItem.getModified());
@@ -240,6 +249,12 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 return dailyPlanDbItem;
             } catch (SOSHibernateInvalidSessionException ex) {
                 throw new DBConnectionRefusedException(ex);
+            }  catch (SOSHibernateException ex) {
+                if (ex.getCause() != null && ex.getCause() instanceof ConstraintViolationException) {
+                    //
+                } else {
+                    throw new DBInvalidDataException(ex);
+                }
             } catch (Exception ex) {
                 throw new DBInvalidDataException(ex);
             }
@@ -252,9 +267,6 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         try {
             if (session == null) {
                 session = Globals.createSosHibernateStatelessConnection(API_CALL);
-            }
-            if (dbLayerReporting == null) {
-                dbLayerReporting = new DBLayerReporting(session);
             }
             if (dailyPlanDBItem != null) {
                 dailyPlanDBItem.setOrderId(orderId);

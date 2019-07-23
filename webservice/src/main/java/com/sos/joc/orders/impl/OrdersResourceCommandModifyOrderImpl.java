@@ -5,14 +5,19 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Path;
 
 import org.dom4j.Element;
+import org.hibernate.exception.ConstraintViolationException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
@@ -22,8 +27,6 @@ import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.jobscheduler.model.event.CalendarEvent;
 import com.sos.jobscheduler.model.event.CalendarObjectType;
-import com.sos.jobscheduler.model.event.CustomEvent;
-import com.sos.jobscheduler.model.event.CustomEventVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -32,6 +35,7 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
+import com.sos.joc.classes.calendar.SendEventScheduled;
 import com.sos.joc.classes.configuration.JSObjectConfiguration;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
@@ -41,7 +45,6 @@ import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -313,13 +316,15 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             }
             
             DBItemAuditLog dbItemAuditLog = storeAuditLogEntry(orderAudit);
-            if ("start".equals(command)) {
-                savePlannedStartOfOrder(order, dbItemAuditLog.getId());
+            Instant plannedStart;
+            try {
+                plannedStart = savePlannedStartOfOrder(order, dbItemAuditLog.getId(), command);
+            } finally {
+                if (!"set_run_time".equals(command)) {
+                    jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+                }
             }
-            if (!"set_run_time".equals(command)) {
-                jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-            }
-            sendOrderStartedEvent(order, command);
+            sendOrderStartedEvent(order, plannedStart, command, jocXmlCommand);
             
             
             return jocXmlCommand.getSurveyDate();
@@ -422,53 +427,75 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
     }
     
-    private void savePlannedStartOfOrder(ModifyOrder order, Long auditLogId) throws JobSchedulerBadRequestException, DBConnectionRefusedException,
+    private Instant savePlannedStartOfOrder(ModifyOrder order, Long auditLogId, String command) throws DBConnectionRefusedException,
             DBInvalidDataException {
-        try {
-            String timeZone = order.getTimeZone();
-            if (timeZone == null || timeZone.isEmpty()) {
-                timeZone = dbItemInventoryInstance.getTimeZone();
-            }
-            if (dbLayerReporting == null) {
-                dbLayerReporting = new DBLayerReporting(session);
-            }
-            Long duration = 30L;
+        Instant plannedStart = null;
+        if ("start".equals(command)) {
             try {
-                duration = dbLayerReporting.getOrderEstimatedDuration(order.getJobChain(), order.getOrderId(), 30);
-            } catch (Exception e) {
+                String timeZone = order.getTimeZone();
+                if (timeZone == null || timeZone.isEmpty()) {
+                    timeZone = dbItemInventoryInstance.getTimeZone();
+                }
+                if (dbLayerReporting == null) {
+                    dbLayerReporting = new DBLayerReporting(session);
+                }
+                Long duration = 30L;
+                try {
+                    duration = dbLayerReporting.getOrderEstimatedDuration(order.getJobChain(), order.getOrderId(), 30);
+                } catch (Exception e) {
+                }
+                plannedStart = Instant.parse(JobSchedulerDate.getAtInUTCISO8601(order.getAt(), timeZone));
+                DailyPlanDBItem dailyPlanDbItem = new DailyPlanDBItem();
+                dailyPlanDbItem.setId(null);
+                dailyPlanDbItem.setAuditLogId(auditLogId);
+                dailyPlanDbItem.setIsAssigned(false);
+                dailyPlanDbItem.setIsLate(false);
+                dailyPlanDbItem.setJob("..");
+                dailyPlanDbItem.setJobChain(order.getJobChain());
+                dailyPlanDbItem.setModified(new Date());
+                dailyPlanDbItem.setCreated(dailyPlanDbItem.getModified());
+                dailyPlanDbItem.setOrderId(order.getOrderId());
+                dailyPlanDbItem.setPlannedStart(Date.from(plannedStart));
+                dailyPlanDbItem.setExpectedEnd(new Date(dailyPlanDbItem.getPlannedStart().getTime() + duration));
+                dailyPlanDbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
+                dailyPlanDbItem.setStartStart(false);
+                dailyPlanDbItem.setState("PLANNED");
+                session.save(dailyPlanDbItem);
+            } catch (SOSHibernateInvalidSessionException ex) {
+                throw new DBConnectionRefusedException(ex);
+            } catch (SOSHibernateException ex) {
+                if (ex.getCause() != null && ex.getCause() instanceof ConstraintViolationException) {
+                    //
+                } else {
+                    throw new DBInvalidDataException(ex);
+                }
+            } catch (Exception ex) {
+                throw new DBInvalidDataException(ex);
             }
-            String plannedStart = JobSchedulerDate.getAtInUTCISO8601(order.getAt(), timeZone);
-            DailyPlanDBItem dailyPlanDbItem = new DailyPlanDBItem();
-            dailyPlanDbItem.setId(null);
-            dailyPlanDbItem.setAuditLogId(auditLogId);
-            dailyPlanDbItem.setIsAssigned(false);
-            dailyPlanDbItem.setIsLate(false);
-            dailyPlanDbItem.setJob(".");
-            dailyPlanDbItem.setJobChain(order.getJobChain());
-            dailyPlanDbItem.setModified(new Date());
-            dailyPlanDbItem.setCreated(dailyPlanDbItem.getModified());
-            dailyPlanDbItem.setOrderId(order.getOrderId());
-            dailyPlanDbItem.setPlannedStart(Date.from(Instant.parse(plannedStart)));
-            dailyPlanDbItem.setExpectedEnd(new Date(dailyPlanDbItem.getPlannedStart().getTime() + duration));
-            dailyPlanDbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
-            dailyPlanDbItem.setStartStart(false);
-            dailyPlanDbItem.setState("PLANNED");
-            session.save(dailyPlanDbItem);
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
         }
+        return plannedStart;
     }
     
-    private void sendOrderStartedEvent(ModifyOrder order, String command) throws JsonProcessingException, JocException {
+    private void sendOrderStartedEvent(ModifyOrder order, Instant plannedStart, String command, JOCXmlCommand jocXmlCommand)
+            throws JsonProcessingException, JocException {
         if ("start".equals(command) || "resume".equals(command)) {
-            CustomEvent customEvt = new CustomEvent();
-            customEvt.setKey("OrderStarted");
-            CustomEventVariables vars = new CustomEventVariables();
-            vars.setAdditionalProperty("path", order.getJobChain() + "," + order.getOrderId());
-            customEvt.setVariables(vars);
-            SendCalendarEventsUtil.sendEvent(customEvt, dbItemInventoryInstance, getAccessToken());
+            long seconds = 0L;
+            if (plannedStart != null) {
+                seconds = plannedStart.getEpochSecond() - Instant.now().getEpochSecond();
+                if (seconds < 0) {
+                    seconds = 0L;
+                }
+            }
+            if (seconds < 60 * 6) { // event api needs max. 6 minutes for next call
+                SendEventScheduled evt = new SendEventScheduled(order.getJobChain() + "," + order.getOrderId(), jocXmlCommand, getAccessToken());
+                if (seconds == 0L) {
+                    evt.run();
+                } else {
+                    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+                    executor.schedule(evt, seconds, TimeUnit.SECONDS);
+                    executor.shutdown();
+                }
+            }
         }
     }
 

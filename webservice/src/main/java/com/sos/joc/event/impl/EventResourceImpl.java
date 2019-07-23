@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Path;
@@ -22,16 +23,22 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
+import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
+import com.sos.jitl.dailyplan.filter.DailyPlanFilter;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.calendar.SendEventScheduled;
 import com.sos.joc.classes.event.EventCallable;
 import com.sos.joc.classes.event.EventCallableActiveJobSchedulerStateChanged;
-import com.sos.joc.classes.event.EventCallablePassiveJobSchedulerStateChanged;
 import com.sos.joc.classes.event.EventCallableOfCurrentCluster;
 import com.sos.joc.classes.event.EventCallableOfCurrentJobScheduler;
+import com.sos.joc.classes.event.EventCallablePassiveJobSchedulerStateChanged;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.event.resource.IEventResource;
@@ -57,8 +64,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
     private static final String SESSION_KEY = "EventsStarted";
     private String threadName = "";
     private String urlOfCurrentJs = null;
+    private ScheduledThreadPoolExecutor executor = null;
     public static final Integer EVENT_TIMEOUT = 90;
-
+    
     @Override
     public JOCDefaultResponse postEvent(String xAccessToken, String accessToken, RegisterEvent eventBody) throws Exception {
         return postEvent(getAccessToken(xAccessToken, accessToken), eventBody);
@@ -105,7 +113,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             if (eventBody.getJobscheduler() == null && eventBody.getJobscheduler().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'jobscheduler'");
             }
-
+            
             Long defaultEventId = Instant.now().toEpochMilli() * 1000;
             List<EventCallable> tasks = new ArrayList<EventCallable>();
             Set<JOCJsonCommand> jocJsonCommands = new HashSet<JOCJsonCommand>();
@@ -125,6 +133,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 List<EventCallable> tasksOfClusterMember = new ArrayList<EventCallable>();
 
                 if (isCurrentJobScheduler) {
+                    sendNexStartsFromDailyPlan(connection, jsObject.getJobschedulerId(), jsEvent.getEventId(), new JOCXmlCommand(instance), accessToken);
                     tasksOfClusterMember.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, instance.getId(),
                             shiroUser, getNestedJobChains(jobChainLayer, instance)));
                 } else {
@@ -262,6 +271,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         } finally {
             LOGGER.debug("./events ended");
             Globals.disconnect(connection);
+            if (executor != null) {
+                executor.shutdown();
+            }
         }
         return JOCDefaultResponse.responseStatus200(entity);
     }
@@ -349,6 +361,51 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             return Globals.jocConfigurationProperties.setUrlMapping(instance, true);
         }
         return instance;
+    }
+    
+    private void sendNexStartsFromDailyPlan(SOSHibernateSession connection, String jobschedulerId, String eventId, JOCXmlCommand jocXmlCommand,
+            String accessToken) {
+        try {
+            Instant from = Instant.ofEpochMilli(Long.valueOf(eventId) / 1000); // Instant.now();
+            Instant to = from.plusSeconds(60 * 6);
+            DailyPlanFilter dailyPlanFilter = new DailyPlanFilter();
+            dailyPlanFilter.setPlannedStartFrom(Date.from(from));
+            dailyPlanFilter.setPlannedStartTo(Date.from(to));
+            dailyPlanFilter.setSchedulerId(jobschedulerId);
+            DailyPlanDBLayer dailyPlanDbLayer = new DailyPlanDBLayer(connection);
+            dailyPlanDbLayer.setFilter(dailyPlanFilter);
+            List<DailyPlanDBItem> dailyPlanDbItems = dailyPlanDbLayer.getDailyPlanListOfOrderSingleStarts();
+            if (dailyPlanDbItems != null && !dailyPlanDbItems.isEmpty()) {
+                List<SendEventScheduled> sendEventsLater = new ArrayList<SendEventScheduled>();
+                for (DailyPlanDBItem dailyPlanDbItem : dailyPlanDbItems) {
+                    long seconds = 0L;
+                    String orderId = dailyPlanDbItem.getOrderIdNotNull();
+                    String jobChain = dailyPlanDbItem.getJobChainNotNull();
+                    if (dailyPlanDbItem.getPlannedStart() != null && !jobChain.isEmpty() && !orderId.isEmpty()) {
+                        seconds = dailyPlanDbItem.getPlannedStart().getTime() - from.getEpochSecond();
+                        if (seconds < 0) {
+                            seconds = 0L;
+                        }
+                        SendEventScheduled evt = new SendEventScheduled(jobChain + "," + orderId, jocXmlCommand, accessToken, seconds);
+                        if (seconds == 0L) {
+                            evt.run();
+                        } else {
+                            sendEventsLater.add(evt);
+                        }
+                    }
+                }
+                if (!sendEventsLater.isEmpty()) {
+                    executor = new ScheduledThreadPoolExecutor(sendEventsLater.size());
+                    executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+                    for (SendEventScheduled evt : sendEventsLater) {
+                        executor.schedule(evt, evt.getSeconds(), TimeUnit.SECONDS);
+                    }
+                }
+            }
+
+        } catch (SOSHibernateException e) {
+            LOGGER.warn("", e);
+        }
     }
 
 }

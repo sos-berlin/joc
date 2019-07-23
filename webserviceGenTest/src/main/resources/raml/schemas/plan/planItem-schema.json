@@ -95,6 +95,9 @@
     },
     "state": {
       "$ref": "planState-schema.json"
+    },
+    "auditLogId": {
+      "$ref": "../common/nonNegativeLong-schema.json"
     }
   }
 }

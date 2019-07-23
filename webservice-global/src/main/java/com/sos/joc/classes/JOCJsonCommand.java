@@ -568,7 +568,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                     throw new JobSchedulerBadRequestException(response);
                 }
             default:
-                throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase());
+                throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase() + ": " + uri.toString());
             }
         } catch (JocException e) {
             e.addErrorMetaInfo(jocError);

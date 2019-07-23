@@ -326,6 +326,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setPath(inconditionValidated);
                         }
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
+                    } else if (eventKey.equals("OrderStarted")) {
+                        eventSnapshot.setEventType("OrderStateChanged");
+                        eventSnapshot.setPath(variables.getString("path", null));
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
+                        eventSnapshots.put(createJobChainEventOfOrder(eventSnapshot));
                     } else {
                         continue;
                     }

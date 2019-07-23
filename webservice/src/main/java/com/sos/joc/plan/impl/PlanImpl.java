@@ -54,6 +54,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
     private PlanItem createPlanItem(DailyPlanDBItem dailyPlanDBItem) {
         PlanItem p = new PlanItem();
         p.setLate(dailyPlanDBItem.getIsLate());
+        p.setAuditLogId(dailyPlanDBItem.getAuditLogId());
 
         Period period = new Period();
         period.setBegin(dailyPlanDBItem.getPeriodBegin());
