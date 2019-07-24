@@ -46,6 +46,8 @@ public class Events {
             this.events.putIfAbsent(event.getEventType() + "." + event.getPath() + "." + event.getObjectType().name(), event); 
         } else if (event.getEventType().startsWith("Calendar")) {
             this.events.putIfAbsent(event.getEventType() + "." + event.getPath() + "." + event.getObjectType().name(), event); 
+        } else if (event.getEventType().startsWith("SchedulerStateChanged")) { 
+            this.events.putIfAbsent(event.getEventType() + "." + event.getPath() + "." + event.getObjectType().name(), event); 
         } else if (event.getEventType().startsWith("FileBased")) { //beats StateChanged events
             this.events.put(event.getEventType() + "." + event.getPath() + "." + event.getObjectType().name(), event); 
         } else {
