@@ -54,6 +54,9 @@
         },
         "auditLog": {
           "type": "boolean"
+        },
+        "conditions": {
+          "type": "boolean"
         }
       }
     }
