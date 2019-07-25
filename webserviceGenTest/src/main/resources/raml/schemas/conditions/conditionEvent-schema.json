@@ -5,7 +5,7 @@
 	"javaType": "com.sos.joc.model.conditions.ConditionEvent",
 	"type": "object",
 	"properties": {
-		"masterId": {
+		"jobSchedulerId": {
 			"type": "string"
 		},
 		"event": {

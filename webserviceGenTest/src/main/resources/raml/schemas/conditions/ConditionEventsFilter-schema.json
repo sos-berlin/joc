@@ -8,7 +8,7 @@
 		"masterId"
 	],
 	"properties": {
-		"masterId": {
+		"jobSchedulerId": {
 			"type": "string"
 		},
 		"session": {

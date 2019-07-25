@@ -59,7 +59,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             checkRequiredParameter("jobschedulerId", jobFilterSchema.getJobschedulerId());
 
             InConditions inConditions = new InConditions();
-            inConditions.setMasterId(jobFilterSchema.getJobschedulerId());
+            inConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
 
             for (JobPath job : jobFilterSchema.getJobs()) {
                 JobInCondition jobInCondition = new JobInCondition();
@@ -70,11 +70,11 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 FilterInConditions filterInConditions = new FilterInConditions();
                 FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
 
-                filterConsumedInConditions.setMasterId(jobFilterSchema.getJobschedulerId());
+                filterConsumedInConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
                 filterConsumedInConditions.setJob(job.getJob());
                 filterConsumedInConditions.setSession(Constants.getSession());
 
-                filterInConditions.setMasterId(jobFilterSchema.getJobschedulerId());
+                filterInConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
                 filterInConditions.setJob(job.getJob());
 
                 JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken, this.getCommandUrl());
@@ -97,7 +97,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 jsJobInConditions.setListOfJobInConditions(listOfInConditions);
                 JSJobConditionKey jsJobConditionKey = new JSJobConditionKey();
                 jsJobConditionKey.setJob(job.getJob());
-                jsJobConditionKey.setMasterId(jobFilterSchema.getJobschedulerId());
+                jsJobConditionKey.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
 
                 jobInCondition.setJob(jsJobConditionKey.getJob());
                 if (jsJobInConditions.getInConditions(jsJobConditionKey) != null) {

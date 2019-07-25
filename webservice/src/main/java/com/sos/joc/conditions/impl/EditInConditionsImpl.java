@@ -27,8 +27,8 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
         SOSHibernateSession sosHibernateSession = null;
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, inConditions, accessToken, inConditions.getMasterId(), getPermissonsJocCockpit(
-                    inConditions.getMasterId(), accessToken).getCondition().getChange().isConditions());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, inConditions, accessToken, inConditions.getJobSchedulerId(), getPermissonsJocCockpit(
+                    inConditions.getJobSchedulerId(), accessToken).getCondition().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

@@ -30,8 +30,8 @@ public class ResetWorkflowImpl extends JOCResourceImpl implements IResetWorkflow
     public JOCDefaultResponse resetWorkflow(String accessToken, ResetWorkflow resetWorkflow) throws Exception {
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetWorkflow, accessToken, resetWorkflow.getMasterId(), getPermissonsJocCockpit(
-                    resetWorkflow.getMasterId(), accessToken).getCondition().getChange().isConditions());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetWorkflow, accessToken, resetWorkflow.getJobSchedulerId(), getPermissonsJocCockpit(
+                    resetWorkflow.getJobSchedulerId(), accessToken).getCondition().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

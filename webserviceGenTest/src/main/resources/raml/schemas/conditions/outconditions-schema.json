@@ -12,7 +12,7 @@
 		"deliveryDate": {
 			"$ref": "../common/deliveryDate-schema.json"
 		},
-		"masterId": {
+		"jobSchedulerId": {
 			"type": "string"
 		},
 		"jobsOutconditions": {

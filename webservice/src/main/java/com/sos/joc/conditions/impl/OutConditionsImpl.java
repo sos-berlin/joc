@@ -57,7 +57,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             checkRequiredParameter("job", jobFilterSchema.getJobs());
 
             OutConditions outConditions = new OutConditions();
-            outConditions.setMasterId(jobFilterSchema.getJobschedulerId());
+            outConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
 
             for (JobPath job : jobFilterSchema.getJobs()) {
 
@@ -76,7 +76,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
                 FilterOutConditions filterOutConditions = new FilterOutConditions();
                 filterOutConditions.setJob(job.getJob());
-                filterOutConditions.setMasterId(jobFilterSchema.getJobschedulerId());
+                filterOutConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
 
                 JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken, this.getCommandUrl());
                 jsConditionResolver.initEvents();
@@ -86,7 +86,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
                 JSJobConditionKey jsJobConditionKey = new JSJobConditionKey();
                 jsJobConditionKey.setJob(job.getJob());
-                jsJobConditionKey.setMasterId(jobFilterSchema.getJobschedulerId());
+                jsJobConditionKey.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
 
                 jobOutCondition.setJob(job.getJob());
 
