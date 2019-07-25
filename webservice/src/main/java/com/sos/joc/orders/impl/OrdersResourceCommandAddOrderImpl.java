@@ -4,12 +4,16 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 import org.hibernate.exception.ConstraintViolationException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
@@ -23,6 +27,7 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
+import com.sos.joc.classes.calendar.SendEventScheduled;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -182,6 +187,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                         orderPath.setOrderId(null);
                     }
                 }
+                sendOrderStartedEvent(order, plannedStart, jocXmlCommand);
                 orderPaths.add(orderPath);
             }
             
@@ -283,5 +289,17 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         }
     }
 
-    
+    private void sendOrderStartedEvent(ModifyOrder order, String plannedStart, JOCXmlCommand jocXmlCommand)
+            throws JsonProcessingException, JocException {
+            long seconds = 0L;
+            if (plannedStart != null) {
+                seconds = Instant.parse(plannedStart).getEpochSecond() - Instant.now().getEpochSecond();
+            }
+            if (seconds < 60 * 6 && seconds > 0L) { // event api needs max. 6 minutes for next call
+                SendEventScheduled evt = new SendEventScheduled(order.getJobChain() + "," + order.getOrderId(), jocXmlCommand, getAccessToken());
+                ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+                executor.schedule(evt, seconds, TimeUnit.SECONDS);
+                executor.shutdown();
+            }
+    }
 }
