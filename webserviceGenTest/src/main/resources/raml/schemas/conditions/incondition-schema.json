@@ -26,6 +26,12 @@
 			"items": {
 				"$ref": "incondition_command-schema.json"
 			}
+		},
+		"outconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "jobOutcondition-schema.json"
+			}
 		}
 	}
 }
