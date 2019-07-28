@@ -266,16 +266,18 @@ public class JobChainVolatileJson extends JobChainV {
             return false;
         }
         for (OrderV order : orders) {
-            switch (order.getProcessingState().get_text()) {
-            case RUNNING:
-            case JOB_NOT_IN_PERIOD:
-            case NODE_DELAY:
-            case WAITING_FOR_LOCK:
-            case WAITING_FOR_PROCESS:
-            case WAITING_FOR_TASK:
-                return true;
-            default:
-                break;
+            if (order != null && order.getProcessingState() != null) {
+                switch (order.getProcessingState().get_text()) {
+                case RUNNING:
+                case JOB_NOT_IN_PERIOD:
+                case NODE_DELAY:
+                case WAITING_FOR_LOCK:
+                case WAITING_FOR_PROCESS:
+                case WAITING_FOR_TASK:
+                    return true;
+                default:
+                    break;
+                }
             }
         }
         return false;
