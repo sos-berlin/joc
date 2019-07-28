@@ -1,0 +1,28 @@
+{
+	"title": "workflowFolders",
+	"id": "schemas/conditions/workflowFolders",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "List of all In Conditions",
+	"javaType": "com.sos.joc.model.conditions.WorkflowFolders",
+	"type": "object",
+	"required": [
+		"deliveryDate"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"jobschedulerId": {
+			"type": "string"
+		},
+		"workflow": {
+			"type": "string"
+		},
+		"workflowFolders": {
+			"type": "array",
+			"items": {
+			  "$ref": "../common/path-schema.json"
+			}
+		}
+	}
+}

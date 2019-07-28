@@ -1,9 +1,11 @@
 package com.sos.joc.conditions.impl;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 
@@ -13,16 +15,27 @@ import org.slf4j.LoggerFactory;
 import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.db.DBItemConsumedInCondition;
 import com.sos.eventhandlerservice.db.DBItemInConditionWithCommand;
+import com.sos.eventhandlerservice.db.DBItemOutConditionWithEvent;
 import com.sos.eventhandlerservice.db.DBLayerConsumedInConditions;
 import com.sos.eventhandlerservice.db.DBLayerInConditions;
+import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
 import com.sos.eventhandlerservice.db.FilterInConditions;
+import com.sos.eventhandlerservice.db.FilterOutConditions;
+import com.sos.eventhandlerservice.resolver.JSCondition;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
+import com.sos.eventhandlerservice.resolver.JSConditions;
+import com.sos.eventhandlerservice.resolver.JSEventKey;
 import com.sos.eventhandlerservice.resolver.JSInCondition;
 import com.sos.eventhandlerservice.resolver.JSInConditionCommand;
 import com.sos.eventhandlerservice.resolver.JSJobConditionKey;
 import com.sos.eventhandlerservice.resolver.JSJobInConditions;
+import com.sos.eventhandlerservice.resolver.JSJobOutConditions;
+import com.sos.eventhandlerservice.resolver.JSOutCondition;
+import com.sos.eventhandlerservice.resolver.JSOutConditionEvent;
+import com.sos.eventhandlerservice.resolver.JSOutConditions;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -34,6 +47,9 @@ import com.sos.joc.model.conditions.InCondition;
 import com.sos.joc.model.conditions.InConditionCommand;
 import com.sos.joc.model.conditions.InConditions;
 import com.sos.joc.model.conditions.JobInCondition;
+import com.sos.joc.model.conditions.JobOutCondition;
+import com.sos.joc.model.conditions.OutCondition;
+import com.sos.joc.model.conditions.OutConditionEvent;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 
@@ -41,13 +57,14 @@ import com.sos.joc.model.job.JobsFilter;
 public class InConditionsImpl extends JOCResourceImpl implements IInConditionsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InConditionsImpl.class);
-    private static final String API_CALL = "./conditions/job_in_conditions";
+    private static final String API_CALL = "./conditions/workflow_folders";
+    private SOSHibernateSession sosHibernateSession = null;
+    private JSConditionResolver jsConditionResolver;
 
     @Override
     public JOCDefaultResponse getJobInConditions(String accessToken, JobsFilter jobFilterSchema) throws Exception {
-        SOSHibernateSession sosHibernateSession = null;
-        try {
 
+        try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilterSchema, accessToken, jobFilterSchema.getJobschedulerId(),
                     getPermissonsJocCockpit(jobFilterSchema.getJobschedulerId(), accessToken).getCondition().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -77,7 +94,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 filterInConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
                 filterInConditions.setJob(job.getJob());
 
-                JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken, this.getCommandUrl());
+                jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken, this.getCommandUrl());
                 jsConditionResolver.initEvents();
 
                 List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
@@ -111,6 +128,8 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         inCondition.setWorkflow(jsInCondition.getWorkflow());
                         inCondition.setId(jsInCondition.getId());
                         inCondition.setConsumed(jsInCondition.isConsumed());
+                        inCondition.setOutconditions(getOutConditions(jsJobConditionKey, jobFilterSchema.getJobschedulerId(), jsInCondition
+                                .getExpression()));
                         for (JSInConditionCommand jsInConditionCommand : jsInCondition.getListOfInConditionCommand()) {
                             InConditionCommand inConditionCommand = new InConditionCommand();
                             inConditionCommand.setCommand(jsInConditionCommand.getCommand());
@@ -136,6 +155,64 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
             Globals.disconnect(sosHibernateSession);
         }
+    }
+
+    private List<JobOutCondition> getOutConditions(JSJobConditionKey jsJobConditionKey, String schedulerId, String expression)
+            throws SOSHibernateException {
+        JSConditions jsConditions = new JSConditions();
+        List<JobOutCondition> listOfOutConditions = new ArrayList<JobOutCondition>();
+        List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expression);
+        DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+        FilterOutConditions filterOutConditions = new FilterOutConditions();
+
+        filterOutConditions.setJobSchedulerId(schedulerId);
+        for (JSCondition jsCondition : listOfConditions) {
+            if ("event".equals(jsCondition.getConditionType())) {
+                filterOutConditions.addEvent(jsCondition.getEventName());
+            }
+        }
+        List<DBItemOutConditionWithEvent> listOfOutConditionsItems = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
+        JSJobOutConditions jsJobOutConditions = new JSJobOutConditions();
+        jsJobOutConditions.setListOfJobOutConditions(listOfOutConditionsItems);
+
+        JSEventKey jsEventKey = new JSEventKey();
+        jsEventKey.setSession(Constants.getSession());
+
+        Map<JSJobConditionKey, JSOutConditions> mapOfjsOutConditions = jsJobOutConditions.getListOfJobOutConditions();
+
+        for (JSOutConditions jsOutConditions : mapOfjsOutConditions.values()) {
+            for (JSOutCondition jsOutCondition : jsOutConditions.getListOfOutConditions().values()) {
+                JobOutCondition jobOutCondition = new JobOutCondition();
+                jobOutCondition.setJob(jsOutCondition.getJob());
+                OutCondition outCondition = new OutCondition();
+                ConditionExpression conditionExpression = new ConditionExpression();
+                conditionExpression.setExpression(jsOutCondition.getExpression());
+                conditionExpression.setValue(jsConditionResolver.validate(-1, jsOutCondition));
+                conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
+                outCondition.setConditionExpression(conditionExpression);
+                outCondition.setWorkflow(jsOutCondition.getWorkflow());
+                outCondition.setId(jsOutCondition.getId());
+                for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
+                    OutConditionEvent outConditionEvent = new OutConditionEvent();
+                    outConditionEvent.setEvent(jsOutConditionEvent.getEventValue());
+                    outConditionEvent.setCommand(jsOutConditionEvent.getCommand());
+                    jsEventKey.setEvent(jsOutConditionEvent.getEvent());
+                    if (jsOutConditionEvent.isCreateCommand()) {
+                        outConditionEvent.setExistsInWorkflow(jsConditionResolver.eventExist(jsEventKey, outCondition.getWorkflow()));
+                        outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey, ""));
+                    } else {
+                        outConditionEvent.setExistsInWorkflow(false);
+                        outConditionEvent.setExists(false);
+                    }
+                    outConditionEvent.setId(jsOutConditionEvent.getId());
+                    outCondition.getOutconditionEvents().add(outConditionEvent);
+                }
+                listOfOutConditions.add(jobOutCondition);
+            }
+
+        }
+
+        return listOfOutConditions;
     }
 
 }
