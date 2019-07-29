@@ -207,6 +207,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                     outConditionEvent.setId(jsOutConditionEvent.getId());
                     outCondition.getOutconditionEvents().add(outConditionEvent);
                 }
+                jobOutCondition.getOutconditions().add(outCondition);
                 listOfOutConditions.add(jobOutCondition);
             }
 
