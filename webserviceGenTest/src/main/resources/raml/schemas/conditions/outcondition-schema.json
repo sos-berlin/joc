@@ -12,7 +12,7 @@
 		"id": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
-		"workflow": {
+		"jobStream": {
 			"type": "string"
 		},
 		"conditionExpression": {

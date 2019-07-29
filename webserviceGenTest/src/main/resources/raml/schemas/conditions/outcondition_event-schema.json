@@ -20,10 +20,10 @@
     "exists": {
       "type": "boolean"
     },
-    "existsInWorkflow": {
+    "existsInJobStream": {
       "type": "boolean"
     },
-    "workflow": {
+    "jobStream": {
       "type": "string"
     }
   }

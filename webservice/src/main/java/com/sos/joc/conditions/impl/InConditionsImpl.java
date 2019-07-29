@@ -57,7 +57,7 @@ import com.sos.joc.model.job.JobsFilter;
 public class InConditionsImpl extends JOCResourceImpl implements IInConditionsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InConditionsImpl.class);
-    private static final String API_CALL = "./conditions/workflow_folders";
+    private static final String API_CALL = "./conditions/jobstream_folders";
     private SOSHibernateSession sosHibernateSession = null;
     private JSConditionResolver jsConditionResolver;
 
@@ -125,7 +125,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         conditionExpression.setValue(jsConditionResolver.validate(null, jsInCondition));
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                         inCondition.setConditionExpression(conditionExpression);
-                        inCondition.setWorkflow(jsInCondition.getWorkflow());
+                        inCondition.setJobStream(jsInCondition.getJobStream());
                         inCondition.setId(jsInCondition.getId());
                         inCondition.setConsumed(jsInCondition.isConsumed());
                         inCondition.setOutconditions(getOutConditions(jsJobConditionKey, jobFilterSchema.getJobschedulerId(), jsInCondition
@@ -190,7 +190,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 conditionExpression.setValue(jsConditionResolver.validate(-1, jsOutCondition));
                 conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                 outCondition.setConditionExpression(conditionExpression);
-                outCondition.setWorkflow(jsOutCondition.getWorkflow());
+                outCondition.setJobStream(jsOutCondition.getJobStream());
                 outCondition.setId(jsOutCondition.getId());
                 for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
                     OutConditionEvent outConditionEvent = new OutConditionEvent();
@@ -198,10 +198,10 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                     outConditionEvent.setCommand(jsOutConditionEvent.getCommand());
                     jsEventKey.setEvent(jsOutConditionEvent.getEvent());
                     if (jsOutConditionEvent.isCreateCommand()) {
-                        outConditionEvent.setExistsInWorkflow(jsConditionResolver.eventExist(jsEventKey, outCondition.getWorkflow()));
+                        outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExist(jsEventKey, outCondition.getJobStream()));
                         outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey, ""));
                     } else {
-                        outConditionEvent.setExistsInWorkflow(false);
+                        outConditionEvent.setExistsInJobStream(false);
                         outConditionEvent.setExists(false);
                     }
                     outConditionEvent.setId(jsOutConditionEvent.getId());

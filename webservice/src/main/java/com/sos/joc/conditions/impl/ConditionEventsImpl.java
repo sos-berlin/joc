@@ -58,7 +58,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
             }
 
-            filter.setWorkflow(conditionEventsFilter.getWorkflow());
+            filter.setJobStream(conditionEventsFilter.getJobStream());
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
             ConditionEvents conditionEvents = new ConditionEvents();
             conditionEvents.setDeliveryDate(new Date());
@@ -71,7 +71,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                     conditionEvent.setEvent(dbItemEvent.getEvent());
                     conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
                     conditionEvent.setSession(dbItemEvent.getSession());
-                    conditionEvent.setWorkflow(dbItemEvent.getWorkflow());
+                    conditionEvent.setJobStream(dbItemEvent.getJobStream());
                     conditionEvent.setPath(dbItemOutCondition.getPath());
                     if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getPath().equals(
                             conditionEventsFilter.getPath())) {
@@ -107,14 +107,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             }
 
             this.checkRequiredParameter("masterId", conditionEvent.getJobSchedulerId());
-            this.checkRequiredParameter("workflow", conditionEvent.getWorkflow());
+            this.checkRequiredParameter("jobStream", conditionEvent.getJobStream());
             this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());
 
             FilterEvents filter = new FilterEvents();
             filter.setEvent(conditionEvent.getEvent());
             filter.setSession(conditionEvent.getSession());
-            filter.setWorkflow(conditionEvent.getWorkflow());
+            filter.setJobStream(conditionEvent.getJobStream());
             filter.setOutConditionId(conditionEvent.getOutConditionId());
 
             notifyEventHandler(accessToken, "AddEvent", filter);
@@ -140,7 +140,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             }
 
             this.checkRequiredParameter("masterId", conditionEvent.getJobSchedulerId());
-            this.checkRequiredParameter("workflow", conditionEvent.getWorkflow());
+            this.checkRequiredParameter("jobStream", conditionEvent.getJobStream());
             this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());
 
@@ -153,7 +153,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             FilterEvents filter = new FilterEvents();
             filter.setEvent(conditionEvent.getEvent());
             filter.setSession(conditionEvent.getSession());
-            filter.setWorkflow(conditionEvent.getWorkflow());
+            filter.setJobStream(conditionEvent.getJobStream());
 
             notifyEventHandler(accessToken, "RemoveEvent", filter);
             return JOCDefaultResponse.responseStatus200(conditionEvent);
@@ -172,7 +172,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             parameters.put("outConditionId", String.valueOf(filter.getOutConditionId()));
             parameters.put("event", filter.getEvent());
             parameters.put("session", filter.getSession());
-            parameters.put("workflow", filter.getWorkflow());
+            parameters.put("jobStream", filter.getJobStream());
         }
         customEventsUtil.addEvent(eventKey, parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();

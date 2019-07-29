@@ -8,14 +8,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.conditions.WorkflowFolders;
+import com.sos.joc.model.conditions.ResetJobStream;
 
-public interface IWorkflowFoldersResource {
+public interface IResetJobStreamResource {
 
     @POST
-    @Path("workflow_folders")
+    @Path("resetjobstream")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse workflowFolders(            
-            @HeaderParam("X-Access-Token") String accessToken, WorkflowFolders workflowFolders) throws Exception;
+    public JOCDefaultResponse resetJobStream(            
+            @HeaderParam("X-Access-Token") String accessToken, ResetJobStream jobStream) throws Exception;
 }
