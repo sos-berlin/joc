@@ -1,5 +1,6 @@
 package com.sos.joc.orders.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +13,8 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -50,6 +53,7 @@ import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
 @Path("orders")
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceCommandAddOrderImpl.class);
     private static final String API_CALL = "./orders/add";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private List<OrderPath200> orderPaths = new ArrayList<OrderPath200>();
@@ -103,7 +107,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     private void executeAddOrderCommand(ModifyOrder order, ModifyOrders modifyOrders) {
 
         try {
-            String plannedStart = null;
+            Instant plannedStart = null;
             if (order.getParams() != null && order.getParams().isEmpty()) {
                 order.setParams(null);
             }
@@ -131,11 +135,8 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                             .getTimeZone()));
                 }
                 try {
-                    String timeZone = order.getTimeZone();
-                    if (timeZone == null || timeZone.isEmpty()) {
-                        timeZone = dbItemInventoryInstance.getTimeZone();
-                    }
-                    plannedStart = JobSchedulerDate.getAtInUTCISO8601(order.getAt(), timeZone);
+                    plannedStart = getPlannedStartOfOrder(order);
+                    orderAudit.setStartTime(plannedStart);
                 } catch (Exception e) {
                 }
             }
@@ -212,10 +213,15 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         return paramsElem;
     }
 
-    private DailyPlanDBItem savePlannedStartOfOrder(ModifyOrder order, String plannedStart, Long auditLogId) throws JobSchedulerBadRequestException,
+    private DailyPlanDBItem savePlannedStartOfOrder(ModifyOrder order, Instant plannedStart, Long auditLogId) throws JobSchedulerBadRequestException,
             DBConnectionRefusedException, DBInvalidDataException, JocConfigurationException, DBOpenSessionException {
         if (plannedStart != null) {
             String orderId = order.getOrderId();
+            LOGGER.info("OrderId length:" + orderId.getBytes().length);
+            try {
+                LOGGER.info("OrderId length2:" + orderId.getBytes("UTF-8").length);
+            } catch (UnsupportedEncodingException e1) {
+            }
             if (orderId == null || orderId.isEmpty()) {
                 orderId = ".";
             }
@@ -243,7 +249,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 dailyPlanDbItem.setModified(new Date());
                 dailyPlanDbItem.setCreated(dailyPlanDbItem.getModified());
                 dailyPlanDbItem.setOrderId(orderId);
-                dailyPlanDbItem.setPlannedStart(Date.from(Instant.parse(plannedStart)));
+                dailyPlanDbItem.setPlannedStart(Date.from(plannedStart));
                 dailyPlanDbItem.setExpectedEnd(new Date(dailyPlanDbItem.getPlannedStart().getTime() + duration));
                 dailyPlanDbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
                 dailyPlanDbItem.setStartStart(false);
@@ -289,11 +295,11 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         }
     }
 
-    private void sendOrderStartedEvent(ModifyOrder order, String plannedStart, JOCXmlCommand jocXmlCommand)
+    private void sendOrderStartedEvent(ModifyOrder order, Instant plannedStart, JOCXmlCommand jocXmlCommand)
             throws JsonProcessingException, JocException {
             long seconds = 0L;
             if (plannedStart != null) {
-                seconds = Instant.parse(plannedStart).getEpochSecond() - Instant.now().getEpochSecond();
+                seconds = plannedStart.getEpochSecond() - Instant.now().getEpochSecond();
             }
             if (seconds < 60 * 6 && seconds > 0L) { // event api needs max. 6 minutes for next call
                 SendEventScheduled evt = new SendEventScheduled(order.getJobChain() + "," + order.getOrderId(), jocXmlCommand, getAccessToken());
@@ -301,5 +307,13 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 executor.schedule(evt, seconds, TimeUnit.SECONDS);
                 executor.shutdown();
             }
+    }
+    
+    private Instant getPlannedStartOfOrder(ModifyOrder order) throws JobSchedulerBadRequestException {
+        String timeZone = order.getTimeZone();
+        if (timeZone == null || timeZone.isEmpty()) {
+            timeZone = dbItemInventoryInstance.getTimeZone();
+        }
+        return Instant.parse(JobSchedulerDate.getAtInUTCISO8601(order.getAt(), timeZone));
     }
 }

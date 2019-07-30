@@ -2,6 +2,7 @@ package com.sos.joc.classes.audit;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
@@ -92,6 +93,12 @@ public class ModifyScheduleAudit extends ModifyRunTime implements IAuditLog {
     @Override
     @JsonIgnore
     public String getCalendar() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getStartTime() {
         return null;
     }
 }

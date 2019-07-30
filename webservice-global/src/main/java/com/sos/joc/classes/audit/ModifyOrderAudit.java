@@ -2,6 +2,8 @@ package com.sos.joc.classes.audit;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
@@ -21,6 +23,9 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
 //    //@JsonIgnore
 //    private String orderId;
 
+    @JsonIgnore
+    private Date startTime;
+    
     @JsonIgnore
     private String comment;
 
@@ -48,6 +53,7 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
             setState(modifyOrder.getState());
             setTimeZone(modifyOrder.getTimeZone());
             setTitle(modifyOrder.getTitle());
+            startTime = null;
             if (modifyOrder.getJobChain() != null) {
                 Path p = Paths.get(modifyOrder.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
@@ -76,6 +82,7 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
             setState(modifyOrder.getState());
             setTimeZone(modifyOrder.getTimeZone());
             setTitle(modifyOrder.getTitle());
+            startTime = null;
             if (modifyOrder.getJobChain() != null) {
                 Path p = Paths.get(modifyOrder.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
@@ -99,6 +106,7 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
             setRunTime(null);
             setState(order.getState());
             setTitle(order.getTitle());
+            startTime = null;
             Path p = Paths.get(order.getJobChain());
             this.folder = p.getParent().toString().replace('\\', '/');
             //this.jobChain = p.toString().replace('\\', '/');
@@ -175,5 +183,20 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
     //@JsonIgnore
     public String getJobschedulerId() {
         return jobschedulerId;
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getStartTime() {
+        return startTime;
+    }
+    
+    @JsonIgnore
+    public void setStartTime(Instant startTime) {
+        if (startTime != null) {
+            this.startTime = Date.from(startTime);
+        } else {
+            this.startTime = null;
+        }
     }
 }

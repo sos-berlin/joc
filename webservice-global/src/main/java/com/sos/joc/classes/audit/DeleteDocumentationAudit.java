@@ -1,6 +1,7 @@
 package com.sos.joc.classes.audit;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -85,6 +86,12 @@ public class DeleteDocumentationAudit extends DocumentationsFilter implements IA
     @Override
     @JsonIgnore
     public String getCalendar() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getStartTime() {
         return null;
     }
     

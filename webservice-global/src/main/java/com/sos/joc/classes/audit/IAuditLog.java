@@ -1,5 +1,7 @@
 package com.sos.joc.classes.audit;
 
+import java.util.Date;
+
 public interface IAuditLog {
     
     public String getComment();
@@ -19,4 +21,6 @@ public interface IAuditLog {
     public String getTicketLink();
     
     public String getCalendar();
+    
+    public Date getStartTime();
 }

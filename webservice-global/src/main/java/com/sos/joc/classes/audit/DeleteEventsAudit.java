@@ -1,5 +1,7 @@
 package com.sos.joc.classes.audit;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.event.custom.EventIdsFilter;
@@ -76,6 +78,12 @@ public class DeleteEventsAudit extends EventIdsFilter implements IAuditLog {
     @Override
     @JsonIgnore
     public String getCalendar() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getStartTime() {
         return null;
     }
 }

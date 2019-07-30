@@ -2,6 +2,7 @@ package com.sos.joc.classes.audit;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
@@ -77,6 +78,12 @@ public class AssignmentOrderDocuAudit extends OrderDocuFilter implements IAuditL
     @Override
     @JsonIgnore
     public String getJob() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getStartTime() {
         return null;
     }
 

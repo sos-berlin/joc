@@ -45,6 +45,7 @@ import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -315,10 +316,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 break;
             }
             
+            Instant plannedStart = getPlannedStartOfOrder(orderAudit, command);
             DBItemAuditLog dbItemAuditLog = storeAuditLogEntry(orderAudit);
-            Instant plannedStart;
             try {
-                plannedStart = savePlannedStartOfOrder(order, dbItemAuditLog.getId(), command);
+                savePlannedStartOfOrder(order, plannedStart, dbItemAuditLog.getId(), command);
             } finally {
                 if (!"set_run_time".equals(command)) {
                     jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
@@ -427,15 +428,23 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
     }
     
-    private Instant savePlannedStartOfOrder(ModifyOrder order, Long auditLogId, String command) throws DBConnectionRefusedException,
+    private Instant getPlannedStartOfOrder(ModifyOrderAudit orderAudit, String command) throws JobSchedulerBadRequestException {
+        if ("start".equals(command)) {
+            String timeZone = orderAudit.getTimeZone();
+            if (timeZone == null || timeZone.isEmpty()) {
+                timeZone = dbItemInventoryInstance.getTimeZone();
+            }
+            Instant plannedStart = Instant.parse(JobSchedulerDate.getAtInUTCISO8601(orderAudit.getAt(), timeZone));
+            orderAudit.setStartTime(plannedStart);
+            return plannedStart;
+        }
+        return null;
+    }
+    
+    private Instant savePlannedStartOfOrder(ModifyOrder order, Instant plannedStart, Long auditLogId, String command) throws DBConnectionRefusedException,
             DBInvalidDataException {
-        Instant plannedStart = null;
         if ("start".equals(command)) {
             try {
-                String timeZone = order.getTimeZone();
-                if (timeZone == null || timeZone.isEmpty()) {
-                    timeZone = dbItemInventoryInstance.getTimeZone();
-                }
                 if (dbLayerReporting == null) {
                     dbLayerReporting = new DBLayerReporting(session);
                 }
@@ -444,7 +453,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     duration = dbLayerReporting.getOrderEstimatedDuration(order.getJobChain(), order.getOrderId(), 30);
                 } catch (Exception e) {
                 }
-                plannedStart = Instant.parse(JobSchedulerDate.getAtInUTCISO8601(order.getAt(), timeZone));
                 DailyPlanDBItem dailyPlanDbItem = new DailyPlanDBItem();
                 dailyPlanDbItem.setId(null);
                 dailyPlanDbItem.setAuditLogId(auditLogId);

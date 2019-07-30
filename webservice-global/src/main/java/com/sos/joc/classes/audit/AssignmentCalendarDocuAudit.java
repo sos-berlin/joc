@@ -2,6 +2,7 @@ package com.sos.joc.classes.audit;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
@@ -79,6 +80,12 @@ public class AssignmentCalendarDocuAudit extends CalendarDocuFilter implements I
     @Override
     @JsonIgnore
     public String getOrderId() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getStartTime() {
         return null;
     }
 

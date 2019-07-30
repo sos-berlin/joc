@@ -1,5 +1,7 @@
 package com.sos.joc.classes.audit;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class SecurityAudit implements IAuditLog {
@@ -67,6 +69,12 @@ public class SecurityAudit implements IAuditLog {
     @Override
     @JsonIgnore
     public String getCalendar() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getStartTime() {
         return null;
     }
 }
