@@ -1,6 +1,5 @@
 package com.sos.joc.orders.impl;
 
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,8 +12,6 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -53,7 +50,6 @@ import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
 @Path("orders")
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceCommandAddOrderImpl.class);
     private static final String API_CALL = "./orders/add";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private List<OrderPath200> orderPaths = new ArrayList<OrderPath200>();
@@ -217,11 +213,6 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             DBConnectionRefusedException, DBInvalidDataException, JocConfigurationException, DBOpenSessionException {
         if (plannedStart != null) {
             String orderId = order.getOrderId();
-            LOGGER.info("OrderId length:" + orderId.getBytes().length);
-            try {
-                LOGGER.info("OrderId length2:" + orderId.getBytes("UTF-8").length);
-            } catch (UnsupportedEncodingException e1) {
-            }
             if (orderId == null || orderId.isEmpty()) {
                 orderId = ".";
             }
