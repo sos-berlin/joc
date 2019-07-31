@@ -39,8 +39,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionEventsFilter, accessToken, conditionEventsFilter.getJobSchedulerId(),
-                    getPermissonsJocCockpit(conditionEventsFilter.getJobSchedulerId(), accessToken).getCondition().getView().isEventlist());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionEventsFilter, accessToken, conditionEventsFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getCondition().getView().isEventlist());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -94,8 +94,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionEvent, accessToken, conditionEvent.getJobSchedulerId(), getPermissonsJocCockpit(
-                    conditionEvent.getJobSchedulerId(), accessToken).getCondition().getChange().getEvents().isAdd());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
+                    conditionEvent.getJobschedulerId(), accessToken).getCondition().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -106,7 +106,6 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 conditionEvent.setSession(conditionEvent.getSession());
             }
 
-            this.checkRequiredParameter("masterId", conditionEvent.getJobSchedulerId());
             this.checkRequiredParameter("jobStream", conditionEvent.getJobStream());
             this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());
@@ -133,13 +132,12 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionEvent, accessToken, conditionEvent.getJobSchedulerId(), getPermissonsJocCockpit(
-                    conditionEvent.getJobSchedulerId(), accessToken).getCondition().getChange().getEvents().isAdd());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
+                    conditionEvent.getJobschedulerId(), accessToken).getCondition().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("masterId", conditionEvent.getJobSchedulerId());
             this.checkRequiredParameter("jobStream", conditionEvent.getJobStream());
             this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());

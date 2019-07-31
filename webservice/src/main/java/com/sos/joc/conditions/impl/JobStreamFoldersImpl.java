@@ -48,8 +48,6 @@ public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamF
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            checkRequiredParameter("jobschedulerId", jobStreams.getJobschedulerId());
-
             Map<String, Set<String>> mapOfJobStream2Folders = new HashMap<String, Set<String>>();
             DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
             FilterInConditions filterInConditions = new FilterInConditions();

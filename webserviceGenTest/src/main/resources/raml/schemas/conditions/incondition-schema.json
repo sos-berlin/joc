@@ -18,6 +18,9 @@
 		"consumed": {
 			"type": "boolean"
 		},
+		"markExpression": {
+			"type": "boolean"
+		},
 		"conditionExpression": {
 			"$ref": "condition_expression-schema.json"
 		},

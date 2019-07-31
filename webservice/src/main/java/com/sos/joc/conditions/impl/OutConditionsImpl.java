@@ -53,11 +53,10 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            checkRequiredParameter("jobschedulerId", jobFilterSchema.getJobschedulerId());
             checkRequiredParameter("job", jobFilterSchema.getJobs());
 
             OutConditions outConditions = new OutConditions();
-            outConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
+            outConditions.setJobschedulerId(jobFilterSchema.getJobschedulerId());
 
             for (JobPath job : jobFilterSchema.getJobs()) {
 

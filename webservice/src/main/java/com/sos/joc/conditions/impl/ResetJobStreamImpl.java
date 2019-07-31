@@ -26,8 +26,8 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
     public JOCDefaultResponse resetJobStream(String accessToken, ResetJobStream resetJobStream) throws Exception {
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetJobStream, accessToken, resetJobStream.getJobSchedulerId(), getPermissonsJocCockpit(
-                    resetJobStream.getJobSchedulerId(), accessToken).getCondition().getChange().isConditions());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetJobStream, accessToken, resetJobStream.getJobschedulerId(), getPermissonsJocCockpit(
+                    resetJobStream.getJobschedulerId(), accessToken).getCondition().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

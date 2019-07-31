@@ -27,8 +27,8 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
         SOSHibernateSession sosHibernateSession = null;
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, outConditions, accessToken, outConditions.getJobSchedulerId(), getPermissonsJocCockpit(
-                    outConditions.getJobSchedulerId(), accessToken).getCondition().getChange().isConditions());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, outConditions, accessToken, outConditions.getJobschedulerId(), getPermissonsJocCockpit(
+                    outConditions.getJobschedulerId(), accessToken).getCondition().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

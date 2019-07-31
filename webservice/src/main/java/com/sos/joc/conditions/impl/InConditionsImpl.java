@@ -73,10 +73,9 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             checkRequiredParameter("jobs", jobFilterSchema.getJobs());
-            checkRequiredParameter("jobschedulerId", jobFilterSchema.getJobschedulerId());
 
             InConditions inConditions = new InConditions();
-            inConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
+            inConditions.setJobschedulerId(jobFilterSchema.getJobschedulerId());
 
             for (JobPath job : jobFilterSchema.getJobs()) {
                 JobInCondition jobInCondition = new JobInCondition();
@@ -128,6 +127,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         inCondition.setJobStream(jsInCondition.getJobStream());
                         inCondition.setId(jsInCondition.getId());
                         inCondition.setConsumed(jsInCondition.isConsumed());
+                        inCondition.setMarkExpression(jsInCondition.isMarkExpression());
                         inCondition.setOutconditions(getOutConditions(jsJobConditionKey, jobFilterSchema.getJobschedulerId(), jsInCondition
                                 .getExpression()));
                         for (JSInConditionCommand jsInConditionCommand : jsInCondition.getListOfInConditionCommand()) {
