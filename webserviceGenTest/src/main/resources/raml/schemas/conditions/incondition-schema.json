@@ -33,7 +33,7 @@
 		"outconditions": {
 			"type": "array",
 			"items": {
-				"$ref": "jobOutcondition-schema.json"
+				"$ref": "jobstreamOutconditions-schema.json"
 			}
 		}
 	}

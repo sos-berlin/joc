@@ -1,18 +1,18 @@
 {
-	"title": "folders2Jobstream",
-	"id": "schemas/conditions/folders2Jobstream",
+	"title": "JobStream Outconditions",
+	"id": "schemas/conditions/jobstreamOutConditions",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "List of all In Conditions",
-	"javaType": "com.sos.joc.model.conditions.Folders2Jobstream",
+	"javaType": "com.sos.joc.model.conditions.JobstreamOutConditions",
 	"type": "object",
 	"properties": {
 		"jobStream": {
 			"type": "string"
 		},
-		"folders": {
+		"jobs": {
 			"type": "array",
 			"items": {
-				"$ref": "../common/path-schema.json"
+				"$ref": "outconditionRef-schema.json"
 			}
 		}
 	}
