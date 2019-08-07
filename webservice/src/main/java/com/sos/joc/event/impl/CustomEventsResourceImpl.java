@@ -4,12 +4,13 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.ws.rs.Path;
 
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.jitl.eventing.db.SchedulerEventDBItem;
