@@ -1,6 +1,7 @@
 package com.sos.joc.classes.jobs;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.concurrent.Callable;
 
 import javax.json.Json;
 import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
@@ -33,6 +35,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsVCallable.class);
     private final String job;
+    private final Collection<String> jobs;
     private final Folder folder;
     private final JobsFilter jobsBody;
     private final Boolean compact;
@@ -45,6 +48,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
 
     public JobsVCallable(JobFilter job, JOCJsonCommand jocJsonCommand, String accessToken, Boolean withOrderQueue, JsonObject summary) {
         this.job = job.getJob();
+        this.jobs = null;
         this.folder = null;
         this.jobsBody = null;
         this.compact = job.getCompact();
@@ -58,6 +62,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
     
     public JobsVCallable(JobPath job, JobsFilter jobs, JOCJsonCommand jocJsonCommand, String accessToken, JsonObject summary) {
         this.job = job.getJob();
+        this.jobs = null;
         this.folder = null;
         this.jobsBody = jobs;
         this.compact = jobs.getCompact();
@@ -71,6 +76,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
     
     public JobsVCallable(String job, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.job = job;
+        this.jobs = null;
         this.folder = null;
         this.jobsBody = null;
         this.compact = true;
@@ -82,8 +88,37 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         this.summary = null;
     }
     
+    public JobsVCallable(Collection<String> jobs, JOCJsonCommand jocJsonCommand, String accessToken) {
+        this.job = null;
+        this.jobs = jobs;
+        this.folder = null;
+        this.jobsBody = null;
+        this.compact = true;
+        this.compactView = true;
+        this.jocJsonCommand = jocJsonCommand;
+        this.accessToken = accessToken;
+        this.suppressJobSchedulerObjectNotExistException = true;
+        this.withOrderQueue = false;
+        this.summary = null;
+    }
+    
+    public JobsVCallable(Collection<String> jobs, JobsFilter jobsFilter, JOCJsonCommand jocJsonCommand, String accessToken, JsonObject summary) {
+        this.job = null;
+        this.jobs = jobs;
+        this.folder = null;
+        this.jobsBody = jobsFilter;
+        this.compact = jobsFilter.getCompact();
+        this.compactView = jobsFilter.getCompactView();
+        this.jocJsonCommand = jocJsonCommand;
+        this.accessToken = accessToken;
+        this.suppressJobSchedulerObjectNotExistException = true;
+        this.withOrderQueue = false;
+        this.summary = summary;
+    }
+
     public JobsVCallable(Folder folder, JobsFilter jobs, JOCJsonCommand jocJsonCommand, String accessToken, JsonObject summary) {
         this.job = null;
+        this.jobs = null;
         this.folder = folder;
         this.jobsBody = jobs;
         this.compact = jobs.getCompact();
@@ -100,6 +135,8 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
         try {
             if (job != null) {
                 return getJobs(job, compact, jocJsonCommand);
+            } else if (jobs != null) {
+                return getJobs(jobs, jobsBody, jocJsonCommand);
             } else {
                 return getJobs(folder, jobsBody, jocJsonCommand);
             }
@@ -138,6 +175,15 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
             throw e;
         }
         return getJobs(json, compact, null, null, null);
+    }
+    
+    private Map<String, JobVolatileJson> getJobs(Collection<String> jobs, JobsFilter jobsBody, JOCJsonCommand jocJsonCommand) throws JocException {
+        if (jobsBody == null) {
+            return getJobs(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobs), accessToken), compact, null, null, null);
+        } else {
+            return getJobs(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobs), accessToken), jobsBody.getCompact(), jobsBody
+                    .getRegex(), jobsBody.getStates(), jobsBody.getIsOrderJob());
+        }
     }
 
     private Map<String, JobVolatileJson> getJobs(Folder folder, JobsFilter jobsBody, JOCJsonCommand jocJsonCommand) throws JocException {
@@ -200,6 +246,17 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
     private String getServiceBody(String job) throws JocMissingRequiredParameterException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("path", job);
+
+        return builder.build().toString();
+    }
+    
+    private String getServiceBody(Collection<String> jobs) throws JocMissingRequiredParameterException {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        JsonArrayBuilder jobsArr = Json.createArrayBuilder();
+        for(String job : jobs) {
+            jobsArr.add(job);
+        }
+        builder.add("paths", jobsArr);
 
         return builder.build().toString();
     }
