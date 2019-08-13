@@ -1,5 +1,4 @@
-package com.sos.joc.conditions.impl;
-
+package com.sos.joc.jobstreams.impl;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +24,7 @@ import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.conditions.resource.IOutConditionsResource;
+import com.sos.joc.jobstreams.resource.IOutConditionsResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.conditions.ConditionExpression;
 import com.sos.joc.model.conditions.JobOutCondition;
@@ -39,7 +38,7 @@ import com.sos.joc.model.job.JobsFilter;
 public class OutConditionsImpl extends JOCResourceImpl implements IOutConditionsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OutConditionsImpl.class);
-    private static final String API_CALL = "./conditions/job_out_conditions";
+    private static final String API_CALL = "./conditions/out_conditions";
 
     @Override
     public JOCDefaultResponse getJobOutConditions(String accessToken, JobsFilter jobFilterSchema) throws Exception {

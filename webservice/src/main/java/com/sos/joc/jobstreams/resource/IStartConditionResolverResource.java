@@ -1,5 +1,4 @@
-package com.sos.joc.conditions.resource;
-
+package com.sos.joc.jobstreams.resource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;

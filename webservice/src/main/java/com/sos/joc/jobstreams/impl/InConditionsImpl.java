@@ -1,13 +1,10 @@
-package com.sos.joc.conditions.impl;
-
+package com.sos.joc.jobstreams.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -34,7 +31,6 @@ import com.sos.eventhandlerservice.resolver.JSJobConditionKey;
 import com.sos.eventhandlerservice.resolver.JSJobInConditions;
 import com.sos.eventhandlerservice.resolver.JSJobOutConditions;
 import com.sos.eventhandlerservice.resolver.JSOutCondition;
-import com.sos.eventhandlerservice.resolver.JSOutConditionEvent;
 import com.sos.eventhandlerservice.resolver.JSOutConditions;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -42,17 +38,14 @@ import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.conditions.resource.IInConditionsResource;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.jobstreams.resource.IInConditionsResource;
 import com.sos.joc.model.conditions.ConditionExpression;
 import com.sos.joc.model.conditions.InCondition;
 import com.sos.joc.model.conditions.InConditionCommand;
 import com.sos.joc.model.conditions.InConditions;
 import com.sos.joc.model.conditions.JobInCondition;
-import com.sos.joc.model.conditions.JobOutCondition;
 import com.sos.joc.model.conditions.JobstreamOutConditions;
-import com.sos.joc.model.conditions.OutCondition;
-import com.sos.joc.model.conditions.OutConditionEvent;
 import com.sos.joc.model.conditions.OutConditionRef;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
@@ -61,7 +54,7 @@ import com.sos.joc.model.job.JobsFilter;
 public class InConditionsImpl extends JOCResourceImpl implements IInConditionsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InConditionsImpl.class);
-    private static final String API_CALL = "./conditions/jobstream_folders";
+    private static final String API_CALL = "./conditions/in_condition";
     private SOSHibernateSession sosHibernateSession = null;
     private JSConditionResolver jsConditionResolver;
 

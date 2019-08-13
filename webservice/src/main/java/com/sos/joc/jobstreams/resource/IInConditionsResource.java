@@ -1,5 +1,4 @@
-package com.sos.joc.conditions.resource;
-
+package com.sos.joc.jobstreams.resource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -8,14 +7,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.conditions.InConditions;
+import com.sos.joc.model.job.JobsFilter;
 
-public interface IEditInConditionsResource {
+public interface IInConditionsResource {
 
     @POST
-    @Path("in_condition")
+    @Path("in_conditions")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse editJobInConditions(            
-            @HeaderParam("X-Access-Token") String accessToken, InConditions inConditions) throws Exception;
+    public JOCDefaultResponse getJobInConditions(            
+            @HeaderParam("X-Access-Token") String accessToken, JobsFilter jobFilterSchema) throws Exception;
 }

@@ -1,4 +1,4 @@
-package com.sos.joc.conditions.impl;
+package com.sos.joc.jobstreams.impl;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.conditions.resource.IConditionEventsResource;
+import com.sos.joc.jobstreams.resource.IConditionEventsResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.conditions.ConditionEvent;
 import com.sos.joc.model.conditions.ConditionEvents;
@@ -31,7 +31,9 @@ import com.sos.joc.model.conditions.ConditionEventsFilter;
 public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEventsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConditionEventsImpl.class);
-    private static final String API_CALL = "./conditions/edit/in_condition";
+    private static final String API_CALL_EVENTLIST = "./conditions/eventlist";
+    private static final String API_CALL_ADD_EVENT = "./conditions/add_event";
+    private static final String API_CALL_DELETE_EVENT = "./conditions/delete_event";
 
     @Override
     public JOCDefaultResponse getEvents(String accessToken, ConditionEventsFilter conditionEventsFilter) throws Exception {
@@ -39,12 +41,12 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionEventsFilter, accessToken, conditionEventsFilter.getJobschedulerId(),
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EVENTLIST, conditionEventsFilter, accessToken, conditionEventsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getCondition().getView().isEventlist());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EVENTLIST);
 
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
@@ -94,7 +96,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
                     conditionEvent.getJobschedulerId(), accessToken).getCondition().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -132,7 +134,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
                     conditionEvent.getJobschedulerId(), accessToken).getCondition().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

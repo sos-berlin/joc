@@ -1,8 +1,6 @@
-package com.sos.joc.conditions.impl;
-
+package com.sos.joc.jobstreams.impl;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -25,8 +23,8 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.conditions.resource.IJobStreamFoldersResource;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.jobstreams.resource.IJobStreamFoldersResource;
 import com.sos.joc.model.conditions.Folders2Jobstream;
 import com.sos.joc.model.conditions.JobStreams;
 

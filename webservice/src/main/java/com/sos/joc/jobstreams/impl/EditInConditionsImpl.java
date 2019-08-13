@@ -1,5 +1,4 @@
-package com.sos.joc.conditions.impl;
-
+package com.sos.joc.jobstreams.impl;
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
@@ -12,7 +11,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.conditions.resource.IEditInConditionsResource;
+import com.sos.joc.jobstreams.resource.IEditInConditionsResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.conditions.InConditions;
 

@@ -1,5 +1,4 @@
-package com.sos.joc.conditions.resource;
-
+package com.sos.joc.jobstreams.resource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -10,12 +9,12 @@ import javax.ws.rs.core.MediaType;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.JobsFilter;
 
-public interface IInConditionsResource {
+public interface IOutConditionsResource {
 
     @POST
-    @Path("in_conditions")
+    @Path("out_conditions")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse getJobInConditions(            
+    public JOCDefaultResponse getJobOutConditions(            
             @HeaderParam("X-Access-Token") String accessToken, JobsFilter jobFilterSchema) throws Exception;
 }
