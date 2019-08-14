@@ -32,11 +32,42 @@
 			<build>
 				<plugins>
 					<plugin>
+						<artifactId>maven-clean-plugin</artifactId>
+						<version>3.1.0</version>
+						<configuration>
+							<excludeDefaultDirectories>true</excludeDefaultDirectories>
+							<filesets>
+								<fileset>
+									<directory>${project.build.directory}/classes/com/sos</directory>
+									<excludes>
+										<exclude>joc2/*</exclude>
+									</excludes>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+								<fileset>
+									<directory>${project.build.directory}/java-gen</directory>
+									<includes>
+										<include>**/*</include>
+									</includes>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+								<fileset>
+									<directory>${project.build.directory}</directory>
+									<includes>
+										<include>*.jar</include>
+									</includes>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+							</filesets>
+						</configuration>
+					</plugin>
+					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>1.2.1</version>
 						<executions>
 							<execution>
+								<phase>test</phase>
 								<goals>
 									<goal>java</goal>
 								</goals>
@@ -72,9 +103,9 @@
 					<artifactId>jersey-media-moxy</artifactId>
 				</dependency>
 				<dependency>
-    		       <groupId>org.glassfish.jersey.media</groupId>
-    		       <artifactId>jersey-media-multipart</artifactId>
-		        </dependency>
+					<groupId>org.glassfish.jersey.media</groupId>
+					<artifactId>jersey-media-multipart</artifactId>
+				</dependency>
 				<dependency>
 					<groupId>org.glassfish.jersey.containers</groupId>
 					<artifactId>jersey-container-grizzly2-http</artifactId>
@@ -83,15 +114,15 @@
 					<groupId>org.glassfish.jersey.containers</groupId>
 					<artifactId>jersey-container-servlet-core</artifactId>
 				</dependency>
-                <dependency>
-                    <groupId>org.jvnet.mimepull</groupId>
-                    <artifactId>mimepull</artifactId>
-                    <version>1.9.10</version>
-                </dependency>
-                <dependency>
-                    <groupId>commons-io</groupId>
-                    <artifactId>commons-io</artifactId>
-                </dependency>
+				<dependency>
+					<groupId>org.jvnet.mimepull</groupId>
+					<artifactId>mimepull</artifactId>
+					<version>1.9.10</version>
+				</dependency>
+				<dependency>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</dependency>
 				<dependency>
 					<groupId>junit</groupId>
 					<artifactId>junit</artifactId>
@@ -139,10 +170,10 @@
 					<groupId>org.mariadb.jdbc</groupId>
 					<artifactId>mariadb-java-client</artifactId>
 				</dependency>
-	            <dependency>
-	                <groupId>net.sourceforge.jtds</groupId>
-	                <artifactId>jtds</artifactId>
-	            </dependency>
+				<dependency>
+					<groupId>net.sourceforge.jtds</groupId>
+					<artifactId>jtds</artifactId>
+				</dependency>
 				<dependency>
 					<groupId>com.owlike</groupId>
 					<artifactId>genson</artifactId>
@@ -200,7 +231,7 @@
 								<version>${stax2.version}</version>
 							</dependency>
 						</dependencies>
-						
+
 						<executions>
 							<execution>
 								<id>generate-joc-model</id>
@@ -214,7 +245,7 @@
 									<includes>
 										<include>**/*.json</include>
 									</includes>
-                            		<excludes>
+									<excludes>
 										<exclude>user/*.json</exclude>
 										<exclude>jobschedulerEvent/*.json</exclude>
 										<exclude>calendar/*.json</exclude>
@@ -331,9 +362,9 @@
 					<artifactId>stax2-api</artifactId>
 				</dependency>
 				<dependency>
-    		       <groupId>org.glassfish.jersey.media</groupId>
-    		       <artifactId>jersey-media-multipart</artifactId>
-		        </dependency>
+					<groupId>org.glassfish.jersey.media</groupId>
+					<artifactId>jersey-media-multipart</artifactId>
+				</dependency>
 				<dependency>
 					<groupId>commons-lang</groupId>
 					<artifactId>commons-lang</artifactId>

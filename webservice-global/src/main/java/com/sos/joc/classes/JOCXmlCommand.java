@@ -219,7 +219,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
     public String executePost(String xmlCommand, ResponseStream responseStream, String accessToken) throws JocException {
         this.xmlCommand = xmlCommand;
         try {
-            return executeXMLPost(xmlCommand, responseStream, accessToken);
+            return executeXMLPost("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" + xmlCommand, responseStream, accessToken);
         } catch (SOSNoResponseException e) {
             JobSchedulerNoResponseException ee = new JobSchedulerNoResponseException(e.getCause());
             ee.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
@@ -272,7 +272,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
     
     public Path getLogPath(String xmlCommand, String accessToken, String prefix, boolean withGzipEncoding) throws JocException {
         try {
-            return getFilePathResponseFromLog(requestXMLPost(xmlCommand, accessToken),prefix, withGzipEncoding);
+            return getFilePathResponseFromLog(requestXMLPost("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" + xmlCommand, accessToken),prefix, withGzipEncoding);
         } catch (JobSchedulerNoResponseException | JobSchedulerBadRequestException e) {
             e.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
             throw e;

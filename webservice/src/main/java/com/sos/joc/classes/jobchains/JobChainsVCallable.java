@@ -2,17 +2,12 @@ package com.sos.joc.classes.jobchains;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import javax.json.Json;
@@ -31,7 +26,6 @@ import com.sos.joc.classes.jobs.JobsVCallable;
 import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
-import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainFilter;
@@ -288,35 +282,7 @@ public class JobChainsVCallable implements Callable<Map<String, JobChainVolatile
         JOCJsonCommand command = new JOCJsonCommand(jocJsonCommand);
         command.setUriBuilderForJobs();
         command.addJobCompactQuery(true);
-        List<JobsVCallable> tasks = new ArrayList<JobsVCallable>();
-        Map<String, JobVolatileJson> listJobs = new HashMap<String, JobVolatileJson>();
-        for (String jobPath : jobChainV.getJobPaths()) {
-            tasks.add(new JobsVCallable(jobPath, new JOCJsonCommand(command), accessToken));
-        }
-
-        if (tasks != null && !tasks.isEmpty()) {
-            if (tasks.size() == 1) {
-                listJobs = tasks.get(0).call();
-            } else {
-                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-                try {
-                    for (Future<Map<String, JobVolatileJson>> result : executorService.invokeAll(tasks)) {
-                        try {
-                            listJobs.putAll(result.get());
-                        } catch (ExecutionException e) {
-                            if (e.getCause() instanceof JocException) {
-                                throw (JocException) e.getCause();
-                            } else {
-                                throw (Exception) e.getCause();
-                            }
-                        }
-                    }
-                } finally {
-                    executorService.shutdown();
-                }
-            }
-        }
-        return listJobs;
+        return new JobsVCallable(jobChainV.getJobPaths(), command, accessToken).call();
     }
 
     private JOCJsonCommand setUriForOrdersJsonCommand() {

@@ -3,6 +3,7 @@ package com.sos.joc.jobs.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,10 +106,21 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
                 if (jobs != null && !jobs.isEmpty()) {
                     Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                    for (JobPath job : jobs) {
-                        if (job != null && canAdd(job.getJob(), permittedFolders)) {
-                            tasks.add(new JobsVCallable(job, jobsFilter, new JOCJsonCommand(command), accessToken, summary));
+                    if (versionIsOlderThan("1.12.10")) {
+                        for (JobPath job : jobs) {
+                            if (job != null && canAdd(job.getJob(), permittedFolders)) {
+                                tasks.add(new JobsVCallable(job, jobsFilter, new JOCJsonCommand(command), accessToken, summary));
+                            }
                         }
+                    } else {
+                        Set<String> jobPaths = new HashSet<String>();
+                        for (JobPath job : jobs) {
+                            if (job != null && canAdd(job.getJob(), permittedFolders)) {
+                                jobPaths.add(job.getJob());
+                            }
+                        }
+                        JobsVCallable callable = new JobsVCallable(jobPaths, jobsFilter, command, accessToken, summary);
+                        listJobs.putAll(callable.call());
                     }
                 } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                     // no permission
