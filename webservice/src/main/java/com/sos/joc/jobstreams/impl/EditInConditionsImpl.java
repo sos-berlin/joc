@@ -27,7 +27,7 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, inConditions, accessToken, inConditions.getJobschedulerId(), getPermissonsJocCockpit(
-                    inConditions.getJobschedulerId(), accessToken).getCondition().getChange().isConditions());
+                    inConditions.getJobschedulerId(), accessToken).getJobStreams().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

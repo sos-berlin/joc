@@ -481,17 +481,17 @@ public class SOSPermissionsCreator {
             sosPermissionJocCockpit.getRuntime().getExecute().setEditXml(haveRight(masterId, "sos:products:joc_cockpit:runtime:execute:edit_xml"));
         
             
-            sosPermissionJocCockpit.setCondition(o.createSOSPermissionJocCockpitCondition());
-            sosPermissionJocCockpit.getCondition().setView(o.createSOSPermissionJocCockpitConditionView());
-            sosPermissionJocCockpit.getCondition().setChange(o.createSOSPermissionJocCockpitConditionChange());
-            sosPermissionJocCockpit.getCondition().getChange().setEvents(o.createSOSPermissionJocCockpitConditionChangeEvents());
+            sosPermissionJocCockpit.setJobStreams(o.createSOSPermissionJocCockpitJobStreams());
+            sosPermissionJocCockpit.getJobStreams().setView(o.createSOSPermissionJocCockpitJobStreamsView());
+            sosPermissionJocCockpit.getJobStreams().setChange(o.createSOSPermissionJocCockpitJobStreamsChange());
+            sosPermissionJocCockpit.getJobStreams().getChange().setEvents(o.createSOSPermissionJocCockpitJobStreamsChangeEvents());
             
-            sosPermissionJocCockpit.getCondition().getView().setEventlist(haveRight(masterId, "sos:products:joc_cockpit:condition:view:eventlist"));
-            sosPermissionJocCockpit.getCondition().getView().setGraph(haveRight(masterId, "sos:products:joc_cockpit:condition:view:graph"));
-            sosPermissionJocCockpit.getCondition().getView().setStatus(haveRight(masterId, "sos:products:joc_cockpit:condition:view:status"));
-            sosPermissionJocCockpit.getCondition().getChange().setConditions(haveRight(masterId, "sos:products:joc_cockpit:condition:change:condition"));
-            sosPermissionJocCockpit.getCondition().getChange().getEvents().setAdd(haveRight(masterId, "sos:products:joc_cockpit:condition:change:event:add"));
-            sosPermissionJocCockpit.getCondition().getChange().getEvents().setRemove(haveRight(masterId, "sos:products:joc_cockpit:condition:change:event:remove"));
+            sosPermissionJocCockpit.getJobStreams().getView().setEventlist(haveRight(masterId, "sos:products:joc_cockpit:jobstream:view:eventlist"));
+            sosPermissionJocCockpit.getJobStreams().getView().setGraph(haveRight(masterId, "sos:products:joc_cockpit:jobstream:view:graph"));
+            sosPermissionJocCockpit.getJobStreams().getView().setStatus(haveRight(masterId, "sos:products:joc_cockpit:jobstream:view:status"));
+            sosPermissionJocCockpit.getJobStreams().getChange().setConditions(haveRight(masterId, "sos:products:joc_cockpit:jobstream:change:condition"));
+            sosPermissionJocCockpit.getJobStreams().getChange().getEvents().setAdd(haveRight(masterId, "sos:products:joc_cockpit:jobstream:change:event:add"));
+            sosPermissionJocCockpit.getJobStreams().getChange().getEvents().setRemove(haveRight(masterId, "sos:products:joc_cockpit:jobstream:change:event:remove"));
 
         }
         return sosPermissionJocCockpit;

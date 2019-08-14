@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.08 um 10:32:37 AM CEST 
+// Generiert: 2019.08.14 um 11:11:38 AM CEST 
 //
 
 
@@ -785,7 +785,7 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="Condition">
+ *         &lt;element name="JobStreams">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -868,7 +868,7 @@ import javax.xml.bind.annotation.XmlType;
     "runtime",
     "joc",
     "documentation",
-    "condition"
+    "jobStreams"
 })
 @XmlRootElement(name = "SOSPermissionJocCockpit")
 public class SOSPermissionJocCockpit {
@@ -917,8 +917,8 @@ public class SOSPermissionJocCockpit {
     protected SOSPermissionJocCockpit.Joc joc;
     @XmlElement(name = "Documentation", required = true)
     protected SOSPermissionJocCockpit.Documentation documentation;
-    @XmlElement(name = "Condition", required = true)
-    protected SOSPermissionJocCockpit.Condition condition;
+    @XmlElement(name = "JobStreams", required = true)
+    protected SOSPermissionJocCockpit.JobStreams jobStreams;
     @XmlAttribute(name = "isAuthenticated")
     protected Boolean isAuthenticated;
     @XmlAttribute(name = "user")
@@ -1459,27 +1459,27 @@ public class SOSPermissionJocCockpit {
     }
 
     /**
-     * Ruft den Wert der condition-Eigenschaft ab.
+     * Ruft den Wert der jobStreams-Eigenschaft ab.
      * 
      * @return
      *     possible object is
-     *     {@link SOSPermissionJocCockpit.Condition }
+     *     {@link SOSPermissionJocCockpit.JobStreams }
      *     
      */
-    public SOSPermissionJocCockpit.Condition getCondition() {
-        return condition;
+    public SOSPermissionJocCockpit.JobStreams getJobStreams() {
+        return jobStreams;
     }
 
     /**
-     * Legt den Wert der condition-Eigenschaft fest.
+     * Legt den Wert der jobStreams-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
-     *     {@link SOSPermissionJocCockpit.Condition }
+     *     {@link SOSPermissionJocCockpit.JobStreams }
      *     
      */
-    public void setCondition(SOSPermissionJocCockpit.Condition value) {
-        this.condition = value;
+    public void setJobStreams(SOSPermissionJocCockpit.JobStreams value) {
+        this.jobStreams = value;
     }
 
     /**
@@ -2118,357 +2118,6 @@ public class SOSPermissionJocCockpit {
              */
             public void setDocumentation(boolean value) {
                 this.documentation = value;
-            }
-
-        }
-
-    }
-
-
-    /**
-     * <p>Java-Klasse für anonymous complex type.
-     * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="view">
-     *           &lt;complexType>
-     *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                 &lt;sequence>
-     *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="graph" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="eventlist" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                 &lt;/sequence>
-     *               &lt;/restriction>
-     *             &lt;/complexContent>
-     *           &lt;/complexType>
-     *         &lt;/element>
-     *         &lt;element name="change">
-     *           &lt;complexType>
-     *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                 &lt;sequence>
-     *                   &lt;element name="conditions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="events">
-     *                     &lt;complexType>
-     *                       &lt;complexContent>
-     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                           &lt;sequence>
-     *                             &lt;element name="add" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                             &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                           &lt;/sequence>
-     *                         &lt;/restriction>
-     *                       &lt;/complexContent>
-     *                     &lt;/complexType>
-     *                   &lt;/element>
-     *                 &lt;/sequence>
-     *               &lt;/restriction>
-     *             &lt;/complexContent>
-     *           &lt;/complexType>
-     *         &lt;/element>
-     *       &lt;/sequence>
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "view",
-        "change"
-    })
-    public static class Condition {
-
-        @XmlElement(required = true)
-        protected SOSPermissionJocCockpit.Condition.View view;
-        @XmlElement(required = true)
-        protected SOSPermissionJocCockpit.Condition.Change change;
-
-        /**
-         * Ruft den Wert der view-Eigenschaft ab.
-         * 
-         * @return
-         *     possible object is
-         *     {@link SOSPermissionJocCockpit.Condition.View }
-         *     
-         */
-        public SOSPermissionJocCockpit.Condition.View getView() {
-            return view;
-        }
-
-        /**
-         * Legt den Wert der view-Eigenschaft fest.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link SOSPermissionJocCockpit.Condition.View }
-         *     
-         */
-        public void setView(SOSPermissionJocCockpit.Condition.View value) {
-            this.view = value;
-        }
-
-        /**
-         * Ruft den Wert der change-Eigenschaft ab.
-         * 
-         * @return
-         *     possible object is
-         *     {@link SOSPermissionJocCockpit.Condition.Change }
-         *     
-         */
-        public SOSPermissionJocCockpit.Condition.Change getChange() {
-            return change;
-        }
-
-        /**
-         * Legt den Wert der change-Eigenschaft fest.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link SOSPermissionJocCockpit.Condition.Change }
-         *     
-         */
-        public void setChange(SOSPermissionJocCockpit.Condition.Change value) {
-            this.change = value;
-        }
-
-
-        /**
-         * <p>Java-Klasse für anonymous complex type.
-         * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
-         * 
-         * <pre>
-         * &lt;complexType>
-         *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *       &lt;sequence>
-         *         &lt;element name="conditions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="events">
-         *           &lt;complexType>
-         *             &lt;complexContent>
-         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *                 &lt;sequence>
-         *                   &lt;element name="add" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *                   &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *                 &lt;/sequence>
-         *               &lt;/restriction>
-         *             &lt;/complexContent>
-         *           &lt;/complexType>
-         *         &lt;/element>
-         *       &lt;/sequence>
-         *     &lt;/restriction>
-         *   &lt;/complexContent>
-         * &lt;/complexType>
-         * </pre>
-         * 
-         * 
-         */
-        @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "", propOrder = {
-            "conditions",
-            "events"
-        })
-        public static class Change {
-
-            protected boolean conditions;
-            @XmlElement(required = true)
-            protected SOSPermissionJocCockpit.Condition.Change.Events events;
-
-            /**
-             * Ruft den Wert der conditions-Eigenschaft ab.
-             * 
-             */
-            public boolean isConditions() {
-                return conditions;
-            }
-
-            /**
-             * Legt den Wert der conditions-Eigenschaft fest.
-             * 
-             */
-            public void setConditions(boolean value) {
-                this.conditions = value;
-            }
-
-            /**
-             * Ruft den Wert der events-Eigenschaft ab.
-             * 
-             * @return
-             *     possible object is
-             *     {@link SOSPermissionJocCockpit.Condition.Change.Events }
-             *     
-             */
-            public SOSPermissionJocCockpit.Condition.Change.Events getEvents() {
-                return events;
-            }
-
-            /**
-             * Legt den Wert der events-Eigenschaft fest.
-             * 
-             * @param value
-             *     allowed object is
-             *     {@link SOSPermissionJocCockpit.Condition.Change.Events }
-             *     
-             */
-            public void setEvents(SOSPermissionJocCockpit.Condition.Change.Events value) {
-                this.events = value;
-            }
-
-
-            /**
-             * <p>Java-Klasse für anonymous complex type.
-             * 
-             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
-             * 
-             * <pre>
-             * &lt;complexType>
-             *   &lt;complexContent>
-             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-             *       &lt;sequence>
-             *         &lt;element name="add" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-             *         &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-             *       &lt;/sequence>
-             *     &lt;/restriction>
-             *   &lt;/complexContent>
-             * &lt;/complexType>
-             * </pre>
-             * 
-             * 
-             */
-            @XmlAccessorType(XmlAccessType.FIELD)
-            @XmlType(name = "", propOrder = {
-                "add",
-                "remove"
-            })
-            public static class Events {
-
-                protected boolean add;
-                protected boolean remove;
-
-                /**
-                 * Ruft den Wert der add-Eigenschaft ab.
-                 * 
-                 */
-                public boolean isAdd() {
-                    return add;
-                }
-
-                /**
-                 * Legt den Wert der add-Eigenschaft fest.
-                 * 
-                 */
-                public void setAdd(boolean value) {
-                    this.add = value;
-                }
-
-                /**
-                 * Ruft den Wert der remove-Eigenschaft ab.
-                 * 
-                 */
-                public boolean isRemove() {
-                    return remove;
-                }
-
-                /**
-                 * Legt den Wert der remove-Eigenschaft fest.
-                 * 
-                 */
-                public void setRemove(boolean value) {
-                    this.remove = value;
-                }
-
-            }
-
-        }
-
-
-        /**
-         * <p>Java-Klasse für anonymous complex type.
-         * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
-         * 
-         * <pre>
-         * &lt;complexType>
-         *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *       &lt;sequence>
-         *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="graph" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="eventlist" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *       &lt;/sequence>
-         *     &lt;/restriction>
-         *   &lt;/complexContent>
-         * &lt;/complexType>
-         * </pre>
-         * 
-         * 
-         */
-        @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "", propOrder = {
-            "status",
-            "graph",
-            "eventlist"
-        })
-        public static class View {
-
-            protected boolean status;
-            protected boolean graph;
-            protected boolean eventlist;
-
-            /**
-             * Ruft den Wert der status-Eigenschaft ab.
-             * 
-             */
-            public boolean isStatus() {
-                return status;
-            }
-
-            /**
-             * Legt den Wert der status-Eigenschaft fest.
-             * 
-             */
-            public void setStatus(boolean value) {
-                this.status = value;
-            }
-
-            /**
-             * Ruft den Wert der graph-Eigenschaft ab.
-             * 
-             */
-            public boolean isGraph() {
-                return graph;
-            }
-
-            /**
-             * Legt den Wert der graph-Eigenschaft fest.
-             * 
-             */
-            public void setGraph(boolean value) {
-                this.graph = value;
-            }
-
-            /**
-             * Ruft den Wert der eventlist-Eigenschaft ab.
-             * 
-             */
-            public boolean isEventlist() {
-                return eventlist;
-            }
-
-            /**
-             * Legt den Wert der eventlist-Eigenschaft fest.
-             * 
-             */
-            public void setEventlist(boolean value) {
-                this.eventlist = value;
             }
 
         }
@@ -4547,6 +4196,357 @@ public class SOSPermissionJocCockpit {
              */
             public void setDocumentation(boolean value) {
                 this.documentation = value;
+            }
+
+        }
+
+    }
+
+
+    /**
+     * <p>Java-Klasse für anonymous complex type.
+     * 
+     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="view">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="graph" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="eventlist" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *         &lt;element name="change">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="conditions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="events">
+     *                     &lt;complexType>
+     *                       &lt;complexContent>
+     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                           &lt;sequence>
+     *                             &lt;element name="add" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                             &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                           &lt;/sequence>
+     *                         &lt;/restriction>
+     *                       &lt;/complexContent>
+     *                     &lt;/complexType>
+     *                   &lt;/element>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "view",
+        "change"
+    })
+    public static class JobStreams {
+
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.JobStreams.View view;
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.JobStreams.Change change;
+
+        /**
+         * Ruft den Wert der view-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.JobStreams.View }
+         *     
+         */
+        public SOSPermissionJocCockpit.JobStreams.View getView() {
+            return view;
+        }
+
+        /**
+         * Legt den Wert der view-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.JobStreams.View }
+         *     
+         */
+        public void setView(SOSPermissionJocCockpit.JobStreams.View value) {
+            this.view = value;
+        }
+
+        /**
+         * Ruft den Wert der change-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.JobStreams.Change }
+         *     
+         */
+        public SOSPermissionJocCockpit.JobStreams.Change getChange() {
+            return change;
+        }
+
+        /**
+         * Legt den Wert der change-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.JobStreams.Change }
+         *     
+         */
+        public void setChange(SOSPermissionJocCockpit.JobStreams.Change value) {
+            this.change = value;
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="conditions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="events">
+         *           &lt;complexType>
+         *             &lt;complexContent>
+         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                 &lt;sequence>
+         *                   &lt;element name="add" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                   &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                 &lt;/sequence>
+         *               &lt;/restriction>
+         *             &lt;/complexContent>
+         *           &lt;/complexType>
+         *         &lt;/element>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "conditions",
+            "events"
+        })
+        public static class Change {
+
+            protected boolean conditions;
+            @XmlElement(required = true)
+            protected SOSPermissionJocCockpit.JobStreams.Change.Events events;
+
+            /**
+             * Ruft den Wert der conditions-Eigenschaft ab.
+             * 
+             */
+            public boolean isConditions() {
+                return conditions;
+            }
+
+            /**
+             * Legt den Wert der conditions-Eigenschaft fest.
+             * 
+             */
+            public void setConditions(boolean value) {
+                this.conditions = value;
+            }
+
+            /**
+             * Ruft den Wert der events-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link SOSPermissionJocCockpit.JobStreams.Change.Events }
+             *     
+             */
+            public SOSPermissionJocCockpit.JobStreams.Change.Events getEvents() {
+                return events;
+            }
+
+            /**
+             * Legt den Wert der events-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link SOSPermissionJocCockpit.JobStreams.Change.Events }
+             *     
+             */
+            public void setEvents(SOSPermissionJocCockpit.JobStreams.Change.Events value) {
+                this.events = value;
+            }
+
+
+            /**
+             * <p>Java-Klasse für anonymous complex type.
+             * 
+             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * 
+             * <pre>
+             * &lt;complexType>
+             *   &lt;complexContent>
+             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *       &lt;sequence>
+             *         &lt;element name="add" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *         &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *       &lt;/sequence>
+             *     &lt;/restriction>
+             *   &lt;/complexContent>
+             * &lt;/complexType>
+             * </pre>
+             * 
+             * 
+             */
+            @XmlAccessorType(XmlAccessType.FIELD)
+            @XmlType(name = "", propOrder = {
+                "add",
+                "remove"
+            })
+            public static class Events {
+
+                protected boolean add;
+                protected boolean remove;
+
+                /**
+                 * Ruft den Wert der add-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isAdd() {
+                    return add;
+                }
+
+                /**
+                 * Legt den Wert der add-Eigenschaft fest.
+                 * 
+                 */
+                public void setAdd(boolean value) {
+                    this.add = value;
+                }
+
+                /**
+                 * Ruft den Wert der remove-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isRemove() {
+                    return remove;
+                }
+
+                /**
+                 * Legt den Wert der remove-Eigenschaft fest.
+                 * 
+                 */
+                public void setRemove(boolean value) {
+                    this.remove = value;
+                }
+
+            }
+
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="graph" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="eventlist" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "status",
+            "graph",
+            "eventlist"
+        })
+        public static class View {
+
+            protected boolean status;
+            protected boolean graph;
+            protected boolean eventlist;
+
+            /**
+             * Ruft den Wert der status-Eigenschaft ab.
+             * 
+             */
+            public boolean isStatus() {
+                return status;
+            }
+
+            /**
+             * Legt den Wert der status-Eigenschaft fest.
+             * 
+             */
+            public void setStatus(boolean value) {
+                this.status = value;
+            }
+
+            /**
+             * Ruft den Wert der graph-Eigenschaft ab.
+             * 
+             */
+            public boolean isGraph() {
+                return graph;
+            }
+
+            /**
+             * Legt den Wert der graph-Eigenschaft fest.
+             * 
+             */
+            public void setGraph(boolean value) {
+                this.graph = value;
+            }
+
+            /**
+             * Ruft den Wert der eventlist-Eigenschaft ab.
+             * 
+             */
+            public boolean isEventlist() {
+                return eventlist;
+            }
+
+            /**
+             * Legt den Wert der eventlist-Eigenschaft fest.
+             * 
+             */
+            public void setEventlist(boolean value) {
+                this.eventlist = value;
             }
 
         }

@@ -63,7 +63,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilterSchema, accessToken, jobFilterSchema.getJobschedulerId(),
-                    getPermissonsJocCockpit(jobFilterSchema.getJobschedulerId(), accessToken).getCondition().getView().isStatus());
+                    getPermissonsJocCockpit(jobFilterSchema.getJobschedulerId(), accessToken).getJobStreams().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
