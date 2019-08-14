@@ -33,11 +33,7 @@
 
 	<dependencies>
 		<!-- SOS DEPENDENCIES -->
-		<dependency>
-			<groupId>com.sos-berlin.jobscheduler</groupId>
-			<artifactId>sos-conditions</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+		 
 		<dependency>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-util</artifactId>
