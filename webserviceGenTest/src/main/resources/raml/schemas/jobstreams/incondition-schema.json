@@ -1,9 +1,9 @@
 {
 	"title": "In-Condition",
-	"id": "schemas/conditions/incondition",
+	"id": "schemas/jobstreams/incondition",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "In Condition",
-	"javaType": "com.sos.joc.model.conditions.InCondition",
+	"javaType": "com.sos.joc.model.jobstreams.InCondition",
 	"type": "object",
 	"required": [
 		"deliveryDate"
@@ -33,7 +33,7 @@
 		"outconditions": {
 			"type": "array",
 			"items": {
-				"$ref": "jobstreamOutconditions-schema.json"
+				"$ref": "jobstreamConditions-schema.json"
 			}
 		}
 	}

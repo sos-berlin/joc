@@ -1,9 +1,9 @@
 {
 	"title": "Start Resolver",
-	"id": "schemas/conditions/start_resolver",
+	"id": "schemas/jobstreams/start_resolver",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "Start Resolver",
-	"javaType": "com.sos.joc.model.conditions.StartResolver",
+	"javaType": "com.sos.joc.model.jobstreams.StartResolver",
 	"type": "object",
 	"required": [
 		"deliveryDate"

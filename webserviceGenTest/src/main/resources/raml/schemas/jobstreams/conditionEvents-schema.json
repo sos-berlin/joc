@@ -1,8 +1,8 @@
 {
 	"title": "ConditionEvents",
-	"id": "schemas/conditions/conditionEvents",
+	"id": "schemas/jobstreams/conditionEvents",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"javaType": "com.sos.joc.model.conditions.ConditionEvents",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionEvents",
 	"type": "object",
 	"required": [
 		"deliveryDate",

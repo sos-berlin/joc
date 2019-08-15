@@ -1,9 +1,9 @@
 {
 	"title": "job Out-Condition",
-	"id": "schemas/conditions/joboutcondition",
+	"id": "schemas/jobstreams/joboutcondition",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "job Out Condition",
-	"javaType": "com.sos.joc.model.conditions.JobOutCondition",
+	"javaType": "com.sos.joc.model.jobstreams.JobOutCondition",
 	"type": "object",
 	"required": [
 		"deliveryDate"

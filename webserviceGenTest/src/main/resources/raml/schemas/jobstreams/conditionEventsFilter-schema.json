@@ -1,8 +1,8 @@
 {
 	"title": "Conditions Events Filter",
-	"id": "schemas/conditions/conditionEventsFilter",
+	"id": "schemas/jobstreams/conditionEventsFilter",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"javaType": "com.sos.joc.model.conditions.ConditionEventsFilter",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionEventsFilter",
 	"type": "object",
 	"required": [
 		"masterId"

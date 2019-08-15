@@ -1,9 +1,9 @@
 {
 	"title": "job In-Condition",
-	"id": "schemas/conditions/jobincondition",
+	"id": "schemas/jobstreams/jobincondition",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "job In Condition",
-	"javaType": "com.sos.joc.model.conditions.JobInCondition",
+	"javaType": "com.sos.joc.model.jobstreams.JobInCondition",
 	"type": "object",
 	"required": [
 		"deliveryDate"

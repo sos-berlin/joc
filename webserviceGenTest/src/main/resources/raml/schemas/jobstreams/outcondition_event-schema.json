@@ -1,9 +1,9 @@
 {
   "title": "Out-Condition-Event",
-  "id": "schemas/conditions/outcondition_event",
+  "id": "schemas/jobstreams/outcondition_event",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "Out Condition Event",
-  "javaType": "com.sos.joc.model.conditions.OutConditionEvent",
+  "javaType": "com.sos.joc.model.jobstreams.OutConditionEvent",
   "type": "object",
   "required": [
    ],

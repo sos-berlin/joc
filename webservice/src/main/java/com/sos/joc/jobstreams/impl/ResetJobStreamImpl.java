@@ -13,8 +13,8 @@ import com.sos.classes.CustomEventsUtil;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobstreams.resource.IResetJobStreamResource;
+import com.sos.joc.model.jobstreams.ResetJobStream;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.conditions.ResetJobStream;
 
 @Path("conditions")
 public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStreamResource {

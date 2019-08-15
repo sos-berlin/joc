@@ -1,9 +1,9 @@
 {
   "title": "Expression",
-  "id": "schemas/conditions/condition_expression",
+  "id": "schemas/jobstreams/condition_expression",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "Expression for Condition",
-  "javaType": "com.sos.joc.model.conditions.ConditionExpression",
+  "javaType": "com.sos.joc.model.jobstreams.ConditionExpression",
   "type": "object",
   "required": [
    ],

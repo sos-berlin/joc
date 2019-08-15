@@ -9,8 +9,8 @@ import com.sos.classes.CustomEventsUtil;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobstreams.resource.IStartConditionResolverResource;
+import com.sos.joc.model.jobstreams.StartResolver;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.conditions.StartResolver;
 
 @Path("conditions")
 public class StartConditionResolverImpl extends JOCResourceImpl implements IStartConditionResolverResource {

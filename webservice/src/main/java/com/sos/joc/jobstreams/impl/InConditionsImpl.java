@@ -40,15 +40,16 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobstreams.resource.IInConditionsResource;
-import com.sos.joc.model.conditions.ConditionExpression;
-import com.sos.joc.model.conditions.InCondition;
-import com.sos.joc.model.conditions.InConditionCommand;
-import com.sos.joc.model.conditions.InConditions;
-import com.sos.joc.model.conditions.JobInCondition;
-import com.sos.joc.model.conditions.JobstreamOutConditions;
-import com.sos.joc.model.conditions.OutConditionRef;
+ 
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
+import com.sos.joc.model.jobstreams.ConditionExpression;
+import com.sos.joc.model.jobstreams.ConditionRef;
+import com.sos.joc.model.jobstreams.InCondition;
+import com.sos.joc.model.jobstreams.InConditionCommand;
+import com.sos.joc.model.jobstreams.InConditions;
+import com.sos.joc.model.jobstreams.JobInCondition;
+import com.sos.joc.model.jobstreams.JobstreamConditions;
 
 @Path("conditions")
 public class InConditionsImpl extends JOCResourceImpl implements IInConditionsResource {
@@ -154,10 +155,10 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
         }
     }
 
-    private List<JobstreamOutConditions> getOutConditions(JSJobConditionKey jsJobConditionKey, String schedulerId, String expression)
+    private List<JobstreamConditions> getOutConditions(JSJobConditionKey jsJobConditionKey, String schedulerId, String expression)
             throws SOSHibernateException {
         JSConditions jsConditions = new JSConditions();
-        List<JobstreamOutConditions> listOfOutConditions = new ArrayList<JobstreamOutConditions>();
+        List<JobstreamConditions> listOfJobStreamConditions = new ArrayList<JobstreamConditions>();
         List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expression);
         DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
         FilterOutConditions filterOutConditions = new FilterOutConditions();
@@ -202,18 +203,18 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
         }
 
         listOfJobstreams.forEach((jobStream, jobs) -> {
-            JobstreamOutConditions jobstreamOutConditions = new JobstreamOutConditions();
-            jobstreamOutConditions.setJobStream(jobStream);
+            JobstreamConditions jobstreamConditions = new JobstreamConditions();
+            jobstreamConditions.setJobStream(jobStream);
             jobs.forEach((job, expressions) -> {
-                OutConditionRef outConditionRef = new OutConditionRef();
-                outConditionRef.setJob(job);
-                outConditionRef.setExpressions(expressions);
-                jobstreamOutConditions.getJobs().add(outConditionRef);
+                ConditionRef conditionRef = new ConditionRef();
+                conditionRef.setJob(job);
+                conditionRef.setExpressions(expressions);
+                jobstreamConditions.getJobs().add(conditionRef);
             });
-            listOfOutConditions.add(jobstreamOutConditions);
+            listOfJobStreamConditions.add(jobstreamConditions);
         });
 
-        return listOfOutConditions;
+        return listOfJobStreamConditions;
     }
 
 }

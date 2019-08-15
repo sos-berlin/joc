@@ -12,9 +12,9 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobstreams.resource.IEditInConditionsResource;
+import com.sos.joc.model.jobstreams.InConditions;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.conditions.InConditions;
-
+ 
 @Path("conditions/edit")
 public class EditInConditionsImpl extends JOCResourceImpl implements IEditInConditionsResource {
 

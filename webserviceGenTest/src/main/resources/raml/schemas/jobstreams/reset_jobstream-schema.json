@@ -1,9 +1,9 @@
 {
 	"title": "Reset JobStream",
-	"id": "schemas/conditions/resetjobstream",
+	"id": "schemas/jobstreams/resetjobstream",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "Reset Workflow, unconsume expressions",
-	"javaType": "com.sos.joc.model.conditions.ResetJobStream",
+	"javaType": "com.sos.joc.model.jobstreams.ResetJobStream",
 	"type": "object",
 	"required": [
 		"deliveryDate"

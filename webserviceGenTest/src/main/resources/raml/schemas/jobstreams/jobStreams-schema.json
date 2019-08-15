@@ -1,9 +1,9 @@
 {
 	"title": "jobStreamFolders",
-	"id": "schemas/conditions/jobStreams",
+	"id": "schemas/jobstreams/jobStreams",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "List of all jobStreams and their folders",
-	"javaType": "com.sos.joc.model.conditions.JobStreams",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreams",
 	"type": "object",
 	"required": [
 		"deliveryDate"

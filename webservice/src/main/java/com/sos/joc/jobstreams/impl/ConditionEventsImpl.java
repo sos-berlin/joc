@@ -22,10 +22,10 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobstreams.resource.IConditionEventsResource;
+import com.sos.joc.model.jobstreams.ConditionEvent;
+import com.sos.joc.model.jobstreams.ConditionEvents;
+import com.sos.joc.model.jobstreams.ConditionEventsFilter;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.conditions.ConditionEvent;
-import com.sos.joc.model.conditions.ConditionEvents;
-import com.sos.joc.model.conditions.ConditionEventsFilter;
 
 @Path("conditions")
 public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEventsResource {

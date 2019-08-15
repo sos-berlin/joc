@@ -1,9 +1,9 @@
 {
 	"title": "Out-Condition",
-	"id": "schemas/conditions/outcondition",
+	"id": "schemas/jobstreams/outcondition",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "Out Condition",
-	"javaType": "com.sos.joc.model.conditions.OutCondition",
+	"javaType": "com.sos.joc.model.jobstreams.OutCondition",
 	"type": "object",
 	"required": [
 		"deliveryDate"
@@ -22,6 +22,12 @@
 			"type": "array",
 			"items": {
 				"$ref": "outcondition_event-schema.json"
+			}
+		},
+		"inconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "jobstreamConditions-schema.json"
 			}
 		}
 	}

@@ -1,9 +1,9 @@
 {
-	"title": "Out-ConditionRef",
-	"id": "schemas/conditions/outconditionref",
+	"title": "ConditionRef",
+	"id": "schemas/jobstreams/conditionref",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "In Condition",
-	"javaType": "com.sos.joc.model.conditions.OutConditionRef",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionRef",
 	"type": "object",
 	"properties": {
 		"job": {

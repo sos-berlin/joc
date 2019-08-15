@@ -1,9 +1,9 @@
 {
 	"title": "In-Conditions",
-	"id": "schemas/conditions/inconditions",
+	"id": "schemas/jobstreams/inconditions",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "List of all In Conditions",
-	"javaType": "com.sos.joc.model.conditions.InConditions",
+	"javaType": "com.sos.joc.model.jobstreams.InConditions",
 	"type": "object",
 	"required": [
 		"deliveryDate"

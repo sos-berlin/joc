@@ -7,8 +7,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.conditions.ConditionEvent;
-import com.sos.joc.model.conditions.ConditionEventsFilter;
+import com.sos.joc.model.jobstreams.ConditionEvent;
+import com.sos.joc.model.jobstreams.ConditionEventsFilter;
+ 
 
 public interface IConditionEventsResource {
 

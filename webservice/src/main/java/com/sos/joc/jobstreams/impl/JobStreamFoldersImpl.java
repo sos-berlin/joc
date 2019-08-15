@@ -25,8 +25,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobstreams.resource.IJobStreamFoldersResource;
-import com.sos.joc.model.conditions.Folders2Jobstream;
-import com.sos.joc.model.conditions.JobStreams;
+import com.sos.joc.model.jobstreams.Folders2Jobstream;
+import com.sos.joc.model.jobstreams.JobStreams;
 
 @Path("conditions")
 public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamFoldersResource {

@@ -1,9 +1,9 @@
 {
 	"title": "Out-Conditions",
-	"id": "schemas/conditions/outconditions",
+	"id": "schemas/jobstreams/outconditions",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "List of all Out Conditions",
-	"javaType": "com.sos.joc.model.conditions.OutConditions",
+	"javaType": "com.sos.joc.model.jobstreams.OutConditions",
 	"type": "object",
 	"required": [
 		"deliveryDate"

@@ -7,8 +7,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.conditions.JobStreams;
-
+import com.sos.joc.model.jobstreams.JobStreams;
+ 
 public interface IJobStreamFoldersResource {
 
     @POST

@@ -12,8 +12,8 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobstreams.resource.IEditOutConditionsResource;
+import com.sos.joc.model.jobstreams.OutConditions;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.conditions.OutConditions;
 
 @Path("conditions/edit")
 public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutConditionsResource {

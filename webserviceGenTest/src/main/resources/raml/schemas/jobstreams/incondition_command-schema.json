@@ -1,9 +1,9 @@
 {
   "title": "In-Condition-Command",
-  "id": "schemas/conditions/incondition_command",
+  "id": "schemas/jobstreams/incondition_command",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "In Condition",
-  "javaType": "com.sos.joc.model.conditions.InConditionCommand",
+  "javaType": "com.sos.joc.model.jobstreams.InConditionCommand",
   "type": "object",
   "required": [
    ],

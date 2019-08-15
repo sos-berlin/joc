@@ -7,8 +7,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.conditions.ResetJobStream;
-
+import com.sos.joc.model.jobstreams.ResetJobStream;
+ 
 public interface IResetJobStreamResource {
 
     @POST

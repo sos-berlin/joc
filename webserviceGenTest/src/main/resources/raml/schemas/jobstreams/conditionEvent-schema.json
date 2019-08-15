@@ -1,8 +1,8 @@
 {
 	"title": "conditionEvent",
-	"id": "schemas/conditions/conditionEvent",
+	"id": "schemas/jobstreams/conditionEvent",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"javaType": "com.sos.joc.model.conditions.ConditionEvent",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionEvent",
 	"type": "object",
 	"properties": {
 		"jobschedulerId": {
