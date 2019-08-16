@@ -42,7 +42,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_EVENTLIST, conditionEventsFilter, accessToken, conditionEventsFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getJobStreams().getView().isEventlist());
+                    getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getJobStream().getView().isEventlist());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -97,7 +97,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
-                    conditionEvent.getJobschedulerId(), accessToken).getJobStreams().getChange().getEvents().isAdd());
+                    conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -135,7 +135,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
-                    conditionEvent.getJobschedulerId(), accessToken).getJobStreams().getChange().getEvents().isAdd());
+                    conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

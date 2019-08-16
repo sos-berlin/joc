@@ -19,7 +19,9 @@ import com.sos.eventhandlerservice.db.DBLayerInConditions;
 import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.eventhandlerservice.db.FilterInConditions;
 import com.sos.eventhandlerservice.db.FilterOutConditions;
+import com.sos.eventhandlerservice.resolver.JSCondition;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
+import com.sos.eventhandlerservice.resolver.JSConditions;
 import com.sos.eventhandlerservice.resolver.JSEventKey;
 import com.sos.eventhandlerservice.resolver.JSJobConditionKey;
 import com.sos.eventhandlerservice.resolver.JSJobOutConditions;
@@ -56,7 +58,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilterSchema, accessToken, jobFilterSchema.getJobschedulerId(),
-                    getPermissonsJocCockpit(jobFilterSchema.getJobschedulerId(), accessToken).getJobStreams().getView().isStatus());
+                    getPermissonsJocCockpit(jobFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -163,8 +165,22 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
         for (DBItemInCondition dbItemInCondition: listOfInConditionsItems) {
         	String expression = " " + dbItemInCondition.getExpression() + " "; 
         	String jobStream = dbItemInCondition.getJobStream();
-        	for (OutConditionEvent event: outCondition.getOutconditionEvents()) {
-        		if (expression.contains(" " + event.getEvent() + " ") || expression.contains(outCondition.getJobStream() + "." + event.getEvent() + " ") || expression.contains(outCondition.getJobStream() + "." + event + "[") || expression.contains(" " + event + "[")) {
+    		
+        	JSConditions jsConditions = new JSConditions();
+        	List<JSCondition>  listOfConditions = jsConditions.getListOfConditions(expression);
+
+    		for (OutConditionEvent event: outCondition.getOutconditionEvents()) {
+    			boolean eventIsUsedInExpression = false;
+    			for (JSCondition jsCondition: listOfConditions) {
+    				if ("event".equals(jsCondition.getConditionType())){
+    					if (jsCondition.getEventName().equals(event.getEvent())) {
+    						eventIsUsedInExpression = true;
+    						continue;
+    					}
+    				}
+    			}
+    			
+        		if (eventIsUsedInExpression) {
         			
         			HashMap<String, ArrayList<String>> listOfJobs = null;
         		    ArrayList<String> listOfExpressions = null;

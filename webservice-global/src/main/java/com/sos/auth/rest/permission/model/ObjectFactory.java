@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.08.14 um 11:11:38 AM CEST 
+// Generiert: 2019.08.16 um 11:02:56 AM CEST 
 //
 
 
@@ -58,19 +58,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJocCockpit.JobStreams }
+     * Create an instance of {@link SOSPermissionJocCockpit.JobStream }
      * 
      */
-    public SOSPermissionJocCockpit.JobStreams createSOSPermissionJocCockpitJobStreams() {
-        return new SOSPermissionJocCockpit.JobStreams();
+    public SOSPermissionJocCockpit.JobStream createSOSPermissionJocCockpitJobStream() {
+        return new SOSPermissionJocCockpit.JobStream();
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJocCockpit.JobStreams.Change }
+     * Create an instance of {@link SOSPermissionJocCockpit.JobStream.Change }
      * 
      */
-    public SOSPermissionJocCockpit.JobStreams.Change createSOSPermissionJocCockpitJobStreamsChange() {
-        return new SOSPermissionJocCockpit.JobStreams.Change();
+    public SOSPermissionJocCockpit.JobStream.Change createSOSPermissionJocCockpitJobStreamChange() {
+        return new SOSPermissionJocCockpit.JobStream.Change();
     }
 
     /**
@@ -450,19 +450,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJocCockpit.JobStreams.View }
+     * Create an instance of {@link SOSPermissionJocCockpit.JobStream.View }
      * 
      */
-    public SOSPermissionJocCockpit.JobStreams.View createSOSPermissionJocCockpitJobStreamsView() {
-        return new SOSPermissionJocCockpit.JobStreams.View();
+    public SOSPermissionJocCockpit.JobStream.View createSOSPermissionJocCockpitJobStreamView() {
+        return new SOSPermissionJocCockpit.JobStream.View();
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJocCockpit.JobStreams.Change.Events }
+     * Create an instance of {@link SOSPermissionJocCockpit.JobStream.Change.Events }
      * 
      */
-    public SOSPermissionJocCockpit.JobStreams.Change.Events createSOSPermissionJocCockpitJobStreamsChangeEvents() {
-        return new SOSPermissionJocCockpit.JobStreams.Change.Events();
+    public SOSPermissionJocCockpit.JobStream.Change.Events createSOSPermissionJocCockpitJobStreamChangeEvents() {
+        return new SOSPermissionJocCockpit.JobStream.Change.Events();
     }
 
     /**

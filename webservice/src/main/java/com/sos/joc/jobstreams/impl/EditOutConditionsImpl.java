@@ -27,7 +27,7 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, outConditions, accessToken, outConditions.getJobschedulerId(), getPermissonsJocCockpit(
-                    outConditions.getJobschedulerId(), accessToken).getJobStreams().getChange().isConditions());
+                    outConditions.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

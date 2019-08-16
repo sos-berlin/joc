@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.08.14 um 11:11:38 AM CEST 
+// Generiert: 2019.08.16 um 11:02:56 AM CEST 
 //
 
 
@@ -785,7 +785,7 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="JobStreams">
+ *         &lt;element name="JobStream">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -868,7 +868,7 @@ import javax.xml.bind.annotation.XmlType;
     "runtime",
     "joc",
     "documentation",
-    "jobStreams"
+    "jobStream"
 })
 @XmlRootElement(name = "SOSPermissionJocCockpit")
 public class SOSPermissionJocCockpit {
@@ -917,8 +917,8 @@ public class SOSPermissionJocCockpit {
     protected SOSPermissionJocCockpit.Joc joc;
     @XmlElement(name = "Documentation", required = true)
     protected SOSPermissionJocCockpit.Documentation documentation;
-    @XmlElement(name = "JobStreams", required = true)
-    protected SOSPermissionJocCockpit.JobStreams jobStreams;
+    @XmlElement(name = "JobStream", required = true)
+    protected SOSPermissionJocCockpit.JobStream jobStream;
     @XmlAttribute(name = "isAuthenticated")
     protected Boolean isAuthenticated;
     @XmlAttribute(name = "user")
@@ -1459,27 +1459,27 @@ public class SOSPermissionJocCockpit {
     }
 
     /**
-     * Ruft den Wert der jobStreams-Eigenschaft ab.
+     * Ruft den Wert der jobStream-Eigenschaft ab.
      * 
      * @return
      *     possible object is
-     *     {@link SOSPermissionJocCockpit.JobStreams }
+     *     {@link SOSPermissionJocCockpit.JobStream }
      *     
      */
-    public SOSPermissionJocCockpit.JobStreams getJobStreams() {
-        return jobStreams;
+    public SOSPermissionJocCockpit.JobStream getJobStream() {
+        return jobStream;
     }
 
     /**
-     * Legt den Wert der jobStreams-Eigenschaft fest.
+     * Legt den Wert der jobStream-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
-     *     {@link SOSPermissionJocCockpit.JobStreams }
+     *     {@link SOSPermissionJocCockpit.JobStream }
      *     
      */
-    public void setJobStreams(SOSPermissionJocCockpit.JobStreams value) {
-        this.jobStreams = value;
+    public void setJobStream(SOSPermissionJocCockpit.JobStream value) {
+        this.jobStream = value;
     }
 
     /**
@@ -4262,22 +4262,22 @@ public class SOSPermissionJocCockpit {
         "view",
         "change"
     })
-    public static class JobStreams {
+    public static class JobStream {
 
         @XmlElement(required = true)
-        protected SOSPermissionJocCockpit.JobStreams.View view;
+        protected SOSPermissionJocCockpit.JobStream.View view;
         @XmlElement(required = true)
-        protected SOSPermissionJocCockpit.JobStreams.Change change;
+        protected SOSPermissionJocCockpit.JobStream.Change change;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
          * 
          * @return
          *     possible object is
-         *     {@link SOSPermissionJocCockpit.JobStreams.View }
+         *     {@link SOSPermissionJocCockpit.JobStream.View }
          *     
          */
-        public SOSPermissionJocCockpit.JobStreams.View getView() {
+        public SOSPermissionJocCockpit.JobStream.View getView() {
             return view;
         }
 
@@ -4286,10 +4286,10 @@ public class SOSPermissionJocCockpit {
          * 
          * @param value
          *     allowed object is
-         *     {@link SOSPermissionJocCockpit.JobStreams.View }
+         *     {@link SOSPermissionJocCockpit.JobStream.View }
          *     
          */
-        public void setView(SOSPermissionJocCockpit.JobStreams.View value) {
+        public void setView(SOSPermissionJocCockpit.JobStream.View value) {
             this.view = value;
         }
 
@@ -4298,10 +4298,10 @@ public class SOSPermissionJocCockpit {
          * 
          * @return
          *     possible object is
-         *     {@link SOSPermissionJocCockpit.JobStreams.Change }
+         *     {@link SOSPermissionJocCockpit.JobStream.Change }
          *     
          */
-        public SOSPermissionJocCockpit.JobStreams.Change getChange() {
+        public SOSPermissionJocCockpit.JobStream.Change getChange() {
             return change;
         }
 
@@ -4310,10 +4310,10 @@ public class SOSPermissionJocCockpit {
          * 
          * @param value
          *     allowed object is
-         *     {@link SOSPermissionJocCockpit.JobStreams.Change }
+         *     {@link SOSPermissionJocCockpit.JobStream.Change }
          *     
          */
-        public void setChange(SOSPermissionJocCockpit.JobStreams.Change value) {
+        public void setChange(SOSPermissionJocCockpit.JobStream.Change value) {
             this.change = value;
         }
 
@@ -4358,7 +4358,7 @@ public class SOSPermissionJocCockpit {
 
             protected boolean conditions;
             @XmlElement(required = true)
-            protected SOSPermissionJocCockpit.JobStreams.Change.Events events;
+            protected SOSPermissionJocCockpit.JobStream.Change.Events events;
 
             /**
              * Ruft den Wert der conditions-Eigenschaft ab.
@@ -4381,10 +4381,10 @@ public class SOSPermissionJocCockpit {
              * 
              * @return
              *     possible object is
-             *     {@link SOSPermissionJocCockpit.JobStreams.Change.Events }
+             *     {@link SOSPermissionJocCockpit.JobStream.Change.Events }
              *     
              */
-            public SOSPermissionJocCockpit.JobStreams.Change.Events getEvents() {
+            public SOSPermissionJocCockpit.JobStream.Change.Events getEvents() {
                 return events;
             }
 
@@ -4393,10 +4393,10 @@ public class SOSPermissionJocCockpit {
              * 
              * @param value
              *     allowed object is
-             *     {@link SOSPermissionJocCockpit.JobStreams.Change.Events }
+             *     {@link SOSPermissionJocCockpit.JobStream.Change.Events }
              *     
              */
-            public void setEvents(SOSPermissionJocCockpit.JobStreams.Change.Events value) {
+            public void setEvents(SOSPermissionJocCockpit.JobStream.Change.Events value) {
                 this.events = value;
             }
 

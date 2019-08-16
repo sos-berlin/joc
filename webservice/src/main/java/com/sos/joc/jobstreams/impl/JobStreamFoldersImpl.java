@@ -40,7 +40,7 @@ public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamF
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobStreams, accessToken, jobStreams.getJobschedulerId(), getPermissonsJocCockpit(
-                    jobStreams.getJobschedulerId(), accessToken).getJobStreams().getView().isStatus());
+                    jobStreams.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

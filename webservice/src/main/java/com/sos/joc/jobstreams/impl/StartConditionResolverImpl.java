@@ -23,7 +23,7 @@ public class StartConditionResolverImpl extends JOCResourceImpl implements IStar
         try {
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, startResolver, accessToken, startResolver.getJobschedulerId(), getPermissonsJocCockpit(
-                    null, accessToken).getJobStreams().getChange().isConditions());
+                    null, accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
