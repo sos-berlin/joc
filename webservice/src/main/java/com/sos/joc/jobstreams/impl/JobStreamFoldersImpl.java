@@ -13,7 +13,9 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.eventhandlerservice.db.DBItemInCondition;
 import com.sos.eventhandlerservice.db.DBItemInConditionWithCommand;
+import com.sos.eventhandlerservice.db.DBItemOutCondition;
 import com.sos.eventhandlerservice.db.DBItemOutConditionWithEvent;
 import com.sos.eventhandlerservice.db.DBLayerInConditions;
 import com.sos.eventhandlerservice.db.DBLayerOutConditions;
@@ -51,29 +53,29 @@ public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamF
             FilterInConditions filterInConditions = new FilterInConditions();
             filterInConditions.setJobStream(jobStreams.getJobStreamFilter());
             filterInConditions.setJobSchedulerId(jobStreams.getJobschedulerId());
-            List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
+            List<DBItemInCondition> listOfInConditions = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
 
-            for (DBItemInConditionWithCommand dbItemInConditionWithCommand : listOfInConditions) {
-                String jobStream = dbItemInConditionWithCommand.getDbItemInCondition().getJobStream();
+            for (DBItemInCondition dbItemInCondition : listOfInConditions) {
+                String jobStream = dbItemInCondition.getJobStream();
                 if (mapOfJobStream2Folders.get(jobStream) == null) {
                     Set<String> listOfFolders = new LinkedHashSet<String>();
                     mapOfJobStream2Folders.put(jobStream, listOfFolders);
                 }
-                mapOfJobStream2Folders.get(jobStream).add(Paths.get(dbItemInConditionWithCommand.getJob()).getParent().toString());
+                mapOfJobStream2Folders.get(jobStream).add(Paths.get(dbItemInCondition.getJob()).getParent().toString());
             }
 
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             FilterOutConditions filterOutConditions = new FilterOutConditions();
             filterOutConditions.setJobSchedulerId(jobStreams.getJobschedulerId());
             filterOutConditions.setJobStream(jobStreams.getJobStreamFilter());
-            List<DBItemOutConditionWithEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
-            for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfOutConditions) {
-                String jobStream = dbItemOutConditionWithEvent.getDbItemOutCondition().getJobStream();
+            List<DBItemOutCondition> listOfOutConditions = dbLayerOutConditions.getSimpleOutConditionsList(filterOutConditions, 0);
+            for (DBItemOutCondition dbItemOutCondition : listOfOutConditions) {
+                String jobStream = dbItemOutCondition.getJobStream();
                 if (mapOfJobStream2Folders.get(jobStream) == null) {
                     Set<String> listOfFolders = new LinkedHashSet<String>();
                     mapOfJobStream2Folders.put(jobStream, listOfFolders);
                 }
-                mapOfJobStream2Folders.get(jobStream).add(Paths.get(dbItemOutConditionWithEvent.getJob()).getParent().toString());
+                mapOfJobStream2Folders.get(jobStream).add(Paths.get(dbItemOutCondition.getJob()).getParent().toString());
             }
 
             mapOfJobStream2Folders.forEach((jobStream, value) -> {
