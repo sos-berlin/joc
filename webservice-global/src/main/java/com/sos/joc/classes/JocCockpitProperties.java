@@ -192,26 +192,23 @@ public class JocCockpitProperties {
     }
     
     private void setLog4JConfiguration() {
-        String propKeyLog4J = "log4j.configuration"; 
-        //String sysLog4JProp = System.getProperty(propKeyLog4J);
-        //if (sysLog4JProp == null || sysLog4JProp.isEmpty()) {
-            String log4jConf = getProperty(propKeyLog4J, "log4j.properties");
+        String propKeyLog4J = "log4j.configuration";
+        String log4jConf = getProperty(propKeyLog4J);
+        if (log4jConf != null) {
             Path p = resolvePath(log4jConf);
             if (p != null) {
                 if (Files.exists(p)) {
-                    //System.setProperty(propKeyLog4J, p.toUri().toString());
                     try {
                         org.apache.log4j.LogManager.resetConfiguration();
                         org.apache.log4j.PropertyConfigurator.configure(p.toUri().toURL());
                     } catch (Exception e) {
-                        LOGGER.warn("",e);
+                        LOGGER.warn("", e);
                     }
-                    //LOGGER.info(propKeyLog4J + "=" + System.getProperty(propKeyLog4J));
                 } else {
                     LOGGER.warn(String.format("%1$s=%2$s is set but file (%3$s) not found.", propKeyLog4J, log4jConf, p.toString()));
                 }
             }
-        //}
+        }
     }
     
     private void substituteProperties() {
