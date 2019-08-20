@@ -170,6 +170,11 @@
 					<artifactId>jtds</artifactId>
 				</dependency>
 				<dependency>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
+					<version>8.0.13</version>
+				</dependency>
+				<dependency>
 					<groupId>com.owlike</groupId>
 					<artifactId>genson</artifactId>
 					<version>1.3</version>

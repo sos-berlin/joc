@@ -313,7 +313,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setEventType(eventKey); // YADETransferStarted, YADETransferUpdated, YADEFileStateChanged
                         }
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
-                        //eventSnapshot.setPath(variables.getString("fileId", null));
+                        // eventSnapshot.setPath(variables.getString("fileId", null));
                         eventSnapshot.setPath(variables.getString("transferId", null));
                     } else if (eventKey.equals("JobSchedulerJobStreamsEventHandler")) {
                         String eventCreated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name(), null);
@@ -542,10 +542,10 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             if (connection == null) {
                 connection = Globals.createSosHibernateStatelessConnection("eventCallable-" + jobSchedulerEvent.getJobschedulerId());
             }
-            
+
             Date from = new Date();
             from.setTime(Long.parseLong(eventId) / 1000);
-           
+
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
             Globals.beginTransaction(connection);
             AuditLogDBFilter auditLogDBFilter = new AuditLogDBFilter();

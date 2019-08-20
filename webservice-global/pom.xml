@@ -33,6 +33,7 @@
 			<artifactId>sos-json</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		 
 		<dependency>
 			<groupId>com.sos-berlin.jobscheduler</groupId>
 			<artifactId>sos-jobstreams</artifactId>
