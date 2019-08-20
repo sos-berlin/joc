@@ -3,7 +3,6 @@
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
 // Generiert: 2019.08.16 um 11:02:56 AM CEST 
-//
 
 
 package com.sos.auth.rest.permission.model;

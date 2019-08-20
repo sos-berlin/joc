@@ -595,7 +595,7 @@ public class SOSPermissionsCreator {
             sosPermissionCommands.getOrder().getExecute().setUpdate(haveRight(masterId, "sos:products:commands:order:execute:update"));
             sosPermissionCommands.getOrder().getExecute().setSuspend(haveRight(masterId, "sos:products:commands:order:execute:suspend"));
             sosPermissionCommands.getOrder().getExecute().setResume(haveRight(masterId, "sos:products:commands:order:execute:resume"));
-            sosPermissionCommands.getOrder().getExecute().setReset(haveRight(masterId, "sos:products:commands:order::execute:reset"));
+            sosPermissionCommands.getOrder().getExecute().setReset(haveRight(masterId, "sos:products:commands:order:execute:reset"));
             sosPermissionCommands.getOrder().getExecute().setRemoveSetback(haveRight(masterId, "sos:products:commands:order:execute:remove_setback"));
             sosPermissionCommands.getOrder().setDelete(haveRight(masterId, "sos:products:commands:order:delete"));
 
