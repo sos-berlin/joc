@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.SOSPermissionsCreator;
+import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.auth.rest.SOSShiroFolderPermissions;
 import com.sos.auth.rest.SOSShiroSession;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
@@ -30,6 +31,7 @@ import com.sos.joc.classes.audit.JocAuditLog;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JocAuthenticationException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingCommentException;
@@ -135,6 +137,12 @@ public class JOCResourceImpl {
 	public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId,
 			boolean permission) throws JocException {
 		this.accessToken = accessToken;
+		
+		SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUserByToken(accessToken);
+		if (sosShiroCurrentUserAnswer.getSessionTimeout()==0L) {
+		    throw new JocAuthenticationException(sosShiroCurrentUserAnswer);
+		}
+		
 		if (jobschedulerUser == null) {
 			jobschedulerUser = new JobSchedulerUser(accessToken);
 		}

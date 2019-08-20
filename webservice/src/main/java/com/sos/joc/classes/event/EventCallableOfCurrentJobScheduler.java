@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
-import com.sos.eventhandlerservice.servlet.JobSchedulerConditionsEventHandler;
+import com.sos.eventhandlerservice.plugin.JobSchedulerJobStreamsEventHandler;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -315,14 +315,14 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
                         //eventSnapshot.setPath(variables.getString("fileId", null));
                         eventSnapshot.setPath(variables.getString("transferId", null));
-                    } else if (eventKey.equals("JobSchedulerConditionsEventHandler")) {
-                        String eventCreated = variables.getString(JobSchedulerConditionsEventHandler.CustomEventType.EventCreated.name(), null);
-                        String inconditionValidated = variables.getString(JobSchedulerConditionsEventHandler.CustomEventType.InconditionValidated.name(), null);
+                    } else if (eventKey.equals("JobSchedulerJobStreamsEventHandler")) {
+                        String eventCreated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name(), null);
+                        String inconditionValidated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated.name(), null);
                         if (eventCreated != null) {
-                            eventSnapshot.setEventType(JobSchedulerConditionsEventHandler.CustomEventType.EventCreated.name());
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name());
                             eventSnapshot.setPath(eventCreated);
                         } else if (inconditionValidated != null) {
-                            eventSnapshot.setEventType(JobSchedulerConditionsEventHandler.CustomEventType.InconditionValidated.name());
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated.name());
                             eventSnapshot.setPath(inconditionValidated);
                         }
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);

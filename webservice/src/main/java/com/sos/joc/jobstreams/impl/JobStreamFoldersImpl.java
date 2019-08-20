@@ -14,9 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.eventhandlerservice.db.DBItemInCondition;
-import com.sos.eventhandlerservice.db.DBItemInConditionWithCommand;
 import com.sos.eventhandlerservice.db.DBItemOutCondition;
-import com.sos.eventhandlerservice.db.DBItemOutConditionWithEvent;
 import com.sos.eventhandlerservice.db.DBLayerInConditions;
 import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.eventhandlerservice.db.FilterInConditions;

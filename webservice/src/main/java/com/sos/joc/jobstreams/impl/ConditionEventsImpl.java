@@ -166,7 +166,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
     }
 
     private void notifyEventHandler(String accessToken, String eventKey, FilterEvents filter) throws JsonProcessingException, JocException {
-        CustomEventsUtil customEventsUtil = new CustomEventsUtil(EditOutConditionsImpl.class.getName());
+        CustomEventsUtil customEventsUtil = new CustomEventsUtil(ConditionEventsImpl.class.getName());
         Map<String, String> parameters = new HashMap<String, String>();
         if (filter != null) {
             parameters.put("outConditionId", String.valueOf(filter.getOutConditionId()));
