@@ -576,7 +576,7 @@ public class SOSPermissionsCreator {
             sosPermissionCommands.getOrder().getChange().setTimeForAdhocOrder(haveRight(masterId,
                     "sos:products:commands:order:change:time_for_adhoc_orders"));
             sosPermissionCommands.getOrder().getChange().setParameter(haveRight(masterId, "sos:products:commands:order:change:parameter"));
-            sosPermissionCommands.getOrder().getChange().setOther(haveRight(masterId, "sos:products:joc_cockpit:order:change:other"));
+            sosPermissionCommands.getOrder().getChange().setOther(haveRight(masterId, "sos:products:commands:order:change:other"));
             sosPermissionCommands.getOrder().getChange().setRunTime(haveRight(masterId, "sos:products:commands:order:change:run_time"));
             sosPermissionCommands.getOrder().getChange().setState(haveRight(masterId, "sos:products:commands:order:change:state"));
             sosPermissionCommands.getOrder().getChange().setHotFolder(haveRight(masterId, "sos:products:commands:order:change:hot_folder"));
@@ -584,7 +584,7 @@ public class SOSPermissionsCreator {
             sosPermissionCommands.getOrder().getExecute().setUpdate(haveRight(masterId, "sos:products:commands:order:execute:update"));
             sosPermissionCommands.getOrder().getExecute().setSuspend(haveRight(masterId, "sos:products:commands:order:execute:suspend"));
             sosPermissionCommands.getOrder().getExecute().setResume(haveRight(masterId, "sos:products:commands:order:execute:resume"));
-            sosPermissionCommands.getOrder().getExecute().setReset(haveRight(masterId, "sos:products:commands:order::execute:reset"));
+            sosPermissionCommands.getOrder().getExecute().setReset(haveRight(masterId, "sos:products:commands:order:execute:reset"));
             sosPermissionCommands.getOrder().getExecute().setRemoveSetback(haveRight(masterId, "sos:products:commands:order:execute:remove_setback"));
             sosPermissionCommands.getOrder().setDelete(haveRight(masterId, "sos:products:commands:order:delete"));
 
