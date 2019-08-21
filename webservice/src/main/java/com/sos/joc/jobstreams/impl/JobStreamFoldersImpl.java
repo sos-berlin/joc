@@ -13,12 +13,12 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.eventhandlerservice.db.DBItemInCondition;
-import com.sos.eventhandlerservice.db.DBItemOutCondition;
-import com.sos.eventhandlerservice.db.DBLayerInConditions;
-import com.sos.eventhandlerservice.db.DBLayerOutConditions;
-import com.sos.eventhandlerservice.db.FilterInConditions;
-import com.sos.eventhandlerservice.db.FilterOutConditions;
+import com.sos.jobstreams.db.DBItemInCondition;
+import com.sos.jobstreams.db.DBItemOutCondition;
+import com.sos.jobstreams.db.DBLayerInConditions;
+import com.sos.jobstreams.db.DBLayerOutConditions;
+import com.sos.jobstreams.db.FilterInConditions;
+import com.sos.jobstreams.db.FilterOutConditions;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;

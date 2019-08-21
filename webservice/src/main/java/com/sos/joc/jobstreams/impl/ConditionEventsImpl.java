@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
-import com.sos.eventhandlerservice.db.DBItemEvent;
-import com.sos.eventhandlerservice.db.DBItemOutCondition;
-import com.sos.eventhandlerservice.db.DBLayerEvents;
-import com.sos.eventhandlerservice.db.DBLayerOutConditions;
-import com.sos.eventhandlerservice.db.FilterEvents;
+import com.sos.jobstreams.db.DBItemEvent;
+import com.sos.jobstreams.db.DBItemOutCondition;
+import com.sos.jobstreams.db.DBLayerEvents;
+import com.sos.jobstreams.db.DBLayerOutConditions;
+import com.sos.jobstreams.db.FilterEvents;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -54,7 +54,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
 
             if (conditionEventsFilter.getSession() == null || conditionEventsFilter.getSession().isEmpty()) {
-                filter.setSession(com.sos.eventhandlerservice.classes.Constants.getSession());
+                filter.setSession(com.sos.jobstreams.classes.Constants.getSession());
             } else {
                 filter.setSession(conditionEventsFilter.getSession());
 
@@ -103,7 +103,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             }
 
             if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession(com.sos.eventhandlerservice.classes.Constants.getSession());
+                conditionEvent.setSession(com.sos.jobstreams.classes.Constants.getSession());
             } else {
                 conditionEvent.setSession(conditionEvent.getSession());
             }
@@ -145,7 +145,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             this.checkRequiredParameter("event", conditionEvent.getEvent());
 
             if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession(com.sos.eventhandlerservice.classes.Constants.getSession());
+                conditionEvent.setSession(com.sos.jobstreams.classes.Constants.getSession());
             } else {
                 conditionEvent.setSession(conditionEvent.getSession());
             }

@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
-import com.sos.eventhandlerservice.plugin.JobSchedulerJobStreamsEventHandler;
+import com.sos.jobstreams.plugins.JobSchedulerJobStreamsEventHandler;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
