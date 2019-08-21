@@ -587,7 +587,7 @@ public class SOSPermissionsCreator {
             sosPermissionCommands.getOrder().getChange().setTimeForAdhocOrder(haveRight(masterId,
                     "sos:products:commands:order:change:time_for_adhoc_orders"));
             sosPermissionCommands.getOrder().getChange().setParameter(haveRight(masterId, "sos:products:commands:order:change:parameter"));
-            sosPermissionCommands.getOrder().getChange().setOther(haveRight(masterId, "sos:products:commandst:order:change:other"));
+            sosPermissionCommands.getOrder().getChange().setOther(haveRight(masterId, "sos:products:commands:order:change:other"));
             sosPermissionCommands.getOrder().getChange().setRunTime(haveRight(masterId, "sos:products:commands:order:change:run_time"));
             sosPermissionCommands.getOrder().getChange().setState(haveRight(masterId, "sos:products:commands:order:change:state"));
             sosPermissionCommands.getOrder().getChange().setHotFolder(haveRight(masterId, "sos:products:commands:order:change:hot_folder"));
