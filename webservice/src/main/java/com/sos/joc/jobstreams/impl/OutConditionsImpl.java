@@ -1,4 +1,5 @@
 package com.sos.joc.jobstreams.impl;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,13 +69,12 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
             OutConditions outConditions = new OutConditions();
             outConditions.setJobschedulerId(jobFilterSchema.getJobschedulerId());
-            
-             DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
+
+            DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
             FilterInConditions filterInConditions = new FilterInConditions();
             filterInConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
 
-            List<DBItemInCondition> listOfInConditionsItems  = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
-
+            List<DBItemInCondition> listOfInConditionsItems = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
 
             for (JobPath job : jobFilterSchema.getJobs()) {
 
@@ -96,6 +96,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 filterOutConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
 
                 JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken, this.getCommandUrl());
+                jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "../../");
                 jsConditionResolver.initEvents();
 
                 List<DBItemOutConditionWithEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
@@ -121,7 +122,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                         outCondition.setConditionExpression(conditionExpression);
                         outCondition.setJobStream(jsOutCondition.getJobStream());
                         outCondition.setId(jsOutCondition.getId());
-                        
+
                         for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
                             OutConditionEvent outConditionEvent = new OutConditionEvent();
                             outConditionEvent.setEvent(jsOutConditionEvent.getEventValue());
@@ -130,14 +131,14 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             if (jsOutConditionEvent.isCreateCommand()) {
                                 outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExist(jsEventKey, outCondition.getJobStream()));
                                 outConditionEvent.setExists(jsConditionResolver.eventExist(jsEventKey, ""));
-                            }else {
+                            } else {
                                 outConditionEvent.setExistsInJobStream(false);
                                 outConditionEvent.setExists(false);
                             }
                             outConditionEvent.setId(jsOutConditionEvent.getId());
                             outCondition.getOutconditionEvents().add(outConditionEvent);
                         }
-                        
+
                         outCondition.setInconditions(getInConditions(sosHibernateSession, outCondition, listOfInConditionsItems));
                         jobOutCondition.getOutconditions().add(outCondition);
                     }
@@ -156,41 +157,41 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             Globals.disconnect(sosHibernateSession);
         }
     }
-    
-    private List<JobstreamConditions> getInConditions(SOSHibernateSession sosHibernateSession, OutCondition outCondition, List<DBItemInCondition> listOfInConditionsItems) throws SOSHibernateException {
-       
+
+    private List<JobstreamConditions> getInConditions(SOSHibernateSession sosHibernateSession, OutCondition outCondition,
+            List<DBItemInCondition> listOfInConditionsItems) throws SOSHibernateException {
+
         List<JobstreamConditions> listOfJobStreamConditions = new ArrayList<JobstreamConditions>();
         Map<String, HashMap<String, ArrayList<String>>> listOfJobstreams = new HashMap<String, HashMap<String, ArrayList<String>>>();
- 
-        for (DBItemInCondition dbItemInCondition: listOfInConditionsItems) {
-        	String expression = " " + dbItemInCondition.getExpression() + " "; 
-        	String jobStream = dbItemInCondition.getJobStream();
-    		
-        	JSConditions jsConditions = new JSConditions();
-        	List<JSCondition>  listOfConditions = jsConditions.getListOfConditions(expression);
 
-    		for (OutConditionEvent event: outCondition.getOutconditionEvents()) {
-    			boolean eventIsUsedInExpression = false;
-    			for (JSCondition jsCondition: listOfConditions) {
-    				if ("event".equals(jsCondition.getConditionType())){
-    					if (jsCondition.getEventName().equals(event.getEvent())) {
-    						eventIsUsedInExpression = true;
-    						continue;
-    					}
-    				}
-    			}
-    			
-        		if (eventIsUsedInExpression) {
-        			
-        			HashMap<String, ArrayList<String>> listOfJobs = null;
-        		    ArrayList<String> listOfExpressions = null;
+        for (DBItemInCondition dbItemInCondition : listOfInConditionsItems) {
+            String expression = " " + dbItemInCondition.getExpression() + " ";
+            String jobStream = dbItemInCondition.getJobStream();
+
+            JSConditions jsConditions = new JSConditions();
+            List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expression);
+
+            for (OutConditionEvent event : outCondition.getOutconditionEvents()) {
+                boolean eventIsUsedInExpression = false;
+                for (JSCondition jsCondition : listOfConditions) {
+                    if ("event".equals(jsCondition.getConditionType())) {
+                        if (jsCondition.getEventName().equals(event.getEvent())) {
+                            eventIsUsedInExpression = true;
+                            continue;
+                        }
+                    }
+                }
+
+                if (eventIsUsedInExpression) {
+
+                    HashMap<String, ArrayList<String>> listOfJobs = null;
+                    ArrayList<String> listOfExpressions = null;
                     if (listOfJobstreams.get(jobStream) == null) {
                         listOfJobs = new HashMap<String, ArrayList<String>>();
                     } else {
                         listOfJobs = listOfJobstreams.get(jobStream);
                     }
-        			
-        			 
+
                     if (listOfJobs.get(dbItemInCondition.getJob()) == null) {
                         listOfExpressions = new ArrayList<String>();
                     } else {
@@ -200,11 +201,10 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                     listOfExpressions.add(expression);
                     listOfJobs.put(dbItemInCondition.getJob(), listOfExpressions);
                     listOfJobstreams.put(jobStream, listOfJobs);
-        		}
-        	}
-        	
-        }
+                }
+            }
 
+        }
 
         listOfJobstreams.forEach((jobStream, jobs) -> {
             JobstreamConditions jobstreamConditions = new JobstreamConditions();
