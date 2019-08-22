@@ -51,6 +51,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             FilterEvents filter = new FilterEvents();
+            filter.setSchedulerId(conditionEventsFilter.getJobschedulerId());
             filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
 
             if (conditionEventsFilter.getSession() == null || conditionEventsFilter.getSession().isEmpty()) {

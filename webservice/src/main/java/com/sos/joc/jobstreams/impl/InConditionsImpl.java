@@ -1,4 +1,5 @@
 package com.sos.joc.jobstreams.impl;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +12,9 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jobstreams.db.DBItemInConditionWithCommand;
@@ -32,15 +36,11 @@ import com.sos.jobstreams.resolver.JSJobInConditions;
 import com.sos.jobstreams.resolver.JSJobOutConditions;
 import com.sos.jobstreams.resolver.JSOutCondition;
 import com.sos.jobstreams.resolver.JSOutConditions;
-import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobstreams.resource.IInConditionsResource;
- 
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.jobstreams.ConditionExpression;
@@ -91,7 +91,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 filterInConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
                 filterInConditions.setJob(job.getJob());
 
-                jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken, this.getCommandUrl());
+                jsConditionResolver = new JSConditionResolver(sosHibernateSession, jobFilterSchema.getJobschedulerId());
                 jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
                 jsConditionResolver.initEvents();
 
