@@ -12,9 +12,12 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.reporting.db.DBItemReportTask;
+import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.db.DBItemInCondition;
-import com.sos.jobstreams.db.DBItemInConditionWithCommand;
 import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
 import com.sos.jobstreams.db.DBLayerInConditions;
 import com.sos.jobstreams.db.DBLayerOutConditions;
@@ -28,10 +31,6 @@ import com.sos.jobstreams.resolver.JSJobConditionKey;
 import com.sos.jobstreams.resolver.JSJobOutConditions;
 import com.sos.jobstreams.resolver.JSOutCondition;
 import com.sos.jobstreams.resolver.JSOutConditionEvent;
-import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.reporting.db.DBItemReportTask;
-import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -96,7 +95,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 filterOutConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
 
                 JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, accessToken, this.getCommandUrl());
-                jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "../../");
+                jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
                 jsConditionResolver.initEvents();
 
                 List<DBItemOutConditionWithEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
