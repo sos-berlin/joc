@@ -317,10 +317,15 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setPath(variables.getString("transferId", null));
                     } else if (eventKey.equals("JobSchedulerJobStreamsEventHandler")) {
                         String eventCreated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name(), null);
-                        String inconditionValidated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated.name(), null);
+                        String eventRemoved = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name(), null);
+                        String inconditionValidated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated
+                                .name(), null);
                         if (eventCreated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name());
                             eventSnapshot.setPath(eventCreated);
+                        } else if (eventRemoved != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name());
+                            eventSnapshot.setPath(eventRemoved);
                         } else if (inconditionValidated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated.name());
                             eventSnapshot.setPath(inconditionValidated);
