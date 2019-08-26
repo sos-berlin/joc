@@ -32,7 +32,7 @@ import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
 import com.sos.joc.model.jobstreams.JobStreamFilter;
 
-@Path("jobstream")
+@Path("jobstreams")
 public class JobStreamResourceHistoryImpl extends JOCResourceImpl implements IJobStreamResourceHistory {
 
     private static final String API_CALL = "./jobstream/history";

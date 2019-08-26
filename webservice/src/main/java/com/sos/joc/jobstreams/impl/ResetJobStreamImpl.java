@@ -16,7 +16,7 @@ import com.sos.joc.jobstreams.resource.IResetJobStreamResource;
 import com.sos.joc.model.jobstreams.ResetJobStream;
 import com.sos.joc.exceptions.JocException;
 
-@Path("conditions")
+@Path("jobstreams")
 public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStreamResource {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResetJobStreamImpl.class);

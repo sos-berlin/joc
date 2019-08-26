@@ -15,7 +15,7 @@ import com.sos.joc.jobstreams.resource.IEditInConditionsResource;
 import com.sos.joc.model.jobstreams.InConditions;
 import com.sos.joc.exceptions.JocException;
  
-@Path("conditions/edit")
+@Path("jobstreams/edit")
 public class EditInConditionsImpl extends JOCResourceImpl implements IEditInConditionsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EditInConditionsImpl.class);

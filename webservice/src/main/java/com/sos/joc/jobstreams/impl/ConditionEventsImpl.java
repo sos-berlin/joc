@@ -27,7 +27,7 @@ import com.sos.joc.model.jobstreams.ConditionEvents;
 import com.sos.joc.model.jobstreams.ConditionEventsFilter;
 import com.sos.joc.exceptions.JocException;
 
-@Path("conditions")
+@Path("jobstreams")
 public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEventsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConditionEventsImpl.class);

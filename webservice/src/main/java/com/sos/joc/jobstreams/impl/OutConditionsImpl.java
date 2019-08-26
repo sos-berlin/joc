@@ -46,7 +46,7 @@ import com.sos.joc.model.jobstreams.OutCondition;
 import com.sos.joc.model.jobstreams.OutConditionEvent;
 import com.sos.joc.model.jobstreams.OutConditions;
 
-@Path("conditions")
+@Path("jobstreams")
 public class OutConditionsImpl extends JOCResourceImpl implements IOutConditionsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OutConditionsImpl.class);

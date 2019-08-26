@@ -28,7 +28,7 @@ import com.sos.joc.jobstreams.resource.IJobStreamFoldersResource;
 import com.sos.joc.model.jobstreams.Folders2Jobstream;
 import com.sos.joc.model.jobstreams.JobStreams;
 
-@Path("conditions")
+@Path("jobstreams")
 public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamFoldersResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamFoldersImpl.class);

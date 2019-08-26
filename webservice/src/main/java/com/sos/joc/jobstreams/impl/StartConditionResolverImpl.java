@@ -12,7 +12,7 @@ import com.sos.joc.jobstreams.resource.IStartConditionResolverResource;
 import com.sos.joc.model.jobstreams.StartResolver;
 import com.sos.joc.exceptions.JocException;
 
-@Path("conditions")
+@Path("jobstreams")
 public class StartConditionResolverImpl extends JOCResourceImpl implements IStartConditionResolverResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StartConditionResolverImpl.class);

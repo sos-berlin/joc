@@ -51,7 +51,7 @@ import com.sos.joc.model.jobstreams.InConditions;
 import com.sos.joc.model.jobstreams.JobInCondition;
 import com.sos.joc.model.jobstreams.JobstreamConditions;
 
-@Path("conditions")
+@Path("jobstreams")
 public class InConditionsImpl extends JOCResourceImpl implements IInConditionsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InConditionsImpl.class);
