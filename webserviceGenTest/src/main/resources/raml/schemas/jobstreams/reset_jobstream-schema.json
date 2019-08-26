@@ -1,13 +1,11 @@
 {
-	"title": "Reset JobStream",
-	"id": "schemas/jobstreams/resetjobstream",
+	"title": "JobStream Filter",
+	"id": "schemas/jobstreams/jobstreamfilter",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"description": "Reset Workflow, unconsume expressions",
-	"javaType": "com.sos.joc.model.jobstreams.ResetJobStream",
+	"description": "Job Stream filter",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreamFilter",
 	"type": "object",
-	"required": [
-		"deliveryDate"
-	],
+	
 	"properties": {
 		"deliveryDate": {
 			"$ref": "../common/deliveryDate-schema.json"
@@ -15,11 +13,12 @@
 		"jobschedulerId": {
 			"type": "string"
 		},
-		"job": {
-			"$ref": "../common/path-schema.json"
-		},
 		"jobStream": {
 			"type": "string"
+		},
+		"limit": {
+			"type": "integer",
+			"default": 10000
 		}
 	}
 }
