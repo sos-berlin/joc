@@ -93,7 +93,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
                 jsConditionResolver = new JSConditionResolver(sosHibernateSession, jobFilterSchema.getJobschedulerId());
                 jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
-                jsConditionResolver.initEvents();
+                jsConditionResolver.initEvents(null);
 
                 List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
                 List<DBItemConsumedInCondition> listOfConsumedInConditions = dbLayerCoumsumedInConditions.getConsumedInConditionsListByJob(
@@ -170,50 +170,52 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 filterOutConditions.addEvent(jsCondition.getEventName());
             }
         }
-        List<DBItemOutConditionWithEvent> listOfOutConditionsItems = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
-        JSJobOutConditions jsJobOutConditions = new JSJobOutConditions();
-        jsJobOutConditions.setListOfJobOutConditions(listOfOutConditionsItems);
+        if (filterOutConditions.getListOfEvents() != null && filterOutConditions.getListOfEvents().size() > 0) {
+            List<DBItemOutConditionWithEvent> listOfOutConditionsItems = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
+            JSJobOutConditions jsJobOutConditions = new JSJobOutConditions();
+            jsJobOutConditions.setListOfJobOutConditions(listOfOutConditionsItems);
 
-        JSEventKey jsEventKey = new JSEventKey();
-        jsEventKey.setSession(Constants.getSession());
+            JSEventKey jsEventKey = new JSEventKey();
+            jsEventKey.setSession(Constants.getSession());
 
-        Map<JSJobConditionKey, JSOutConditions> mapOfjsOutConditions = jsJobOutConditions.getListOfJobOutConditions();
-        Map<String, HashMap<String, ArrayList<String>>> listOfJobstreams = new HashMap<String, HashMap<String, ArrayList<String>>>();
-        // List<> listOfJobs = new HashMap<String,LinkedHashSet<OutConditionRef>>();
+            Map<JSJobConditionKey, JSOutConditions> mapOfjsOutConditions = jsJobOutConditions.getListOfJobOutConditions();
+            Map<String, HashMap<String, ArrayList<String>>> listOfJobstreams = new HashMap<String, HashMap<String, ArrayList<String>>>();
+            // List<> listOfJobs = new HashMap<String,LinkedHashSet<OutConditionRef>>();
 
-        for (JSOutConditions jsOutConditions : mapOfjsOutConditions.values()) {
-            for (JSOutCondition jsOutCondition : jsOutConditions.getListOfOutConditions().values()) {
-                HashMap<String, ArrayList<String>> listOfJobs = null;
-                ArrayList<String> listOfExpressions = null;
-                if (listOfJobstreams.get(jsOutCondition.getJobStream()) == null) {
-                    listOfJobs = new HashMap<String, ArrayList<String>>();
-                } else {
-                    listOfJobs = listOfJobstreams.get(jsOutCondition.getJobStream());
+            for (JSOutConditions jsOutConditions : mapOfjsOutConditions.values()) {
+                for (JSOutCondition jsOutCondition : jsOutConditions.getListOfOutConditions().values()) {
+                    HashMap<String, ArrayList<String>> listOfJobs = null;
+                    ArrayList<String> listOfExpressions = null;
+                    if (listOfJobstreams.get(jsOutCondition.getJobStream()) == null) {
+                        listOfJobs = new HashMap<String, ArrayList<String>>();
+                    } else {
+                        listOfJobs = listOfJobstreams.get(jsOutCondition.getJobStream());
+                    }
+
+                    if (listOfJobs.get(jsOutCondition.getJob()) == null) {
+                        listOfExpressions = new ArrayList<String>();
+                    } else {
+                        listOfExpressions = listOfJobs.get(jsOutCondition.getJob());
+                    }
+
+                    listOfExpressions.add(jsOutCondition.getExpression());
+                    listOfJobs.put(jsOutCondition.getJob(), listOfExpressions);
+                    listOfJobstreams.put(jsOutCondition.getJobStream(), listOfJobs);
                 }
-
-                if (listOfJobs.get(jsOutCondition.getJob()) == null) {
-                    listOfExpressions = new ArrayList<String>();
-                } else {
-                    listOfExpressions = listOfJobs.get(jsOutCondition.getJob());
-                }
-
-                listOfExpressions.add(jsOutCondition.getExpression());
-                listOfJobs.put(jsOutCondition.getJob(), listOfExpressions);
-                listOfJobstreams.put(jsOutCondition.getJobStream(), listOfJobs);
             }
-        }
 
-        listOfJobstreams.forEach((jobStream, jobs) -> {
-            JobstreamConditions jobstreamConditions = new JobstreamConditions();
-            jobstreamConditions.setJobStream(jobStream);
-            jobs.forEach((job, expressions) -> {
-                ConditionRef conditionRef = new ConditionRef();
-                conditionRef.setJob(job);
-                conditionRef.setExpressions(expressions);
-                jobstreamConditions.getJobs().add(conditionRef);
+            listOfJobstreams.forEach((jobStream, jobs) -> {
+                JobstreamConditions jobstreamConditions = new JobstreamConditions();
+                jobstreamConditions.setJobStream(jobStream);
+                jobs.forEach((job, expressions) -> {
+                    ConditionRef conditionRef = new ConditionRef();
+                    conditionRef.setJob(job);
+                    conditionRef.setExpressions(expressions);
+                    jobstreamConditions.getJobs().add(conditionRef);
+                });
+                listOfJobStreamConditions.add(jobstreamConditions);
             });
-            listOfJobStreamConditions.add(jobstreamConditions);
-        });
+        }
 
         return listOfJobStreamConditions;
     }

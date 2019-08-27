@@ -100,8 +100,7 @@ public class JobStreamResourceHistoryImpl extends JOCResourceImpl implements IJo
             filter.setLimit(jobStreamFilter.getLimit());
             List<DBItemReportTask> listOfDBItemReportTaskDBItems = new ArrayList<DBItemReportTask>();
 
-            reportTaskExecutionsDBLayer.setFilter(filter);
-            listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
+            listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo(filter);
 
             if (listOfDBItemReportTaskDBItems != null) {
                 for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
