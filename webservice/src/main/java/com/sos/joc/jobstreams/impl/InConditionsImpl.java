@@ -127,8 +127,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         inCondition.setId(jsInCondition.getId());
                         inCondition.setConsumed(jsInCondition.isConsumed());
                         inCondition.setMarkExpression(jsInCondition.isMarkExpression());
-                        inCondition.setOutconditions(getOutConditions(jsJobConditionKey, jobFilterSchema.getJobschedulerId(), jsInCondition
-                                .getExpression()));
+                        inCondition.setOutconditions(getOutConditions(jsJobConditionKey, jobFilterSchema.getJobschedulerId(), jsInCondition));
                         for (JSInConditionCommand jsInConditionCommand : jsInCondition.getListOfInConditionCommand()) {
                             InConditionCommand inConditionCommand = new InConditionCommand();
                             inConditionCommand.setCommand(jsInConditionCommand.getCommand());
@@ -156,18 +155,20 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
         }
     }
 
-    private List<JobstreamConditions> getOutConditions(JSJobConditionKey jsJobConditionKey, String schedulerId, String expression)
+    private List<JobstreamConditions> getOutConditions(JSJobConditionKey jsJobConditionKey, String schedulerId, JSInCondition jsInCondition)
             throws SOSHibernateException {
         JSConditions jsConditions = new JSConditions();
         List<JobstreamConditions> listOfJobStreamConditions = new ArrayList<JobstreamConditions>();
-        List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expression);
+        List<JSCondition> listOfConditions = jsConditions.getListOfConditions(jsInCondition.getExpression());
         DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
         FilterOutConditions filterOutConditions = new FilterOutConditions();
 
         filterOutConditions.setJobSchedulerId(schedulerId);
         for (JSCondition jsCondition : listOfConditions) {
             if ("event".equals(jsCondition.getConditionType())) {
-                filterOutConditions.addEvent(jsCondition.getEventName());
+                if ("".equals(jsCondition.getConditionJobStream()) || !jsInCondition.getJobStream().equals(jsCondition.getConditionJobStream())) {
+                    filterOutConditions.addEvent(jsCondition.getEventName());
+                }
             }
         }
         if (filterOutConditions.getListOfEvents() != null && filterOutConditions.getListOfEvents().size() > 0) {

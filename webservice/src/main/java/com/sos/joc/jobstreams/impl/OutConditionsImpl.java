@@ -174,7 +174,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 boolean eventIsUsedInExpression = false;
                 for (JSCondition jsCondition : listOfConditions) {
                     if ("event".equals(jsCondition.getConditionType())) {
-                        if (jsCondition.getEventName().equals(event.getEvent())) {
+                        if (jsCondition.getEventName().equals(event.getEvent()) && ("".equals(jsCondition.getConditionJobStream()) || outCondition.getJobStream().equals(jsCondition.getConditionJobStream()))){
                             eventIsUsedInExpression = true;
                             continue;
                         }
