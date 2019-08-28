@@ -39,7 +39,7 @@ public class JocConfigurationFilter extends SOSHibernateFilter{
 
 
     public String getAccount() {
-        return account;
+        return (account == null) ? null : account.toLowerCase();
     }
 
 

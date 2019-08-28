@@ -1,7 +1,9 @@
 package com.sos.joc.db.configuration;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.query.Query;
 
@@ -27,7 +29,7 @@ public class JocConfigurationDbLayer extends DBLayer {
     }
 
     public JocConfigurationDbItem getJocConfigurationDbItem(final Long id) throws SOSHibernateException {
-        return (JocConfigurationDbItem) (this.getSession().get(JocConfigurationDbItem.class, id));
+        return this.getSession().get(JocConfigurationDbItem.class, id);
     }
 
     public void resetFilter() {
@@ -87,7 +89,7 @@ public class JocConfigurationDbLayer extends DBLayer {
             and = " and ";
         }
         if (filter.getAccount() != null && !"".equals(filter.getAccount())) {
-            where += and + " account = :account";
+            where += and + " lower(account) = :account";
             and = " and ";
         }
         if (filter.isShared() != null) {
@@ -140,7 +142,7 @@ public class JocConfigurationDbLayer extends DBLayer {
         StringBuilder sql = new StringBuilder();
         sql.append("select new ").append(CONFIGURATION_PROFILE);
         sql.append("(jc.account, max(al.created)) from ").append(JOC_CONFIGURATION_DB_ITEM).append(" jc, ").append(DBITEM_AUDIT_LOG).append(" al ");
-        sql.append("where jc.account=al.account and jc.configurationType='PROFILE' and al.request='./login' group by jc.account");
+        sql.append("where lower(jc.account)=lower(al.account) and jc.configurationType='PROFILE' and al.request='./login' group by lower(jc.account)");
         Query<Profile> query = this.getSession().createQuery(sql.toString());
         return this.getSession().getResultList(query);
     }
@@ -184,11 +186,11 @@ public class JocConfigurationDbLayer extends DBLayer {
         this.getSession().delete(dbItem);
     }
     
-    public int deleteConfigurations(List<String> accounts) throws DBConnectionRefusedException, DBInvalidDataException {
+    public int deleteConfigurations(Collection<String> accounts) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            String hql = "delete from " + JOC_CONFIGURATION_DB_ITEM + " where account in (:accounts)";
+            String hql = "delete from " + JOC_CONFIGURATION_DB_ITEM + " where lower(account) in (:accounts)";
             Query<Integer> query = this.getSession().createQuery(hql);
-            query.setParameterList("accounts", accounts);
+            query.setParameterList("accounts", accounts.stream().map(String::toLowerCase).collect(Collectors.toSet()));
             return this.getSession().executeUpdate(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

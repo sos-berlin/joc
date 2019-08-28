@@ -67,7 +67,7 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
                     String userName = getJobschedulerUser(accessToken).getSosShiroCurrentUser().getUsername();
                     if (configurationsFilter.getAccount() == null || configurationsFilter.getAccount().isEmpty()) {
                         configurationsFilter.setAccount(userName);
-                    } else if (!configurationsFilter.getAccount().equals(userName)) {
+                    } else if (!configurationsFilter.getAccount().equalsIgnoreCase(userName)) {
                         throw new JobSchedulerBadRequestException("You can only read your own profile.");
                     }
                 }
@@ -97,7 +97,7 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
                 }
                 String defaultProfileAccount = Globals.sosShiroProperties.getProperty("default_profile_account", "").trim();
                 String currentAccount = configurationsFilter.getAccount();
-                if (!defaultProfileAccount.isEmpty() && !defaultProfileAccount.equals(currentAccount)) {
+                if (!defaultProfileAccount.isEmpty() && !defaultProfileAccount.equalsIgnoreCase(currentAccount)) {
                     jocConfigurationDBLayer.getFilter().setAccount(defaultProfileAccount);
                     listOfJocConfigurationDbItem = cleanupProfileDuplicates(jocConfigurationDBLayer.getJocConfigurationList(0));
                     //if default_profile_account profile exist then store it for new user
