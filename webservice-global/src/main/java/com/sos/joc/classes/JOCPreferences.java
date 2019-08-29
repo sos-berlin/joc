@@ -13,9 +13,14 @@ public class JOCPreferences {
 
     public void put(String key, String value){
         prefs.node(WebserviceConstants.JOC_COCKPIT).put(getKey(key),value);
+        prefs.node(WebserviceConstants.JOC_COCKPIT).put(getKey(key).toLowerCase(),value);
     }
     public String get(String key, String defaultValue){
-        return prefs.node(WebserviceConstants.JOC_COCKPIT).get(getKey(key),defaultValue);
+        String pref = prefs.node(WebserviceConstants.JOC_COCKPIT).get(getKey(key), null);
+        if (pref == null) {
+            pref = prefs.node(WebserviceConstants.JOC_COCKPIT).get(getKey(key).toLowerCase(), defaultValue);
+        }
+        return pref;
     }
     
     private String getKey(String key){
