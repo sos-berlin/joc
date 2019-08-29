@@ -362,7 +362,7 @@ public class SOSPermissionsCreator {
             sosPermissionJocCockpit.getOrder().getExecute().setUpdate(haveRight(masterId, "sos:products:joc_cockpit:order:execute:update"));
             sosPermissionJocCockpit.getOrder().getExecute().setSuspend(haveRight(masterId, "sos:products:joc_cockpit:order:execute:suspend"));
             sosPermissionJocCockpit.getOrder().getExecute().setResume(haveRight(masterId, "sos:products:joc_cockpit:order:execute:resume"));
-            sosPermissionJocCockpit.getOrder().getExecute().setReset(haveRight(masterId, "sos:products:joc_cockpit:order::execute:reset"));
+            sosPermissionJocCockpit.getOrder().getExecute().setReset(haveRight(masterId, "sos:products:joc_cockpit:order:execute:reset"));
             sosPermissionJocCockpit.getOrder().getExecute().setRemoveSetback(haveRight(masterId,
                     "sos:products:joc_cockpit:order:execute:remove_setback"));
             sosPermissionJocCockpit.getOrder().getDelete().setPermanent(haveRight(masterId, "sos:products:joc_cockpit:order:delete:permanent"));
