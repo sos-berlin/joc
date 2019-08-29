@@ -82,6 +82,9 @@ public class JobStreamResourceHistoryImpl extends JOCResourceImpl implements IJo
 
             ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(sosHibernateSession);
             ReportExecutionFilter filter = new ReportExecutionFilter();
+            filter.setDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+            filter.setOrderCriteria("startTime");
+            filter.setSortMode("desc");
             filter.setSchedulerId(jobStreamFilter.getJobschedulerId());
 
             if (listOfJobs.size() > 0) {
