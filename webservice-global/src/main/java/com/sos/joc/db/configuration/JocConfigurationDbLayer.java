@@ -144,7 +144,7 @@ public class JocConfigurationDbLayer extends DBLayer {
         sql.append("(lower(al.account), al.account, max(al.created)) from ").append(JOC_CONFIGURATION_DB_ITEM).append(" jc, ").append(
                 DBITEM_AUDIT_LOG).append(" al ");
         sql.append("where lower(jc.account)=lower(al.account) and jc.configurationType='PROFILE' and al.request='./login'").append(
-                " group by lower(jc.account), al.account order by max(al.created) desc");
+                " group by lower(al.account), al.account order by max(al.created) desc");
         Query<ConfigurationProfile> query = this.getSession().createQuery(sql.toString());
         List<ConfigurationProfile> profiles = this.getSession().getResultList(query);
         if (profiles == null) {
