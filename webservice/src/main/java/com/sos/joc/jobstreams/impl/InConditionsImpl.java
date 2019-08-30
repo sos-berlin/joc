@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -118,10 +119,20 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 if (jsJobInConditions.getInConditions(jsJobConditionKey) != null) {
                     for (JSInCondition jsInCondition : jsJobInConditions.getInConditions(jsJobConditionKey).getListOfInConditions().values()) {
                         InCondition inCondition = new InCondition();
+                        JSConditions jsConditions = new JSConditions();
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsInCondition.getExpression());
                         conditionExpression.setValue(jsConditionResolver.validate(null, jsInCondition));
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
+                        List<JSCondition> listOfConditions = jsConditions.getListOfConditions(jsInCondition.getExpression());
+                        for (JSCondition jsCondition : listOfConditions) {
+                            if (!conditionExpression.getJobStreamEvents().contains(jsCondition.getEventName())) {
+                                if (jsCondition.getConditionJobStream().isEmpty() || jsInCondition.getJobStream().equals(jsCondition
+                                        .getConditionJobStream())) {
+                                    conditionExpression.getJobStreamEvents().add(jsCondition.getEventName());
+                                }
+                            }
+                        }
                         inCondition.setConditionExpression(conditionExpression);
                         inCondition.setJobStream(jsInCondition.getJobStream());
                         inCondition.setId(jsInCondition.getId());
@@ -166,9 +177,10 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
         filterOutConditions.setJobSchedulerId(schedulerId);
         for (JSCondition jsCondition : listOfConditions) {
             if ("event".equals(jsCondition.getConditionType())) {
-                if ("".equals(jsCondition.getConditionJobStream()) || !jsInCondition.getJobStream().equals(jsCondition.getConditionJobStream())) {
-                    filterOutConditions.addEvent(jsCondition.getEventName());
-                }
+                JSEventKey jsEventKey = new JSEventKey();
+                jsEventKey.setEvent(jsCondition.getEventName());
+                jsEventKey.setJobStream(jsCondition.getConditionJobStream());
+                filterOutConditions.addEvent(jsEventKey);
             }
         }
         if (filterOutConditions.getListOfEvents() != null && filterOutConditions.getListOfEvents().size() > 0) {

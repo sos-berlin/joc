@@ -1,21 +1,26 @@
 {
-  "title": "Expression",
-  "id": "schemas/jobstreams/condition_expression",
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "description": "Expression for Condition",
-  "javaType": "com.sos.joc.model.jobstreams.ConditionExpression",
-  "type": "object",
-  "required": [
-   ],
-  "properties": {
-    "expression": {
-      "type": "string"
-    },
-    "validatedExpression": {
-      "type": "string"
-    },
-    "value": {
-      "type": "boolean"
-    }
-  }
+	"title": "Expression",
+	"id": "schemas/jobstreams/condition_expression",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Expression for Condition",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionExpression",
+	"type": "object",
+	"required": [],
+	"properties": {
+		"expression": {
+			"type": "string"
+		},
+		"validatedExpression": {
+			"type": "string"
+		},
+		"value": {
+			"type": "boolean"
+		},
+		"jobStreamEvents": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		}
+	}
 }
