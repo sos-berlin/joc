@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.classes.event.EventHandlerSettings;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jobstreams.db.DBItemInConditionWithCommand;
