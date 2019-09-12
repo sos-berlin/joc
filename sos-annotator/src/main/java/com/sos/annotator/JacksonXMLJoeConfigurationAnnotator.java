@@ -21,7 +21,7 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 
-public class JacksonXMLAgentAnnotator extends AbstractAnnotator implements Annotator {
+public class JacksonXMLJoeConfigurationAnnotator extends AbstractAnnotator implements Annotator {
 
     private Map<String, String> xmlPropertyNames = new HashMap<String, String>();
     private Map<String, Boolean> xmlPropertyAttributes = new HashMap<String, Boolean>();

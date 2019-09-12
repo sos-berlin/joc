@@ -290,12 +290,12 @@
 									<targetPackage>com.sos.joc.model</targetPackage>
 									<removeOldOutput>false</removeOldOutput>
 									<annotationStyle>jackson2</annotationStyle>
-									<customAnnotator>com.sos.annotator.JacksonXMLAgentAnnotator</customAnnotator>
+									<customAnnotator>com.sos.annotator.JacksonXMLJoeConfigurationAnnotator</customAnnotator>
 									<propertyWordDelimiters>- </propertyWordDelimiters>
 									<initializeCollections>false</initializeCollections>
 									<includeAdditionalProperties>false</includeAdditionalProperties>
 									<includes>
-										<include>agentCluster/*.json</include>
+										<include>joe/**/*.json</include>
 									</includes>
 								</configuration>
 								<goals>

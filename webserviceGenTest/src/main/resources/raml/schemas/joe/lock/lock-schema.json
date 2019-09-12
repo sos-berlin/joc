@@ -1,0 +1,22 @@
+{
+	"title": "lock object (configuration part)",
+	"id": "schemas/joe/joe/lock",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.joe.Lock",
+	"type": "object",
+	"description": "A Lock: test.lock.xml",
+	"required": [
+		"name"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"type": "string"
+		},
+		"name": {
+			"$ref": "../../common/path-schema.json"
+		},
+		"maxNonExclusive": {
+			"$ref": "../../common/nonNegativeInteger-schema.json"
+		}
+	}
+}

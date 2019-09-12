@@ -39,22 +39,20 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
     public JOCDefaultResponse postLocksP(String accessToken, LocksFilter locksFilter) throws Exception {
         SOSHibernateSession connection = null;
 
-		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, locksFilter, accessToken,
-					locksFilter.getJobschedulerId(),
-					getPermissonsJocCockpit(locksFilter.getJobschedulerId(), accessToken).getLock().getView()
-							.isStatus());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-			// FILTER
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, locksFilter, accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    locksFilter.getJobschedulerId(), accessToken).getLock().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            // FILTER
             List<LockPath> locks = locksFilter.getLocks();
             String regex = locksFilter.getRegex();
             boolean withFolderFilter = locksFilter.getFolders() != null && !locksFilter.getFolders().isEmpty();
             List<Folder> folders = addPermittedFolder(locksFilter.getFolders());
             DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
-            Map<String,String> documentations = dbDocLayer.getDocumentationPaths(locksFilter.getJobschedulerId(), JobSchedulerObjectType.LOCK);
+            Map<String, String> documentations = dbDocLayer.getDocumentationPaths(locksFilter.getJobschedulerId(), JobSchedulerObjectType.LOCK);
             InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(connection);
             LocksP entity = new LocksP();
             List<LockP> listOfLocks = new ArrayList<LockP>();
@@ -67,6 +65,9 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                             continue;
                         }
                         LockP lock = LockPermanent.getLockP(dbLayer, documentations.get(lockFromDb.getName()), lockFromDb);
+                        if (lockFromDb.getMaxNonExclusive() != null) {
+                            lock.setMaxNonExclusive(lockFromDb.getMaxNonExclusive());
+                        }
                         listOfLocks.add(lock);
                     }
                 }

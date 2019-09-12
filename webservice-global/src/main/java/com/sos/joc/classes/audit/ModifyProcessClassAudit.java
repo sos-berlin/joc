@@ -6,25 +6,23 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
-import com.sos.joc.model.processClass.ConfigurationEdit;
+import com.sos.joc.model.joe.processClass.ProcessClassConfigurationEdit;
 
+public class ModifyProcessClassAudit extends ProcessClassConfigurationEdit implements IAuditLog {
 
-public class MofifyProcessClassAudit extends ConfigurationEdit implements IAuditLog {
-    
     @JsonIgnore
     private String comment;
 
     @JsonIgnore
     private Integer timeSpent;
-    
+
     @JsonIgnore
     private String ticketLink;
-    
+
     @JsonIgnore
     private String folder;
-    
-    
-    public MofifyProcessClassAudit(ConfigurationEdit conf) {
+
+    public ModifyProcessClassAudit(ProcessClassConfigurationEdit conf) {
         setAuditParams(conf.getAuditLog());
         setJobschedulerId(conf.getJobschedulerId());
         setProcessClass(conf.getProcessClass());
@@ -37,7 +35,7 @@ public class MofifyProcessClassAudit extends ConfigurationEdit implements IAudit
         if (auditParams != null) {
             this.comment = auditParams.getComment();
             this.timeSpent = auditParams.getTimeSpent();
-            this.ticketLink = auditParams.getTicketLink(); 
+            this.ticketLink = auditParams.getTicketLink();
         }
     }
 
@@ -94,5 +92,5 @@ public class MofifyProcessClassAudit extends ConfigurationEdit implements IAudit
     public Date getStartTime() {
         return null;
     }
-    
+
 }
