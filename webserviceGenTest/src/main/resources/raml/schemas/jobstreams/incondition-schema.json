@@ -21,6 +21,9 @@
 		"markExpression": {
 			"type": "boolean"
 		},
+		"skipOutCondition": {
+			"type": "boolean"
+		},
 		"conditionExpression": {
 			"$ref": "condition_expression-schema.json"
 		},
