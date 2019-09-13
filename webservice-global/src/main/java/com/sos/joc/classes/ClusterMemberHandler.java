@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemSubmission;
@@ -18,59 +15,49 @@ import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocConfigurationException;
-import com.sos.joc.model.joe.processClass.ProcessClassConfiguration;
 
 public class ClusterMemberHandler {
 
     private DBItemInventoryInstance dbItemInventoryInstance;
-    private String identifier;
-    private String accessToken;
-    private String fileExtension;
+    private String path;
     private String apiCall;
 
-    public ClusterMemberHandler(DBItemInventoryInstance dbItemInventoryInstance, String accessToken, String identifier, String fileExtension,
-            String apiCall) {
-        super();
+    public ClusterMemberHandler(DBItemInventoryInstance dbItemInventoryInstance, String path, String apiCall) {
         this.dbItemInventoryInstance = dbItemInventoryInstance;
-        this.accessToken = accessToken;
-        this.identifier = identifier;
-        this.fileExtension = fileExtension;
+        this.path = path;
         this.apiCall = apiCall;
     }
 
-    public void deleteAtOtherClusterMembers(String command) throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException,
+    public void deleteAtOtherClusterMembers() throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException,
             DBConnectionRefusedException {
 
         if (!dbItemInventoryInstance.standalone()) {
             DBItemSubmittedObject dbItem = new DBItemSubmittedObject();
             dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
-            dbItem.setPath(this.identifier + fileExtension);
+            dbItem.setPath(path);
             dbItem.setToDelete(true);
-            updateOtherClusterMembers("delete", command, dbItem);
+            updateOtherClusterMembers("delete", dbItem);
         }
     }
 
-    public void updateAtOtherClusterMembers(String command, ProcessClassConfiguration jsObject) throws JocConfigurationException,
+    public void updateAtOtherClusterMembers(String content) throws JocConfigurationException,
             DBOpenSessionException, DBInvalidDataException, DBConnectionRefusedException, JsonProcessingException {
 
         if (!dbItemInventoryInstance.standalone()) {
             DBItemSubmittedObject dbItem = new DBItemSubmittedObject();
             dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
-            dbItem.setPath(this.identifier + fileExtension);
+            dbItem.setPath(path);
             dbItem.setToDelete(false);
-            ObjectMapper xmlMapper = new XmlMapper();
-            xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, Boolean.TRUE);
-            String jsObjectXml = xmlMapper.writeValueAsString(jsObject);
-            dbItem.setContent(jsObjectXml);
-            updateOtherClusterMembers("save", command, dbItem);
+            dbItem.setContent(content);
+            updateOtherClusterMembers("save", dbItem);
         }
     }
 
-    private void updateOtherClusterMembers(String sessionIdentifier, String command, DBItemSubmittedObject dbItem) throws JocConfigurationException,
+    private void updateOtherClusterMembers(String sessionIdentifier, DBItemSubmittedObject dbItem) throws JocConfigurationException,
             DBOpenSessionException, DBInvalidDataException, DBConnectionRefusedException {
         // ask db for other cluster members
         SOSHibernateSession connection = null;
-        JOCXmlCommand jocXmlCommand = null;
+        JOCHotFolder httpClient = null;
         boolean isUpdated = false;
         try {
             connection = Globals.createSosHibernateStatelessConnection(apiCall + sessionIdentifier);
@@ -91,8 +78,12 @@ public class ClusterMemberHandler {
                     }
                     try {
                         clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
-                        jocXmlCommand = new JOCXmlCommand(clusterMember);
-                        jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
+                        httpClient = new JOCHotFolder(clusterMember);
+                        if ("save".equals(sessionIdentifier)) {
+                            httpClient.put(path, dbItem.getContent());
+                        } else {
+                            httpClient.delete(path);
+                        }
                     } catch (Exception e) {
                         // if error then store object conf in db for inventory plugin
                         if (!isUpdated) {
