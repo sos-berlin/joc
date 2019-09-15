@@ -1,0 +1,15 @@
+{
+  "title": "include",
+  "id": "schemas/joe/common/include",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.Include",
+  "type": "object",
+  "properties": {
+    "file": {
+      "type": "string"
+    },
+    "liveFile": {
+      "type": "string"
+    }
+  }
+}

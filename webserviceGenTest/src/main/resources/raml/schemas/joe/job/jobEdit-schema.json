@@ -1,12 +1,12 @@
 {
-  "title": "edit process_class configuration",
-  "id": "schemas/joe/agentCluster/processClassEdit",
+  "title": "edit job configuration",
+  "id": "schemas/joe/job/jobEdit",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.processClass.ProcessClassConfigurationEdit",
+  "javaType": "com.sos.joc.model.joe.job.JobEdit",
   "type": "object",
   "required": [
     "jobschedulerId",
-    "processClass",
+    "job",
     "configuration"
   ],
   "properties": {
@@ -19,11 +19,11 @@
     "jobschedulerId": {
       "type": "string"
     },
-    "processClass": {
+    "job": {
       "$ref": "../../common/path-schema.json"
     },
     "configuration": {
-      "$ref": "processClassConfiguration-schema.json"
+      "$ref": "job-schema.json"
     },
     "auditLog": {
       "$ref": "../../audit/auditParams-schema.json"

@@ -1,0 +1,35 @@
+{
+  "title": "parameters",
+  "id": "schemas/joe/common/params",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.Params",
+  "type": "object",
+  "properties": {
+    "params": {
+      "xmlElement": "param",
+      "type": "array",
+      "items": {
+        "$ref": "param-schema.json"
+      }
+    },
+    "copyParams": {
+      "decription": "Only valid in start_job and add_order. Possible values task or order.",
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.common.CopyParams",
+      "required": [
+        "from"
+      ],
+      "properties": {
+        "from": {
+          "type": "string"
+        }
+      }
+    },
+    "includes": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/paramInclude-schema.json"
+      }
+    }
+  }
+}

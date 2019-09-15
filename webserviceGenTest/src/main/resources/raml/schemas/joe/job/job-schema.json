@@ -1,0 +1,208 @@
+{
+  "title": "job without name, visible, temporary, spooler_id, log_append, separate_process, mail_xslt_stylesheet attributes and TODO: commands, run_time Element",
+  "id": "schemas/joe/job/job",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.job.Job",
+  "type": "object",
+  "properties": {
+    "priority": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "order": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string"
+    },
+    "tasks": {
+      "$ref": "../../common/nonNegativeInteger-schema.json"
+    },
+    "minTasks": {
+      "$ref": "../../common/nonNegativeInteger-schema.json"
+    },
+    "timeout": {
+      "type": "string"
+    },
+    "idleTimeout": {
+      "type": "string"
+    },
+    "forceIdleTimeout": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string"
+    },
+    "processClass": {
+      "description": "path of a process class object",
+      "type": "string"
+    },
+    "javaOptions": {
+      "type": "string"
+    },
+    "stopOnError": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string"
+    },
+    "settings": {
+      "$ref": "settings-schema.json"
+    },
+    "lockUses": {
+      "type": "array",
+      "xmlElement": "lock.use",
+      "items": {
+        "xmlElement": "lock.use",
+        "type": "object",
+        "javaType": "com.sos.joc.model.joe.job.LockUse",
+        "required": [
+          "lock"
+        ],
+        "properties": {
+          "lock": {
+            "description": "path to a lock object",
+            "type": "string"
+          },
+          "exclusive": {
+            "description": "possible values: yes, no, 1, 0, true, false",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "params": {
+      "$ref": "../common/params-schema.json"
+    },
+    "environment": {
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.job.EnviromentVariables",
+      "xmlElement": "environment",
+      "properties": {
+        "variables": {
+          "type": "array",
+          "xmlElement": "variable",
+          "items": {
+            "type": "object",
+            "javaType": "com.sos.joc.model.joe.job.EnviromentVariable",
+            "xmlElement": "variable",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "login": {
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.job.Login",
+      "required": [
+        "user",
+        "password"
+      ],
+      "properties": {
+        "user": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string",
+          "xmlElement": "password.plain",
+          "isXmlCData": true
+        }
+      }
+    },
+    "script": {
+      "$ref": "script-schema.json"
+    },
+    "monitors": {
+      "type": "array",
+      "items": {
+        "$ref": "monitor-schema.json"
+      }
+    },
+    "monitorUses": {
+      "type": "array",
+      "xmlElement": "monitor.use",
+      "items": {
+        "xmlElement": "monitor.use",
+        "type": "object",
+        "javaType": "com.sos.joc.model.joe.job.MonitorUse",
+        "required": [
+          "monitor"
+        ],
+        "properties": {
+          "monitor": {
+            "description": "path to a monitor object",
+            "type": "string"
+          },
+          "ordering": {
+            "$ref": "../../common/nonNegativeInteger-schema.json"
+          }
+        }
+      }
+    },
+    "startWhenDirectoriesChanged": {
+      "type": "array",
+      "xmlElement": "start_when_directory_changed",
+      "items": {
+		"type": "object",
+        "javaType": "com.sos.joc.model.joe.job.StartWhenDirectoryChanged",
+        "required": [
+          "directory"
+        ],
+        "properties": {
+          "directory": {
+            "type": "string"
+          },
+          "regex": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "delayAfterErrors": {
+      "type": "array",
+      "xmlElement": "delay_after_error",
+      "items": {
+		"type": "object",
+        "javaType": "com.sos.joc.model.joe.job.DelayAfterError",
+        "required": [
+          "errorCount",
+          "delay"
+        ],
+        "properties": {
+          "errorCount": {
+            "$ref": "../../common/nonNegativeInteger-schema.json"
+          },
+          "delay": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "delayOrderAfterSetbacks": {
+      "type": "array",
+      "xmlElement": "delay_order_after_setback",
+      "items": {
+		"type": "object",
+        "javaType": "com.sos.joc.model.joe.job.DelayOrderAfterSetback",
+        "required": [
+          "setbackCount"
+        ],
+        "properties": {
+          "setbackCount": {
+            "$ref": "../../common/nonNegativeInteger-schema.json"
+          },
+          "delay": {
+            "type": "string"
+          },
+          "isMaximum": {
+            "description": "possible values: yes, no, 1, 0, true, false",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
