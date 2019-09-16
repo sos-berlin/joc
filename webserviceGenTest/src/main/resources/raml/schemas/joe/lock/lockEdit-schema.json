@@ -1,12 +1,12 @@
 {
-  "title": "edit process_class configuration",
-  "id": "schemas/joe/agentCluster/processClassEdit",
+  "title": "edit lock configuration",
+  "id": "schemas/joe/lock/lockEdit",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.processClass.ProcessClassEdit",
+  "javaType": "com.sos.joc.model.joe.lock.LockEdit",
   "type": "object",
   "required": [
     "jobschedulerId",
-    "processClass",
+    "lock",
     "configuration"
   ],
   "properties": {
@@ -19,11 +19,11 @@
     "jobschedulerId": {
       "type": "string"
     },
-    "processClass": {
+    "lock": {
       "$ref": "../../common/path-schema.json"
     },
     "configuration": {
-      "$ref": "processClass-schema.json"
+      "$ref": "lock-schema.json"
     },
     "auditLog": {
       "$ref": "../../audit/auditParams-schema.json"

@@ -1,5 +1,5 @@
 {
-  "title": "job without name, visible, temporary, spooler_id, log_append, separate_process, mail_xslt_stylesheet attributes and TODO: commands, run_time Element",
+  "title": "job without name, visible, temporary, spooler_id, log_append, separate_process, mail_xslt_stylesheet attributes",
   "id": "schemas/joe/job/job",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.job.Job",
@@ -71,28 +71,7 @@
       "$ref": "../common/params-schema.json"
     },
     "environment": {
-      "type": "object",
-      "javaType": "com.sos.joc.model.joe.job.EnviromentVariables",
-      "xmlElement": "environment",
-      "properties": {
-        "variables": {
-          "type": "array",
-          "xmlElement": "variable",
-          "items": {
-            "type": "object",
-            "javaType": "com.sos.joc.model.joe.job.EnviromentVariable",
-            "xmlElement": "variable",
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "value": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
+      "$ref": "environment-schema.json"
     },
     "login": {
       "type": "object",
@@ -200,6 +179,31 @@
           "isMaximum": {
             "description": "possible values: yes, no, 1, 0, true, false",
             "type": "string"
+          }
+        }
+      }
+    },
+    "runTime": {
+      "type": "string",
+      "default": "",
+      "isXmlCData": false
+    },
+    "commands": {
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.job.Commands",
+      "properties": {
+        "addOrders": {
+          "type": "array",
+          "xmlElement": "add_order",
+          "items": {
+            "$ref": "../order/addOrder-schema.json"
+          }
+        },
+        "startJobs": {
+          "type": "array",
+          "xmlElement": "start_job",
+          "items": {
+            "$ref": "startJob-schema.json"
           }
         }
       }

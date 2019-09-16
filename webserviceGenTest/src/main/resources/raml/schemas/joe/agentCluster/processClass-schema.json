@@ -1,8 +1,8 @@
 {
   "title": "processClass configuration",
-  "id": "schemas/joe/agentCluster/processclassConfiguration",
+  "id": "schemas/joe/agentCluster/processClass",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.processClass.ProcessClassConfiguration",
+  "javaType": "com.sos.joc.model.joe.processClass.ProcessClass",
   "xmlElement": "process_class",
   "type": "object",
   "required": [

@@ -6,9 +6,9 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
-import com.sos.joc.model.joe.processClass.ProcessClassConfigurationEdit;
+import com.sos.joc.model.joe.processClass.ProcessClassEdit;
 
-public class ModifyProcessClassAudit extends ProcessClassConfigurationEdit implements IAuditLog {
+public class ModifyProcessClassAudit extends ProcessClassEdit implements IAuditLog {
 
     @JsonIgnore
     private String comment;
@@ -22,7 +22,7 @@ public class ModifyProcessClassAudit extends ProcessClassConfigurationEdit imple
     @JsonIgnore
     private String folder;
 
-    public ModifyProcessClassAudit(ProcessClassConfigurationEdit conf) {
+    public ModifyProcessClassAudit(ProcessClassEdit conf) {
         setAuditParams(conf.getAuditLog());
         setJobschedulerId(conf.getJobschedulerId());
         setProcessClass(conf.getProcessClass());

@@ -13,8 +13,8 @@ import com.sos.joc.classes.audit.ModifyProcessClassAudit;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.joe.processclass.resource.IAgentConfigurationResource;
-import com.sos.joc.model.joe.processClass.ProcessClassConfiguration;
-import com.sos.joc.model.joe.processClass.ProcessClassConfigurationEdit;
+import com.sos.joc.model.joe.processClass.ProcessClass;
+import com.sos.joc.model.joe.processClass.ProcessClassEdit;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 
 @Path("process_class")
@@ -36,9 +36,9 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             JOCHotFolder httpClient = new JOCHotFolder(this);
             byte[] fileContent = httpClient.getFile(agentFilter.getProcessClass() + FILE_EXTENSION);
             
-            ProcessClassConfigurationEdit entity = new ProcessClassConfigurationEdit();
+            ProcessClassEdit entity = new ProcessClassEdit();
             entity.setProcessClass(agentFilter.getProcessClass());
-            entity.setConfiguration(createPoJoFromXml(fileContent, ProcessClassConfiguration.class));
+            entity.setConfiguration(createPoJoFromXml(fileContent, ProcessClass.class));
             entity.setConfigurationDate(httpClient.getLastModifiedDate());
             entity.setDeliveryDate(Date.from(Instant.now()));
             
@@ -53,7 +53,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
     }
 
     @Override
-    public JOCDefaultResponse saveAgentConfiguration(String accessToken, ProcessClassConfigurationEdit configuration) throws Exception {
+    public JOCDefaultResponse saveAgentConfiguration(String accessToken, ProcessClassEdit configuration) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "save", configuration, accessToken, configuration.getJobschedulerId(),
                     getPermissonsJocCockpit(configuration.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());
@@ -61,7 +61,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
                 return jocDefaultResponse;
             }
             checkRequiredParameter("processClass", configuration.getProcessClass());
-            ProcessClassConfiguration agent = configuration.getConfiguration();
+            ProcessClass agent = configuration.getConfiguration();
             if (agent == null) {
                 throw new JocMissingRequiredParameterException("undefined 'configuration'");
             }
@@ -93,7 +93,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
     }
 
     @Override
-    public JOCDefaultResponse deleteAgentConfiguration(String accessToken, ProcessClassConfigurationEdit agentFilter) throws Exception {
+    public JOCDefaultResponse deleteAgentConfiguration(String accessToken, ProcessClassEdit agentFilter) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "delete", agentFilter, accessToken, agentFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());

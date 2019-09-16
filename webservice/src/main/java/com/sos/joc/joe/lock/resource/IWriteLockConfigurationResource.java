@@ -7,7 +7,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.joe.Lock;
+import com.sos.joc.model.joe.lock.LockEdit;
  
 public interface IWriteLockConfigurationResource {
 
@@ -16,5 +16,5 @@ public interface IWriteLockConfigurationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse writeLocks(            
-            @HeaderParam("X-Access-Token") String accessToken, Lock lock) throws Exception;
+            @HeaderParam("X-Access-Token") String accessToken, LockEdit lock) throws Exception;
 }

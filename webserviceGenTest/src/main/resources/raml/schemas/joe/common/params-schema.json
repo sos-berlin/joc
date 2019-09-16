@@ -5,7 +5,7 @@
   "javaType": "com.sos.joc.model.joe.common.Params",
   "type": "object",
   "properties": {
-    "params": {
+    "paramList": {
       "xmlElement": "param",
       "type": "array",
       "items": {

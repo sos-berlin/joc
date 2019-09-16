@@ -1,0 +1,32 @@
+{
+  "title": "order TODO",
+  "id": "schemas/joe/order/order",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.order.Order",
+  "type": "object",
+  "properties": {
+    "priority": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "endState": {
+      "type": "string"
+    },
+    "webService": {
+      "type": "string"
+    },
+    "params": {
+      "$ref": "../common/params-schema.json"
+    },
+    "runTime": {
+      "type": "string",
+      "default": "",
+      "isXmlCData": false
+    }
+  }
+}
