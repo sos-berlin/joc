@@ -1,0 +1,34 @@
+{
+  "title": "job chain",
+  "id": "schemas/joe/jobChain/jobChain",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.jobChain.JobChain",
+  "type": "object",
+  "javaInterfaces" : [
+    "com.sos.joc.model.joe.common.IJSObject"
+  ],
+  "properties": {
+    "ordersRecoverable": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "maxOrders": {
+      "$ref": "../../common/nonNegativeInteger-schema.json"
+    },
+    "distributed": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string"
+    },
+    "processClass": {
+      "description": "path of a process class object",
+      "type": "string"
+    },
+    "fileWatchingProcessClass": {
+      "description": "path of a process class object",
+      "type": "string"
+    }
+  }
+}

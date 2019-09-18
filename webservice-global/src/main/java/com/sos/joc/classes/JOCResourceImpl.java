@@ -1,6 +1,5 @@
 package com.sos.joc.classes;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,13 +10,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.sos.auth.rest.SOSPermissionsCreator;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.auth.rest.SOSShiroFolderPermissions;
@@ -271,13 +265,7 @@ public class JOCResourceImpl {
     public String writeXmlPoJoAsString(Object xmlPoJo) throws JsonProcessingException {
         // ObjectMapper xmlMapper = new XmlMapper().configure(Feature.WRITE_XML_DECLARATION, true).configure(SerializationFeature.INDENT_OUTPUT, true);
         // TODO generates <?xml version="1.0" encoding="UTF-8" ?> instead of ISO-8859-1
-        ObjectMapper xmlMapper = new XmlMapper().configure(SerializationFeature.INDENT_OUTPUT, true);
-        return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n\n" + xmlMapper.writeValueAsString(xmlPoJo);
-    }
-
-    public <T> T createPoJoFromXml(byte[] fileContent, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
-        ObjectMapper xmlMapper = new XmlMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return xmlMapper.readValue(fileContent, clazz);
+        return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n\n" + Globals.xmlMapper.writeValueAsString(xmlPoJo);
     }
 
     public String getUrl() {

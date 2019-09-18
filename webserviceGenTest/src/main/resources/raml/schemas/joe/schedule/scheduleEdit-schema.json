@@ -1,8 +1,8 @@
 {
-  "title": "edit order configuration",
-  "id": "schemas/joe/order/orderEdit",
+  "title": "edit schedule configuration",
+  "id": "schemas/joe/schedule/ScheduleEdit",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.order.OrderEdit",
+  "javaType": "com.sos.joc.model.joe.schedule.ScheduleEdit",
   "type": "object",
   "required": [
     "configuration"
@@ -12,7 +12,7 @@
   },
   "properties": {
     "configuration": {
-      "$ref": "order-schema.json"
+      "$ref": "schedule-schema.json"
     }
   }
 }

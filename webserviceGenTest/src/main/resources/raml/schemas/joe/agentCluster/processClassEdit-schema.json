@@ -5,28 +5,14 @@
   "javaType": "com.sos.joc.model.joe.processClass.ProcessClassEdit",
   "type": "object",
   "required": [
-    "jobschedulerId",
-    "processClass",
     "configuration"
   ],
+  "extends": {
+    "javaType": "com.sos.joc.model.joe.common.JSObjectEdit"
+  },
   "properties": {
-    "deliveryDate": {
-      "$ref": "../../common/deliveryDate-schema.json"
-    },
-    "configurationDate": {
-      "$ref": "../../common/timestamp-schema.json"
-    },
-    "jobschedulerId": {
-      "type": "string"
-    },
-    "processClass": {
-      "$ref": "../../common/path-schema.json"
-    },
     "configuration": {
       "$ref": "processClass-schema.json"
-    },
-    "auditLog": {
-      "$ref": "../../audit/auditParams-schema.json"
     }
   }
 }

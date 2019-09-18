@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.ClusterMemberHandler;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
@@ -38,7 +39,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             
             ProcessClassEdit entity = new ProcessClassEdit();
             entity.setProcessClass(agentFilter.getProcessClass());
-            entity.setConfiguration(createPoJoFromXml(fileContent, ProcessClass.class));
+            entity.setConfiguration(Globals.xmlMapper.readValue(fileContent, ProcessClass.class));
             entity.setConfigurationDate(httpClient.getLastModifiedDate());
             entity.setDeliveryDate(Date.from(Instant.now()));
             

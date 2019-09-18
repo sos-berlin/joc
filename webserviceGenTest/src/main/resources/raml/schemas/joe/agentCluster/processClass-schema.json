@@ -3,6 +3,9 @@
   "id": "schemas/joe/agentCluster/processClass",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.processClass.ProcessClass",
+  "javaInterfaces" : [
+    "com.sos.joc.model.joe.common.IJSObject"
+  ],
   "xmlElement": "process_class",
   "type": "object",
   "required": [
@@ -35,6 +38,7 @@
         },
         "list": {
           "type": "array",
+          
           "xmlElement": "remote_scheduler",
           "items": {
             "javaType": "com.sos.joc.model.processClass.RemoteScheduler",

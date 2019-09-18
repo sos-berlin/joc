@@ -1,9 +1,12 @@
 {
-  "title": "order TODO",
+  "title": "order",
   "id": "schemas/joe/order/order",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.order.Order",
   "type": "object",
+  "javaInterfaces" : [
+    "com.sos.joc.model.joe.common.IJSObject"
+  ],
   "properties": {
     "priority": {
       "type": "string"
