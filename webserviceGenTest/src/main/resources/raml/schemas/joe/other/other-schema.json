@@ -1,0 +1,15 @@
+{
+	"title": "other files",
+	"id": "schemas/joe/other/other",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.joe.other.Other",
+	"type": "object",
+	"javaInterfaces" : [
+    	"com.sos.joc.model.joe.common.IJSObject"
+  	],
+  	"properties": {
+		"content": {
+			"type": "string"
+		}
+	}
+}

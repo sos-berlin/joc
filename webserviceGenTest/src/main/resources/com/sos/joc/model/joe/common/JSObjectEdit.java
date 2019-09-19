@@ -32,7 +32,8 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.processClass.ProcessClassEdit.class, name = "PROCESSCLASS"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.lock.LockEdit.class, name = "LOCK"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.schedule.ScheduleEdit.class, name = "SCHEDULE"),
-    @JsonSubTypes.Type(value = com.sos.joc.model.joe.job.MonitorEdit.class, name = "MONITOR")
+    @JsonSubTypes.Type(value = com.sos.joc.model.joe.job.MonitorEdit.class, name = "MONITOR"),
+    @JsonSubTypes.Type(value = com.sos.joc.model.joe.job.OtherEdit.class, name = "OTHER")
 })
 
 @JsonPropertyOrder({

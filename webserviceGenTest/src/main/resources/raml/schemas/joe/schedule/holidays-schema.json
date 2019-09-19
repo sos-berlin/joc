@@ -1,0 +1,35 @@
+{
+	"title": "holidays without weekdays elements TODO?",
+	"id": "schemas/joe/schedule/holidays",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"javaType": "com.sos.joc.model.joe.schedule.Holidays",
+	"properties": {
+    	"includes": {
+    		"$ref": "../common/includes-schema.json"
+    	},
+		"days": {
+			"xmlElement": "holiday",
+			"type": "array",
+			"items": {
+				"xmlElement": "holiday",
+				"type": "object",
+				"javaType": "com.sos.joc.model.joe.schedule.Holiday",
+				"required": [
+					"date"
+				],
+				"properties": {
+					"date": {
+						"type": "string"
+					},
+					"calendar": {
+						"type": "string"
+					},
+					"periods": {
+						"$ref": "periods-schema.json"
+					}
+				}
+			}
+		}
+	}
+}

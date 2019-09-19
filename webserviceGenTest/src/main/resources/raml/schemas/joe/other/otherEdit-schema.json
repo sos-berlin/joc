@@ -1,0 +1,18 @@
+{
+  "title": "edit other files",
+  "id": "schemas/joe/other/otherEdit",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.other.OtherEdit",
+  "type": "object",
+  "required": [
+    "configuration"
+  ],
+  "extends": {
+    "javaType": "com.sos.joc.model.joe.common.JSObjectEdit"
+  },
+  "properties": {
+    "configuration": {
+      "$ref": "other-schema.json"
+    }
+  }
+}

@@ -33,6 +33,7 @@
 			"type": "array",
 			"items": {
 				"type": "object",
+				"javaType": "com.sos.joc.model.joe.schedule.At",
 				"properties": {
 					"at": {
 						"description": "yyyy-mm-dd HH:MM[:SS]",
@@ -47,6 +48,10 @@
 			"items": {
 				"xmlElement": "date",
 				"type": "object",
+				"javaType": "com.sos.joc.model.joe.schedule.Date",
+				"required": [
+					"date"
+				],
 				"properties": {
 					"date": {
 						"type": "string"
@@ -81,9 +86,7 @@
       		"isXmlCData": false
 		},
 		"holidays": {
-			"description": "TODO",
-			"type": "string",
-      		"isXmlCData": false
+			"$ref": "holidays-schema.json"
 		},
 		"calendars": {
 			"type": "string",
