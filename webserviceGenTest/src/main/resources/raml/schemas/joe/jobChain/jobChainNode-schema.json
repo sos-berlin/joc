@@ -1,0 +1,69 @@
+{
+  "title": "jobChainNode",
+  "id": "schemas/joe/jobChain/jobChainNode",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.jobChain.JobChainNode",
+  "type": "object",
+  "extends": [
+    "JobChainEndNode"
+  ],
+  "properties": {
+    "job": {
+      "description": "path to job",
+      "type": "string"
+    },
+    "nextState": {
+      "description": "name of the next job chain node in successful case",
+      "type": "string"
+    },
+    "errorState": {
+      "description": "name of the next job chain node in errornous case",
+      "type": "string"
+    },
+    "onError": {
+      "description": "possible values: suspend and setback",
+      "type": "string"
+    },
+    "delay": {
+      "$ref": "../../common/nonNegativeInteger-schema.json"
+    },
+    "onReturnCodes": {
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.jobChain.OnReturnCodes",
+      "properties": {
+        "onReturnCodeList": {
+          "xmlElement": "on_return_code",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "javaType": "com.sos.joc.model.joe.jobChain.OnReturnCode",
+            "required": [
+              "returnCode"
+            ],
+            "properties": {
+              "returnCode": {
+                "type": "string"
+              },
+              "toState": {
+                "type": "object",
+                "javaType": "com.sos.joc.model.joe.jobChain.ToState",
+                "required": [
+                  "state"
+                ],
+                "properties": {
+                  "state": {
+                    "description": "name of a job chain node",
+                    "type": "string"
+                  }
+                }
+              },
+              "addOrder": {
+                "$ref": "../order/returnCodeAddOrder-schema.json"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

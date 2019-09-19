@@ -1,6 +1,6 @@
 {
-  "title": "order TODO",
-  "id": "schemas/joe/order/order",
+  "title": "add order",
+  "id": "schemas/joe/order/addOrder",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.order.AddOrder",
   "type": "object",
@@ -8,8 +8,7 @@
     "javaType": "Order"
   },
   "required": [
-    "jobChain",
-    "id"
+    "jobChain"
   ],
   "properties": {
     "jobChain": {
@@ -19,8 +18,7 @@
       "type": "string"
     },
     "at": {
-      "type": "string",
-      "default": "now"
+      "type": "string"
     },
     "replace": {
       "description": "possible values: yes, no, 1, 0, true, false",
@@ -29,6 +27,10 @@
     "suspended": {
       "description": "possible values: yes, no, 1, 0, true, false",
       "type": "string"
+    },
+    "runTime": {
+      "type": "string",
+      "isXmlCData": false
     }
   }
 }

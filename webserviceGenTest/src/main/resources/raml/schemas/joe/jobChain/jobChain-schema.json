@@ -1,5 +1,5 @@
 {
-  "title": "job chain",
+  "title": "job chain without name, replace, visible attributes",
   "id": "schemas/joe/jobChain/jobChain",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.jobChain.JobChain",
@@ -29,6 +29,41 @@
     "fileWatchingProcessClass": {
       "description": "path of a process class object",
       "type": "string"
+    },
+    "fileOrderSources": {
+      "xmlElement": "file_order_source",
+      "type": "array",
+      "items": {
+        "$ref": "fileOrderSource-schema.json"
+      }
+    },
+    "jobChainNodes": {
+      "xmlElement": "job_chain_node",
+      "type": "array",
+      "items": {
+        "$ref": "jobChainNode-schema.json"
+      }
+    },
+    "fileOrderSinks": {
+      "xmlElement": "file_order_sink",
+      "type": "array",
+      "items": {
+        "$ref": "fileOrderSink-schema.json"
+      }
+    },
+    "nestedJobChainNodes": {
+      "xmlElement": "job_chain_node.job_chain",
+      "type": "array",
+      "items": {
+        "$ref": "nestedJobChainNode-schema.json"
+      }
+    },
+    "jobChainEndNodes": {
+      "xmlElement": "job_chain_node.end",
+      "type": "array",
+      "items": {
+        "$ref": "jobChainEndNode-schema.json"
+      }
     }
   }
 }

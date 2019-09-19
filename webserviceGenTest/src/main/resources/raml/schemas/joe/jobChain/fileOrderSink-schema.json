@@ -1,0 +1,27 @@
+{
+  "title": "fileOrderSink",
+  "id": "schemas/joe/jobChain/fileOrderSink",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.jobChain.FileOrderSink",
+  "type": "object",
+  "required": [
+    "state"
+  ],
+  "properties": {
+    "state": {
+      "description": "name of the job chain node",
+      "type": "string"
+    },
+    "moveTo": {
+      "description": "path of the target folder",
+      "type": "string"
+    },
+    "remove": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string"
+    },
+    "delay": {
+      "$ref": "../../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

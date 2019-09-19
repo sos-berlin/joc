@@ -1,0 +1,17 @@
+{
+  "title": "jobChainEndNode",
+  "id": "schemas/joe/jobChain/jobChainEndNode",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.jobChain.JobChainEndNode",
+  "type": "object",
+  "xmlElement": "job_chain_node.end",
+  "required": [
+    "state"
+  ],
+  "properties": {
+    "state": {
+      "description": "name of the job chain node",
+      "type": "string"
+    }
+  }
+}

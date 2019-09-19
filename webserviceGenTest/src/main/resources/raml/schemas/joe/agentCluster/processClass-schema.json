@@ -1,5 +1,5 @@
 {
-  "title": "processClass configuration",
+  "title": "processClass without name, replace, spooler_id attributes",
   "id": "schemas/joe/agentCluster/processClass",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.processClass.ProcessClass",
@@ -12,9 +12,6 @@
     "maxProcesses"
   ],
   "properties": {
-    "name": {
-      "type": "string"
-    },
     "maxProcesses": {
       "$ref": "../../common/nonNegativeInteger-schema.json"
     },
@@ -29,16 +26,15 @@
       "type": "object",
       "javaType": "com.sos.joc.model.processClass.RemoteSchedulers",
       "required": [
-        "list"
+        "remoteSchedulerList"
       ],
       "properties": {
         "select": {
           "description": "first, next",
           "type": "string"
         },
-        "list": {
+        "remoteSchedulerList": {
           "type": "array",
-          
           "xmlElement": "remote_scheduler",
           "items": {
             "javaType": "com.sos.joc.model.processClass.RemoteScheduler",

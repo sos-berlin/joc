@@ -38,7 +38,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             byte[] fileContent = httpClient.getFile(agentFilter.getProcessClass() + FILE_EXTENSION);
             
             ProcessClassEdit entity = new ProcessClassEdit();
-            entity.setProcessClass(agentFilter.getProcessClass());
+            entity.setPath(agentFilter.getProcessClass());
             entity.setConfiguration(Globals.xmlMapper.readValue(fileContent, ProcessClass.class));
             entity.setConfigurationDate(httpClient.getLastModifiedDate());
             entity.setDeliveryDate(Date.from(Instant.now()));
@@ -61,7 +61,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("processClass", configuration.getProcessClass());
+            checkRequiredParameter("processClass", configuration.getPath());
             ProcessClass agent = configuration.getConfiguration();
             if (agent == null) {
                 throw new JocMissingRequiredParameterException("undefined 'configuration'");
@@ -74,7 +74,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             ModifyProcessClassAudit audit = new ModifyProcessClassAudit(configuration);
             logAuditMessage(audit);
 
-            String processClassPath = configuration.getProcessClass() + FILE_EXTENSION;
+            String processClassPath = configuration.getPath() + FILE_EXTENSION;
             JOCHotFolder httpClient = new JOCHotFolder(this);
             String xmlContent = writeXmlPoJoAsString(agent);
             httpClient.put(processClassPath, xmlContent);
@@ -101,13 +101,13 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("processClass", agentFilter.getProcessClass());
+            checkRequiredParameter("processClass", agentFilter.getPath());
 
             ModifyProcessClassAudit audit = new ModifyProcessClassAudit(agentFilter);
             logAuditMessage(audit);
 
             JOCHotFolder httpClient = new JOCHotFolder(this);
-            String processClassPath = agentFilter.getProcessClass() + FILE_EXTENSION;
+            String processClassPath = agentFilter.getPath() + FILE_EXTENSION;
             httpClient.delete(processClassPath);
 
             storeAuditLogEntry(audit);

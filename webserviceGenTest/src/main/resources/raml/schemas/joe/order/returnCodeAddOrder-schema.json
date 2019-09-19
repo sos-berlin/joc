@@ -1,0 +1,19 @@
+{
+  "title": "add order in return code",
+  "id": "schemas/joe/order/returnCodeAddOrder",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.order.ReturnCodeAddOrder",
+  "type": "object",
+  "extends" : {
+    "javaType": "AddOrder"
+  },
+  "required": [
+    "xmlns"
+  ],
+  "properties": {
+    "xmlns": {
+      "type": "string",
+      "default": "https://jobscheduler-plugins.sos-berlin.com/NodeOrderPlugin"
+    }
+  }
+}

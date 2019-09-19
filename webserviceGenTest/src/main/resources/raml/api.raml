@@ -1,6 +1,6 @@
 #%RAML 0.8
 title: JOC API
-version: 1.12.10
+version: 1.13.1
 protocols: [ HTTP, HTTPS ]
 baseUri: http://test.sos-berlin.com:3001/joc/api
 #mediaType: application/json
@@ -2839,3 +2839,10 @@ traits:
       description200: " "
       schema200: !include schemas/joc/properties-schema.json
       example200: !include examples/joc/properties-example.json
+
+/joe:
+  /read:
+  /store:
+  /deploy:
+  /toxml:
+  /tojson:

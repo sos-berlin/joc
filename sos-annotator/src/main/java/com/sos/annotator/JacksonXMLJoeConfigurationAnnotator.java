@@ -9,6 +9,7 @@ import java.util.Set;
 import org.jsonschema2pojo.AbstractAnnotator;
 import org.jsonschema2pojo.Annotator;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 import com.sun.codemodel.JAnnotatable;
+import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -28,6 +30,7 @@ public class JacksonXMLJoeConfigurationAnnotator extends AbstractAnnotator imple
     private Map<String, String> xmlPropertyNames = new HashMap<String, String>();
     private Map<String, Boolean> xmlPropertyAttributes = new HashMap<String, Boolean>();
     private Map<String, Boolean> xmlPropertyCDatas = new HashMap<String, Boolean>();
+    private Map<String, String[]> jsonAliases = new HashMap<String, String[]>();
 
     @Override
     public void propertyInclusion(JDefinedClass clazz, JsonNode schema) {
@@ -43,6 +46,7 @@ public class JacksonXMLJoeConfigurationAnnotator extends AbstractAnnotator imple
         xmlPropertyNames.put(propertyName, camelCaseToLowerUnderscore(propertyName));
         xmlPropertyAttributes.put(propertyName, isAttribute(field, propertyNode));
         xmlPropertyCDatas.put(propertyName, isCData(propertyNode));
+        jsonAliases.put(propertyName, getAliases(propertyNode));
 
         if (isCollection(field)) {
             if (propertyNode.has("xmlElement")) {
@@ -72,6 +76,12 @@ public class JacksonXMLJoeConfigurationAnnotator extends AbstractAnnotator imple
         } else {
             if (xmlPropertyCDatas.get(propertyName)) {
                 annotator.annotate(JacksonXmlCData.class);
+            }
+            if (jsonAliases.get(propertyName) != null && jsonAliases.get(propertyName).length > 0) {
+                JAnnotationArrayMember annotationValue = annotator.annotate(JsonAlias.class).paramArray("value");
+                for (String alias : jsonAliases.get(propertyName)) {
+                    annotationValue.param(alias.trim()); 
+                }
             }
             annotator.annotate(JacksonXmlProperty.class).param("localName", xmlPropertyNames.get(propertyName)).param("isAttribute", xmlPropertyAttributes
                 .get(propertyName));
@@ -111,6 +121,13 @@ public class JacksonXMLJoeConfigurationAnnotator extends AbstractAnnotator imple
             return propertyNode.get("isXmlCData").asBoolean();
         }
         return false;
+    }
+    
+    private String[] getAliases(JsonNode propertyNode) {
+        if (propertyNode.has("aliases")) {
+            return propertyNode.get("aliases").asText().split(",");
+        }
+        return null;
     }
 
 }

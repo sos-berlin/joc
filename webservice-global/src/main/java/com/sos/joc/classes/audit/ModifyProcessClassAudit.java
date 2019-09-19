@@ -25,9 +25,9 @@ public class ModifyProcessClassAudit extends ProcessClassEdit implements IAuditL
     public ModifyProcessClassAudit(ProcessClassEdit conf) {
         setAuditParams(conf.getAuditLog());
         setJobschedulerId(conf.getJobschedulerId());
-        setProcessClass(conf.getProcessClass());
+        setPath(conf.getPath());
         setConfiguration(conf.getConfiguration());
-        Path p = Paths.get(conf.getProcessClass());
+        Path p = Paths.get(conf.getPath());
         this.folder = p.getParent().toString().replace('\\', '/');
     }
 
