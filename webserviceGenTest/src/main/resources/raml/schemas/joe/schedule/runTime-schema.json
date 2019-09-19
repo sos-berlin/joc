@@ -9,7 +9,7 @@
   	},
   	"properties": {
 		"schedule": {
-			"description": "path to another schedule",
+			"description": "path to a schedule",
 			"type": "string"
 		}
 	}
