@@ -1,0 +1,35 @@
+{
+	"title": "period",
+	"id": "schemas/joe/schedule/period",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.joe.schedule.Period",
+	"type": "object",
+	"properties": {
+		"begin": {
+			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9][0-9])?",
+			"type": "string"
+		},
+		"end": {
+			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9][0-9])?",
+			"type": "string"
+		},
+		"singleStart": {
+			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9][0-9])?",
+			"type": "string"
+		},
+		"letRun": {
+			"description": "possible values: yes, no, 1, 0, true, false",
+			"type": "string"
+		},
+		"startOnce": {
+			"description": "possible values: yes, no, 1, 0, true, false",
+			"type": "string"
+		},
+		"repeat": {
+			"type": "string"
+		},
+		"absoluteRepeat": {
+			"type": "string"
+		}
+	}
+}

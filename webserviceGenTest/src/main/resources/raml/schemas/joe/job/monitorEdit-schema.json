@@ -1,0 +1,18 @@
+{
+  "title": "edit monitor configuration",
+  "id": "schemas/joe/job/monitorEdit",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.job.MonitorEdit",
+  "type": "object",
+  "required": [
+    "configuration"
+  ],
+  "extends": {
+    "javaType": "com.sos.joc.model.joe.common.JSObjectEdit"
+  },
+  "properties": {
+    "configuration": {
+      "$ref": "monitor-schema.json"
+    }
+  }
+}

@@ -33,6 +33,7 @@ public class TreePermanent {
 		
 		for (JobSchedulerObjectType type : treeBody.getTypes()) {
 			switch (type) {
+			case MONITOR:
 			case JOB:
 				if (sosPermission.getJob().getView().isStatus()) {
 					types.add(type);
@@ -49,10 +50,6 @@ public class TreePermanent {
 				}
 				break;
 			case PROCESSCLASS:
-				if (sosPermission.getProcessClass().getView().isStatus()) {
-					types.add(type);
-				}
-				break;
 			case AGENTCLUSTER:
 				if (sosPermission.getProcessClass().getView().isStatus()) {
 					types.add(type);
@@ -69,10 +66,6 @@ public class TreePermanent {
 				}
 				break;
 			case WORKINGDAYSCALENDAR:
-                if (sosPermission.getCalendar().getView().isStatus()) {
-                    types.add(type);
-                }
-                break;
 			case NONWORKINGDAYSCALENDAR:
                 if (sosPermission.getCalendar().getView().isStatus()) {
                     types.add(type);

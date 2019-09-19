@@ -1,5 +1,5 @@
 {
-  "title": "job chain without name, replace, visible attributes",
+  "title": "job chain without name, replace attributes",
   "id": "schemas/joe/jobChain/jobChain",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.jobChain.JobChain",
@@ -28,6 +28,10 @@
     },
     "fileWatchingProcessClass": {
       "description": "path of a process class object",
+      "type": "string"
+    },
+    "visible": {
+      "description": "possible values: yes, no, 1, 0, true, false or never",
       "type": "string"
     },
     "fileOrderSources": {

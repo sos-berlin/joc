@@ -4,9 +4,9 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.jobChain.JobChainNode",
   "type": "object",
-  "extends": [
-    "JobChainEndNode"
-  ],
+  "extends": {
+    "javaType": "JobChainEndNode"
+  },
   "properties": {
     "job": {
       "description": "path to job",
@@ -17,7 +17,7 @@
       "type": "string"
     },
     "errorState": {
-      "description": "name of the next job chain node in errornous case",
+      "description": "name of the next job chain node in erroneous case",
       "type": "string"
     },
     "onError": {

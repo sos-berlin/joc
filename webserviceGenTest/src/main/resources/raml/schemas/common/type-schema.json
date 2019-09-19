@@ -17,6 +17,7 @@
     "FOLDER",
     "JOBSCHEDULER",
     "DOCUMENTATION",
+    "MONITOR",
     "OTHER"
   ]
 }

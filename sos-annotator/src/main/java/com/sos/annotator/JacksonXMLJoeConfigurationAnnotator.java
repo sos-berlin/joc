@@ -43,15 +43,16 @@ public class JacksonXMLJoeConfigurationAnnotator extends AbstractAnnotator imple
 
     @Override
     public void propertyField(JFieldVar field, JDefinedClass clazz, String propertyName, JsonNode propertyNode) {
-        xmlPropertyNames.put(propertyName, camelCaseToLowerUnderscore(propertyName));
+        if (propertyNode.has("xmlElement")) {
+            xmlPropertyNames.put(propertyName, propertyNode.get("xmlElement").asText());
+        } else {
+            xmlPropertyNames.put(propertyName, camelCaseToLowerUnderscore(propertyName)); 
+        }
         xmlPropertyAttributes.put(propertyName, isAttribute(field, propertyNode));
         xmlPropertyCDatas.put(propertyName, isCData(propertyNode));
         jsonAliases.put(propertyName, getAliases(propertyNode));
 
         if (isCollection(field)) {
-            if (propertyNode.has("xmlElement")) {
-                xmlPropertyNames.put(propertyName, propertyNode.get("xmlElement").asText());
-            }
             field.annotate(JacksonXmlElementWrapper.class).param("useWrapping", false);
         }
         setLocalNameXMLProperty(field, propertyName);

@@ -4,6 +4,9 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.job.Monitor",
   "type": "object",
+  "javaInterfaces" : [
+    "com.sos.joc.model.joe.common.IJSObject"
+  ],
   "properties": {
     "name": {
       "type": "string"
@@ -11,12 +14,8 @@
     "ordering": {
       "$ref": "../../common/nonNegativeInteger-schema.json"
     },
-    "scripts": {
-      "xmlElement": "script",
-      "type": "array",
-      "items": {
-        "$ref": "script-schema.json"
-      }
+    "script": {
+      "$ref": "script-schema.json"
     }
   }
 }
