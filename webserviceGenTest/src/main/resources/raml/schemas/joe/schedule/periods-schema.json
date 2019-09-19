@@ -1,0 +1,10 @@
+{
+	"title": "periods",
+	"id": "schemas/joe/schedule/periods",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"xmlElement": "period",
+	"type": "array",
+	"items": {
+		"$ref": "period-schema.json"
+	}
+}

@@ -27,9 +27,7 @@
       "$ref": "../common/params-schema.json"
     },
     "runTime": {
-      "type": "string",
-      "default": "",
-      "isXmlCData": false
+      "$ref": "../schedule/runTime-schema.json"
     }
   }
 }

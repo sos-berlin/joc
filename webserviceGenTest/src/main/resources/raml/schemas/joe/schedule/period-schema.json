@@ -6,29 +6,36 @@
 	"type": "object",
 	"properties": {
 		"begin": {
-			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9][0-9])?",
+			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9]{2})?",
 			"type": "string"
 		},
 		"end": {
-			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9][0-9])?",
+			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9]{2})?",
 			"type": "string"
 		},
 		"singleStart": {
-			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9][0-9])?",
+			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9]{2})?",
 			"type": "string"
 		},
 		"letRun": {
 			"description": "possible values: yes, no, 1, 0, true, false",
 			"type": "string"
 		},
-		"startOnce": {
+		"runOnce": {
+			"xmlElement": "start_once",
 			"description": "possible values: yes, no, 1, 0, true, false",
 			"type": "string"
 		},
 		"repeat": {
+			"description": "pattern: ([0-9]+)|([0-9]+:[0-9]{2}(:[0-9]{2})?)",
 			"type": "string"
 		},
 		"absoluteRepeat": {
+			"description": "pattern: ([0-9]+)|([0-9]+:[0-9]{2}(:[0-9]{2})?)",
+			"type": "string"
+		},
+		"whenHoliday": {
+			"description": "possible values: suppress (default), ignore_holiday, previous_non_holiday, next_non_holiday",
 			"type": "string"
 		}
 	}

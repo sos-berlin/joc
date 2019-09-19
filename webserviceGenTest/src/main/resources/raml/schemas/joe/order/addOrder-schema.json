@@ -27,10 +27,6 @@
     "suspended": {
       "description": "possible values: yes, no, 1, 0, true, false",
       "type": "string"
-    },
-    "runTime": {
-      "type": "string",
-      "isXmlCData": false
     }
   }
 }

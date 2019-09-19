@@ -183,10 +183,10 @@
 						<artifactId>maven-compiler-plugin</artifactId>
 						<inherited>true</inherited>
 						<configuration>
-              				<includes>
-                				<include>**/Main.java</include>
-              				</includes>
-            			</configuration>
+							<includes>
+								<include>**/Main.java</include>
+							</includes>
+						</configuration>
 					</plugin>
 					<plugin>
 						<groupId>org.jsonschema2pojo</groupId>
@@ -331,6 +331,33 @@
 										</resource>
 									</resources>
 									<overwrite>true</overwrite>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>modify some pojos</id>
+								<phase>process-classes</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+								    <!-- to provide that at least an empty run_time is created at job and order  -->
+									<target description="modify initial values">
+										<replaceregexp flags="ig" byline="true"
+											match="(private RunTime runTime)( = null)?;"
+											replace="\1 = new RunTime();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/job/Job.java"
+											preserveLastModified="true" />
+										<replaceregexp flags="ig" byline="true"
+											match="(private RunTime runTime)( = null)?;"
+											replace="\1 = new RunTime();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/order/Order.java"
+											preserveLastModified="true" />
+									</target>
 								</configuration>
 							</execution>
 						</executions>

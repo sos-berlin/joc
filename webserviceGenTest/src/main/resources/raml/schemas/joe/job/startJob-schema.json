@@ -20,8 +20,7 @@
     },
     "force": {
       "description": "possible values: yes, no, 1, 0, true, false",
-      "type": "string",
-      "default": "true"
+      "type": "string"
     },
     "params": {
       "$ref": "../common/params-schema.json"

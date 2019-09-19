@@ -1,0 +1,16 @@
+{
+	"title": "runTime",
+	"id": "schemas/joe/schedule/nonEmptyRunTime",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.joe.schedule.RunTime",
+	"type": "object",
+	"extends" : {
+  		"$ref": "superSchedule-schema.json"
+  	},
+  	"properties": {
+		"schedule": {
+			"description": "path to another schedule",
+			"type": "string"
+		}
+	}
+}

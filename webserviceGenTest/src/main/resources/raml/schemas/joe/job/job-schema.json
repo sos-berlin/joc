@@ -215,9 +215,7 @@
       }
     },
     "runTime": {
-      "type": "string",
-      "default": "",
-      "isXmlCData": false
+      "$ref": "../schedule/runTime-schema.json"
     },
     "commands": {
       "type": "array",

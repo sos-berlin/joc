@@ -7,9 +7,24 @@
 	"javaInterfaces" : [
     	"com.sos.joc.model.joe.common.IJSObject"
   	],
+  	"extends" : {
+  		"$ref": "superSchedule-schema.json"
+  	},
   	"properties": {
-		"maxNonExclusive": {
-			"$ref": "../../common/nonNegativeInteger-schema.json"
+		"validFrom": {
+			"description": "yyyy-mm-dd HH:MM[:SS]",
+			"type": "string"
+		},
+		"validTo": {
+			"description": "yyyy-mm-dd HH:MM[:SS]",
+			"type": "string"
+		},
+		"substitute": {
+			"description": "path to another schedule",
+			"type": "string"
+		},
+		"title": {
+			"type": "string"
 		}
 	}
 }
