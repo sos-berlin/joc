@@ -149,7 +149,7 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     }
 
     private void put(URI uri, byte[] body) throws JocException {
-        setAccept("*/*");
+        setAccept("text/plain");
         addHeader("Content-Type", "application/octet-stream");
         JocError jocError = new JocError();
         jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()), "JS-PutBody: " + body);
@@ -186,7 +186,7 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     }
 
     private void delete(URI uri) throws JocException {
-        setAccept("*/*");
+        setAccept("text/plain");
         JocError jocError = new JocError();
         jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         try {
@@ -250,7 +250,7 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     }
 
     private byte[] getFile(URI uri) throws JocException {
-        setAccept("application/json");
+        setAccept("application/octet-stream");
         JocError jocError = new JocError();
         jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         try {
@@ -284,23 +284,26 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
 
     private void checkResponse(String response, URI uri, JocError jocError) throws JocException {
         int httpReplyCode = statusCode();
+        String status = null;
         if (response == null) {
             response = "";
         }
-
+        
         try {
             switch (httpReplyCode) {
             case 200:
+            case 201:
                 break;
             case 400:
+                status = String.format("%d %s: %s", httpReplyCode, getHttpResponse().getStatusLine().getReasonPhrase(), response);
                 // Async call while JobScheduler is terminating
                 if (response.contains("com.sos.scheduler.engine.common.async.CallQueue$ClosedException")) {
-                    throw new JobSchedulerConnectionResetException(response);
+                    throw new JobSchedulerConnectionResetException(status);
                 }
-                throw new JobSchedulerBadRequestException(response);
+                throw new JobSchedulerBadRequestException(status);
             default:
-                throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase() + ": " + uri
-                        .toString());
+                status = String.format("%d %s: %s", httpReplyCode, getHttpResponse().getStatusLine().getReasonPhrase(), response);
+                throw new JobSchedulerBadRequestException(status);
             }
         } catch (JocException e) {
             e.addErrorMetaInfo(jocError);
@@ -311,10 +314,11 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     private JsonArray getFolderResponse(String response, URI uri, JocError jocError) throws JocException {
         int httpReplyCode = statusCode();
         String contentType = getResponseHeader("Content-Type");
+        String status = null;
         if (response == null) {
             response = "";
         }
-
+        
         try {
             switch (httpReplyCode) {
             case 200:
@@ -336,10 +340,11 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
                 if (response.contains("com.sos.scheduler.engine.common.async.CallQueue$ClosedException")) {
                     throw new JobSchedulerConnectionResetException(response);
                 }
-                throw new JobSchedulerBadRequestException(response);
+                status = String.format("%d %s: %s", httpReplyCode, getHttpResponse().getStatusLine().getReasonPhrase(), response);
+                throw new JobSchedulerBadRequestException(status);
             default:
-                throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase() + ": " + uri
-                        .toString());
+                status = String.format("%d %s: %s", httpReplyCode, getHttpResponse().getStatusLine().getReasonPhrase(), response);
+                throw new JobSchedulerBadRequestException(status);
             }
         } catch (JocException e) {
             e.addErrorMetaInfo(jocError);
@@ -352,11 +357,10 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
         try {
             switch (httpReplyCode) {
             case 200:
-                if (response == null || response.length == 0) {
-                    throw new JobSchedulerNoResponseException("Unexpected empty response");
-                }
+                break;
             default:
-                throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase());
+                String status = String.format("%d %s: %s", httpReplyCode, getHttpResponse().getStatusLine().getReasonPhrase(), new String(response));
+                throw new JobSchedulerBadRequestException(status);
             }
         } catch (JocException e) {
             e.addErrorMetaInfo(jocError);

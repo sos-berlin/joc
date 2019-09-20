@@ -2,7 +2,7 @@
 title: JOC API
 version: 1.13.1
 protocols: [ HTTP, HTTPS ]
-baseUri: http://test.sos-berlin.com:3001/joc/api
+#baseUri: http://test.sos-berlin.com:3001/joc/api
 #mediaType: application/json
 
 documentation:
@@ -2841,8 +2841,103 @@ traits:
       example200: !include examples/joc/properties-example.json
 
 /joe:
-  /read:
+  description: |
+    This is not an API call. Use its children!!
+    
+  /read/file:
+    type:
+      postJSON:
+        description: Read configuration files
+        description1: !include documentation/joe/jsObject.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/joe/readFileAnswer.md
+        schema: !include schemas/joe/common/jsObjectEdit-schema.json
+        schema200: !include schemas/joe/common/jsObjectEdit-schema.json
+        example: !include examples/joe/jsObjectEdit-example.json
+        example200: !include examples/joe/jsObjectEdit200-example.json
+  /read/folder:
+    type:
+      postJSON:
+        description: Read folder content
+        description1: !include documentation/joe/pathRequired.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/joe/readFolderAnswer.md
+        schema: !include schemas/joe/other/folder-schema.json
+        schema200: !include schemas/joe/other/folder-schema.json
+        example: " "
+        example200: " "
   /store:
+    type:
+      postJSON:
+        description: Store configuration files
+        description1: !include documentation/joe/jsObject.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/joe/common/jsObjectEdit-schema.json
+        schema200: ok
+        example: !include examples/joe/jsObjectEdit-example.json
+        example200: " "
   /deploy:
+    type:
+      postJSON:
+        description: Deploy configuration files to JobScheduler
+        description1: !include documentation/joe/jsObject.md
+        description2: !include documentation/audit/auditLog.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/joe/common/jsObjectEdit-schema.json
+        schema200: ok
+        example: !include examples/joe/jsObjectEdit-example.json
+        example200: " "
   /toxml:
+    type: error
+    post:
+      description: <h2>convert JSON to XML format</h2>
+      body:
+        application/json:
+      responses:
+        200:
+          body:
+            application/xml:
   /tojson:
+    type: error
+    post:
+      description: <h2>convert XML to JSON format after schema validation (for JOE expert mode)</h2>
+      body:
+        application/xml:
+      responses:
+        200:
+          body:
+            application/json:
+        

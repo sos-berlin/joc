@@ -1,0 +1,10 @@
+{
+  "title": "edit folders",
+  "id": "schemas/joe/other/folderEdit",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.other.FolderEdit",
+  "type": "object",
+  "extends": {
+    "javaType": "com.sos.joc.model.joe.common.JSObjectEdit"
+  }
+}

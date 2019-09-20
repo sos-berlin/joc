@@ -1,0 +1,75 @@
+{
+	"title": "folder content",
+	"id": "schemas/joe/other/folder",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.joe.other.Folder",
+	"type": "object",
+	"required": [
+		"path"
+	],
+	"properties": {
+		"path": {
+			"$ref": "../../common/path-schema.json"
+		},
+		"folders": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"jobs": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"jobChains": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"orders": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"processClasses": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"locks": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"schedules": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"monitors": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"params": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"other": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		}
+	}
+}

@@ -1,0 +1,5 @@
+{
+  "jobschedulerId" : "myJobScheduler",
+  "path" : "/path/to/job",
+  "objectType" : "JOB"
+}

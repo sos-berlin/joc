@@ -32,8 +32,9 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.processClass.ProcessClassEdit.class, name = "PROCESSCLASS"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.lock.LockEdit.class, name = "LOCK"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.schedule.ScheduleEdit.class, name = "SCHEDULE"),
+    @JsonSubTypes.Type(value = com.sos.joc.model.joe.other.FolderEdit.class, name = "FOLDER"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.job.MonitorEdit.class, name = "MONITOR"),
-    @JsonSubTypes.Type(value = com.sos.joc.model.joe.job.OtherEdit.class, name = "OTHER")
+    @JsonSubTypes.Type(value = com.sos.joc.model.joe.other.OtherEdit.class, name = "OTHER")
 })
 
 @JsonPropertyOrder({
@@ -42,6 +43,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
     "jobschedulerId",
     "path",
     "objectType",
+    "deployed",
     "configuration",
     "account",
     "auditLog"
@@ -87,6 +89,13 @@ public abstract class JSObjectEdit {
      */
     @JsonProperty("objectType")
     private JobSchedulerObjectType objectType;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("deployed")
+    private Boolean deployed;
     /**
      * 
      * (Required)
@@ -232,6 +241,30 @@ public abstract class JSObjectEdit {
     public void setObjectType(JobSchedulerObjectType objectType) {
         this.objectType = objectType;
     }
+    
+    /**
+     * 
+     * (Required)
+     * 
+     * @return
+     *     The deployed
+     */
+    @JsonProperty("deployed")
+    public Boolean getDeployed() {
+        return deployed;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @param deployed
+     *     The deployed
+     */
+    @JsonProperty("deployed")
+    public void setDeployed(Boolean deployed) {
+        this.deployed = deployed;
+    }
 
     /**
      * 
@@ -310,7 +343,7 @@ public abstract class JSObjectEdit {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(configurationDate).append(jobschedulerId).append(path).append(objectType).append(configuration).append(account).append(auditLog).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(configurationDate).append(jobschedulerId).append(path).append(objectType).append(deployed).append(configuration).append(account).append(auditLog).toHashCode();
     }
 
     @Override
@@ -322,7 +355,7 @@ public abstract class JSObjectEdit {
             return false;
         }
         JSObjectEdit rhs = ((JSObjectEdit) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(configurationDate, rhs.configurationDate).append(jobschedulerId, rhs.jobschedulerId).append(path, rhs.path).append(objectType, rhs.objectType).append(configuration, rhs.configuration).append(account, rhs.account).append(auditLog, rhs.auditLog).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(configurationDate, rhs.configurationDate).append(jobschedulerId, rhs.jobschedulerId).append(path, rhs.path).append(objectType, rhs.objectType).append(deployed, rhs.deployed).append(configuration, rhs.configuration).append(account, rhs.account).append(auditLog, rhs.auditLog).isEquals();
     }
     
     @JsonIgnore

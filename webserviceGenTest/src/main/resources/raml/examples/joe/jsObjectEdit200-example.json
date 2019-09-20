@@ -1,0 +1,41 @@
+{
+  "deliveryDate" : "2019-09-20T00:27:32.374Z",
+  "jobschedulerId" : "myJobScheduler",
+  "path" : "/path/to/job",
+  "objectType" : "JOB",
+  "account" : "John Doe",
+  "deployed": false,
+  "configurationDate" : "2019-09-20T13:41:33.000Z",
+  "configuration" : {
+    "title" : "myJob",
+    "isOrderJob" : "yes",
+    "maxTasks" : 5,
+    "stopOnError" : "no",
+    "settings" : {
+      "logLevel" : "debug9"
+    },
+    "params" : {
+      "paramList" : [ {
+        "name" : "myParam",
+        "value" : "myParamVal"
+      }, {
+        "name" : "myParam2",
+        "value" : "myParamVal2"
+      } ]
+    },
+    "environment" : {
+      "variables" : [ {
+        "name" : "myEnv",
+        "value" : "myEnvVal"
+      } ]
+    },
+    "login" : {
+      "user" : "me",
+      "password" : "secret"
+    },
+    "script" : {
+      "language" : "shell",
+      "content" : "\necho hello\necho world\n"
+    }
+  }
+}
