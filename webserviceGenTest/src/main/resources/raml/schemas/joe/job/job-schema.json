@@ -76,6 +76,16 @@
     "settings": {
       "$ref": "settings-schema.json"
     },
+    "documentation": {
+      "xmlElement": "description",
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.job.Description",
+      "properties": {
+        "inculdes": {
+          "$ref": "../common/includes-schema.json"
+        }
+      }
+    },
     "lockUses": {
       "type": "array",
       "xmlElement": "lock.use",

@@ -34,6 +34,8 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.schedule.ScheduleEdit.class, name = "SCHEDULE"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.other.FolderEdit.class, name = "FOLDER"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.job.MonitorEdit.class, name = "MONITOR"),
+    @JsonSubTypes.Type(value = com.sos.joc.model.joe.nodeParams.NodeParamsEdit.class, name = "NODEPARAMS"),
+    @JsonSubTypes.Type(value = com.sos.joc.model.joe.schedule.HolidaysEdit.class, name = "HOLIDAYS"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.other.OtherEdit.class, name = "OTHER")
 })
 

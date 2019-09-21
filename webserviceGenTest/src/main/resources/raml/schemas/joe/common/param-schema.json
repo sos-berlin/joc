@@ -4,6 +4,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.common.Param",
   "type": "object",
+  "required": [
+    "name",
+    "value"
+  ],
   "properties": {
     "name": {
       "type": "string"

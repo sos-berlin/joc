@@ -1,0 +1,40 @@
+{
+	"title": "external holidays",
+	"id": "schemas/joe/schedule/holidaysConfig",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"javaType": "com.sos.joc.model.joe.schedule.HolidaysFile",
+	"javaInterfaces" : [
+    	"com.sos.joc.model.joe.common.IJSObject"
+  	],
+  	"properties": {
+    	"weekDays": {
+			"description": "TODO",
+			"type": "string",
+      		"isXmlCData": false
+		},
+		"days": {
+			"xmlElement": "holiday",
+			"type": "array",
+			"items": {
+				"xmlElement": "holiday",
+				"type": "object",
+				"javaType": "com.sos.joc.model.joe.schedule.Holiday",
+				"required": [
+					"date"
+				],
+				"properties": {
+					"date": {
+						"type": "string"
+					},
+					"calendar": {
+						"type": "string"
+					},
+					"periods": {
+						"$ref": "periods-schema.json"
+					}
+				}
+			}
+		}
+	}
+}

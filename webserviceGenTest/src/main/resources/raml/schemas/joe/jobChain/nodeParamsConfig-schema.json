@@ -1,0 +1,55 @@
+{
+  "title": "node params config file",
+  "id": "schemas/joe/jobChain/nodeParams",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.nodeParams.Config",
+  "type": "object",
+  "xmlElement": "settings",
+  "javaInterfaces" : [
+   	"com.sos.joc.model.joe.common.IJSObject"
+  ],
+  "required": [
+    "jobChain"
+  ],
+  "properties": {
+    "jobChain": {
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.nodeParams.ConfigJobChain",
+      "xmlElement": "job_chain",
+      "required": [
+        "name",
+        "order"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "order": {
+          "type": "object",
+          "javaType": "com.sos.joc.model.joe.nodeParams.ConfigOrder",
+          "xmlElement": "order",
+          "properties": {
+            "jobChainNodes": {
+              "xmlElement": "process",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "javaType": "com.sos.joc.model.joe.nodeParams.ConfigNode",
+                "xmlElement": "process",
+                "properties": {
+                  "state": {
+                    "description": "name of the job chain node",
+                    "type": "string"
+                  },
+                  "params": {
+                    "$ref": "nodeParams-schema.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

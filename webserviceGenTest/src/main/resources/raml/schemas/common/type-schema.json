@@ -18,6 +18,8 @@
     "JOBSCHEDULER",
     "DOCUMENTATION",
     "MONITOR",
+    "NODEPARAMS",
+    "HOLIDAYS",
     "OTHER"
   ]
 }

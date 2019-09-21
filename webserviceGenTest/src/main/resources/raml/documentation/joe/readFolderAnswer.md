@@ -2,9 +2,12 @@
     * folders
     * jobs
     * job chains
-    * order
+    * orders
     * process classes
     * locks
     * schedules
     * params
+    * nodeParams
     * monitors
+    * holdays
+    * others
