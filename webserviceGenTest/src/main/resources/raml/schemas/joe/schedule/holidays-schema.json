@@ -1,5 +1,5 @@
 {
-	"title": "holidays without weekdays elements TODO?",
+	"title": "holidays",
 	"id": "schemas/joe/schedule/holidays",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"type": "object",
@@ -8,6 +8,9 @@
     	"includes": {
     		"$ref": "../common/includes-schema.json"
     	},
+		"weekDays": {
+			"$ref": "weekdays-schema.json"
+		},
 		"days": {
 			"xmlElement": "holiday",
 			"type": "array",

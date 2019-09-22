@@ -66,24 +66,16 @@
 			}
 		},
 		"weekDays": {
-			"description": "TODO",
-			"type": "string",
-      		"isXmlCData": false
+			"$ref": "weekdays-schema.json"
 		},
 		"monthDays": {
-			"description": "TODO",
-			"type": "string",
-      		"isXmlCData": false
+			"$ref": "monthdays-schema.json"
 		},
 		"ultimos": {
-			"description": "TODO",
-			"type": "string",
-      		"isXmlCData": false
+			"$ref": "ultimos-schema.json"
 		},
 		"month": {
-			"description": "TODO",
-			"type": "string",
-      		"isXmlCData": false
+			"$ref": "months-schema.json"
 		},
 		"holidays": {
 			"$ref": "holidays-schema.json"

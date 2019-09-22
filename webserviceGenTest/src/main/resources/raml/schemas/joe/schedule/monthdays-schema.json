@@ -1,0 +1,38 @@
+{
+	"title": "monthdays",
+	"id": "schemas/joe/schedule/monthdays",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"javaType": "com.sos.joc.model.joe.schedule.Monthdays",
+	"properties": {
+    	"days": {
+			"$ref": "days-schema.json"
+		},
+		"weekdays": {
+			"type": "array",
+			"xmlElement": "weekday",
+			"items": {
+				"type": "object",
+				"javaType": "com.sos.joc.model.joe.schedule.WeekdayOfMonth",
+				"xmlElement": "weekday",
+				"required": [
+					"day",
+					"which"
+				],
+				"properties": {
+					"day": {
+						"description": "[01234567]|(so(nntag)?)|(mo(ntag)?)|(di(enstag)?)|(mi(ttwoch)?)|(do(nnerstag)?)|(fr(eitag)?)|(sa(mstag)?)|(sun(day)?)|(mon(day)?)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?)",
+						"type": "string"
+					},
+					"which": {
+						"description": "possible value: -4, -3, -2, -1, 1, 2, 3, 4",
+						"type": "integer"
+					},
+					"periods": {
+						"$ref": "periods-schema.json"
+					}
+				}
+			}
+		}
+	}
+}

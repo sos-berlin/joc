@@ -9,9 +9,7 @@
   	],
   	"properties": {
     	"weekDays": {
-			"description": "TODO",
-			"type": "string",
-      		"isXmlCData": false
+			"$ref": "weekdays-schema.json"
 		},
 		"days": {
 			"xmlElement": "holiday",

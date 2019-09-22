@@ -1,0 +1,30 @@
+{
+	"title": "months",
+	"id": "schemas/joe/schedule/months",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "array",
+	"xmlElement": "month",
+	"items": {
+    	"type": "object",
+    	"javaType": "com.sos.joc.model.joe.schedule.Month",
+    	"xmlElement": "month",
+    	"properties": {
+    		"month": {
+    			"description": "unordered space seperated list of 1-12 or january, february, march, april, may, june, july, august, september, october, november, december",
+    			"type": "string"
+    		},
+			"periods": {
+				"$ref": "periods-schema.json"
+			},
+			"weekDays": {
+				"$ref": "weekdays-schema.json"
+			},
+			"monthDays": {
+				"$ref": "monthdays-schema.json"
+			},
+			"ultimos": {
+				"$ref": "ultimos-schema.json"
+			}
+    	}
+	}
+}

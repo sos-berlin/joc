@@ -9,5 +9,5 @@
     * params
     * nodeParams
     * monitors
-    * holdays
+    * holidays
     * others
