@@ -65,10 +65,10 @@
 				}
 			}
 		},
-		"weekDays": {
+		"weekdays": {
 			"$ref": "weekdays-schema.json"
 		},
-		"monthDays": {
+		"monthdays": {
 			"$ref": "monthdays-schema.json"
 		},
 		"ultimos": {

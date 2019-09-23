@@ -8,7 +8,7 @@
     	"includes": {
     		"$ref": "../common/includes-schema.json"
     	},
-		"weekDays": {
+		"weekdays": {
 			"$ref": "weekdays-schema.json"
 		},
 		"days": {

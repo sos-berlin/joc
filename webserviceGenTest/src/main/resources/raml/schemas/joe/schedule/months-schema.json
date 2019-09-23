@@ -10,16 +10,16 @@
     	"xmlElement": "month",
     	"properties": {
     		"month": {
-    			"description": "unordered space seperated list of 1-12 or january, february, march, april, may, june, july, august, september, october, november, december",
+    			"description": "unordered space separated list of 1-12 or january, february, march, april, may, june, july, august, september, october, november, december",
     			"type": "string"
     		},
 			"periods": {
 				"$ref": "periods-schema.json"
 			},
-			"weekDays": {
+			"weekdays": {
 				"$ref": "weekdays-schema.json"
 			},
-			"monthDays": {
+			"monthdays": {
 				"$ref": "monthdays-schema.json"
 			},
 			"ultimos": {
