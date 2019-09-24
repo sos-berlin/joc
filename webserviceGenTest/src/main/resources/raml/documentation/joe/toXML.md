@@ -1,4 +1,5 @@
-<tr><td></td><td></td><td>supported JSON:
+<h2>convert JSON to XML format</h2>
+<p>supported JSON:
 <ul>
 	<li><a href="../../../../../raml/schemas/joe/job/job-schema.json" target="job">job JSON schema</a></li>
 	<li><a href="../../../../../raml/schemas/joe/jobChain/jobChain-schema.json" target="jobchain">job chain JSON schema</a></li>
@@ -12,4 +13,4 @@
 	<li><a href="../../../../../raml/schemas/joe/schedule/holidaysConfig-schema.json" target="monitor">external holidays JSON schema</a></li>
 	<li><a href="../../../../../raml/schemas/joe/other/other-schema.json" target="monitor">external params and others JSON schema</a></li>
 </ul>
-</td><td></td><td></td></tr>
+</p>

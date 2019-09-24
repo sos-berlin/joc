@@ -2958,10 +2958,11 @@ traits:
         schema200: ok
         example: !include examples/joe/jsObjectEdit-example.json
         example200: " "
-  /toxml:
+  
+  /{objectType}/toxml:
     type: error
     post:
-      description: <h2>convert JSON to XML format</h2>
+      description: !include documentation/joe/toXML.md
       body:
         application/json:
       responses:
@@ -2971,7 +2972,7 @@ traits:
   /tojson:
     type: error
     post:
-      description: <h2>convert XML to JSON format after schema validation (for JOE expert mode)</h2>
+      description:  !include documentation/joe/toJSON.md
       body:
         application/xml:
       responses:

@@ -1,7 +1,8 @@
-<tr><td></td><td></td><td>supported XML are Job Scheduler objects such as
+<h2>convert XML to JSON format after schema validation (for JOE expert mode)</h2>
+<p>supported XML are Job Scheduler objects such as
 <ul>
 	<li>jobs</li>
-	<li>job chains></li>
+	<li>job chains</li>
 	<li>orders</li>
 	<li>process classes</li>
 	<li>locks</li>
@@ -14,4 +15,4 @@ according the <a href="../../../../raml/documentation/joe/scheduler.xsd" target=
 <ul>
 	<li>node parameters</li>
 </ul>
-</td><td></td><td></td></tr>
+</p>

@@ -44,14 +44,14 @@ public class MapConfigurationResource extends JOCResourceImpl implements IMapCon
         {
             put("job", Job.class);
             put("order", Order.class);
-            put("job_chain", JobChain.class);
-            put("process_class", ProcessClass.class);
+            put("jobchain", JobChain.class);
+            put("processclass", ProcessClass.class);
             put("lock", Lock.class);
             put("schedule", Schedule.class);
             put("monitor", Monitor.class);
             put("settings", Config.class);
             put("holidays", HolidaysFile.class);
-            put("run_time", RunTime.class);
+            put("runtime", RunTime.class);
         }
     });
 
@@ -66,26 +66,27 @@ public class MapConfigurationResource extends JOCResourceImpl implements IMapCon
             SAXReader reader = new SAXReader();
             reader.setValidation(false);
             final String rootElementName = reader.read(new ByteArrayInputStream(requestBody)).getRootElement().getName().toLowerCase();
+            final String objType = rootElementName.replaceAll("_", "");
 
-            if (!CLASS_MAPPING.containsKey(rootElementName)) {
-                throw new JobSchedulerBadRequestException("unsupported xml");
+            if (!CLASS_MAPPING.containsKey(objType)) {
+                throw new JobSchedulerBadRequestException("unsupported xml: " + rootElementName);
             }
-            if (!"settings".equals(rootElementName)) {
+            if (!"settings".equals(objType)) {
                 ValidateXML.validateAgainstJobSchedulerSchema(new ByteArrayInputStream(requestBody));
             }
 
-            // final byte[] bytes = Globals.objectMapper.writeValueAsBytes(Globals.xmlMapper.readValue(requestBody, CLASS_MAPPING.get(rootElementName)));
+            // final byte[] bytes = Globals.objectMapper.writeValueAsBytes(Globals.xmlMapper.readValue(requestBody, CLASS_MAPPING.get(objType)));
             // set runtime as xml string for job and order
 
             IJSObject obj = null;
-            if ("job".equals(rootElementName)) {
+            if ("job".equals(objType)) {
                 Job job = Globals.xmlMapper.readValue(requestBody, Job.class);
                 if (job.getRunTimeJson() != null) {
                     job.setRunTime(Globals.objectMapper.writeValueAsString(job.getRunTimeJson()));
                     job.setRunTimeJson(null);
                 }
                 obj = job;
-            } else if ("order".equals(rootElementName)) {
+            } else if ("order".equals(objType)) {
                 Order order = Globals.xmlMapper.readValue(requestBody, Order.class);
                 if (order.getRunTimeJson() != null) {
                     order.setRunTime(Globals.objectMapper.writeValueAsString(order.getRunTimeJson()));
@@ -93,7 +94,7 @@ public class MapConfigurationResource extends JOCResourceImpl implements IMapCon
                 }
                 obj = order;
             } else {
-                obj = (IJSObject) Globals.xmlMapper.readValue(requestBody, CLASS_MAPPING.get(rootElementName));
+                obj = (IJSObject) Globals.xmlMapper.readValue(requestBody, CLASS_MAPPING.get(objType));
             }
             final byte[] bytes = Globals.objectMapper.writeValueAsBytes(obj);
 
@@ -122,34 +123,43 @@ public class MapConfigurationResource extends JOCResourceImpl implements IMapCon
     }
 
     @Override
-    public JOCDefaultResponse toXML(final String accessToken, final byte[] requestBody) {
+    public JOCDefaultResponse toXML(final String accessToken, final String objectType, final byte[] requestBody) {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_XML, null, accessToken, "", true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            String objType = objectType.replaceAll("_", "").toLowerCase();
             
-            // final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(requestBody, IJSObject.class));
+            if (!CLASS_MAPPING.containsKey(objType)) {
+                throw new JobSchedulerBadRequestException("unsupported xml: " + objectType);
+            }
+            
+            // final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(requestBody, CLASS_MAPPING.get(objType)));
             // read runtime as xml string for job and order
-            IJSObject obj = Globals.objectMapper.readValue(requestBody, IJSObject.class);
-            if (obj instanceof Job) {
-                Job job = (Job) obj;
+            
+            IJSObject obj = null;
+            if ("job".equals(objType)) {
+                Job job = Globals.objectMapper.readValue(requestBody, Job.class);
                 if (job.getRunTime() != null && !job.getRunTime().isEmpty()) {
                     job.setRunTimeJson(Globals.objectMapper.readValue(job.getRunTime(), RunTime.class));
                     job.setRunTime(null);
-                } else {
+                } else if (job.getRunTimeJson() == null) {
                     job.setRunTimeJson(new RunTime());
                 }
                 obj = job;
-            } else if (obj instanceof Order) {
-                Order order = (Order) obj;
+            } else if ("order".equals(objType)) {
+                Order order = Globals.objectMapper.readValue(requestBody, Order.class);
                 if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
                     order.setRunTimeJson(Globals.objectMapper.readValue(order.getRunTime(), RunTime.class));
                     order.setRunTime(null);
-                } else {
+                } else if (order.getRunTimeJson() == null) {
                     order.setRunTimeJson(new RunTime());
                 }
                 obj = order;
+            } else {
+                obj = (IJSObject) Globals.objectMapper.readValue(requestBody, CLASS_MAPPING.get(objType));
             }
 
             final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(obj);
