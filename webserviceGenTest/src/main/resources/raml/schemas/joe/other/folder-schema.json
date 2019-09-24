@@ -19,63 +19,73 @@
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		},
 		"jobs": {
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		},
 		"jobChains": {
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		},
 		"orders": {
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		},
 		"processClasses": {
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		},
 		"locks": {
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		},
 		"schedules": {
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		},
 		"monitors": {
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		},
 		"nodeParams": {
 			"description": "[jobChainName].config.xml files with node parameters",
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		},
 		"others": {
 			"description": "external files, e.g. shell scripts to include in job's script, parameter files for jobs and orders, holidays files",
 			"type": "array",
 			"items": {
 				"type": "string"
-			}
+			},
+			"uniqueItems": true
 		}
 	}
 }

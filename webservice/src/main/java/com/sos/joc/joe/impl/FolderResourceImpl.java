@@ -1,17 +1,27 @@
 package com.sos.joc.joe.impl;
 
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.json.JsonArray;
 import javax.json.JsonString;
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.joe.DBItemJoeObject;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.resource.IFolderResource;
 import com.sos.joc.model.joe.common.JSObjectEdit;
@@ -24,6 +34,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
 
     @Override
     public JOCDefaultResponse readFolder(final String accessToken, final JSObjectEdit body) {
+        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
@@ -32,80 +43,110 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
 
             checkRequiredParameter("path", body.getPath());
             String path = normalizeFolder(body.getPath() + "/");
-            
+
             if (!isPermittedForFolder(path)) {
                 return accessDeniedResponse();
             }
+
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(connection);
+
+            final int parentDepth = Paths.get(path).getNameCount();
+            //Map: grouped by DBItemJoeObject::isDeleted -> DBItemJoeObject::objectType -> DBItemJoeObject::path collection
+            Map<Boolean, Map<String, Set<String>>> folderContent = dbLayer.getFolderContentRecursive(body.getJobschedulerId(), path).stream().filter(
+                    item -> {
+                        return Paths.get(item.getPath()).getParent().getNameCount() == parentDepth; //not recursive
+                    }).collect(Collectors.groupingBy(DBItemJoeObject::isDeleted, Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors
+                            .mapping(DBItemJoeObject::getPath, Collectors.toSet()))));
+            folderContent.putIfAbsent(Boolean.FALSE, new HashMap<String, Set<String>>());
+            folderContent.putIfAbsent(Boolean.TRUE, new HashMap<String, Set<String>>());
+
+            List<String> objectTypes = Arrays.asList("FOLDER", "JOB", "JOBCHAIN", "ORDER", "PROCESSCLASS", "SCHEDULE", "LOCK", "MONITOR",
+                    "NODEPARAMS", "OTHER");
+
+            Map<String, Set<String>> folderContentToAdd = folderContent.get(Boolean.FALSE);
+            for (String objectType : objectTypes) {
+                folderContentToAdd.putIfAbsent(objectType, new HashSet<String>());
+            }
             
+            Map<String, Set<String>> folderContentToDelete = folderContent.get(Boolean.TRUE);
+            for (String objectType : objectTypes) {
+                folderContentToDelete.putIfAbsent(objectType, new HashSet<String>());
+            }
+            
+            for (String folder: folderContentToAdd.get("FOLDER")) {
+                if (!isPermittedForFolder(folder)) {
+                    folderContentToDelete.get("FOLDER").add(folder);
+                }
+            }
+
             JOCHotFolder httpClient = new JOCHotFolder(this);
             JsonArray folder = httpClient.getFolder(path);
-            
-            List<String> folders = new ArrayList<String>();
-            List<String> jobs = new ArrayList<String>();
-            List<String> jobChains = new ArrayList<String>();
-            List<String> orders = new ArrayList<String>();
-            List<String> processClasses = new ArrayList<String>();
-            List<String> schedules = new ArrayList<String>();
-            List<String> locks = new ArrayList<String>();
-            List<String> monitors = new ArrayList<String>();
-            List<String> nodeParams = new ArrayList<String>();
-            List<String> others = new ArrayList<String>();
-            
+
             for (JsonString jsonStr : folder.getValuesAs(JsonString.class)) {
                 String s = jsonStr.getString();
                 if (s.startsWith(".")) {
                     continue;
                 }
                 if (s.endsWith("/")) {
-                    folders.add(s);
+                    if (isPermittedForFolder(path + s)) {
+                        folderContentToAdd.get("FOLDER").add(s.replaceFirst("/$", ""));
+                    }
                 } else if (s.endsWith(".job.xml")) {
-                    jobs.add(s);
+                    folderContentToAdd.get("JOB").add(s);
                 } else if (s.endsWith(".job_chain.xml")) {
-                    jobChains.add(s);
+                    folderContentToAdd.get("JOBCHAIN").add(s);
                 } else if (s.endsWith(".order.xml")) {
-                    orders.add(s);
+                    folderContentToAdd.get("ORDER").add(s);
                 } else if (s.endsWith(".process_class.xml")) {
-                    processClasses.add(s);
+                    folderContentToAdd.get("PROCESSCLASS").add(s);
                 } else if (s.endsWith(".schedule.xml")) {
-                    schedules.add(s);
+                    folderContentToAdd.get("SCHEDULE").add(s);
                 } else if (s.endsWith(".lock.xml")) {
-                    locks.add(s);
-                } else if (s.endsWith(".config.xml")) { //maybe test if job chain exist
-                    nodeParams.add(s);
+                    folderContentToAdd.get("LOCK").add(s);
+                } else if (s.endsWith(".monitor.xml")) {
+                    folderContentToAdd.get("MONITOR").add(s);
+                } else if (s.endsWith(".config.xml")) { // maybe test if job chain exist
+                    folderContentToAdd.get("NODEPARAMS").add(s);
                 } else {
-                    others.add(s);
+                    folderContentToAdd.get("OTHER").add(s);
                 }
             }
+            
+            for (String objectType : objectTypes) {
+                folderContentToAdd.get(objectType).removeAll(folderContentToDelete.get(objectType));
+            }
+            
             Folder entity = new Folder();
-            if (!folders.isEmpty()) {
-                entity.setFolders(folders);
+            if (!folderContentToAdd.get("FOLDER").isEmpty()) {
+                entity.setFolders(folderContentToAdd.get("FOLDER"));
             }
-            if (!jobs.isEmpty()) {
-                entity.setJobs(jobs);
+            if (!folderContentToAdd.get("JOB").isEmpty()) {
+                entity.setJobs(folderContentToAdd.get("JOB"));
             }
-            if (!jobChains.isEmpty()) {
-                entity.setJobChains(jobChains);
+            if (!folderContentToAdd.get("JOBCHAIN").isEmpty()) {
+                entity.setJobChains(folderContentToAdd.get("JOBCHAIN"));
             }
-            if (!orders.isEmpty()) {
-                entity.setOrders(orders);
+            if (!folderContentToAdd.get("ORDER").isEmpty()) {
+                entity.setOrders(folderContentToAdd.get("ORDER"));
             }
-            if (!processClasses.isEmpty()) {
-                entity.setProcessClasses(processClasses);
+            if (!folderContentToAdd.get("PROCESSCLASS").isEmpty()) {
+                entity.setProcessClasses(folderContentToAdd.get("PROCESSCLASS"));
             }
-            if (!schedules.isEmpty()) {
-                entity.setSchedules(schedules);
+            if (!folderContentToAdd.get("SCHEDULE").isEmpty()) {
+                entity.setSchedules(folderContentToAdd.get("SCHEDULE"));
             }
-            if (!locks.isEmpty()) {
-                entity.setLocks(locks);
+            if (!folderContentToAdd.get("LOCK").isEmpty()) {
+                entity.setLocks(folderContentToAdd.get("LOCK"));
             }
-            if (!monitors.isEmpty()) {
-                entity.setMonitors(monitors);
+            if (!folderContentToAdd.get("MONITOR").isEmpty()) {
+                entity.setMonitors(folderContentToAdd.get("MONITOR"));
             }
-            if (!nodeParams.isEmpty()) {
-                entity.setNodeParams(nodeParams);
+            if (!folderContentToAdd.get("NODEPARAMS").isEmpty()) {
+                entity.setNodeParams(folderContentToAdd.get("NODEPARAMS"));
             }
-            if (!others.isEmpty()) {
-                entity.setOthers(others);
+            if (!folderContentToAdd.get("OTHER").isEmpty()) {
+                entity.setOthers(folderContentToAdd.get("OTHER"));
             }
             entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setPath(path);
@@ -116,6 +157,8 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
         }
     }
 

@@ -3,17 +3,17 @@ package com.sos.joc.db.joe;
 import java.util.List;
 
 import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.joe.DBItemJoeObject;
+import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 
 public class DBLayerJoeObjects {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DBLayerJoeObjects.class);
-    private static final String DBItemJoeObject = DBItemJoeObject.class.getSimpleName();
     private final SOSHibernateSession sosHibernateSession;
 
     public DBLayerJoeObjects(SOSHibernateSession session) {
@@ -81,7 +81,7 @@ public class DBLayerJoeObjects {
     }
 
     public List<DBItemJoeObject> getJoeObjectList(FilterJoeObjects filter, final int limit) throws SOSHibernateException {
-        String q = "from " + DBItemJoeObject + getWhere(filter);
+        String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
 
         Query<DBItemJoeObject> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
@@ -93,7 +93,7 @@ public class DBLayerJoeObjects {
     }
 
     public DBItemJoeObject getJoeObject(FilterJoeObjects filter) throws SOSHibernateException {
-        String q = "from " + DBItemJoeObject + getWhere(filter);
+        String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
 
         Query<DBItemJoeObject> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
@@ -104,6 +104,27 @@ public class DBLayerJoeObjects {
             return null;
         } else {
             return sosHibernateSession.getResultList(query).get(0);
+        }
+    }
+    
+    public List<DBItemJoeObject> getFolderContentRecursive(final String schedulerId, final String path) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBLayer.DBITEM_JOE_OBJECT);
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and path like :path");
+            Query<DBItemJoeObject> query = sosHibernateSession.createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            if (path.endsWith("/")) {
+                query.setParameter("path", path + "%");
+            } else {
+                query.setParameter("path", path + "/%");
+            }
+            return sosHibernateSession.getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
         }
     }
 
