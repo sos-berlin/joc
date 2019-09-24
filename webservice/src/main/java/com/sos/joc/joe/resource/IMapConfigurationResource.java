@@ -21,7 +21,7 @@ public interface IMapConfigurationResource {
     @POST
     @Path("{objectType}/toxml")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces({ MediaType.APPLICATION_XML })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse toXML(@HeaderParam("X-Access-Token") final String accessToken, @PathParam("objectType") final String objectType,
             final byte[] requestBody);
 }

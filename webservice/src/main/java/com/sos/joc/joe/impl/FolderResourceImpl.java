@@ -25,7 +25,6 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
     @Override
     public JOCDefaultResponse readFolder(final String accessToken, final JSObjectEdit body) {
         try {
-            // TODO permission??
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -33,6 +32,11 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
 
             checkRequiredParameter("path", body.getPath());
             String path = normalizeFolder(body.getPath() + "/");
+            
+            if (!isPermittedForFolder(path)) {
+                return accessDeniedResponse();
+            }
+            
             JOCHotFolder httpClient = new JOCHotFolder(this);
             JsonArray folder = httpClient.getFolder(path);
             

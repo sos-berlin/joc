@@ -461,6 +461,14 @@ public class JOCResourceImpl {
     protected String getParent(String path) {
         return Globals.getParent(path);
     }
+    
+    protected boolean isPermittedForFolder(String path) {
+        if (path.endsWith("/")) {
+            return folderPermissions.isPermittedForFolder(path);
+        } else {
+            return folderPermissions.isPermittedForFolder(getParent(path));
+        }
+    }
 
     protected boolean canAdd(String path, Set<Folder> listOfFolders) {
         return folderPermissions.isPermittedForFolder(getParent(path), listOfFolders);
