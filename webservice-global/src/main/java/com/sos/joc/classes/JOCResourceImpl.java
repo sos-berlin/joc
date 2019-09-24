@@ -144,8 +144,7 @@ public class JOCResourceImpl {
             throw new JocAuthenticationException(sosShiroCurrentUserAnswer);
         }
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUserByToken(accessToken);
-        if (Globals.jocWebserviceDataContainer == null || Globals.jocWebserviceDataContainer.getCurrentUsersList() == null
-                || sosShiroCurrentUserAnswer.getSessionTimeout() == 0L) {
+        if (sosShiroCurrentUserAnswer.getSessionTimeout() == 0L) {
             throw new JocAuthenticationException(sosShiroCurrentUserAnswer);
         }
 
