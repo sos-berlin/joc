@@ -2,7 +2,7 @@
   "title": "edit job chain configuration",
   "id": "schemas/joe/jobChain/jobChainEdit",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.nodeParams.NodeParamsEdit",
+  "javaType": "com.sos.joc.model.joe.nodeparams.NodeParamsEdit",
   "type": "object",
   "required": [
     "configuration"

@@ -18,7 +18,7 @@ import com.sos.joc.model.joe.common.JSObjectEdit;
 import com.sos.joc.model.joe.other.Folder;
 
 @Path("joe/read")
-public class FolderResource extends JOCResourceImpl implements IFolderResource {
+public class FolderResourceImpl extends JOCResourceImpl implements IFolderResource {
 
     private static final String API_CALL = "./joe/read/folder";
 

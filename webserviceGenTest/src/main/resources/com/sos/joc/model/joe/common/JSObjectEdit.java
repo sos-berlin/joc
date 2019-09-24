@@ -27,14 +27,14 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "objectType")
 @JsonSubTypes({ 
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.job.JobEdit.class, name = "JOB"),
-    @JsonSubTypes.Type(value = com.sos.joc.model.joe.jobChain.JobChainEdit.class, name = "JOBCHAIN"),
+    @JsonSubTypes.Type(value = com.sos.joc.model.joe.jobchain.JobChainEdit.class, name = "JOBCHAIN"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.order.OrderEdit.class, name = "ORDER"),
-    @JsonSubTypes.Type(value = com.sos.joc.model.joe.processClass.ProcessClassEdit.class, name = "PROCESSCLASS"),
+    @JsonSubTypes.Type(value = com.sos.joc.model.joe.processclass.ProcessClassEdit.class, name = "PROCESSCLASS"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.lock.LockEdit.class, name = "LOCK"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.schedule.ScheduleEdit.class, name = "SCHEDULE"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.other.FolderEdit.class, name = "FOLDER"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.job.MonitorEdit.class, name = "MONITOR"),
-    @JsonSubTypes.Type(value = com.sos.joc.model.joe.nodeParams.NodeParamsEdit.class, name = "NODEPARAMS"),
+    @JsonSubTypes.Type(value = com.sos.joc.model.joe.nodeparams.NodeParamsEdit.class, name = "NODEPARAMS"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.schedule.HolidaysEdit.class, name = "HOLIDAYS"),
     @JsonSubTypes.Type(value = com.sos.joc.model.joe.other.OtherEdit.class, name = "OTHER")
 })

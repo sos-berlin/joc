@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.joe.processClass.ProcessClassEdit;
+import com.sos.joc.model.joe.processclass.ProcessClassEdit;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 
 public interface IAgentConfigurationResource {

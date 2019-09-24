@@ -23,17 +23,17 @@ import com.sos.joc.joe.resource.IMapConfigurationResource;
 import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.job.Monitor;
-import com.sos.joc.model.joe.jobChain.JobChain;
+import com.sos.joc.model.joe.jobchain.JobChain;
 import com.sos.joc.model.joe.lock.Lock;
-import com.sos.joc.model.joe.nodeParams.Config;
+import com.sos.joc.model.joe.nodeparams.Config;
 import com.sos.joc.model.joe.order.Order;
-import com.sos.joc.model.joe.processClass.ProcessClass;
+import com.sos.joc.model.joe.processclass.ProcessClass;
 import com.sos.joc.model.joe.schedule.HolidaysFile;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.joe.schedule.Schedule;
 
 @Path("joe")
-public class MapConfigurationResource extends JOCResourceImpl implements IMapConfigurationResource {
+public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMapConfigurationResource {
 
     private static final String API_CALL_JSON = "./joe/tojson";
     private static final String API_CALL_XML = "./joe/toxml";

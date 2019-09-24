@@ -2,7 +2,7 @@
   "title": "processClass without name, replace, spooler_id attributes",
   "id": "schemas/joe/agentCluster/processClass",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.processClass.ProcessClass",
+  "javaType": "com.sos.joc.model.joe.processclass.ProcessClass",
   "javaInterfaces" : [
     "com.sos.joc.model.joe.common.IJSObject"
   ],
@@ -24,7 +24,7 @@
     "remoteSchedulers": {
       "xmlElement": "remote_schedulers",
       "type": "object",
-      "javaType": "com.sos.joc.model.processClass.RemoteSchedulers",
+      "javaType": "com.sos.joc.model.joe.processclass.RemoteSchedulers",
       "required": [
         "remoteSchedulerList"
       ],
@@ -37,7 +37,7 @@
           "type": "array",
           "xmlElement": "remote_scheduler",
           "items": {
-            "javaType": "com.sos.joc.model.processClass.RemoteScheduler",
+            "javaType": "com.sos.joc.model.joe.processclass.RemoteScheduler",
             "type": "object",
             "required": [
               "remoteScheduler"

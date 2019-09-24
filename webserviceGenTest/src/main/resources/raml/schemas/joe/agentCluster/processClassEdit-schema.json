@@ -2,7 +2,7 @@
   "title": "edit process_class configuration",
   "id": "schemas/joe/agentCluster/processClassEdit",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.processClass.ProcessClassEdit",
+  "javaType": "com.sos.joc.model.joe.processclass.ProcessClassEdit",
   "type": "object",
   "required": [
     "configuration"

@@ -2,7 +2,7 @@
   "title": "fileOrderSink",
   "id": "schemas/joe/jobChain/fileOrderSink",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.jobChain.FileOrderSink",
+  "javaType": "com.sos.joc.model.joe.jobchain.FileOrderSink",
   "type": "object",
   "required": [
     "state"

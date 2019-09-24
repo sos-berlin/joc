@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.model.job.JobsV;
-import com.sos.joc.model.joe.processClass.ProcessClass;
+import com.sos.joc.model.joe.processclass.ProcessClass;
 
 public class ValidateXMLTest {
 

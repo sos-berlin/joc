@@ -6,7 +6,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
-import com.sos.joc.model.joe.processClass.ProcessClassEdit;
+import com.sos.joc.model.joe.processclass.ProcessClassEdit;
 
 public class ModifyProcessClassAudit extends ProcessClassEdit implements IAuditLog {
 

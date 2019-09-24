@@ -2,7 +2,7 @@
   "title": "jobChainNode",
   "id": "schemas/joe/jobChain/jobChainNode",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.jobChain.JobChainNode",
+  "javaType": "com.sos.joc.model.joe.jobchain.JobChainNode",
   "type": "object",
   "extends": {
     "javaType": "JobChainEndNode"
@@ -29,14 +29,14 @@
     },
     "onReturnCodes": {
       "type": "object",
-      "javaType": "com.sos.joc.model.joe.jobChain.OnReturnCodes",
+      "javaType": "com.sos.joc.model.joe.jobchain.OnReturnCodes",
       "properties": {
         "onReturnCodeList": {
           "xmlElement": "on_return_code",
           "type": "array",
           "items": {
             "type": "object",
-            "javaType": "com.sos.joc.model.joe.jobChain.OnReturnCode",
+            "javaType": "com.sos.joc.model.joe.jobchain.OnReturnCode",
             "required": [
               "returnCode"
             ],
@@ -46,7 +46,7 @@
               },
               "toState": {
                 "type": "object",
-                "javaType": "com.sos.joc.model.joe.jobChain.ToState",
+                "javaType": "com.sos.joc.model.joe.jobchain.ToState",
                 "required": [
                   "state"
                 ],

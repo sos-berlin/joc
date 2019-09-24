@@ -2,7 +2,7 @@
   "title": "job chain without name, replace attributes",
   "id": "schemas/joe/jobChain/jobChain",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.jobChain.JobChain",
+  "javaType": "com.sos.joc.model.joe.jobchain.JobChain",
   "type": "object",
   "javaInterfaces" : [
     "com.sos.joc.model.joe.common.IJSObject"

@@ -2,7 +2,7 @@
   "title": "nested jobChainNode",
   "id": "schemas/joe/jobChain/nestedJobChainNode",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.jobChain.NestedJobChainNode",
+  "javaType": "com.sos.joc.model.joe.jobchain.NestedJobChainNode",
   "type": "object",
   "xmlElement": "job_chain_node.job_chain",
   "extends": {

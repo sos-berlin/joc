@@ -14,8 +14,8 @@ import com.sos.joc.classes.audit.ModifyProcessClassAudit;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.joe.processclass.resource.IAgentConfigurationResource;
-import com.sos.joc.model.joe.processClass.ProcessClass;
-import com.sos.joc.model.joe.processClass.ProcessClassEdit;
+import com.sos.joc.model.joe.processclass.ProcessClass;
+import com.sos.joc.model.joe.processclass.ProcessClassEdit;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 
 @Path("process_class")
@@ -36,13 +36,13 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             JOCHotFolder httpClient = new JOCHotFolder(this);
             byte[] fileContent = httpClient.getFile(agentFilter.getProcessClass() + FILE_EXTENSION);
-            
+
             ProcessClassEdit entity = new ProcessClassEdit();
             entity.setPath(agentFilter.getProcessClass());
             entity.setConfiguration(Globals.xmlMapper.readValue(fileContent, ProcessClass.class));
             entity.setConfigurationDate(httpClient.getLastModifiedDate());
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (JocException e) {
@@ -66,8 +66,8 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             if (agent == null) {
                 throw new JocMissingRequiredParameterException("undefined 'configuration'");
             }
-            if (agent.getRemoteSchedulers() != null && (agent.getRemoteSchedulers().getList() == null || agent.getRemoteSchedulers().getList() != null
-                    && agent.getRemoteSchedulers().getList().isEmpty())) {
+            if (agent.getRemoteSchedulers() != null && (agent.getRemoteSchedulers().getRemoteSchedulerList() == null || agent.getRemoteSchedulers()
+                    .getRemoteSchedulerList() != null && agent.getRemoteSchedulers().getRemoteSchedulerList().isEmpty())) {
                 agent.setRemoteSchedulers(null);
             }
 

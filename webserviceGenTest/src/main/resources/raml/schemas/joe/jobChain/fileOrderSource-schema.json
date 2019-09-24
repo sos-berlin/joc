@@ -2,7 +2,7 @@
   "title": "fileOrderSource",
   "id": "schemas/joe/jobChain/fileOrderSource",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.jobChain.FileOrderSource",
+  "javaType": "com.sos.joc.model.joe.jobchain.FileOrderSource",
   "type": "object",
   "required": [
     "directory"

@@ -11,6 +11,5 @@
 	<li><a href="../../../../../raml/schemas/joe/jobChain/nodeParamsConfig-schema.json" target="nodeparams">node parameters JSON schema</a></li>
 	<li><a href="../../../../../raml/schemas/joe/job/monitor-schema.json" target="monitor">monitor JSON schema</a></li>
 	<li><a href="../../../../../raml/schemas/joe/schedule/holidaysConfig-schema.json" target="monitor">external holidays JSON schema</a></li>
-	<li><a href="../../../../../raml/schemas/joe/other/other-schema.json" target="monitor">external params and others JSON schema</a></li>
 </ul>
 </p>
