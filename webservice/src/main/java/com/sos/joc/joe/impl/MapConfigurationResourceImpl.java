@@ -133,7 +133,7 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
             String objType = objectType.replaceAll("_", "").toLowerCase();
             
             if (!CLASS_MAPPING.containsKey(objType)) {
-                throw new JobSchedulerBadRequestException("unsupported xml: " + objectType);
+                throw new JobSchedulerBadRequestException("unsupported json object: " + objectType);
             }
             
             // final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(requestBody, CLASS_MAPPING.get(objType)));

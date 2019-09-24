@@ -17,15 +17,15 @@ import com.sos.joc.joe.resource.IFolderResource;
 import com.sos.joc.model.joe.common.JSObjectEdit;
 import com.sos.joc.model.joe.other.Folder;
 
-@Path("joe/read")
+@Path("joe")
 public class FolderResourceImpl extends JOCResourceImpl implements IFolderResource {
 
     private static final String API_CALL = "./joe/read/folder";
 
     @Override
-    public JOCDefaultResponse read(final String accessToken, final JSObjectEdit body) {
+    public JOCDefaultResponse readFolder(final String accessToken, final JSObjectEdit body) {
         try {
-            // permission??
+            // TODO permission??
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -109,9 +109,9 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseHTMLStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseHTMLStatusJSError(e, getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 

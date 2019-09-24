@@ -13,9 +13,9 @@ import com.sos.joc.model.joe.common.JSObjectEdit;
 public interface IFolderResource {
     
     @POST
-    @Path("folder")
+    @Path("read/folder")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse read(@HeaderParam("X-Access-Token") final String accessToken, final JSObjectEdit body);   
+    public JOCDefaultResponse readFolder(@HeaderParam("X-Access-Token") final String accessToken, final JSObjectEdit body);   
 
 }
