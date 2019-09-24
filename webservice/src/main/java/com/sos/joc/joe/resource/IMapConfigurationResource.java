@@ -1,4 +1,4 @@
-package com.sos.joc.joe.common.resource;
+package com.sos.joc.joe.resource;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
@@ -12,10 +12,14 @@ import com.sos.joc.classes.JOCDefaultResponse;
 public interface IMapConfigurationResource {
     
     @POST
-    @Path("toJson")
+    @Path("tojson")
     @Consumes(MediaType.APPLICATION_XML)
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse toJson(@HeaderParam("X-Access-Token") final String accessToken, final byte[] requestBody);
     
-
+    @POST
+    @Path("toxml")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_XML })
+    public JOCDefaultResponse toXML(@HeaderParam("X-Access-Token") final String accessToken, final byte[] requestBody);
 }

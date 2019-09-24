@@ -935,6 +935,9 @@
             <xsd:attribute name="order" type="Order_id" use="required"/>
         </xsd:complexType>
     </xsd:element>
+    <xsd:element name="publish_event">
+        <xsd:complexType mixed="true"/>
+    </xsd:element>
     <xsd:element name="run_time" type="run_time"/>
     <!-- Für Order.Run_time.xml = "<run_time>" -->
     <xsd:element name="s" type="Show_state"/>
@@ -1426,6 +1429,7 @@
         <xsd:attribute name="remote_scheduler" type="String"/>
         <xsd:attribute name="spooler_id" type="Name"/>
         <xsd:attribute name="replace" type="Yes_no"/>
+        <xsd:attribute name="timeout" type="xsd:nonNegativeInteger"/>
     </xsd:complexType>
     <xsd:complexType name="process_class.remove">
         <xsd:attribute name="process_class" type="Path"/>
@@ -1484,6 +1488,7 @@
                 <xsd:element ref="holidays"/>
                 <xsd:element ref="holiday" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:choice>
+            <xsd:element name="calendars" type="xsd:anyType" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="schedule" type="String"/>
         <xsd:attribute name="name" type="Name"/>

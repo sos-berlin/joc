@@ -5,9 +5,13 @@
 	"javaType": "com.sos.joc.model.joe.other.Folder",
 	"type": "object",
 	"required": [
+		"deliveryDate",
 		"path"
 	],
 	"properties": {
+		"deliveryDate": {
+			"$ref": "../../common/deliveryDate-schema.json"
+		},
 		"path": {
 			"$ref": "../../common/path-schema.json"
 		},
@@ -59,13 +63,6 @@
 				"type": "string"
 			}
 		},
-		"params": {
-		    "description": "external parameter files for jobs and orders",
-			"type": "array",
-			"items": {
-				"type": "string"
-			}
-		},
 		"nodeParams": {
 			"description": "[jobChainName].config.xml files with node parameters",
 			"type": "array",
@@ -73,15 +70,8 @@
 				"type": "string"
 			}
 		},
-		"holidays": {
-			"description": "external holidays files",
-			"type": "array",
-			"items": {
-				"type": "string"
-			}
-		},
 		"others": {
-			"description": "external files, e.g. shell scripts to include in job's script",
+			"description": "external files, e.g. shell scripts to include in job's script, parameter files for jobs and orders, holidays files",
 			"type": "array",
 			"items": {
 				"type": "string"

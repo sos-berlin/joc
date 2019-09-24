@@ -44,6 +44,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
     "configurationDate",
     "jobschedulerId",
     "path",
+    "oldPath",
     "objectType",
     "deployed",
     "configuration",
@@ -84,6 +85,16 @@ public abstract class JSObjectEdit {
      */
     @JsonProperty("path")
     private String path;
+    /**
+     * oldPath
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * used for rename/move
+     * (Required)
+     * 
+     */
+    @JsonProperty("oldPath")
+    private String oldPath;
     /**
      * 
      * (Required)
@@ -221,6 +232,34 @@ public abstract class JSObjectEdit {
     }
     
     /**
+     * oldPath
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * (Required)
+     * 
+     * @return
+     *     The oldPath
+     */
+    @JsonProperty("oldPath")
+    public String getOldPath() {
+        return oldPath;
+    }
+
+    /**
+     * oldPath
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * (Required)
+     * 
+     * @param oldPath
+     *     The oldPath
+     */
+    @JsonProperty("oldPath")
+    public void setOldPath(String oldPath) {
+        this.oldPath = oldPath;
+    }
+    
+    /**
      * 
      * (Required)
      * 
@@ -345,7 +384,7 @@ public abstract class JSObjectEdit {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(configurationDate).append(jobschedulerId).append(path).append(objectType).append(deployed).append(configuration).append(account).append(auditLog).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(configurationDate).append(jobschedulerId).append(path).append(oldPath).append(objectType).append(deployed).append(configuration).append(account).append(auditLog).toHashCode();
     }
 
     @Override
@@ -357,7 +396,7 @@ public abstract class JSObjectEdit {
             return false;
         }
         JSObjectEdit rhs = ((JSObjectEdit) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(configurationDate, rhs.configurationDate).append(jobschedulerId, rhs.jobschedulerId).append(path, rhs.path).append(objectType, rhs.objectType).append(deployed, rhs.deployed).append(configuration, rhs.configuration).append(account, rhs.account).append(auditLog, rhs.auditLog).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(configurationDate, rhs.configurationDate).append(jobschedulerId, rhs.jobschedulerId).append(path, rhs.path).append(oldPath, rhs.oldPath).append(objectType, rhs.objectType).append(deployed, rhs.deployed).append(configuration, rhs.configuration).append(account, rhs.account).append(auditLog, rhs.auditLog).isEquals();
     }
     
     @JsonIgnore

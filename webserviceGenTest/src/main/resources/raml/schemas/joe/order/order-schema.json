@@ -27,6 +27,12 @@
       "$ref": "../common/params-schema.json"
     },
     "runTime": {
+      "xmlElement": "run_time_str",
+      "isXmlCData": true,
+      "description": "xml string of the run time",
+      "type": "string"
+    },
+    "runTimeJson": {
       "$ref": "../schedule/runTime-schema.json"
     }
   }

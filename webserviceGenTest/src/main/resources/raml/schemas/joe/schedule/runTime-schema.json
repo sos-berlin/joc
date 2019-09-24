@@ -4,7 +4,11 @@
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"javaType": "com.sos.joc.model.joe.schedule.RunTime",
 	"type": "object",
-	"extends" : {
+	"xmlElement": "run_time",
+	"javaInterfaces" : [
+    	"com.sos.joc.model.joe.common.IJSObject"
+  	],
+  	"extends" : {
   		"$ref": "superSchedule-schema.json"
   	},
   	"properties": {

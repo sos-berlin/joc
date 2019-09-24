@@ -72,6 +72,8 @@ public class Globals {
     public static Validator schemaValidator = null;
     public static ObjectMapper xmlMapper = new XmlMapper().configure(SerializationFeature.INDENT_OUTPUT, true).configure(
             DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    public static ObjectMapper objectMapper = new ObjectMapper().configure(SerializationFeature.INDENT_OUTPUT, true).configure(
+            DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {

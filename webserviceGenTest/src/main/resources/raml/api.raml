@@ -2878,14 +2878,52 @@ traits:
         description9: " "
         description10: " "
         description200: !include documentation/joe/readFolderAnswer.md
-        schema: !include schemas/joe/other/folder-schema.json
+        schema: !include schemas/joe/common/jsObjectEdit-schema.json
         schema200: !include schemas/joe/other/folder-schema.json
         example: " "
         example200: " "
   /store:
     type:
       postJSON:
-        description: Store configuration files
+        description: Store configuration files/folders
+        description1: !include documentation/joe/jsObject.md
+        description2: !include documentation/joe/jsConfiguration.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/joe/common/jsObjectEdit-schema.json
+        schema200: ok
+        example: !include examples/joe/jsObjectEdit-example.json
+        example200: " "
+  /rename:
+    type:
+      postJSON:
+        description: rename/move configuration files/folders
+        description1: !include documentation/joe/jsObject.md
+        description2: !include documentation/joe/oldPathRequired.md
+        description3: !include documentation/joe/jsConfiguration.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/joe/common/jsObjectEdit-schema.json
+        schema200: ok
+        example: !include examples/joe/jsObjectEdit-example.json
+        example200: " "
+  /delete:
+    type:
+      postJSON:
+        description: delete files/folders
         description1: !include documentation/joe/jsObject.md
         description2: " "
         description3: " "
