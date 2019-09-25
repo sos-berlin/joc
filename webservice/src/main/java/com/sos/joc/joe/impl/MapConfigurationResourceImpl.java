@@ -20,7 +20,6 @@ import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.resource.IMapConfigurationResource;
-import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.job.Monitor;
 import com.sos.joc.model.joe.jobchain.JobChain;
@@ -75,28 +74,28 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
                 ValidateXML.validateAgainstJobSchedulerSchema(new ByteArrayInputStream(requestBody));
             }
 
-            // final byte[] bytes = Globals.objectMapper.writeValueAsBytes(Globals.xmlMapper.readValue(requestBody, CLASS_MAPPING.get(objType)));
+            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(Globals.xmlMapper.readValue(requestBody, CLASS_MAPPING.get(objType)));
             // set runtime as xml string for job and order
 
-            IJSObject obj = null;
-            if ("job".equals(objType)) {
-                Job job = Globals.xmlMapper.readValue(requestBody, Job.class);
-                if (job.getRunTimeJson() != null) {
-                    job.setRunTime(Globals.objectMapper.writeValueAsString(job.getRunTimeJson()));
-                    job.setRunTimeJson(null);
-                }
-                obj = job;
-            } else if ("order".equals(objType)) {
-                Order order = Globals.xmlMapper.readValue(requestBody, Order.class);
-                if (order.getRunTimeJson() != null) {
-                    order.setRunTime(Globals.objectMapper.writeValueAsString(order.getRunTimeJson()));
-                    order.setRunTimeJson(null);
-                }
-                obj = order;
-            } else {
-                obj = (IJSObject) Globals.xmlMapper.readValue(requestBody, CLASS_MAPPING.get(objType));
-            }
-            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(obj);
+//            IJSObject obj = null;
+//            if ("job".equals(objType)) {
+//                Job job = Globals.xmlMapper.readValue(requestBody, Job.class);
+//                if (job.getRunTimeJson() != null) {
+//                    job.setRunTime(Globals.objectMapper.writeValueAsString(job.getRunTimeJson()));
+//                    job.setRunTimeJson(null);
+//                }
+//                obj = job;
+//            } else if ("order".equals(objType)) {
+//                Order order = Globals.xmlMapper.readValue(requestBody, Order.class);
+//                if (order.getRunTimeJson() != null) {
+//                    order.setRunTime(Globals.objectMapper.writeValueAsString(order.getRunTimeJson()));
+//                    order.setRunTimeJson(null);
+//                }
+//                obj = order;
+//            } else {
+//                obj = (IJSObject) Globals.xmlMapper.readValue(requestBody, CLASS_MAPPING.get(objType));
+//            }
+//            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(obj);
 
             StreamingOutput streamOut = new StreamingOutput() {
 
@@ -136,33 +135,33 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
                 throw new JobSchedulerBadRequestException("unsupported json object: " + objectType);
             }
             
-            // final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(requestBody, CLASS_MAPPING.get(objType)));
+            final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(requestBody, CLASS_MAPPING.get(objType)));
             // read runtime as xml string for job and order
             
-            IJSObject obj = null;
-            if ("job".equals(objType)) {
-                Job job = Globals.objectMapper.readValue(requestBody, Job.class);
-                if (job.getRunTime() != null && !job.getRunTime().isEmpty()) {
-                    job.setRunTimeJson(Globals.objectMapper.readValue(job.getRunTime(), RunTime.class));
-                    job.setRunTime(null);
-                } else if (job.getRunTimeJson() == null) {
-                    job.setRunTimeJson(new RunTime());
-                }
-                obj = job;
-            } else if ("order".equals(objType)) {
-                Order order = Globals.objectMapper.readValue(requestBody, Order.class);
-                if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
-                    order.setRunTimeJson(Globals.objectMapper.readValue(order.getRunTime(), RunTime.class));
-                    order.setRunTime(null);
-                } else if (order.getRunTimeJson() == null) {
-                    order.setRunTimeJson(new RunTime());
-                }
-                obj = order;
-            } else {
-                obj = (IJSObject) Globals.objectMapper.readValue(requestBody, CLASS_MAPPING.get(objType));
-            }
-
-            final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(obj);
+//            IJSObject obj = null;
+//            if ("job".equals(objType)) {
+//                Job job = Globals.objectMapper.readValue(requestBody, Job.class);
+//                if (job.getRunTime() != null && !job.getRunTime().isEmpty()) {
+//                    job.setRunTimeJson(Globals.objectMapper.readValue(job.getRunTime(), RunTime.class));
+//                    job.setRunTime(null);
+//                } else if (job.getRunTimeJson() == null) {
+//                    job.setRunTimeJson(new RunTime());
+//                }
+//                obj = job;
+//            } else if ("order".equals(objType)) {
+//                Order order = Globals.objectMapper.readValue(requestBody, Order.class);
+//                if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
+//                    order.setRunTimeJson(Globals.objectMapper.readValue(order.getRunTime(), RunTime.class));
+//                    order.setRunTime(null);
+//                } else if (order.getRunTimeJson() == null) {
+//                    order.setRunTimeJson(new RunTime());
+//                }
+//                obj = order;
+//            } else {
+//                obj = (IJSObject) Globals.objectMapper.readValue(requestBody, CLASS_MAPPING.get(objType));
+//            }
+//
+//            final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(obj);
 
             StreamingOutput streamOut = new StreamingOutput() {
 

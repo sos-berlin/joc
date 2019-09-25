@@ -51,7 +51,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
     "account",
     "auditLog"
 })
-public abstract class JSObjectEdit {
+public class JSObjectEdit {
 
     /**
      * delivery date

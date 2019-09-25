@@ -21,16 +21,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IReadFileResource;
 import com.sos.joc.model.joe.common.Filter;
-import com.sos.joc.model.joe.common.IJSObjectEdit;
 import com.sos.joc.model.joe.common.JSObjectEdit;
-import com.sos.joc.model.joe.job.JobEdit;
-import com.sos.joc.model.joe.job.MonitorEdit;
-import com.sos.joc.model.joe.jobchain.JobChainEdit;
-import com.sos.joc.model.joe.lock.LockEdit;
-import com.sos.joc.model.joe.order.OrderEdit;
-import com.sos.joc.model.joe.processclass.ProcessClass;
-import com.sos.joc.model.joe.processclass.ProcessClassEdit;
-import com.sos.joc.model.joe.schedule.ScheduleEdit;
 
 @Path("joe")
 public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileResource {
@@ -93,39 +84,40 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
                 }
             }
 
-            JSObjectEdit jsObjectEdit = null;
+            JSObjectEdit jsObjectEdit = new JSObjectEdit();
 
             switch (body.getObjectType()) {
             case JOB:
-                jsObjectEdit = new JobEdit();
                 jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.job.Job.class));
                 break;
             case ORDER:
-                jsObjectEdit = new OrderEdit();
                 jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.order.Order.class));
                 break;
             case JOBCHAIN:
-                jsObjectEdit = new JobChainEdit();
                 jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.jobchain.JobChain.class));
                 break;
             case LOCK:
-                jsObjectEdit = new LockEdit();
                 jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.lock.Lock.class));
                 break;
             case PROCESSCLASS:
             case AGENTCLUSTER:
-                jsObjectEdit = new ProcessClassEdit();
                 jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.processclass.ProcessClass.class));
                 break;
             case SCHEDULE:
-                jsObjectEdit = new ScheduleEdit();
                 jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.schedule.Schedule.class));
                 break;
             case MONITOR:
-                jsObjectEdit = new MonitorEdit();
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, ProcessClass.class));
+                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.job.Monitor.class));
                 break;
-            // TODO case for NODEPARAMS, HOLIDAYS, OTHERS
+            case NODEPARAMS:
+                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.nodeparams.Config.class));
+                break;
+            case HOLIDAYS:
+                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.schedule.HolidaysFile.class));
+                break;
+            case OTHER:
+                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.other.Other.class));
+                break;
             default:
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }

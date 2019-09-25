@@ -15,6 +15,9 @@
       "$ref": "../common/surveyDate_v-schema.json"
     },
     "runTime": {
+      "$ref": "../joe/schedule/runTime-schema.json"
+    },
+    "runTimeXML": {
       "type": "string"
     },
     "permanentRunTime": {

@@ -1,9 +1,13 @@
 package com.sos.joc.job.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
@@ -25,15 +29,10 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 	private static final String API_CALL = "./job/run_time";
 
 	@Override
-	public JOCDefaultResponse postJobRunTime(String xAccessToken, String accessToken, JobFilter jobFilter)
-			throws Exception {
-		return postJobRunTime(getAccessToken(xAccessToken, accessToken), jobFilter);
-	}
-
-	public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) throws Exception {
+	public JOCDefaultResponse postJobRunTimeWithXML(String accessToken, JobFilter jobFilter) {
 		SOSHibernateSession connection = null;
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL + "_xml", jobFilter, accessToken,
 					jobFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
 			if (jocDefaultResponse != null) {
@@ -44,9 +43,9 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 			String jobPath = normalizePath(jobFilter.getJob());
 			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 			String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
-			runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken);
+			runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, true);
 
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL + "_xml");
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
             List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(), "JOB",
                     jobPath);
@@ -69,6 +68,62 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 		} finally {
 			Globals.disconnect(connection);
 		}
-
 	}
+	
+	public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) {
+        SOSHibernateSession connection = null;
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
+                    jobFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            checkRequiredParameter("job", jobFilter.getJob());
+            RunTime200 runTimeAnswer = new RunTime200();
+            String jobPath = normalizePath(jobFilter.getJob());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+            String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
+            runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken);
+
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
+            List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(), "JOB",
+                    jobPath);
+            if (dbCalendars != null && !dbCalendars.isEmpty()) {
+                List<Calendar> calendars = new ArrayList<Calendar>();
+                for (CalendarUsageConfiguration dbCalendar : dbCalendars) {
+                    if (dbCalendar.getCalendar() != null) {
+                        calendars.add(dbCalendar.getCalendar());
+                    }
+                }
+                runTimeAnswer.getRunTime().setCalendars(calendars);
+            }
+            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(runTimeAnswer);
+            StreamingOutput streamOut = new StreamingOutput() {
+
+                @Override
+                public void write(OutputStream output) throws IOException {
+                    try {
+                        output.write(bytes);
+                        output.flush();
+                    } finally {
+                        try {
+                            output.close();
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+            };
+            return JOCDefaultResponse.responseStatus200(streamOut, MediaType.APPLICATION_JSON);
+            //return JOCDefaultResponse.responseStatus200(runTimeAnswer);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
+        }
+    }
 }

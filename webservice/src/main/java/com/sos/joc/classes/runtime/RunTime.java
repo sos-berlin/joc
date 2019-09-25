@@ -18,12 +18,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.model.common.RunTime200;
 
 public class RunTime {
-
+    
     public static RunTime200 set(String path, JOCXmlCommand jocXmlCommand, String postCommand, String xPath, String accessToken) throws Exception {
+        return set(path, jocXmlCommand, postCommand, xPath, accessToken, false);
+    }
+
+    public static RunTime200 set(String path, JOCXmlCommand jocXmlCommand, String postCommand, String xPath, String accessToken, boolean asXML) throws Exception {
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(postCommand, accessToken);
         RunTime200 runTimeAnswer = new RunTime200();
 
@@ -35,11 +40,14 @@ public class RunTime {
 
         if (runtimeNodes != null && runtimeNodes.getLength() > 0) { // adhoc and file orders
             Node runtimeNode = runtimeNodes.item(0);
-            runTime.setRunTime(getRuntimeXmlString(parent, runtimeNode));
+            runTime.setRunTimeXML(getRuntimeXmlString(parent, runtimeNode));
         } else {
-            runTime.setRunTime(getRuntimeXmlString(parent, null));
+            runTime.setRunTimeXML(getRuntimeXmlString(parent, null));
         }
-
+        if (!asXML) {
+            runTime.setRunTime(Globals.xmlMapper.readValue(runTime.getRunTimeXML(), com.sos.joc.model.joe.schedule.RunTime.class));
+            runTime.setRunTimeXML(null);
+        }
         runTimeAnswer.setRunTime(runTime);
         runTimeAnswer.setDeliveryDate(Date.from(Instant.now()));
         return runTimeAnswer;
