@@ -15,7 +15,13 @@ public interface IScheduleResourceConfiguration {
     @POST
     @Path("configuration")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postScheduleConfiguration(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ScheduleConfigurationFilter scheduleConfigurationFilterSchema)
-            throws Exception;
+    public JOCDefaultResponse postScheduleConfiguration(@HeaderParam("X-Access-Token") String xAccessToken,
+            ScheduleConfigurationFilter scheduleConfigurationFilterSchema);
+
+    @POST
+    @Path("run_time")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse postScheduleRunTime(@HeaderParam("X-Access-Token") String xAccessToken,
+            ScheduleConfigurationFilter scheduleConfigurationFilterSchema);
 
 }
