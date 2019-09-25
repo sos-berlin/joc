@@ -15,7 +15,7 @@ import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeleteResource;
-import com.sos.joc.model.joe.common.JSObjectEdit;
+import com.sos.joc.model.joe.common.Filter;
 
 @Path("joe")
 public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResource {
@@ -23,7 +23,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
     private static final String API_CALL = "./joe/delete";
 
     @Override
-    public JOCDefaultResponse delete(final String accessToken, final JSObjectEdit body) {
+    public JOCDefaultResponse delete(final String accessToken, final Filter body) {
         SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), Helper.hasPermission(body

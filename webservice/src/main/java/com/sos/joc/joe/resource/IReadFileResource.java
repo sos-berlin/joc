@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.joe.common.JSObjectEdit;
+import com.sos.joc.model.joe.common.Filter;
 
 public interface IReadFileResource {
     
@@ -16,6 +16,6 @@ public interface IReadFileResource {
     @Path("read/file")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse readFile(@HeaderParam("X-Access-Token") final String accessToken, final JSObjectEdit body);   
+    public JOCDefaultResponse readFile(@HeaderParam("X-Access-Token") final String accessToken, final Filter body);   
 
 }
