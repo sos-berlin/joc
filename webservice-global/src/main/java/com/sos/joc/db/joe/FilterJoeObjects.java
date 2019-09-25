@@ -1,11 +1,19 @@
 package com.sos.joc.db.joe;
 
+import com.sos.joc.model.joe.common.JSObjectEdit;
+
 public class FilterJoeObjects {
 
     private String schedulerId;
     private String objectType;
     private String account;
     private String path;
+    
+    public void setConstraint(JSObjectEdit filter) {
+        schedulerId = filter.getJobschedulerId();
+        objectType = filter.getObjectType().value();
+        path = filter.getPath();
+    }
 
     public String getSchedulerId() {
         return schedulerId;

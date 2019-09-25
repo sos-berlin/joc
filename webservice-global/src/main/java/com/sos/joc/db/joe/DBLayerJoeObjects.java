@@ -1,6 +1,10 @@
 package com.sos.joc.db.joe;
 
+import java.sql.Date;
+import java.time.Instant;
 import java.util.List;
+
+import javax.persistence.TemporalType;
 
 import org.hibernate.query.Query;
 
@@ -38,7 +42,7 @@ public class DBLayerJoeObjects {
         String and = " and ";
 
         if (filter.getSchedulerId() != null && !"".equals(filter.getSchedulerId())) {
-            where += and + " o.schedulerId = :schedulerId";
+            where += and + " schedulerId = :schedulerId";
             and = " and ";
         }
 
@@ -92,22 +96,23 @@ public class DBLayerJoeObjects {
         return sosHibernateSession.getResultList(query);
     }
 
-    public DBItemJoeObject getJoeObject(FilterJoeObjects filter) throws SOSHibernateException {
-        String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
+    public DBItemJoeObject getJoeObject(FilterJoeObjects filter) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
 
-        Query<DBItemJoeObject> query = sosHibernateSession.createQuery(q);
-        query = bindParameters(filter, query);
+            Query<DBItemJoeObject> query = sosHibernateSession.createQuery(q);
+            query = bindParameters(filter, query);
 
-        query.setMaxResults(1);
-        List<DBItemJoeObject> l = sosHibernateSession.getResultList(query);
-        if (l.size() == 0) {
-            return null;
-        } else {
-            return sosHibernateSession.getResultList(query).get(0);
+            return sosHibernateSession.getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
         }
     }
-    
-    public List<DBItemJoeObject> getFolderContentRecursive(final String schedulerId, final String path) throws DBConnectionRefusedException, DBInvalidDataException {
+
+    public List<DBItemJoeObject> getFolderContentRecursive(final String schedulerId, final String path) throws DBConnectionRefusedException,
+            DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBLayer.DBITEM_JOE_OBJECT);
@@ -121,6 +126,44 @@ public class DBLayerJoeObjects {
                 query.setParameter("path", path + "/%");
             }
             return sosHibernateSession.getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public Integer updateOperationRecursive(DBItemJoeObject folderItem) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("update ").append(DBLayer.DBITEM_JOE_OBJECT);
+            sql.append(" set operation = :operation,");
+            sql.append(" set account = :account,");
+            sql.append(" set modified = :modified");
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and (path like :parentPath or path = :path");
+            Query<Integer> query = sosHibernateSession.createQuery(sql.toString());
+            query.setParameter("schedulerId", folderItem.getSchedulerId());
+            if (folderItem.getPath().endsWith("/")) {
+                query.setParameter("parentPath", folderItem.getPath() + "%");
+            } else {
+                query.setParameter("parentPath", folderItem.getPath() + "/%");
+            }
+            query.setParameter("path", folderItem.getPath());
+            query.setParameter("account", folderItem.getAccount());
+            query.setParameter("modified", Date.from(Instant.now()), TemporalType.TIMESTAMP);
+            return sosHibernateSession.executeUpdate(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public void update(DBItemJoeObject item) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            item.setModified(Date.from(Instant.now()));
+            sosHibernateSession.update(item);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

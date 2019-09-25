@@ -6,9 +6,12 @@ import java.time.Instant;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.db.joe.DBLayerJoeObjects;
+import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeleteResource;
@@ -40,15 +43,23 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 return accessDeniedResponse();
             }
             
-            Globals.beginTransaction(connection);
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(connection);
+            FilterJoeObjects filter = new FilterJoeObjects();
+            filter.setConstraint(body);
+            DBItemJoeObject item = dbLayer.getJoeObject(filter);
             
-            if (isDirectory) {
-                // update delete=true where schedulerId and (path like :path% or path = :path)
-            } else {
-                // update delete=true where schedulerId = :schedulerId and path = :path and objectType = :objectType
+            if (item != null) {
+                item.setOperation("delete");
+                item.setAccount(getAccount());
+                if (isDirectory) {
+                    Globals.beginTransaction(connection);
+                    dbLayer.updateOperationRecursive(item);
+                    Globals.commit(connection);
+                } else {
+                    dbLayer.update(item);
+                }
             }
-            
-            Globals.commit(connection);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

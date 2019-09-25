@@ -308,6 +308,14 @@ public class JOCResourceImpl {
             return null;
         }
     }
+    
+    public String getAccount() {
+        try {
+            return jobschedulerUser.getSosShiroCurrentUser().getUsername().trim();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public String retrySchedulerInstance() throws JocException {
         return retrySchedulerInstance(null);
