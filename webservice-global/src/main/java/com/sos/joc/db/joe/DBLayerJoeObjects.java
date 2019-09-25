@@ -1,7 +1,7 @@
 package com.sos.joc.db.joe;
 
-import java.sql.Date;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.TemporalType;

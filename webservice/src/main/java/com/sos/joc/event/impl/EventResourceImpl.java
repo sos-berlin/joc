@@ -1,8 +1,8 @@
 package com.sos.joc.event.impl;
 
-import java.sql.Date;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

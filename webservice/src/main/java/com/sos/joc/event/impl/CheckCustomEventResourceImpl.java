@@ -1,7 +1,7 @@
 package com.sos.joc.event.impl;
 
-import java.sql.Date;
 import java.time.Instant;
+import java.util.Date;
 
 import javax.ws.rs.Path;
 

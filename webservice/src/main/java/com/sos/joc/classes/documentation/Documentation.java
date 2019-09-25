@@ -1,7 +1,7 @@
 package com.sos.joc.classes.documentation;
 
-import java.sql.Date;
 import java.time.Instant;
+import java.util.Date;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;

@@ -1,9 +1,9 @@
 package com.sos.joc.joe.impl;
 
 import java.nio.file.Paths;
-import java.sql.Date;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.sos.joc.documentation.impl;
 
 import java.io.UnsupportedEncodingException;
-import java.sql.Date;
 import java.time.Instant;
+import java.util.Date;
 
 import javax.ws.rs.Path;
 
