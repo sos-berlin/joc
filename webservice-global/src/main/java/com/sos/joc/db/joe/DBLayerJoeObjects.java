@@ -62,7 +62,7 @@ public class DBLayerJoeObjects {
         }
 
         if (!"".equals(where.trim())) {
-            where = "where " + where;
+            where = " where " + where;
         }
         return where;
     }

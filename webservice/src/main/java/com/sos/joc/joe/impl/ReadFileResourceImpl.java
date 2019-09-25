@@ -5,6 +5,9 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
@@ -18,6 +21,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IReadFileResource;
 import com.sos.joc.model.joe.common.Filter;
+import com.sos.joc.model.joe.common.IJSObjectEdit;
 import com.sos.joc.model.joe.common.JSObjectEdit;
 import com.sos.joc.model.joe.job.JobEdit;
 import com.sos.joc.model.joe.job.MonitorEdit;
@@ -32,6 +36,7 @@ import com.sos.joc.model.joe.schedule.ScheduleEdit;
 public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileResource {
 
     private static final String API_CALL = "./joe/read/file";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReadFileResourceImpl.class);
 
     @Override
     public JOCDefaultResponse readFile(final String accessToken, final Filter body) {
@@ -45,29 +50,51 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
 
             checkRequiredParameter("path", body.getPath());
             String path = normalizePath(body.getPath());
+            if (!folderPermissions.isPermittedForFolder(getParent(path))) {
+                return accessDeniedResponse();
+            }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             DBLayerJoeObjects dbLayerJoeObjects = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
             filterJoeObjects.setConstraint(body);
-            
+
             DBItemJoeObject dbItemJoeObject = dbLayerJoeObjects.getJoeObject(filterJoeObjects);
 
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-            byte[] fileContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
-            Date configurationDate = null;
-            
-            if (dbItemJoeObject == null || jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
-                //TODO muss hier der Satz in der DB geloescht werden, wenn vorhanden??
-                configurationDate = jocHotFolder.getLastModifiedDate();
-            } else {
-                configurationDate = dbItemJoeObject.getModified();
-                fileContent = dbItemJoeObject.getConfiguration().getBytes();
+            byte[] fileContent = null;
+            boolean fileRead = false;
+            try {
+                fileContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
+                fileRead = true;
+                /*
+                 * ForcedClosingHttpClientException JobSchedulerConnectionResetException JobSchedulerConnectionRefusedException JobSchedulerNoResponseException
+                 * JobSchedulerBadRequestException JocException
+                 */
+            } catch (Exception e) {
+                LOGGER.warn(e.getMessage());
             }
-            
+            Date configurationDate = null;
+
+            if (fileRead) {
+                if (dbItemJoeObject == null || jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
+                    configurationDate = jocHotFolder.getLastModifiedDate();
+                } else {
+                    configurationDate = dbItemJoeObject.getModified();
+                    fileContent = dbItemJoeObject.getConfiguration().getBytes();
+                }
+            } else {
+                if (dbItemJoeObject != null) {
+                    configurationDate = dbItemJoeObject.getModified();
+                    fileContent = dbItemJoeObject.getConfiguration().getBytes();
+                }else {
+                    fileContent = "".getBytes();
+                }
+            }
+
             JSObjectEdit jsObjectEdit = null;
-            
+
             switch (body.getObjectType()) {
             case JOB:
                 jsObjectEdit = new JobEdit();
@@ -98,11 +125,11 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
                 jsObjectEdit = new MonitorEdit();
                 jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, ProcessClass.class));
                 break;
-            //TODO case for NODEPARAMS, HOLIDAYS, OTHERS
+            // TODO case for NODEPARAMS, HOLIDAYS, OTHERS
             default:
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
-            
+
             jsObjectEdit.setDeployed(dbItemJoeObject == null);
             jsObjectEdit.setConfigurationDate(configurationDate);
             jsObjectEdit.setJobschedulerId(body.getJobschedulerId());

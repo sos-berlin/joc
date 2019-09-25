@@ -19,8 +19,8 @@ import com.sos.joc.model.configuration.Profile;
 /** @author Uwe Risse */
 public class JocConfigurationDbLayer extends DBLayer {
 
-    private static final String JOC_CONFIGURATION_DB_ITEM = JocConfigurationDbItem.class.getName();
-    private static final String CONFIGURATION_PROFILE = ConfigurationProfile.class.getName();
+    private static final String JOC_CONFIGURATION_DB_ITEM = JocConfigurationDbItem.class.getSimpleName();
+    private static final String CONFIGURATION_PROFILE = ConfigurationProfile.class.getSimpleName();
     private JocConfigurationFilter filter = null;
 
     public JocConfigurationDbLayer(SOSHibernateSession sosHibernateSession) {
