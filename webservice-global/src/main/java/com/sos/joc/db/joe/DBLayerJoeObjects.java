@@ -120,11 +120,7 @@ public class DBLayerJoeObjects {
             sql.append(" and path like :path");
             Query<DBItemJoeObject> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
-            if (path.endsWith("/")) {
-                query.setParameter("path", path + "%");
-            } else {
-                query.setParameter("path", path + "/%");
-            }
+            query.setParameter("path", path + "/%");
             return sosHibernateSession.getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
@@ -139,16 +135,13 @@ public class DBLayerJoeObjects {
             sql.append("update ").append(DBLayer.DBITEM_JOE_OBJECT);
             sql.append(" set operation = :operation,");
             sql.append(" set account = :account,");
+            sql.append(" set deployed = false,");
             sql.append(" set modified = :modified");
             sql.append(" where schedulerId = :schedulerId");
             sql.append(" and (path like :parentPath or path = :path");
             Query<Integer> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", folderItem.getSchedulerId());
-            if (folderItem.getPath().endsWith("/")) {
-                query.setParameter("parentPath", folderItem.getPath() + "%");
-            } else {
-                query.setParameter("parentPath", folderItem.getPath() + "/%");
-            }
+            query.setParameter("parentPath", folderItem.getPath() + "/%");
             query.setParameter("path", folderItem.getPath());
             query.setParameter("account", folderItem.getAccount());
             query.setParameter("modified", Date.from(Instant.now()), TemporalType.TIMESTAMP);
@@ -164,6 +157,17 @@ public class DBLayerJoeObjects {
         try {
             item.setModified(Date.from(Instant.now()));
             sosHibernateSession.update(item);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public void save(DBItemJoeObject item) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            item.setModified(Date.from(Instant.now()));
+            sosHibernateSession.save(item);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

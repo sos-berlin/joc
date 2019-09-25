@@ -52,6 +52,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             if (item != null) {
                 item.setOperation("delete");
                 item.setAccount(getAccount());
+                item.setDeployed(false);
                 if (isDirectory) {
                     Globals.beginTransaction(connection);
                     dbLayer.updateOperationRecursive(item);
@@ -59,6 +60,18 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 } else {
                     dbLayer.update(item);
                 }
+            } else {
+                item = new DBItemJoeObject();
+                item.setId(null);
+                item.setAccount(getAccount());
+                item.setSchedulerId(body.getJobschedulerId());
+                item.setAuditLogId(null);
+                item.setConfiguration(null);
+                item.setDeployed(false);
+                item.setObjectType(body.getObjectType().value());
+                item.setOperation("delete");
+                item.setPath(body.getPath());
+                dbLayer.save(item);
             }
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));

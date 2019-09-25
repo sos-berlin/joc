@@ -42,18 +42,19 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             }
 
             checkRequiredParameter("path", body.getPath());
-            String path = normalizeFolder(body.getPath() + "/");
+            body.setPath(normalizeFolder(body.getPath()));
+            String path = (body.getPath() + "/").replaceAll("//+", "/");
 
-            if (!isPermittedForFolder(path)) {
+            if (!isPermittedForFolder(body.getPath())) {
                 return accessDeniedResponse();
             }
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(connection);
 
-            final int parentDepth = Paths.get(path).getNameCount();
+            final int parentDepth = Paths.get(body.getPath()).getNameCount();
             //Map: grouped by DBItemJoeObject::isDeleted -> DBItemJoeObject::objectType -> DBItemJoeObject::path collection
-            Map<Boolean, Map<String, Set<String>>> folderContent = dbLayer.getFolderContentRecursive(body.getJobschedulerId(), path).stream().filter(
+            Map<Boolean, Map<String, Set<String>>> folderContent = dbLayer.getFolderContentRecursive(body.getJobschedulerId(), body.getPath()).stream().filter(
                     item -> {
                         return Paths.get(item.getPath()).getParent().getNameCount() == parentDepth; //not recursive
                     }).collect(Collectors.groupingBy(DBItemJoeObject::isDeleted, Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors
@@ -149,7 +150,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                 entity.setOthers(folderContentToAdd.get("OTHER"));
             }
             entity.setDeliveryDate(Date.from(Instant.now()));
-            entity.setPath(path);
+            entity.setPath(body.getPath());
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
