@@ -1,6 +1,6 @@
 {
   "title": "abstract super class for editing all JobScheduler Objects",
-  "id": "schemas/joe/common/include",
+  "id": "schemas/joe/common/jsObjectEdit",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.common.JSObjectEdit",
   "type": "object",

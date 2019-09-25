@@ -5,7 +5,7 @@ import com.sos.jitl.reporting.helper.EConfigFileExtensions;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 
 public class Helper {
-    
+
     public static boolean hasPermission(JobSchedulerObjectType objectType, SOSPermissionJocCockpit sosPermission) {
         switch (objectType) {
         case MONITOR:
@@ -57,12 +57,14 @@ public class Helper {
         case MONITOR:
             fileExtension = EConfigFileExtensions.MONITOR.extension();
             break;
-
+        case NODEPARAMS:
+            fileExtension = ".config.xml";
+            break;
         default:
             break;
         }
         return fileExtension;
 
     }
-    
+
 }

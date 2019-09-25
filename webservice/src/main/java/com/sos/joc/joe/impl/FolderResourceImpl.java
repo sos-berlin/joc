@@ -24,7 +24,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.resource.IFolderResource;
-import com.sos.joc.model.joe.common.JSObjectEdit;
+import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.other.Folder;
 
 @Path("joe")
@@ -33,7 +33,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
     private static final String API_CALL = "./joe/read/folder";
 
     @Override
-    public JOCDefaultResponse readFolder(final String accessToken, final JSObjectEdit body) {
+    public JOCDefaultResponse readFolder(final String accessToken, final Filter body) {
         SOSHibernateSession connection = null;
         try {
             //JSObjectEdit body = Globals.objectMapper.readValue(responseBody, JSObjectEdit.class);
