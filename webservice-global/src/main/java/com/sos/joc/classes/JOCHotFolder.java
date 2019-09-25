@@ -68,6 +68,7 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     }
 
     public JsonArray getFolder(String path) throws JocException {
+        path = (path + "/").replaceAll("//+", "/");
         return getFolder(getURI(path));
     }
 

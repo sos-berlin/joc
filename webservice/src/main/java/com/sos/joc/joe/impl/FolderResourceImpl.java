@@ -36,6 +36,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
     public JOCDefaultResponse readFolder(final String accessToken, final JSObjectEdit body) {
         SOSHibernateSession connection = null;
         try {
+            //JSObjectEdit body = Globals.objectMapper.readValue(responseBody, JSObjectEdit.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -45,7 +46,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             body.setPath(normalizeFolder(body.getPath()));
             String path = (body.getPath() + "/").replaceAll("//+", "/");
 
-            if (!isPermittedForFolder(body.getPath())) {
+            if (!folderPermissions.isPermittedForFolder(body.getPath())) {
                 return accessDeniedResponse();
             }
 
@@ -53,11 +54,11 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(connection);
 
             final int parentDepth = Paths.get(body.getPath()).getNameCount();
-            //Map: grouped by DBItemJoeObject::isDeleted -> DBItemJoeObject::objectType -> DBItemJoeObject::path collection
+            //Map: grouped by DBItemJoeObject::operationIsDelete -> DBItemJoeObject::objectType -> DBItemJoeObject::path collection
             Map<Boolean, Map<String, Set<String>>> folderContent = dbLayer.getFolderContentRecursive(body.getJobschedulerId(), body.getPath()).stream().filter(
                     item -> {
                         return Paths.get(item.getPath()).getParent().getNameCount() == parentDepth; //not recursive
-                    }).collect(Collectors.groupingBy(DBItemJoeObject::isDeleted, Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors
+                    }).collect(Collectors.groupingBy(DBItemJoeObject::operationIsDelete, Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors
                             .mapping(DBItemJoeObject::getPath, Collectors.toSet()))));
             folderContent.putIfAbsent(Boolean.FALSE, new HashMap<String, Set<String>>());
             folderContent.putIfAbsent(Boolean.TRUE, new HashMap<String, Set<String>>());
@@ -76,7 +77,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             }
             
             for (String folder: folderContentToAdd.get("FOLDER")) {
-                if (!isPermittedForFolder(folder)) {
+                if (!folderPermissions.isPermittedForFolder(folder)) {
                     folderContentToDelete.get("FOLDER").add(folder);
                 }
             }
@@ -90,7 +91,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                     continue;
                 }
                 if (s.endsWith("/")) {
-                    if (isPermittedForFolder(path + s)) {
+                    if (folderPermissions.isPermittedForFolder(path + s)) {
                         folderContentToAdd.get("FOLDER").add(s.replaceFirst("/$", ""));
                     }
                 } else if (s.endsWith(".job.xml")) {

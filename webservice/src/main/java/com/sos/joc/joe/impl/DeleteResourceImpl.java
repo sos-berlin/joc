@@ -26,7 +26,8 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
     public JOCDefaultResponse delete(final String accessToken, final JSObjectEdit body) {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), Helper.hasPermission(body
+                    .getObjectType(), getPermissonsJocCockpit(body.getJobschedulerId(), accessToken)));
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -35,20 +36,23 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             checkRequiredParameter("objectType", body.getObjectType().value());
             boolean isDirectory = body.getPath().endsWith("/");
             String path = isDirectory ? normalizeFolder(body.getPath()) : normalizePath(body.getPath());
-            
-            if (!Helper.hasPermission(body.getObjectType(), getPermissonsJocCockpit(body.getJobschedulerId(), accessToken))) {
-                return accessDeniedResponse();
+
+            if (isDirectory) {
+                if (!folderPermissions.isPermittedForFolder(path)) {
+                    return accessDeniedResponse();
+                }
+            } else {
+                if (!folderPermissions.isPermittedForFolder(getParent(path))) {
+                    return accessDeniedResponse();
+                }
             }
-            if (!isPermittedForFolder(path)) {
-                return accessDeniedResponse();
-            }
-            
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(connection);
             FilterJoeObjects filter = new FilterJoeObjects();
             filter.setConstraint(body);
             DBItemJoeObject item = dbLayer.getJoeObject(filter);
-            
+
             if (item != null) {
                 item.setOperation("delete");
                 item.setAccount(getAccount());
