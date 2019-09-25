@@ -15,6 +15,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IReadFileResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.JSObjectEdit;
@@ -49,7 +50,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             DBItemJoeObject dbItemJoeObject = dbLayerJoeObjects.getJoeObject(filterJoeObjects);
 
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-            byte[] fileContent = jocHotFolder.getFile(path + this.getFileExtension(body.getObjectType()));
+            byte[] fileContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
             
             if (dbItemJoeObject == null || jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
                 body.setConfigurationDate(jocHotFolder.getLastModifiedDate());
@@ -60,27 +61,26 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             
             body.setDeployed(false);
 
-            switch (body.getObjectType().value()) {
-            case "JOB":
+            switch (body.getObjectType()) {
+            case JOB:
                 body.setConfiguration(Globals.xmlMapper.readValue(fileContent, ProcessClass.class));
                 break;
-            case "ORDER":
+            case ORDER:
                 body.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.order.Order.class));
                 break;
-            case "JOB_CHAIN":
+            case JOBCHAIN:
                 body.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.jobchain.JobChain.class));
                 break;
-            case "LOCK":
+            case LOCK:
                 body.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.lock.Lock.class));
                 break;
-            case "PROCESS_CLASS":
-            case "AGENTCLUSTER":
+            case PROCESSCLASS:
+            case AGENTCLUSTER:
                 body.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.processclass.ProcessClass.class));
                 break;
-            case "SCHEDULE":
-                body.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.schedule.Schedule.class));
+            case SCHEDULE:                body.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.schedule.Schedule.class));
                 break;
-            case "MONITOR":
+            case MONITOR:
                 body.setConfiguration(Globals.xmlMapper.readValue(fileContent, ProcessClass.class));
                 break;
 
@@ -101,37 +101,6 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
         }
     }
 
-    private String getFileExtension(JobSchedulerObjectType jobSchedulerObjectType) {
-        String fileExtension = "";
-        switch (jobSchedulerObjectType.value()) {
-        case "JOB":
-            fileExtension = EConfigFileExtensions.JOB.extension();
-            break;
-        case "ORDER":
-            fileExtension = EConfigFileExtensions.ORDER.extension();
-            break;
-        case "JOB_CHAIN":
-            fileExtension = EConfigFileExtensions.JOB_CHAIN.extension();
-            break;
-        case "LOCK":
-            fileExtension = EConfigFileExtensions.LOCK.extension();
-            break;
-        case "PROCESS_CLASS":
-        case "AGENTCLUSTER":
-            fileExtension = EConfigFileExtensions.PROCESS_CLASS.extension();
-            break;
-        case "SCHEDULE":
-            fileExtension = EConfigFileExtensions.SCHEDULE.extension();
-            break;
-        case "MONITOR":
-            fileExtension = EConfigFileExtensions.MONITOR.extension();
-            break;
-
-        default:
-            break;
-        }
-        return fileExtension;
-
-    }
+  
 
 }
