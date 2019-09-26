@@ -41,6 +41,7 @@ import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.exceptions.UnknownJobSchedulerMasterException;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 
 public class JOCResourceImpl {
 
@@ -206,6 +207,13 @@ public class JOCResourceImpl {
 
     public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null || paramVal.isEmpty()) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+        }
+        return true;
+    }
+    
+    public boolean checkRequiredParameter(String paramKey, JobSchedulerObjectType paramVal) throws JocMissingRequiredParameterException {
+        if (paramVal == null || paramVal.value().isEmpty()) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
         }
         return true;

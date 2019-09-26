@@ -21,11 +21,11 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
     private static final String API_CALL = "./joe/read/file";
 
     @Override
-    //public JOCDefaultResponse storeFile(final String accessToken, final JSObjectEdit body) {
-       public JOCDefaultResponse storeFile(final String accessToken, final byte[] jsObj) {
+    public JOCDefaultResponse storeFile(final String accessToken, final byte[] jsObj) {
         SOSHibernateSession sosHibernateSession = null;
         try {
             JSObjectEdit body = Globals.objectMapper.readValue(jsObj, JSObjectEdit.class);
+            checkRequiredParameter("objectType", body.getObjectType());
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), Helper.hasPermission(body
                     .getObjectType(), getPermissonsJocCockpit(body.getJobschedulerId(), accessToken)));
             if (jocDefaultResponse != null) {
@@ -41,7 +41,6 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 }
 
             } else {
-
                 if (!this.folderPermissions.isPermittedForFolder(getParent(path))) {
                     return accessDeniedResponse();
                 }

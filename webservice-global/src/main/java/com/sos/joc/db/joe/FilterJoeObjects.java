@@ -1,6 +1,7 @@
 package com.sos.joc.db.joe;
 
 import com.sos.joc.model.joe.common.Filter;
+import com.sos.joc.model.joe.common.JSObjectEdit;
 
 public class FilterJoeObjects {
 
@@ -8,7 +9,7 @@ public class FilterJoeObjects {
     private String objectType;
     private String account;
     private String path;
-    
+
     public void setConstraint(Filter filter) {
         schedulerId = filter.getJobschedulerId();
         objectType = filter.getObjectType().value();
@@ -45,6 +46,12 @@ public class FilterJoeObjects {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public void setConstraint(JSObjectEdit body) {
+        schedulerId = body.getJobschedulerId();
+        objectType = body.getObjectType().value();
+        path = body.getPath();
     }
 
 }

@@ -39,6 +39,9 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
     public JOCDefaultResponse readFile(final String accessToken, final Filter body) {
         SOSHibernateSession sosHibernateSession = null;
         try {
+
+            checkRequiredParameter("objectType", body.getObjectType());
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), Helper.hasPermission(body
                     .getObjectType(), getPermissonsJocCockpit(body.getJobschedulerId(), accessToken)));
             if (jocDefaultResponse != null) {
@@ -46,7 +49,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             }
 
             checkRequiredParameter("path", body.getPath());
-            if(!Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
+            if (!Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
             String path = normalizePath(body.getPath());
@@ -66,43 +69,48 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
             byte[] fileContent = null;
             boolean fileRead = false;
-            boolean fileIsXML = true;
+            boolean fileIsXML = false;
             try {
                 fileContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
                 fileRead = true;
-                /*
-                 * ForcedClosingHttpClientException JobSchedulerConnectionResetException JobSchedulerConnectionRefusedException JobSchedulerNoResponseException
-                 * JobSchedulerBadRequestException JobSchedulerObjectNotExistException
-                 */
+                fileIsXML = true;
             } catch (JocException e) {
                 LOGGER.warn(e.getMessage());
-                //jsObjectEdit.set_message(e.getClass().getSimpleName());
             }
 
-            
             if (fileRead) {
-                if (dbItemJoeObject == null || jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
+                if (dbItemJoeObject == null) {
                     jsObjectEdit.setConfigurationDate(jocHotFolder.getLastModifiedDate());
+                    jsObjectEdit.set_message("Using version in live folde. No draft version found in database");
                 } else {
-                    jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
-                    fileContent = dbItemJoeObject.getConfiguration().getBytes();
-                    fileIsXML = false;
+                    if (jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
+                        jsObjectEdit.setConfigurationDate(jocHotFolder.getLastModifiedDate());
+                        jsObjectEdit.set_message("Version in live folder is newer then draft version in database");
+                    } else {
+                        jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
+                        fileContent = dbItemJoeObject.getConfiguration().getBytes();
+                        fileIsXML = false;
+                        jsObjectEdit.set_message("Draft version in database is newer then the version in the live folder");
+                    }
                 }
             } else {
                 if (dbItemJoeObject != null) {
                     jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
                     fileContent = dbItemJoeObject.getConfiguration().getBytes();
+                    jsObjectEdit.set_message("Using Draft version in databas. No configuration found in the live folder");
                     fileIsXML = false;
                 } else {
                     fileContent = null;
                 }
             }
-            
+
             if (fileContent != null) {
                 if (fileIsXML) {
-                    jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType().value())));
+                    jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType()
+                            .value())));
                 } else {
-                    jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType().value())));
+                    jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body
+                            .getObjectType().value())));
                 }
             }
             jsObjectEdit.setDeployed(dbItemJoeObject == null);
@@ -110,9 +118,9 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             jsObjectEdit.setPath(path);
             jsObjectEdit.setObjectType(body.getObjectType());
             jsObjectEdit.setDeliveryDate(Date.from(Instant.now()));
-            
+
             final byte[] bytes = Globals.objectMapper.writeValueAsBytes(jsObjectEdit);
-            
+
             StreamingOutput streamOut = new StreamingOutput() {
 
                 @Override
