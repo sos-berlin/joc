@@ -9,6 +9,9 @@
   	"deliveryDate": {
     	"$ref": "../../common/deliveryDate-schema.json"
     },
+    "_message": {
+    	"type": "string"
+    },
     "configurationDate": {
       	"$ref": "../../common/timestamp-schema.json"
     },

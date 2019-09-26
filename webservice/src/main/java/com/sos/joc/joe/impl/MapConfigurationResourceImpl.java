@@ -3,9 +3,6 @@ package com.sos.joc.joe.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -19,40 +16,14 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IMapConfigurationResource;
-import com.sos.joc.model.joe.job.Job;
-import com.sos.joc.model.joe.job.Monitor;
-import com.sos.joc.model.joe.jobchain.JobChain;
-import com.sos.joc.model.joe.lock.Lock;
-import com.sos.joc.model.joe.nodeparams.Config;
-import com.sos.joc.model.joe.order.Order;
-import com.sos.joc.model.joe.processclass.ProcessClass;
-import com.sos.joc.model.joe.schedule.HolidaysFile;
-import com.sos.joc.model.joe.schedule.RunTime;
-import com.sos.joc.model.joe.schedule.Schedule;
 
 @Path("joe")
 public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMapConfigurationResource {
 
     private static final String API_CALL_JSON = "./joe/tojson";
     private static final String API_CALL_XML = "./joe/toxml";
-    private static final Map<String, Class<?>> CLASS_MAPPING = Collections.unmodifiableMap(new HashMap<String, Class<?>>() {
-
-        private static final long serialVersionUID = 1L;
-
-        {
-            put("job", Job.class);
-            put("order", Order.class);
-            put("jobchain", JobChain.class);
-            put("processclass", ProcessClass.class);
-            put("lock", Lock.class);
-            put("schedule", Schedule.class);
-            put("monitor", Monitor.class);
-            put("settings", Config.class);
-            put("holidays", HolidaysFile.class);
-            put("runtime", RunTime.class);
-        }
-    });
 
     @Override
     public JOCDefaultResponse toJson(final String accessToken, final byte[] requestBody) {
@@ -65,16 +36,19 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
             SAXReader reader = new SAXReader();
             reader.setValidation(false);
             final String rootElementName = reader.read(new ByteArrayInputStream(requestBody)).getRootElement().getName().toLowerCase();
-            final String objType = rootElementName.replaceAll("_", "");
+            String objType = rootElementName.replaceAll("_", "").toUpperCase();
+            if ("SETTINGS".equals(objType)) {
+                objType = "NODEPARAMS";
+            }
 
-            if (!CLASS_MAPPING.containsKey(objType)) {
+            if (!Helper.CLASS_MAPPING.containsKey(objType)) {
                 throw new JobSchedulerBadRequestException("unsupported xml: " + rootElementName);
             }
             if (!"settings".equals(objType)) {
                 ValidateXML.validateAgainstJobSchedulerSchema(new ByteArrayInputStream(requestBody));
             }
 
-            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(Globals.xmlMapper.readValue(requestBody, CLASS_MAPPING.get(objType)));
+            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(Globals.xmlMapper.readValue(requestBody, Helper.CLASS_MAPPING.get(objType)));
             // set runtime as xml string for job and order
 
 //            IJSObject obj = null;
@@ -129,13 +103,13 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
                 return jocDefaultResponse;
             }
 
-            String objType = objectType.replaceAll("_", "").toLowerCase();
+            String objType = objectType.replaceAll("_", "").toUpperCase();
             
-            if (!CLASS_MAPPING.containsKey(objType)) {
+            if (!Helper.CLASS_MAPPING.containsKey(objType)) {
                 throw new JobSchedulerBadRequestException("unsupported json object: " + objectType);
             }
             
-            final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(requestBody, CLASS_MAPPING.get(objType)));
+            final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(requestBody, Helper.CLASS_MAPPING.get(objType)));
             // read runtime as xml string for job and order
             
 //            IJSObject obj = null;

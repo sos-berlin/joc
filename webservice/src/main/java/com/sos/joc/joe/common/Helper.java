@@ -1,10 +1,44 @@
 package com.sos.joc.joe.common;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.helper.EConfigFileExtensions;
 import com.sos.joc.model.common.JobSchedulerObjectType;
+import com.sos.joc.model.joe.job.Job;
+import com.sos.joc.model.joe.job.Monitor;
+import com.sos.joc.model.joe.jobchain.JobChain;
+import com.sos.joc.model.joe.lock.Lock;
+import com.sos.joc.model.joe.nodeparams.Config;
+import com.sos.joc.model.joe.order.Order;
+import com.sos.joc.model.joe.other.Other;
+import com.sos.joc.model.joe.processclass.ProcessClass;
+import com.sos.joc.model.joe.schedule.HolidaysFile;
+import com.sos.joc.model.joe.schedule.RunTime;
+import com.sos.joc.model.joe.schedule.Schedule;
 
 public class Helper {
+    
+    public static final Map<String, Class<?>> CLASS_MAPPING = Collections.unmodifiableMap(new HashMap<String, Class<?>>() {
+
+        private static final long serialVersionUID = 1L;
+
+        {
+            put("JOB", Job.class);
+            put("ORDER", Order.class);
+            put("JOBCHAIN", JobChain.class);
+            put("PROCESSCLASS", ProcessClass.class);
+            put("LOCK", Lock.class);
+            put("SCHEDULE", Schedule.class);
+            put("MONITOR", Monitor.class);
+            put("NODEPARAMS", Config.class);
+            put("HOLIDAYS", HolidaysFile.class);
+            put("RUNTIME", RunTime.class);
+            put("OTHER", Other.class);
+        }
+    });
 
     public static boolean hasPermission(JobSchedulerObjectType objectType, SOSPermissionJocCockpit sosPermission) {
         switch (objectType) {

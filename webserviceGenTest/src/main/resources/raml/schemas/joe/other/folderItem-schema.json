@@ -1,0 +1,20 @@
+{
+	"title": "folder item",
+	"id": "schemas/joe/other/folderItem",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.joe.other.FolderItem",
+	"type": "object",
+	"required": [
+		"name",
+		"deployed"
+	],
+	"properties": {
+		"name": {
+			"type": "string"
+		},
+		"deployed": {
+			"type": "boolean",
+			"default": false
+		}
+	}
+}

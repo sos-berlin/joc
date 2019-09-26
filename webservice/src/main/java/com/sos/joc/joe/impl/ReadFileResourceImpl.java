@@ -1,9 +1,13 @@
 package com.sos.joc.joe.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +21,12 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IReadFileResource;
 import com.sos.joc.model.joe.common.Filter;
+import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.common.JSObjectEdit;
 
 @Path("joe")
@@ -40,6 +46,9 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             }
 
             checkRequiredParameter("path", body.getPath());
+            if(!Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
+                throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
+            }
             String path = normalizePath(body.getPath());
             if (!folderPermissions.isPermittedForFolder(getParent(path))) {
                 return accessDeniedResponse();
@@ -53,82 +62,73 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
 
             DBItemJoeObject dbItemJoeObject = dbLayerJoeObjects.getJoeObject(filterJoeObjects);
 
+            JSObjectEdit jsObjectEdit = new JSObjectEdit();
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
             byte[] fileContent = null;
             boolean fileRead = false;
+            boolean fileIsXML = true;
             try {
                 fileContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
                 fileRead = true;
                 /*
                  * ForcedClosingHttpClientException JobSchedulerConnectionResetException JobSchedulerConnectionRefusedException JobSchedulerNoResponseException
-                 * JobSchedulerBadRequestException JocException
+                 * JobSchedulerBadRequestException JobSchedulerObjectNotExistException
                  */
-            } catch (Exception e) {
+            } catch (JocException e) {
                 LOGGER.warn(e.getMessage());
+                //jsObjectEdit.set_message(e.getClass().getSimpleName());
             }
-            Date configurationDate = null;
 
+            
             if (fileRead) {
                 if (dbItemJoeObject == null || jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
-                    configurationDate = jocHotFolder.getLastModifiedDate();
+                    jsObjectEdit.setConfigurationDate(jocHotFolder.getLastModifiedDate());
                 } else {
-                    configurationDate = dbItemJoeObject.getModified();
+                    jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
                     fileContent = dbItemJoeObject.getConfiguration().getBytes();
+                    fileIsXML = false;
                 }
             } else {
                 if (dbItemJoeObject != null) {
-                    configurationDate = dbItemJoeObject.getModified();
+                    jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
                     fileContent = dbItemJoeObject.getConfiguration().getBytes();
-                }else {
-                    fileContent = "".getBytes();
+                    fileIsXML = false;
+                } else {
+                    fileContent = null;
                 }
             }
-
-            JSObjectEdit jsObjectEdit = new JSObjectEdit();
-
-            switch (body.getObjectType()) {
-            case JOB:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.job.Job.class));
-                break;
-            case ORDER:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.order.Order.class));
-                break;
-            case JOBCHAIN:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.jobchain.JobChain.class));
-                break;
-            case LOCK:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.lock.Lock.class));
-                break;
-            case PROCESSCLASS:
-            case AGENTCLUSTER:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.processclass.ProcessClass.class));
-                break;
-            case SCHEDULE:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.schedule.Schedule.class));
-                break;
-            case MONITOR:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.job.Monitor.class));
-                break;
-            case NODEPARAMS:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.nodeparams.Config.class));
-                break;
-            case HOLIDAYS:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.schedule.HolidaysFile.class));
-                break;
-            case OTHER:
-                jsObjectEdit.setConfiguration(Globals.xmlMapper.readValue(fileContent, com.sos.joc.model.joe.other.Other.class));
-                break;
-            default:
-                throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
+            
+            if (fileContent != null) {
+                if (fileIsXML) {
+                    jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType().value())));
+                } else {
+                    jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType().value())));
+                }
             }
-
             jsObjectEdit.setDeployed(dbItemJoeObject == null);
-            jsObjectEdit.setConfigurationDate(configurationDate);
             jsObjectEdit.setJobschedulerId(body.getJobschedulerId());
             jsObjectEdit.setPath(path);
             jsObjectEdit.setObjectType(body.getObjectType());
             jsObjectEdit.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(jsObjectEdit);
+            
+            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(jsObjectEdit);
+            
+            StreamingOutput streamOut = new StreamingOutput() {
+
+                @Override
+                public void write(OutputStream output) throws IOException {
+                    try {
+                        output.write(bytes);
+                        output.flush();
+                    } finally {
+                        try {
+                            output.close();
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+            };
+            return JOCDefaultResponse.responseStatus200(streamOut, MediaType.APPLICATION_JSON);
 
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
