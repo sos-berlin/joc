@@ -94,6 +94,9 @@ public class Helper {
         case NODEPARAMS:
             fileExtension = ".config.xml";
             break;
+        case FOLDER:
+            fileExtension = "/";
+            break;
         default:
             break;
         }

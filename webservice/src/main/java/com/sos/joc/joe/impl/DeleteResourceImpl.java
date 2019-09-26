@@ -13,9 +13,11 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeleteResource;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
 
 @Path("joe")
@@ -36,10 +38,13 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            if (versionIsOlderThan("1.13.1")) {
+                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
+            }
 
             checkRequiredParameter("path", body.getPath());
-            checkRequiredParameter("objectType", body.getObjectType().value());
-            boolean isDirectory = body.getPath().endsWith("/");
+            boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
             String path = isDirectory ? normalizeFolder(body.getPath()) : normalizePath(body.getPath());
 
             if (isDirectory) {
@@ -61,14 +66,13 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             if (item != null) {
                 item.setOperation("delete");
                 item.setAccount(getAccount());
+                dbLayer.update(item);
                 if (isDirectory) {
                     Globals.beginTransaction(connection);
-                    dbLayer.updateOperationRecursive(item);
+                    dbLayer.deleteFolderContentRecursive(item.getSchedulerId(), item.getPath());
                     Globals.commit(connection);
-                } else {
-                    dbLayer.update(item);
                 }
-            } else {
+            } else { //TODO wirklich Satz anlegen??
                 item = new DBItemJoeObject();
                 item.setId(null);
                 item.setAccount(getAccount());

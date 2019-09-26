@@ -365,6 +365,17 @@
 											replace="\1abstract \2"
 											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/schedule/AbstractSchedule.java"
 											preserveLastModified="true" />
+										<!-- change hashcode and equals -->
+										<replaceregexp flags="ig" byline="true"
+											match="(\s*return new HashCodeBuilder).*"
+											replace="\1().append(name).toHashCode();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/other/FolderItem.java"
+											preserveLastModified="true" />
+										<replaceregexp flags="ig" byline="true"
+											match="(\s*return new EqualsBuilder).*"
+											replace="\1().append(name, rhs.name).isEquals();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/other/FolderItem.java"
+											preserveLastModified="true" />
 									</target>
 								</configuration>
 							</execution>

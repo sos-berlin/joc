@@ -22,10 +22,10 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
-import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IReadFileResource;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.common.JSObjectEdit;
@@ -52,9 +52,16 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
                 return jocDefaultResponse;
             }
 
+            if (versionIsOlderThan("1.13.1")) {
+                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
+            }
+
             checkRequiredParameter("path", body.getPath());
             if (!Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
-                throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
+                throw new JobSchedulerBadRequestException("Unsupported object type: " + body.getObjectType().value());
+            }
+            if (body.getObjectType() == JobSchedulerObjectType.FOLDER) {
+                throw new JobSchedulerBadRequestException("Unsupported object type: " + body.getObjectType().value());
             }
             String path = normalizePath(body.getPath());
             if (!folderPermissions.isPermittedForFolder(getParent(path))) {
@@ -72,49 +79,39 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             JSObjectEdit jsObjectEdit = new JSObjectEdit();
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
             byte[] fileContent = null;
-            boolean fileRead = false;
-            boolean fileIsXML = false;
             try {
                 fileContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
-                fileRead = true;
-                fileIsXML = true;
             } catch (JocException e) {
                 LOGGER.warn(e.getMessage());
             }
 
-            if (fileRead) {
-                if (dbItemJoeObject == null) {
+            if (fileContent != null) {
+                if (dbItemJoeObject == null || dbItemJoeObject.getConfiguration() == null) {
                     jsObjectEdit.setConfigurationDate(jocHotFolder.getLastModifiedDate());
                     jsObjectEdit.set_message("Using version in live folder. No draft version found in database");
+                    jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType()
+                            .value())));
                 } else {
-                    if (jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
+                    if (jocHotFolder.getLastModifiedDate() != null && jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
                         jsObjectEdit.setConfigurationDate(jocHotFolder.getLastModifiedDate());
                         jsObjectEdit.set_message("Version in live folder is newer then draft version in database");
+                        jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body
+                                .getObjectType().value())));
                     } else {
                         jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
-                        fileContent = dbItemJoeObject.getConfiguration().getBytes();
-                        fileIsXML = false;
+                        jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(dbItemJoeObject.getConfiguration(),
+                                Helper.CLASS_MAPPING.get(body.getObjectType().value())));
                         jsObjectEdit.set_message("Draft version in database is newer then the version in the live folder");
                     }
                 }
             } else {
-                if (dbItemJoeObject != null) {
+                if (dbItemJoeObject != null && dbItemJoeObject.getConfiguration() != null) {
                     jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
-                    fileContent = dbItemJoeObject.getConfiguration().getBytes();
                     jsObjectEdit.set_message("Using Draft version in databas. No configuration found in the live folder");
-                    fileIsXML = false;
+                    jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(dbItemJoeObject.getConfiguration(), Helper.CLASS_MAPPING
+                            .get(body.getObjectType().value())));
                 } else {
                     fileContent = null;
-                }
-            }
-
-            if (fileContent != null) {
-                if (fileIsXML) {
-                    jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType()
-                            .value())));
-                } else {
-                    jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body
-                            .getObjectType().value())));
                 }
             }
             jsObjectEdit.setDeployed(dbItemJoeObject == null);

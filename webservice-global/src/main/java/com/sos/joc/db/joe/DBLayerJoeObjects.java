@@ -129,22 +129,15 @@ public class DBLayerJoeObjects {
         }
     }
 
-    public Integer updateOperationRecursive(DBItemJoeObject folderItem) throws DBConnectionRefusedException, DBInvalidDataException {
+    public Integer deleteFolderContentRecursive(final String schedulerId, final String path) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("update ").append(DBLayer.DBITEM_JOE_OBJECT);
-            sql.append(" set operation = :operation,");
-            sql.append(" set account = :account,");
-            sql.append(" set deployed = false,");
-            sql.append(" set modified = :modified");
+            sql.append("delete from ").append(DBLayer.DBITEM_JOE_OBJECT);
             sql.append(" where schedulerId = :schedulerId");
-            sql.append(" and (path like :parentPath or path = :path");
+            sql.append(" and path like :parentPath");
             Query<Integer> query = sosHibernateSession.createQuery(sql.toString());
-            query.setParameter("schedulerId", folderItem.getSchedulerId());
-            query.setParameter("parentPath", folderItem.getPath() + "/%");
-            query.setParameter("path", folderItem.getPath());
-            query.setParameter("account", folderItem.getAccount());
-            query.setParameter("modified", Date.from(Instant.now()), TemporalType.TIMESTAMP);
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("parentPath", path + "/%");
             return sosHibernateSession.executeUpdate(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
