@@ -2,6 +2,7 @@ package com.sos.joc.joe.impl;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
@@ -14,6 +15,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocObjectAlreadyExistException;
 import com.sos.joc.joe.common.Helper;
@@ -72,6 +74,12 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             
             if (item != null) {
                 throw new JocObjectAlreadyExistException(path);
+            } else if (isDirectory) {
+                //TODO count(*) statement
+                List<DBItemJoeObject> children = dbLayer.getFolderContentRecursive(body.getJobschedulerId(), body.getPath());
+                if (children != null && children.size() > 0) {
+                    throw new JocObjectAlreadyExistException(path);
+                }
             }
             
             filter.setPath(oldPath);
@@ -82,32 +90,27 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 item.setAccount(getAccount());
                 item.setPath(path);
                 if (!isDirectory) {
-                    item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                    if (body.getConfiguration() != null) {
+                        item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                    }
+                    dbLayer.update(item);
                 } else {
                     item.setConfiguration(null);
-                }
-                dbLayer.update(item);
-                if (isDirectory) {
-                    //TODO recursive rename
+                    dbLayer.update(item);
+                    //TODO executeUpdate
+                    int oldPathLength = oldPath.length();
+                    List<DBItemJoeObject> children = dbLayer.getFolderContentRecursive(body.getJobschedulerId(), body.getOldPath());
+                    for (DBItemJoeObject child : children) {
+                        child.setOperation("rename");
+                        child.setAccount(getAccount());
+                        child.setPath(path + child.getPath().substring(oldPathLength));
+                        dbLayer.update(child);
+                    }
                 }
 
-            } else {  //if old item doesn't exist then really create an item??
-                item = new DBItemJoeObject();
-                item.setId(null);
-                item.setAccount(getAccount());
-                item.setSchedulerId(body.getJobschedulerId());
-                item.setAuditLogId(null);
-                if (!isDirectory) {
-                    item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
-                } else {
-                    item.setConfiguration(null);
-                }
-                item.setObjectType(body.getObjectType().value());
-                item.setOperation("store");
-                item.setPath(body.getPath());
-                dbLayer.save(item);
+            } else {
+                throw new JobSchedulerObjectNotExistException(oldPath);
             }
-            
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

@@ -67,7 +67,9 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setOperation("store");
                 item.setAccount(getAccount());
                 if (!isDirectory) {
-                    item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                    if (body.getConfiguration() != null) {
+                        item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                    }
                 } else {
                     item.setConfiguration(null);
                 }
@@ -80,7 +82,9 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setSchedulerId(body.getJobschedulerId());
                 item.setAuditLogId(null);
                 if (!isDirectory) {
-                    item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                    if (body.getConfiguration() != null) {
+                        item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                    }
                 } else {
                     item.setConfiguration(null);
                 }

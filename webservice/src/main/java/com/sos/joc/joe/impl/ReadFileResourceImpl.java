@@ -116,26 +116,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             jsObjectEdit.setObjectType(body.getObjectType());
             jsObjectEdit.setDeliveryDate(Date.from(Instant.now()));
 
-//            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(jsObjectEdit);
-//
-//            StreamingOutput streamOut = new StreamingOutput() {
-//
-//                @Override
-//                public void write(OutputStream output) throws IOException {
-//                    try {
-//                        output.write(bytes);
-//                        output.flush();
-//                    } finally {
-//                        try {
-//                            output.close();
-//                        } catch (Exception e) {
-//                        }
-//                    }
-//                }
-//            };
-//            return JOCDefaultResponse.responseStatus200(streamOut);
-            
-            return JOCDefaultResponse.responseStatus200(jsObjectEdit);
+            return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(jsObjectEdit));
 
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
