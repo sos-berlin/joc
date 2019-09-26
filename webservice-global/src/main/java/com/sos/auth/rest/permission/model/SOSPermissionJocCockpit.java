@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.08.16 um 11:02:56 AM CEST 
+// Generiert: 2019.09.26 um 04:06:36 PM CEST 
 //
 
 
@@ -79,6 +79,20 @@ import javax.xml.bind.annotation.XmlType;
  *                             &lt;element name="manageCategories" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="editPermissions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="editMainSection" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *                             &lt;element name="Configurations">
+ *                               &lt;complexType>
+ *                                 &lt;complexContent>
+ *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                     &lt;sequence>
+ *                                       &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                       &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                       &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                       &lt;element name="deploy" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                     &lt;/sequence>
+ *                                   &lt;/restriction>
+ *                                 &lt;/complexContent>
+ *                               &lt;/complexType>
+ *                             &lt;/element>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -4612,6 +4626,20 @@ public class SOSPermissionJocCockpit {
      *                   &lt;element name="manageCategories" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="editPermissions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="editMainSection" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+     *                   &lt;element name="Configurations">
+     *                     &lt;complexType>
+     *                       &lt;complexContent>
+     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                           &lt;sequence>
+     *                             &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                             &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                             &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                             &lt;element name="deploy" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                           &lt;/sequence>
+     *                         &lt;/restriction>
+     *                       &lt;/complexContent>
+     *                     &lt;/complexType>
+     *                   &lt;/element>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -4727,6 +4755,20 @@ public class SOSPermissionJocCockpit {
          *         &lt;element name="manageCategories" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="editPermissions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="editMainSection" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+         *         &lt;element name="Configurations">
+         *           &lt;complexType>
+         *             &lt;complexContent>
+         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                 &lt;sequence>
+         *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                   &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                   &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                   &lt;element name="deploy" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                 &lt;/sequence>
+         *               &lt;/restriction>
+         *             &lt;/complexContent>
+         *           &lt;/complexType>
+         *         &lt;/element>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -4740,7 +4782,8 @@ public class SOSPermissionJocCockpit {
             "removeOldInstances",
             "manageCategories",
             "editPermissions",
-            "editMainSection"
+            "editMainSection",
+            "configurations"
         })
         public static class Administration {
 
@@ -4749,6 +4792,8 @@ public class SOSPermissionJocCockpit {
             protected boolean editPermissions;
             @XmlElement(required = true)
             protected Object editMainSection;
+            @XmlElement(name = "Configurations", required = true)
+            protected SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations configurations;
 
             /**
              * Ruft den Wert der removeOldInstances-Eigenschaft ab.
@@ -4820,6 +4865,133 @@ public class SOSPermissionJocCockpit {
              */
             public void setEditMainSection(Object value) {
                 this.editMainSection = value;
+            }
+
+            /**
+             * Ruft den Wert der configurations-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations }
+             *     
+             */
+            public SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations getConfigurations() {
+                return configurations;
+            }
+
+            /**
+             * Legt den Wert der configurations-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations }
+             *     
+             */
+            public void setConfigurations(SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations value) {
+                this.configurations = value;
+            }
+
+
+            /**
+             * <p>Java-Klasse für anonymous complex type.
+             * 
+             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * 
+             * <pre>
+             * &lt;complexType>
+             *   &lt;complexContent>
+             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *       &lt;sequence>
+             *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *         &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *         &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *         &lt;element name="deploy" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *       &lt;/sequence>
+             *     &lt;/restriction>
+             *   &lt;/complexContent>
+             * &lt;/complexType>
+             * </pre>
+             * 
+             * 
+             */
+            @XmlAccessorType(XmlAccessType.FIELD)
+            @XmlType(name = "", propOrder = {
+                "view",
+                "edit",
+                "delete",
+                "deploy"
+            })
+            public static class Configurations {
+
+                protected boolean view;
+                protected boolean edit;
+                protected boolean delete;
+                protected boolean deploy;
+
+                /**
+                 * Ruft den Wert der view-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isView() {
+                    return view;
+                }
+
+                /**
+                 * Legt den Wert der view-Eigenschaft fest.
+                 * 
+                 */
+                public void setView(boolean value) {
+                    this.view = value;
+                }
+
+                /**
+                 * Ruft den Wert der edit-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isEdit() {
+                    return edit;
+                }
+
+                /**
+                 * Legt den Wert der edit-Eigenschaft fest.
+                 * 
+                 */
+                public void setEdit(boolean value) {
+                    this.edit = value;
+                }
+
+                /**
+                 * Ruft den Wert der delete-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isDelete() {
+                    return delete;
+                }
+
+                /**
+                 * Legt den Wert der delete-Eigenschaft fest.
+                 * 
+                 */
+                public void setDelete(boolean value) {
+                    this.delete = value;
+                }
+
+                /**
+                 * Ruft den Wert der deploy-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isDeploy() {
+                    return deploy;
+                }
+
+                /**
+                 * Legt den Wert der deploy-Eigenschaft fest.
+                 * 
+                 */
+                public void setDeploy(boolean value) {
+                    this.deploy = value;
+                }
+
             }
 
         }

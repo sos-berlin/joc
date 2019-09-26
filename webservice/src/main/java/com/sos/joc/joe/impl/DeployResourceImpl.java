@@ -22,29 +22,28 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
-import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
-import com.sos.joc.joe.resource.IReadFileResource;
+import com.sos.joc.joe.resource.IDeployResource;
 import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.common.JSObjectEdit;
 
 @Path("joe")
-public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileResource {
+public class DeployResourceImpl extends JOCResourceImpl implements IDeployResource {
 
-    private static final String API_CALL = "./joe/read/file";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReadFileResourceImpl.class);
+    private static final String API_CALL = "./joe/deploy";
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeployResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse readFile(final String accessToken, final Filter body) {
+    public JOCDefaultResponse deploy(final String accessToken, final Filter body) {
         SOSHibernateSession sosHibernateSession = null;
         try {
 
             checkRequiredParameter("objectType", body.getObjectType());
-            
-            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 
-            boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
+
+            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
+            boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDeploy();
             boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);

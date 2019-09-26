@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
@@ -26,8 +27,12 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
     public JOCDefaultResponse delete(final String accessToken, final Filter body) {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), Helper.hasPermission(body
-                    .getObjectType(), getPermissonsJocCockpit(body.getJobschedulerId(), accessToken)));
+            checkRequiredParameter("objectType", body.getObjectType());
+        
+            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 
+            boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDelete();
+            boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

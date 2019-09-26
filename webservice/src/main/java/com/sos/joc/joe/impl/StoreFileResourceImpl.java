@@ -2,6 +2,7 @@ package com.sos.joc.joe.impl;
 
 import javax.ws.rs.Path;
 
+import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
@@ -18,7 +19,7 @@ import com.sos.joc.model.joe.common.JSObjectEdit;
 @Path("joe")
 public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFileResource {
 
-    private static final String API_CALL = "./joe/read/file";
+    private static final String API_CALL = "./joe/store";
 
     @Override
     public JOCDefaultResponse storeFile(final String accessToken, final byte[] jsObj) {
@@ -26,8 +27,12 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
         try {
             JSObjectEdit body = Globals.objectMapper.readValue(jsObj, JSObjectEdit.class);
             checkRequiredParameter("objectType", body.getObjectType());
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), Helper.hasPermission(body
-                    .getObjectType(), getPermissonsJocCockpit(body.getJobschedulerId(), accessToken)));
+            
+            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 
+            boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
+            boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
+
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

@@ -1,11 +1,16 @@
 package com.sos.auth.rest;
 
 import java.io.File;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.subject.Subject;
@@ -27,6 +32,7 @@ public class SOSShiroCurrentUser {
     private String password;
     private String accessToken;
     private String authorization;
+    private HttpServletRequest httpServletRequest;
 
     private SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters;
     private SOSPermissionCommandsMasters sosPermissionCommandsMasters;
@@ -36,7 +42,7 @@ public class SOSShiroCurrentUser {
     private SOSShiroFolderPermissions sosShiroFolderPermissions;
     private SOSShiroFolderPermissions sosShiroCalendarFolderPermissions;
     private Set<JOCJsonCommand> jocJsonCommands;
-    
+
     public SOSShiroCurrentUser(String username, String password) {
         super();
         initFolders();
@@ -54,33 +60,48 @@ public class SOSShiroCurrentUser {
     }
 
     public SOSPermissionJocCockpit getSosPermissionJocCockpit(String masterId) {
-    	if (listOfSOSPermissionJocCockpit == null) {
-    		initListOfSOSPermissionJocCockpit();
-    	}
-    	if(listOfSOSPermissionJocCockpit.containsKey(masterId)) {
+        if (listOfSOSPermissionJocCockpit == null) {
+            initListOfSOSPermissionJocCockpit();
+        }
+
+        if (httpServletRequest != null) {
+            String ip = httpServletRequest.getRemoteAddr();
+            String ipMasterKey = "ip=" + ip + ":" + masterId;
+            String ipKey = "ip=" + ip;
+
+            if (listOfSOSPermissionJocCockpit.containsKey(ipMasterKey)) {
+                // return listOfSOSPermissionJocCockpit.get(ipMasterKey);
+            }
+
+            if (listOfSOSPermissionJocCockpit.containsKey(ipKey)) {
+                // return listOfSOSPermissionJocCockpit.get(ipKey);
+            }
+        }
+        
+        if (listOfSOSPermissionJocCockpit.containsKey(masterId)) {
             return listOfSOSPermissionJocCockpit.get(masterId);
-    	} else {
+        } else {
             return listOfSOSPermissionJocCockpit.get("");
-    	}
+        }
     }
-    
+
     private void initListOfSOSPermissionJocCockpit() {
-    	listOfSOSPermissionJocCockpit = new HashMap<String,SOSPermissionJocCockpit>();
-    	for (SOSPermissionJocCockpitMaster permission: sosPermissionJocCockpitMasters.getSOSPermissionJocCockpitMaster()) {
-    		listOfSOSPermissionJocCockpit.put(permission.getJobSchedulerMaster(), permission.getSOSPermissionJocCockpit());
-    	}
-		
-	}
+        listOfSOSPermissionJocCockpit = new HashMap<String, SOSPermissionJocCockpit>();
+        for (SOSPermissionJocCockpitMaster permission : sosPermissionJocCockpitMasters.getSOSPermissionJocCockpitMaster()) {
+            listOfSOSPermissionJocCockpit.put(permission.getJobSchedulerMaster(), permission.getSOSPermissionJocCockpit());
+        }
+
+    }
 
     private void initListOfSOSPermissionCommands() {
-    	listOfSOSPermissionCommands = new HashMap<String,SOSPermissionCommands>();
-    	for (SOSPermissionCommandsMaster permission: sosPermissionCommandsMasters.getSOSPermissionCommandsMaster()) {
-    		listOfSOSPermissionCommands.put(permission.getJobSchedulerMaster(), permission.getSOSPermissionCommands());
-    	}
-		
-	}
+        listOfSOSPermissionCommands = new HashMap<String, SOSPermissionCommands>();
+        for (SOSPermissionCommandsMaster permission : sosPermissionCommandsMasters.getSOSPermissionCommandsMaster()) {
+            listOfSOSPermissionCommands.put(permission.getJobSchedulerMaster(), permission.getSOSPermissionCommands());
+        }
 
-	public SOSPermissionJocCockpitMasters getSosPermissionJocCockpitMasters() {
+    }
+
+    public SOSPermissionJocCockpitMasters getSosPermissionJocCockpitMasters() {
         return sosPermissionJocCockpitMasters;
     }
 
@@ -88,18 +109,18 @@ public class SOSShiroCurrentUser {
         this.sosPermissionJocCockpitMasters = sosPermissionJocCockpitMasters;
     }
 
-	public SOSPermissionCommandsMasters getSosPermissionCommandsMasters() {
+    public SOSPermissionCommandsMasters getSosPermissionCommandsMasters() {
         return sosPermissionCommandsMasters;
     }
 
     public void setSosPermissionCommandsMasters(SOSPermissionCommandsMasters sosPermissionCommandsMasters) {
         this.sosPermissionCommandsMasters = sosPermissionCommandsMasters;
     }
-    
+
     public SOSPermissionCommands getSosPermissionCommands(String masterId) {
-    	if (listOfSOSPermissionCommands == null) {
-    		initListOfSOSPermissionCommands();
-    	}
+        if (listOfSOSPermissionCommands == null) {
+            initListOfSOSPermissionCommands();
+        }
         return listOfSOSPermissionCommands.get(masterId);
     }
 
@@ -159,10 +180,71 @@ public class SOSShiroCurrentUser {
         return getExcluded(permission, masterId);
     }
 
-    private boolean getPermissionFromSubject(String masterId, String permission) {
-        return (currentSubject.isPermitted(permission) || currentSubject.isPermitted(masterId + ":" + permission)) && !getExcluded(permission, masterId);
+    private boolean ipPermission(String permission, String master, String[] ipParts, int parts, boolean excluded) {
+        boolean b = false;
+        String s = "";
+
+        for (int i = 0; i < parts; i++) {
+            s = s + ipParts[i] + ".";
+        }
+        s = s + ipParts[parts];
+
+        b = (currentSubject.isPermitted(permission) || currentSubject.isPermitted(s + ":" + permission) || currentSubject.isPermitted(s + ":" + master
+                + ":" + permission)) && !excluded;
+        return b;
     }
-     
+
+    private boolean handleIpPermission(String masterId, String permission) {
+
+        String remoteAddress = "1.1.1.1";
+        InetAddress inetAddress;
+        boolean ipv6 = false;
+        try {
+            inetAddress = InetAddress.getByName(remoteAddress);
+            ipv6 = inetAddress instanceof Inet6Address;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        if (masterId.toLowerCase().startsWith("ip=")) {
+            String[] s = masterId.split("=");
+            String[] s2 = s[1].split(":");
+            String ip = s2[0];
+            String master = "";
+            if (s2.length > 1) {
+                master = s2[1];
+            }
+
+            String[] ipParts = ip.split("\\.");
+
+            if ((ipParts.length < 4) && !ipv6 || (ipParts.length < 8 && ipv6)) {
+                LOGGER.warn("Wrong ip address found: " + ip);
+                return false;
+            }
+
+            boolean excluded = false;
+            String es = "";
+            for (int i = 0; i < ipParts.length; i++) {
+                es = es + ipParts[i];
+                excluded = excluded || getExcluded(permission, "ip=" + es);
+                if (excluded) {
+                    break;
+                }
+                es = es + ".";
+            }
+
+            return ipPermission(permission, master, ipParts, 0, excluded) || ipPermission(permission, master, ipParts, 1, excluded) || ipPermission(
+                    permission, master, ipParts, 2, excluded) || ipPermission(permission, master, ipParts, 3, excluded);
+        }
+        return false;
+    }
+
+    private boolean getPermissionFromSubject(String masterId, String permission) {
+        return (handleIpPermission(masterId, permission) || currentSubject.isPermitted(permission) || currentSubject.isPermitted(masterId + ":"
+                + permission)) && !getExcluded(permission, masterId);
+
+    }
+
     public boolean isPermitted(String masterId, String permission) {
         if (currentSubject != null) {
             return getPermissionFromSubject(masterId, permission);
@@ -178,7 +260,7 @@ public class SOSShiroCurrentUser {
             return false;
         }
     }
-    
+
     public boolean isAuthenticated() {
         if (currentSubject != null) {
             return currentSubject.isAuthenticated();
@@ -248,20 +330,45 @@ public class SOSShiroCurrentUser {
         this.authorization = authorization;
     }
 
-	public Set<JOCJsonCommand> getJocJsonCommands() {
-		return jocJsonCommands;
-	}
+    public Set<JOCJsonCommand> getJocJsonCommands() {
+        return jocJsonCommands;
+    }
 
-	public void setJocJsonCommands(Set<JOCJsonCommand> jocJsonCommands) {
-		this.jocJsonCommands = jocJsonCommands;
-	}
-	
+    public void setJocJsonCommands(Set<JOCJsonCommand> jocJsonCommands) {
+        this.jocJsonCommands = jocJsonCommands;
+    }
+
     public SOSShiroFolderPermissions getSosShiroFolderPermissions() {
         return sosShiroFolderPermissions;
     }
-    
+
     public SOSShiroFolderPermissions getSosShiroCalendarFolderPermissions() {
         return sosShiroCalendarFolderPermissions;
+    }
+
+    public void setHttpServletRequest(HttpServletRequest httpServletRequest) {
+        this.httpServletRequest = httpServletRequest;
+    }
+
+    public String getCallerIpAddress() {
+        if (httpServletRequest != null) {
+            String s = httpServletRequest.getRemoteAddr();
+            if ("0:0:0:0:0:0:0:1".equals(s)) {
+                return "127.0.0.1";
+            } else {
+                return s;
+            }
+        } else {
+            return "192.11.0.12";
+        }
+    }
+
+    public String getCallerHostName() {
+        if (httpServletRequest != null) {
+            return httpServletRequest.getRemoteHost();
+        } else {
+            return "";
+        }
     }
 
 }

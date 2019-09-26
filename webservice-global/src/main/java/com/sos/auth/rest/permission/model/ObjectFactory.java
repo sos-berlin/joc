@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.08.16 um 11:02:56 AM CEST 
+// Generiert: 2019.09.26 um 04:06:36 PM CEST 
 //
 
 
@@ -263,6 +263,14 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpit.JobschedulerMaster createSOSPermissionJocCockpitJobschedulerMaster() {
         return new SOSPermissionJocCockpit.JobschedulerMaster();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.JobschedulerMaster.Administration }
+     * 
+     */
+    public SOSPermissionJocCockpit.JobschedulerMaster.Administration createSOSPermissionJocCockpitJobschedulerMasterAdministration() {
+        return new SOSPermissionJocCockpit.JobschedulerMaster.Administration();
     }
 
     /**
@@ -754,11 +762,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJocCockpit.JobschedulerMaster.Administration }
+     * Create an instance of {@link SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations }
      * 
      */
-    public SOSPermissionJocCockpit.JobschedulerMaster.Administration createSOSPermissionJocCockpitJobschedulerMasterAdministration() {
-        return new SOSPermissionJocCockpit.JobschedulerMaster.Administration();
+    public SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurations() {
+        return new SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations();
     }
 
     /**

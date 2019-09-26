@@ -255,6 +255,7 @@ public class SOSPermissionsCreator {
 
             sosPermissionJocCockpit.getJobschedulerMaster().setView(o.createSOSPermissionJocCockpitJobschedulerMasterView());
             sosPermissionJocCockpit.getJobschedulerMaster().setAdministration(o.createSOSPermissionJocCockpitJobschedulerMasterAdministration());
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().setConfigurations(o.createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurations());
             sosPermissionJocCockpit.getJobschedulerMaster().setExecute(o.createSOSPermissionJocCockpitJobschedulerMasterExecute());
             sosPermissionJocCockpit.getJobschedulerMaster().getExecute().setRestart(o
                     .createSOSPermissionJocCockpitJobschedulerMasterExecuteRestart());
@@ -329,6 +330,16 @@ public class SOSPermissionsCreator {
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().setRemoveOldInstances(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:remove_old_instances"));
 
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setDelete(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configuration:delete"));
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setDeploy(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configuration:deploy"));
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setEdit(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configuration:edit"));
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setView(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configuration:view"));
+
+            
             sosPermissionJocCockpit.getJobschedulerMasterCluster().getView().setStatus(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status"));
             sosPermissionJocCockpit.getJobschedulerMasterCluster().getExecute().setTerminateFailSafe(haveRight(masterId,
@@ -545,7 +556,6 @@ public class SOSPermissionsCreator {
             sosPermissionCommands.getJobschedulerMaster().setExecute(o.createSOSPermissionCommandsJobschedulerMasterExecute());
             sosPermissionCommands.getJobschedulerMaster().setAdministration(o.createSOSPermissionCommandsJobschedulerMasterAdministration());
             sosPermissionCommands.getJobschedulerMaster().getExecute().setRestart(o.createSOSPermissionCommandsJobschedulerMasterExecuteRestart());
-
             sosPermissionCommands.getJobschedulerMasterCluster().setExecute(o.createSOSPermissionCommandsJobschedulerMasterClusterExecute());
 
             sosPermissionCommands.getOrder().setView(o.createSOSPermissionCommandsOrderView());
