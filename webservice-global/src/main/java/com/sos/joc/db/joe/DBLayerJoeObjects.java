@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.TemporalType;
-
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -47,7 +45,11 @@ public class DBLayerJoeObjects {
         }
 
         if (filter.getPath() != null && !"".equals(filter.getPath())) {
-            where += and + " path = :path";
+            if (filter.isRecursive()) {
+                where += and + " path like :path";
+            } else {
+                where += and + " path = :path";
+            }
             and = " and ";
         }
 
@@ -96,6 +98,12 @@ public class DBLayerJoeObjects {
         return sosHibernateSession.getResultList(query);
     }
 
+
+    public List<DBItemJoeObject> getRecursiveJoeObjectList(FilterJoeObjects filter, final int limit) throws SOSHibernateException {
+        filter.setRecursive();
+        return getJoeObjectList(filter,0);
+    }
+    
     public DBItemJoeObject getJoeObject(FilterJoeObjects filter) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
@@ -118,6 +126,7 @@ public class DBLayerJoeObjects {
             sql.append("from ").append(DBLayer.DBITEM_JOE_OBJECT);
             sql.append(" where schedulerId = :schedulerId");
             sql.append(" and path like :path");
+
             Query<DBItemJoeObject> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("path", path + "/%");

@@ -54,4 +54,15 @@ public class FilterJoeObjects {
         path = body.getPath();
     }
 
+    public boolean isRecursive() {
+        return path.endsWith("%");
+    }
+
+    public void setRecursive() {
+        if (!path.endsWith("%")) {
+            path = path + "%";
+        }
+
+    }
+
 }
