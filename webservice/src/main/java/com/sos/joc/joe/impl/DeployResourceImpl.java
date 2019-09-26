@@ -19,6 +19,7 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeployResource;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
 
 @Path("joe")
@@ -48,9 +49,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
 
-            boolean isDirectory = body.getPath().endsWith("/");
+            boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
 
-            String path = normalizePath(body.getPath());
+            String path = isDirectory ? normalizeFolder(body.getPath()) : normalizePath(body.getPath());
             if (isDirectory) {
                 if (!folderPermissions.isPermittedForFolder(path)) {
                     return accessDeniedResponse();

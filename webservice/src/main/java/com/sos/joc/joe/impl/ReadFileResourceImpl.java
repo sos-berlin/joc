@@ -1,13 +1,9 @@
 package com.sos.joc.joe.impl;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +78,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             try {
                 fileContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
             } catch (JocException e) {
-                LOGGER.warn(e.getMessage());
+                LOGGER.warn(e.toString());
             }
 
             if (fileContent != null) {
@@ -120,24 +116,26 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             jsObjectEdit.setObjectType(body.getObjectType());
             jsObjectEdit.setDeliveryDate(Date.from(Instant.now()));
 
-            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(jsObjectEdit);
-
-            StreamingOutput streamOut = new StreamingOutput() {
-
-                @Override
-                public void write(OutputStream output) throws IOException {
-                    try {
-                        output.write(bytes);
-                        output.flush();
-                    } finally {
-                        try {
-                            output.close();
-                        } catch (Exception e) {
-                        }
-                    }
-                }
-            };
-            return JOCDefaultResponse.responseStatus200(streamOut, MediaType.APPLICATION_JSON);
+//            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(jsObjectEdit);
+//
+//            StreamingOutput streamOut = new StreamingOutput() {
+//
+//                @Override
+//                public void write(OutputStream output) throws IOException {
+//                    try {
+//                        output.write(bytes);
+//                        output.flush();
+//                    } finally {
+//                        try {
+//                            output.close();
+//                        } catch (Exception e) {
+//                        }
+//                    }
+//                }
+//            };
+//            return JOCDefaultResponse.responseStatus200(streamOut);
+            
+            return JOCDefaultResponse.responseStatus200(jsObjectEdit);
 
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

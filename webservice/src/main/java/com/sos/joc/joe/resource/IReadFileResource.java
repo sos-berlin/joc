@@ -16,6 +16,6 @@ public interface IReadFileResource {
     @Path("read/file")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse readFile(@HeaderParam("X-Access-Token") final String accessToken, final Filter body);   
+    public JOCDefaultResponse readFile(@HeaderParam("X-Access-Token") final String accessToken, final Filter body);
 
 }

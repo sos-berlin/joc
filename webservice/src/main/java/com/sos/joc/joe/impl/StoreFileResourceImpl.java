@@ -10,6 +10,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IStoreFileResource;
@@ -37,10 +38,15 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 return jocDefaultResponse;
             }
 
-            checkRequiredParameter("path", body.getPath());
-            String path = normalizePath(body.getPath() + "/");
+            if (versionIsOlderThan("1.13.1")) {
+                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
+            }
 
-            if (body.getObjectType() == JobSchedulerObjectType.FOLDER) {
+            checkRequiredParameter("path", body.getPath());
+            String path = normalizePath(body.getPath());
+            boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
+
+            if (isDirectory) {
                 if (!this.folderPermissions.isPermittedForFolder(path)) {
                     return accessDeniedResponse();
                 }
@@ -57,11 +63,14 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             FilterJoeObjects filter = new FilterJoeObjects();
             filter.setConstraint(body);
             DBItemJoeObject item = dbLayer.getJoeObject(filter);
-            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(body.getConfiguration());
             if (item != null) {
                 item.setOperation("store");
                 item.setAccount(getAccount());
-                item.setConfiguration(new String(bytes));
+                if (!isDirectory) {
+                    item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                } else {
+                    item.setConfiguration(null);
+                }
                 dbLayer.update(item);
 
             } else {
@@ -70,7 +79,11 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setAccount(getAccount());
                 item.setSchedulerId(body.getJobschedulerId());
                 item.setAuditLogId(null);
-                item.setConfiguration(new String(bytes));
+                if (!isDirectory) {
+                    item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                } else {
+                    item.setConfiguration(null);
+                }
                 item.setObjectType(body.getObjectType().value());
                 item.setOperation("store");
                 item.setPath(body.getPath());

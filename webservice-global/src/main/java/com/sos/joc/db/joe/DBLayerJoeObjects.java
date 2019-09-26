@@ -86,24 +86,31 @@ public class DBLayerJoeObjects {
         return query;
     }
 
-    public List<DBItemJoeObject> getJoeObjectList(FilterJoeObjects filter, final int limit) throws SOSHibernateException {
-        String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
+    public List<DBItemJoeObject> getJoeObjectList(FilterJoeObjects filter, final int limit) throws DBConnectionRefusedException,
+            DBInvalidDataException {
+        try {
+            String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
 
-        Query<DBItemJoeObject> query = sosHibernateSession.createQuery(q);
-        query = bindParameters(filter, query);
+            Query<DBItemJoeObject> query = sosHibernateSession.createQuery(q);
+            query = bindParameters(filter, query);
 
-        if (limit > 0) {
-            query.setMaxResults(limit);
+            if (limit > 0) {
+                query.setMaxResults(limit);
+            }
+            return sosHibernateSession.getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
         }
-        return sosHibernateSession.getResultList(query);
     }
 
-
-    public List<DBItemJoeObject> getRecursiveJoeObjectList(FilterJoeObjects filter, final int limit) throws SOSHibernateException {
+    public List<DBItemJoeObject> getRecursiveJoeObjectList(FilterJoeObjects filter, final int limit) throws DBConnectionRefusedException,
+            DBInvalidDataException {
         filter.setRecursive();
-        return getJoeObjectList(filter,0);
+        return getJoeObjectList(filter, 0);
     }
-    
+
     public DBItemJoeObject getJoeObject(FilterJoeObjects filter) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
@@ -138,15 +145,17 @@ public class DBLayerJoeObjects {
         }
     }
 
-    public Integer deleteFolderContentRecursive(final String schedulerId, final String path) throws DBConnectionRefusedException, DBInvalidDataException {
+    public Integer deleteFolderContentRecursive(final String schedulerId, final String path) throws DBConnectionRefusedException,
+            DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("delete from ").append(DBLayer.DBITEM_JOE_OBJECT);
             sql.append(" where schedulerId = :schedulerId");
-            sql.append(" and path like :parentPath");
+            sql.append(" and path like :path");
+            
             Query<Integer> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
-            query.setParameter("parentPath", path + "/%");
+            query.setParameter("path", path + "/%");
             return sosHibernateSession.executeUpdate(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
