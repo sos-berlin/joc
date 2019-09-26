@@ -109,28 +109,14 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                     if (s.startsWith(".")) {
                         continue;
                     }
-                    if (s.endsWith(Helper.getFileExtension(JobSchedulerObjectType.FOLDER))) {
-                        if (folderPermissions.isPermittedForFolder(path + s)) {
-                            folderContentToAdd.get(JobSchedulerObjectType.FOLDER.value()).add(new FolderItem(s.replaceFirst("/$", ""), true));
+                    for (JobSchedulerObjectType objectType : objectTypes) {
+                        if (Helper.pathIsObjectOf(s, objectType)) {
+                            if (objectType == JobSchedulerObjectType.FOLDER && !folderPermissions.isPermittedForFolder(path + s)) {
+                                break;
+                            }
+                            folderContentToAdd.get(objectType.value()).add(new FolderItem(Helper.getPathWithoutExtension(s, objectType), true));
+                            break;
                         }
-                    } else if (s.endsWith(Helper.getFileExtension(JobSchedulerObjectType.JOB))) {
-                        folderContentToAdd.get(JobSchedulerObjectType.JOB.value()).add(new FolderItem(s, true));
-                    } else if (s.endsWith(Helper.getFileExtension(JobSchedulerObjectType.JOBCHAIN))) {
-                        folderContentToAdd.get(JobSchedulerObjectType.JOBCHAIN.value()).add(new FolderItem(s, true));
-                    } else if (s.endsWith(Helper.getFileExtension(JobSchedulerObjectType.ORDER))) {
-                        folderContentToAdd.get(JobSchedulerObjectType.ORDER.value()).add(new FolderItem(s, true));
-                    } else if (s.endsWith(Helper.getFileExtension(JobSchedulerObjectType.PROCESSCLASS))) {
-                        folderContentToAdd.get(JobSchedulerObjectType.PROCESSCLASS.value()).add(new FolderItem(s, true));
-                    } else if (s.endsWith(Helper.getFileExtension(JobSchedulerObjectType.SCHEDULE))) {
-                        folderContentToAdd.get(JobSchedulerObjectType.SCHEDULE.value()).add(new FolderItem(s, true));
-                    } else if (s.endsWith(Helper.getFileExtension(JobSchedulerObjectType.LOCK))) {
-                        folderContentToAdd.get(JobSchedulerObjectType.LOCK.value()).add(new FolderItem(s, true));
-                    } else if (s.endsWith(Helper.getFileExtension(JobSchedulerObjectType.MONITOR))) {
-                        folderContentToAdd.get(JobSchedulerObjectType.MONITOR.value()).add(new FolderItem(s, true));
-                    } else if (s.endsWith(Helper.getFileExtension(JobSchedulerObjectType.NODEPARAMS))) { // maybe test if job chain exist
-                        folderContentToAdd.get(JobSchedulerObjectType.NODEPARAMS.value()).add(new FolderItem(s, true));
-                    } else {
-                        folderContentToAdd.get(JobSchedulerObjectType.OTHER.value()).add(new FolderItem(s, true));
                     }
                 }
             } catch (JocException e) {
