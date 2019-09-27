@@ -59,7 +59,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
                 runTimeAnswer.getRunTime().setCalendars(calendars);
             }
 
-			return JOCDefaultResponse.responseStatus200(runTimeAnswer);
+			return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(runTimeAnswer));
 		} catch (JocException e) {
 			e.addErrorMetaInfo(getJocError());
 			return JOCDefaultResponse.responseStatusJSError(e);

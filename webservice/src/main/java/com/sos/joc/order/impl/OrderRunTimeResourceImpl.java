@@ -63,7 +63,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
                 runTimeAnswer.getRunTime().setCalendars(calendars);
             }
             
-            return JOCDefaultResponse.responseStatus200(runTimeAnswer);
+            return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(runTimeAnswer));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -149,7 +149,6 @@ public class DBLayerJoeObjects {
 
     public void update(DBItemJoeObject item) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            item.setModified(Date.from(Instant.now()));
             sosHibernateSession.update(item);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

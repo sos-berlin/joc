@@ -75,7 +75,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 }
             } else { 
                 item = new DBItemJoeObject();
-                item.setCreated(new Date());
+                item.setCreated(Date.from(Instant.now()));
                 item.setId(null);
                 item.setAccount(getAccount());
                 item.setSchedulerId(body.getJobschedulerId());

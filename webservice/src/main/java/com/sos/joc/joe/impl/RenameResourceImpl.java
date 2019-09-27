@@ -21,7 +21,7 @@ import com.sos.joc.exceptions.JocObjectAlreadyExistException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IRenameResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
-import com.sos.joc.model.joe.common.JSObjectEdit;
+import com.sos.joc.model.joe.common.Filter;
 
 @Path("joe")
 public class RenameResourceImpl extends JOCResourceImpl implements IRenameResource {
@@ -29,10 +29,9 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
     private static final String API_CALL = "./joe/delete";
 
     @Override
-    public JOCDefaultResponse rename(final String accessToken, final byte[] responseBody) {
+    public JOCDefaultResponse rename(final String accessToken, final Filter body) {
         SOSHibernateSession connection = null;
         try {
-            JSObjectEdit body = Globals.objectMapper.readValue(responseBody, JSObjectEdit.class);
             checkRequiredParameter("objectType", body.getObjectType());
             
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 
@@ -81,7 +80,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 filterJoeObjects.setPath(body.getPath());
 
                 
-                List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filterJoeObjects);
+                List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filterJoeObjects, 0);
                 if (children != null && children.size() > 0) {
                     throw new JocObjectAlreadyExistException(path);
                 }
@@ -89,25 +88,20 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             
             filter.setPath(oldPath);
             item = dbLayer.getJoeObject(filter);
-            FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
-            filterJoeObjects.setSchedulerId(body.getJobschedulerId());
-            filterJoeObjects.setPath(body.getOldPath());
             
             if (item != null) {
                 item.setOperation("rename");
                 item.setAccount(getAccount());
                 item.setPath(path);
                 if (!isDirectory) {
-                    if (body.getConfiguration() != null) {
-                        item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
-                    }
                     dbLayer.update(item);
                 } else {
                     item.setConfiguration(null);
                     dbLayer.update(item);
                     //TODO executeUpdate
                     int oldPathLength = oldPath.length();
-                    List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filterJoeObjects);
+                    filter.setObjectType(null);
+                    List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filter, 0);
                     for (DBItemJoeObject child : children) {
                         child.setOperation("rename");
                         child.setAccount(getAccount());
