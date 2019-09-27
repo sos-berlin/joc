@@ -30,15 +30,15 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
         SOSHibernateSession connection = null;
         try {
             checkRequiredParameter("objectType", body.getObjectType());
-        
-            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 
+
+            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDelete();
             boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             if (versionIsOlderThan("1.13.1")) {
                 throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
             }
@@ -66,14 +66,16 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             if (item != null) {
                 item.setOperation("delete");
                 item.setAccount(getAccount());
+                item.setModified(new Date());
                 dbLayer.update(item);
                 if (isDirectory) {
                     Globals.beginTransaction(connection);
                     dbLayer.deleteFolderContentRecursive(item.getSchedulerId(), item.getPath());
                     Globals.commit(connection);
                 }
-            } else { //TODO wirklich Satz anlegen??
+            } else { 
                 item = new DBItemJoeObject();
+                item.setCreated(new Date());
                 item.setId(null);
                 item.setAccount(getAccount());
                 item.setSchedulerId(body.getJobschedulerId());

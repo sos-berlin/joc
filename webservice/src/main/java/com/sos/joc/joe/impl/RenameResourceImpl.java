@@ -76,7 +76,12 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 throw new JocObjectAlreadyExistException(path);
             } else if (isDirectory) {
                 //TODO count(*) statement
-                List<DBItemJoeObject> children = dbLayer.getFolderContentRecursive(body.getJobschedulerId(), body.getPath());
+                FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
+                filterJoeObjects.setSchedulerId(body.getJobschedulerId());
+                filterJoeObjects.setPath(body.getPath());
+
+                
+                List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filterJoeObjects);
                 if (children != null && children.size() > 0) {
                     throw new JocObjectAlreadyExistException(path);
                 }
@@ -84,6 +89,9 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             
             filter.setPath(oldPath);
             item = dbLayer.getJoeObject(filter);
+            FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
+            filterJoeObjects.setSchedulerId(body.getJobschedulerId());
+            filterJoeObjects.setPath(body.getOldPath());
             
             if (item != null) {
                 item.setOperation("rename");
@@ -99,7 +107,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     dbLayer.update(item);
                     //TODO executeUpdate
                     int oldPathLength = oldPath.length();
-                    List<DBItemJoeObject> children = dbLayer.getFolderContentRecursive(body.getJobschedulerId(), body.getOldPath());
+                    List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filterJoeObjects);
                     for (DBItemJoeObject child : children) {
                         child.setOperation("rename");
                         child.setAccount(getAccount());

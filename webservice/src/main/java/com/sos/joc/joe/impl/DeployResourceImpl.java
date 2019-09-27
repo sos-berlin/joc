@@ -50,12 +50,12 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
 
             checkRequiredParameter("path", body.getPath());
-            if (!Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
+  
+            boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
+            if (!isDirectory && !Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
-
-            boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
-
+            
             String path = "";
             if (isDirectory) {
                 if (!folderPermissions.isPermittedForFolder(path)) {
@@ -111,16 +111,17 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
                         return accessDeniedResponse();
                     }
+                    
+                    String extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
 
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
                         final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(joeObject.getConfiguration(),
                                 Helper.CLASS_MAPPING.get(joeObject.getObjectType())));
-                        jocHotFolder.put(joeObject.getPath() + Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType())),
-                                bytes);
+                        jocHotFolder.putFile(joeObject.getPath() + extension,bytes);
                         break;
                     case "delete":
-                        jocHotFolder.delete(joeObject.getPath());
+                        jocHotFolder.delete(joeObject.getPath() + extension);
                         break;
 
                     default:

@@ -26,6 +26,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
+import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
@@ -68,10 +69,13 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(connection);
-
+            FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
+            filterJoeObjects.setSchedulerId(body.getJobschedulerId());
+            filterJoeObjects.setPath(path);
+            
             final int parentDepth = Paths.get(body.getPath()).getNameCount();
             // Map: grouped by DBItemJoeObject::operationIsDelete -> DBItemJoeObject::objectType -> new FolderItem(DBItemJoeObject::path, false) collection
-            Map<Boolean, Map<String, Set<FolderItem>>> folderContent = dbLayer.getFolderContentRecursive(body.getJobschedulerId(), body.getPath())
+            Map<Boolean, Map<String, Set<FolderItem>>> folderContent = dbLayer.getRecursiveJoeObjectList(filterJoeObjects)
                     .stream().filter(item -> {
 
                         return Paths.get(item.getPath()).getParent().getNameCount() == parentDepth; // not recursive
