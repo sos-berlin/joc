@@ -28,11 +28,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
     public JOCDefaultResponse storeFile(final String accessToken, final byte[] jsObj) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-            
-            if (versionIsOlderThan("1.13.1")) {
-                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
-            }
-            
+                      
             JSObjectEdit body = Globals.objectMapper.readValue(jsObj, JSObjectEdit.class);
             checkRequiredParameter("objectType", body.getObjectType());
             

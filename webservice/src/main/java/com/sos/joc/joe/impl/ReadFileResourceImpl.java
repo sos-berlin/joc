@@ -36,11 +36,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
     public JOCDefaultResponse readFile(final String accessToken, final Filter body) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-            
-            if (versionIsOlderThan("1.13.1")) {
-                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
-            }
-            
+             
             checkRequiredParameter("objectType", body.getObjectType());
             
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 

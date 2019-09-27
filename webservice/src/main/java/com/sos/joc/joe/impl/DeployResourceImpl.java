@@ -34,10 +34,6 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         SOSHibernateSession sosHibernateSession = null;
         try {
 
-            if (versionIsOlderThan("1.13.1")) {
-                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
-            }
-
             checkRequiredParameter("objectType", body.getObjectType());
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
@@ -47,6 +43,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
+            }
+
+            if (versionIsOlderThan("1.13.1")) {
+                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
             }
 
             checkRequiredParameter("path", body.getPath());
