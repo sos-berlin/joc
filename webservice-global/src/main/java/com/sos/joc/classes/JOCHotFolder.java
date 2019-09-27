@@ -55,12 +55,16 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     public void setUrl(String url) {
         this.url = url;
     }
-
-    public void put(String path, String body) throws JocException {
-        put(getURI(path), body);
+    
+    public void putFolder(String path) throws JocException {
+        put(getURI(path), (String) null, false);
     }
 
-    public void put(String path, byte[] body) throws JocException {
+    public void putFile(String path, String body) throws JocException {
+        put(getURI(path), body, true);
+    }
+
+    public void putFile(String path, byte[] body) throws JocException {
         put(getURI(path), body);
     }
 
@@ -113,14 +117,18 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
         return uriBuilder.buildFromEncoded(path);
     }
 
-    private void put(URI uri, String body) throws JocException {
-        setAccept("*/*");
-        addHeader("Content-Type", "application/octet-stream");
+    private void put(URI uri, String body, boolean bodyExpected) throws JocException {
+        setAccept("text/plain");
         JocError jocError = new JocError();
-        jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()), "JS-PutBody: " + body);
-        if (body == null || body.isEmpty()) {
-            jocError.setMessage("body is missing");
-            throw new JobSchedulerBadRequestException(jocError);
+        if (bodyExpected) {
+            addHeader("Content-Type", "application/octet-stream");
+            jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()), "JS-PutBody: " + body);
+            if (body == null || body.isEmpty()) {
+                jocError.setMessage("body is missing");
+                throw new JobSchedulerBadRequestException(jocError);
+            }
+        } else {
+            jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         }
         try {
             String response = putRestService(uri, body);

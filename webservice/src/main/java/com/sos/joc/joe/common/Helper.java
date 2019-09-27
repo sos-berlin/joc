@@ -104,7 +104,7 @@ public class Helper {
     }
     
     public static String getPathWithoutExtension(String path, JobSchedulerObjectType jobSchedulerObjectType) {
-        return path.substring(0, path.length()-getFileExtension(jobSchedulerObjectType).length());
+        return path.substring(0, path.length() - getFileExtension(jobSchedulerObjectType).length());
     }
     
     public static boolean pathIsObjectOf(String path, JobSchedulerObjectType jobSchedulerObjectType) {
