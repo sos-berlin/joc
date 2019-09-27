@@ -1,5 +1,6 @@
 package com.sos.joc.joe.impl;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.ws.rs.Path;
@@ -7,6 +8,9 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
@@ -117,14 +121,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
-                        final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(joeObject.getConfiguration(),
-                                Helper.CLASS_MAPPING.get(joeObject.getObjectType())));
-                        jocHotFolder.putFile(joeObject.getPath() + extension, bytes);
+                        jocHotFolder.putFile(joeObject.getPath() + extension, this.getPojoAsByte(joeObject));
                         break;
                     case "delete":
                         jocHotFolder.delete(joeObject.getPath() + extension);
                         break;
-
                     default:
                         break;
                     }
@@ -146,4 +147,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         }
     }
 
+    private byte[] getPojoAsByte(DBItemJoeObject joeObject) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException {
+        String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n\n";
+        final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(joeObject.getConfiguration(),
+                Helper.CLASS_MAPPING.get(joeObject.getObjectType())));
+
+        return Helper.concatByteArray(xmlHeader.getBytes(), bytes);
+    }
 }

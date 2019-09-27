@@ -33,8 +33,8 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
         SOSHibernateSession connection = null;
         try {
             checkRequiredParameter("objectType", body.getObjectType());
-            
-            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 
+
+            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
             boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
 
@@ -42,7 +42,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             if (versionIsOlderThan("1.13.1")) {
                 throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
             }
@@ -70,25 +70,24 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             FilterJoeObjects filter = new FilterJoeObjects();
             filter.setConstraint(body);
             DBItemJoeObject item = dbLayer.getJoeObject(filter);
-            
+
             if (item != null) {
                 throw new JocObjectAlreadyExistException(path);
             } else if (isDirectory) {
-                //TODO count(*) statement
+                // TODO count(*) statement
                 FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
                 filterJoeObjects.setSchedulerId(body.getJobschedulerId());
                 filterJoeObjects.setPath(body.getPath());
 
-                
-                List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filterJoeObjects, 0);
+                List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filterJoeObjects);
                 if (children != null && children.size() > 0) {
                     throw new JocObjectAlreadyExistException(path);
                 }
             }
-            
+
             filter.setPath(oldPath);
             item = dbLayer.getJoeObject(filter);
-            
+
             if (item != null) {
                 item.setOperation("rename");
                 item.setAccount(getAccount());
@@ -98,10 +97,10 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 } else {
                     item.setConfiguration(null);
                     dbLayer.update(item);
-                    //TODO executeUpdate
+                    // TODO executeUpdate
                     int oldPathLength = oldPath.length();
                     filter.setObjectType(null);
-                    List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filter, 0);
+                    List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filter);
                     for (DBItemJoeObject child : children) {
                         child.setOperation("rename");
                         child.setAccount(getAccount());

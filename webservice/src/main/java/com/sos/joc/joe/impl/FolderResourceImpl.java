@@ -75,7 +75,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             
             final int parentDepth = Paths.get(body.getPath()).getNameCount();
             // Map: grouped by DBItemJoeObject::operationIsDelete -> DBItemJoeObject::objectType -> new FolderItem(DBItemJoeObject::path, false) collection
-            Map<Boolean, Map<String, Set<FolderItem>>> folderContent = dbLayer.getRecursiveJoeObjectList(filterJoeObjects, 0)
+            Map<Boolean, Map<String, Set<FolderItem>>> folderContent = dbLayer.getRecursiveJoeObjectList(filterJoeObjects)
                     .stream().filter(item -> {
 
                         return Paths.get(item.getPath()).getParent().getNameCount() == parentDepth; // not recursive

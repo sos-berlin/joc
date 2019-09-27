@@ -1,5 +1,7 @@
 package com.sos.joc.joe.common;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,6 +111,14 @@ public class Helper {
     
     public static boolean pathIsObjectOf(String path, JobSchedulerObjectType jobSchedulerObjectType) {
         return path.endsWith(Helper.getFileExtension(jobSchedulerObjectType));
+    }
+    
+    public static byte[] concatByteArray(byte[] a, byte[] b) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+        outputStream.write( a );
+        outputStream.write( b );
+
+       return outputStream.toByteArray( );
     }
 
 }

@@ -77,6 +77,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             String processClassPath = configuration.getPath() + FILE_EXTENSION;
             JOCHotFolder httpClient = new JOCHotFolder(this);
             String xmlContent = writeXmlPoJoAsString(agent);
+            
             httpClient.putFile(processClassPath, xmlContent);
 
             storeAuditLogEntry(audit);
