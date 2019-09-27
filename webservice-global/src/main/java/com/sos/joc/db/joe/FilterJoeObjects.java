@@ -9,6 +9,8 @@ public class FilterJoeObjects {
     private String objectType;
     private String account;
     private String path;
+    private Object orderCriteria;
+    private String sortMode="asc";
 
     public void setConstraint(Filter filter) {
         schedulerId = filter.getJobschedulerId();
@@ -62,7 +64,31 @@ public class FilterJoeObjects {
         if (!path.endsWith("%")) {
             path = path + "/%";
         }
-
     }
+    
+    public String getSortMode() {
+        if (orderCriteria == null || "".equals(orderCriteria) || sortMode == null) {
+            return "";
+        } else {
+            return " " + sortMode;
+        }
+    }
+
+    public void setSortMode(String sortMode) {
+        this.sortMode = sortMode;
+    }
+
+    public String getOrderCriteria() {
+        if (orderCriteria == null || "".equals(orderCriteria)) {
+            return "";
+        } else {
+            return " order by " + orderCriteria;
+        }
+    }
+
+    public void setOrderCriteria(String orderCriteria) {
+        this.orderCriteria = orderCriteria;
+    }
+
 
 }

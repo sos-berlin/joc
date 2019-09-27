@@ -12,6 +12,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
@@ -33,6 +34,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         SOSHibernateSession sosHibernateSession = null;
         try {
 
+            if (versionIsOlderThan("1.13.1")) {
+                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
+            }
+
             checkRequiredParameter("objectType", body.getObjectType());
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
@@ -51,29 +56,81 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
 
-            String path = isDirectory ? normalizeFolder(body.getPath()) : normalizePath(body.getPath());
+            String path = "";
             if (isDirectory) {
                 if (!folderPermissions.isPermittedForFolder(path)) {
                     return accessDeniedResponse();
                 }
+                path = normalizeFolder(body.getPath());
             } else {
                 if (!folderPermissions.isPermittedForFolder(getParent(path))) {
                     return accessDeniedResponse();
                 }
+                path = normalizePath(body.getPath());
             }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
+            Globals.beginTransaction(sosHibernateSession);
 
             DBLayerJoeObjects dbLayerJoeObjects = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
+
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
             filterJoeObjects.setPath(path);
- 
-            List<DBItemJoeObject> listOfJoeObjects = dbLayerJoeObjects.getRecursiveJoeObjectList(filterJoeObjects, 0);
-            for (DBItemJoeObject joeObject: listOfJoeObjects) {
-                //deploy(joeObject);
+            filterJoeObjects.setOrderCriteria("created");
+            if (isDirectory) {
+                filterJoeObjects.setRecursive();
             }
- 
+
+            List<DBItemJoeObject> listOfJoeObjects = dbLayerJoeObjects.getJoeObjectList(filterJoeObjects, 0);
+            JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+
+            for (DBItemJoeObject joeObject : listOfJoeObjects) {
+                if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
+                    throw new JobSchedulerBadRequestException("unsupported objectType found in database: " + joeObject.getObjectType());
+                }
+
+                if ("FOLDER".equals(joeObject.getObjectType())) {
+
+                    if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
+                        return accessDeniedResponse();
+                    }
+
+                    switch (joeObject.getOperation().toLowerCase()) {
+                    case "store":
+              //          jocHotFolder.put(joeObject.getPath() + Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType())));
+                        break;
+                    case "delete":
+                        jocHotFolder.delete(normalizeFolder(joeObject.getPath() + "/"));
+                        break;
+
+                    default:
+                        break;
+                    }
+                } else {
+                    if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
+                        return accessDeniedResponse();
+                    }
+
+                    switch (joeObject.getOperation().toLowerCase()) {
+                    case "store":
+                        final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(joeObject.getConfiguration(),
+                                Helper.CLASS_MAPPING.get(joeObject.getObjectType())));
+                        jocHotFolder.put(joeObject.getPath() + Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType())),
+                                bytes);
+                        break;
+                    case "delete":
+                        jocHotFolder.delete(joeObject.getPath());
+                        break;
+
+                    default:
+                        break;
+                    }
+                }
+                dbLayerJoeObjects.delete(joeObject);
+            }
+            Globals.commit(sosHibernateSession);
+
             return JOCDefaultResponse.responseStatusJSOk(null);
 
         } catch (JocException e) {
@@ -82,6 +139,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
+            Globals.rollback(sosHibernateSession);
             Globals.disconnect(sosHibernateSession);
         }
     }

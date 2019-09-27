@@ -1,5 +1,7 @@
 package com.sos.joc.joe.impl;
 
+import java.util.Date;
+
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
@@ -26,6 +28,11 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
     public JOCDefaultResponse storeFile(final String accessToken, final byte[] jsObj) {
         SOSHibernateSession sosHibernateSession = null;
         try {
+            
+            if (versionIsOlderThan("1.13.1")) {
+                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
+            }
+            
             JSObjectEdit body = Globals.objectMapper.readValue(jsObj, JSObjectEdit.class);
             checkRequiredParameter("objectType", body.getObjectType());
             
@@ -65,6 +72,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             DBItemJoeObject item = dbLayer.getJoeObject(filter);
             if (item != null) {
                 item.setOperation("store");
+                item.setModified(new Date());
                 item.setAccount(getAccount());
                 if (!isDirectory) {
                     if (body.getConfiguration() != null) {
@@ -81,6 +89,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setAccount(getAccount());
                 item.setSchedulerId(body.getJobschedulerId());
                 item.setAuditLogId(null);
+                item.setCreated(new Date());
                 if (!isDirectory) {
                     if (body.getConfiguration() != null) {
                         item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));

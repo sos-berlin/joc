@@ -89,7 +89,7 @@ public class DBLayerJoeObjects {
     public List<DBItemJoeObject> getJoeObjectList(FilterJoeObjects filter, final int limit) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
-            String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
+            String q = "from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter) + filter.getOrderCriteria() + filter.getSortMode();
 
             Query<DBItemJoeObject> query = sosHibernateSession.createQuery(q);
             query = bindParameters(filter, query);
@@ -152,7 +152,7 @@ public class DBLayerJoeObjects {
             sql.append("delete from ").append(DBLayer.DBITEM_JOE_OBJECT);
             sql.append(" where schedulerId = :schedulerId");
             sql.append(" and path like :path");
-            
+
             Query<Integer> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("path", path + "/%");
@@ -179,6 +179,16 @@ public class DBLayerJoeObjects {
         try {
             item.setModified(Date.from(Instant.now()));
             sosHibernateSession.save(item);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public void delete(DBItemJoeObject joeObject) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            sosHibernateSession.delete(joeObject);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
