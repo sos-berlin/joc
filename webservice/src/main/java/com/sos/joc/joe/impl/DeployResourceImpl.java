@@ -50,12 +50,12 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
 
             checkRequiredParameter("path", body.getPath());
-  
+
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
             if (!isDirectory && !Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
-            
+
             String path = "";
             if (isDirectory) {
                 if (!folderPermissions.isPermittedForFolder(path)) {
@@ -86,9 +86,6 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
 
             for (DBItemJoeObject joeObject : listOfJoeObjects) {
-                if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
-                    throw new JobSchedulerBadRequestException("unsupported objectType found in database: " + joeObject.getObjectType());
-                }
 
                 if ("FOLDER".equals(joeObject.getObjectType())) {
 
@@ -98,7 +95,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
-              //          jocHotFolder.put(joeObject.getPath() + Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType())));
+                        jocHotFolder.putFolder(joeObject.getPath());
                         break;
                     case "delete":
                         jocHotFolder.delete(normalizeFolder(joeObject.getPath() + "/"));
@@ -111,14 +108,18 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
                         return accessDeniedResponse();
                     }
-                    
+
+                    if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
+                        throw new JobSchedulerBadRequestException("unsupported objectType found in database: " + joeObject.getObjectType());
+                    }
+
                     String extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
 
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
                         final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(joeObject.getConfiguration(),
                                 Helper.CLASS_MAPPING.get(joeObject.getObjectType())));
-                        jocHotFolder.putFile(joeObject.getPath() + extension,bytes);
+                        jocHotFolder.putFile(joeObject.getPath() + extension, bytes);
                         break;
                     case "delete":
                         jocHotFolder.delete(joeObject.getPath() + extension);

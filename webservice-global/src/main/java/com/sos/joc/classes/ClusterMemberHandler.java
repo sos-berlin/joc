@@ -80,7 +80,7 @@ public class ClusterMemberHandler {
                         clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
                         httpClient = new JOCHotFolder(clusterMember);
                         if ("save".equals(sessionIdentifier)) {
-                            httpClient.put(path, dbItem.getContent());
+                            httpClient.putFile(path, dbItem.getContent());
                         } else {
                             httpClient.delete(path);
                         }
