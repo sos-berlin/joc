@@ -95,7 +95,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
-                        jocHotFolder.putFolder(joeObject.getPath());
+                        jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()) + "/");
                         break;
                     case "delete":
                         jocHotFolder.delete(normalizeFolder(joeObject.getPath() + "/"));

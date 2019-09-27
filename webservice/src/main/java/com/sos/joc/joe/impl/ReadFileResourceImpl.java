@@ -103,7 +103,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             } else {
                 if (dbItemJoeObject != null && dbItemJoeObject.getConfiguration() != null) {
                     jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
-                    jsObjectEdit.set_message("Using Draft version in databas. No configuration found in the live folder");
+                    jsObjectEdit.set_message("Using Draft version in database. No configuration found in the live folder");
                     jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(dbItemJoeObject.getConfiguration(), Helper.CLASS_MAPPING
                             .get(body.getObjectType().value())));
                 } else {
