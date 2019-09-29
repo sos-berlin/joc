@@ -82,7 +82,7 @@ public class ClusterMemberHandler {
                         if ("save".equals(sessionIdentifier)) {
                             httpClient.putFile(path, dbItem.getContent());
                         } else {
-                            httpClient.delete(path);
+                            httpClient.deleteFile(path);
                         }
                     } catch (Exception e) {
                         // if error then store object conf in db for inventory plugin

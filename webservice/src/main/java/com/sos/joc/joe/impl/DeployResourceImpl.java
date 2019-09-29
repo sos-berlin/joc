@@ -1,12 +1,11 @@
 package com.sos.joc.joe.impl;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,6 +17,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.audit.DeployJoeAudit;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -31,7 +31,6 @@ import com.sos.joc.model.joe.common.Filter;
 public class DeployResourceImpl extends JOCResourceImpl implements IDeployResource {
 
     private static final String API_CALL = "./joe/deploy";
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeployResourceImpl.class);
 
     @Override
     public JOCDefaultResponse deploy(final String accessToken, final Filter body) {
@@ -90,19 +89,23 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
 
             for (DBItemJoeObject joeObject : listOfJoeObjects) {
+                
+                DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
+                logAuditMessage(deployJoeAudit);
 
                 if ("FOLDER".equals(joeObject.getObjectType())) {
 
                     if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
                         return accessDeniedResponse();
+                        //continue; ... maybe better?
                     }
 
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
-                        jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()) + "/");
+                        jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()));
                         break;
                     case "delete":
-                        jocHotFolder.delete(normalizeFolder(joeObject.getPath() + "/"));
+                        jocHotFolder.deleteFolder(normalizeFolder(joeObject.getPath()));
                         break;
 
                     default:
@@ -111,10 +114,12 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 } else {
                     if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
                         return accessDeniedResponse();
+                        //continue; ... maybe better?
                     }
 
                     if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
                         throw new JobSchedulerBadRequestException("unsupported objectType found in database: " + joeObject.getObjectType());
+                        //continue; ... maybe better?
                     }
 
                     String extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
@@ -124,17 +129,22 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         jocHotFolder.putFile(joeObject.getPath() + extension, this.getPojoAsByte(joeObject));
                         break;
                     case "delete":
-                        jocHotFolder.delete(joeObject.getPath() + extension);
+                        jocHotFolder.deleteFile(joeObject.getPath() + extension);
                         break;
                     default:
                         break;
                     }
                 }
+                
+                storeAuditLogEntry(deployJoeAudit);
+                
+                //TODO update other cluster members if (!dbItemInventoryInstance.standalone())
+                
                 dbLayerJoeObjects.delete(joeObject);
             }
             Globals.commit(sosHibernateSession);
 
-            return JOCDefaultResponse.responseStatusJSOk(null);
+            return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
 
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

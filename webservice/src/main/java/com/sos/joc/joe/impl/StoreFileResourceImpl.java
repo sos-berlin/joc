@@ -99,7 +99,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 dbLayer.save(item);
             }
 
-            return JOCDefaultResponse.responseStatusJSOk(null);
+            return JOCDefaultResponse.responseStatusJSOk(item.getModified());
 
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

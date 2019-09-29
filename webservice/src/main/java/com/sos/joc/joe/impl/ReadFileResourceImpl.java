@@ -18,6 +18,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IReadFileResource;
@@ -77,6 +78,8 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             byte[] fileContent = null;
             try {
                 fileContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
+            } catch (JobSchedulerObjectNotExistException e) {
+                LOGGER.warn(e.toString()); //maybe for this case something special?
             } catch (JocException e) {
                 LOGGER.warn(e.toString());
             }

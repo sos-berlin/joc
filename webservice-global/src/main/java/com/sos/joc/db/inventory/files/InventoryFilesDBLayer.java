@@ -2,6 +2,7 @@ package com.sos.joc.db.inventory.files;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.query.Query;
 
@@ -31,6 +32,57 @@ public class InventoryFilesDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }       
+    }
+    
+    public List<DBItemInventoryFile> getFiles(Long instanceId, String folder) throws DBConnectionRefusedException, DBInvalidDataException  {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_FILES);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" and fileDirectory = :fileDirectory");
+            Query<DBItemInventoryFile> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("fileDirectory", folder);
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }       
+    }
+    
+    public boolean fileExists(Long instanceId, String path) throws DBConnectionRefusedException, DBInvalidDataException  {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_FILES);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" where fileName = :path");
+            Query<DBItemInventoryFile> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("path", path);
+            return getSession().getSingleResult(query) != null;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }       
+    }
+    
+    public boolean folderExists(Long instanceId, String path) throws DBConnectionRefusedException, DBInvalidDataException  {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select count(*) from ").append(DBITEM_INVENTORY_FILES);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" where fileDirectory = :path");
+            Query<Long> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("path", path);
+            return getSession().getSingleResult(query) > 0;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -78,7 +130,7 @@ public class InventoryFilesDBLayer extends DBLayer {
         }       
     }
     
-    public List<String> getFoldersByFolderAndType(Long instanceId, String folderName, Set<String> types) throws DBConnectionRefusedException, DBInvalidDataException {
+    public Set<String> getFoldersByFolderAndType(Long instanceId, String folderName, Set<String> types) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select fileDirectory from ").append(DBITEM_INVENTORY_FILES);
@@ -109,7 +161,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             }
             List<String> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
-                return result;
+                return result.stream().collect(Collectors.toSet());
             }
             return null;
         } catch (SOSHibernateInvalidSessionException ex) {

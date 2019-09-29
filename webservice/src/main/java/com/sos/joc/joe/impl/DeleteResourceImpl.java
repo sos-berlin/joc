@@ -66,7 +66,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             if (item != null) {
                 item.setOperation("delete");
                 item.setAccount(getAccount());
-                item.setModified(new Date());
+                item.setModified(Date.from(Instant.now()));
                 dbLayer.update(item);
                 if (isDirectory) {
                     Globals.beginTransaction(connection);

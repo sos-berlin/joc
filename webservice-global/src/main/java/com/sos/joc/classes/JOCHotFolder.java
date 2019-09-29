@@ -25,6 +25,7 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.exceptions.JobSchedulerModifyObjectException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocError;
@@ -57,6 +58,7 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     }
     
     public void putFolder(String path) throws JocException {
+        path = (path + "/").replaceAll("//+", "/");
         put(getURI(path), (String) null, false);
     }
 
@@ -67,8 +69,18 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     public void putFile(String path, byte[] body) throws JocException {
         put(getURI(path), body);
     }
+    
+    public void deleteFolder(String path) throws JocException {
+        path = (path + "/").replaceAll("//+", "/");
+        try {
+            delete(getURI(path));
+        } catch (JobSchedulerModifyObjectException e) {
+            //try again once if DirectoryNotEmptyException
+            delete(getURI(path));
+        }
+    }
 
-    public void delete(String path) throws JocException {
+    public void deleteFile(String path) throws JocException {
         delete(getURI(path));
     }
 
@@ -310,6 +322,9 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
                 // Async call while JobScheduler is terminating
                 if (response.contains("com.sos.scheduler.engine.common.async.CallQueue$ClosedException")) {
                     throw new JobSchedulerConnectionResetException(status);
+                }
+                if (response.contains("DirectoryNotEmptyException")) {
+                    throw new JobSchedulerModifyObjectException(response);
                 }
                 throw new JobSchedulerBadRequestException(status);
             case 404:

@@ -2,6 +2,7 @@ package com.sos.joc.joe.impl;
 
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,20 +12,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.json.JsonArray;
-import javax.json.JsonString;
 import javax.ws.rs.Path;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
+import com.sos.jitl.reporting.db.DBItemInventoryFile;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -40,7 +37,6 @@ import com.sos.joc.model.joe.other.FolderItem;
 public class FolderResourceImpl extends JOCResourceImpl implements IFolderResource {
 
     private static final String API_CALL = "./joe/read/folder";
-    private static final Logger LOGGER = LoggerFactory.getLogger(FolderResourceImpl.class);
 
     @Override
     public JOCDefaultResponse readFolder(final String accessToken, final Filter body) {
@@ -74,18 +70,20 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             filterJoeObjects.setPath(path);
             
             final int parentDepth = Paths.get(body.getPath()).getNameCount();
-            // Map: grouped by DBItemJoeObject::operationIsDelete -> DBItemJoeObject::objectType -> new FolderItem(DBItemJoeObject::path, false) collection
-            Map<Boolean, Map<String, Set<FolderItem>>> folderContent = dbLayer.getRecursiveJoeObjectList(filterJoeObjects)
-                    .stream().filter(item -> {
-
-                        return Paths.get(item.getPath()).getParent().getNameCount() == parentDepth; // not recursive
-
-                    }).collect(Collectors.groupingBy(DBItemJoeObject::operationIsDelete, Collectors.groupingBy(DBItemJoeObject::getObjectType,
-                            Collectors.mapping(item -> new FolderItem(Paths.get(item.getPath()).getFileName().toString(), false), Collectors
-                                    .toSet()))));
+            List<DBItemJoeObject> dbItems = dbLayer.getRecursiveJoeObjectList(filterJoeObjects);
+            if (dbItems == null) {
+                dbItems = new ArrayList<DBItemJoeObject>();
+            }
+            // Map: grouped by DBItemJoeObject::operationIsDelete -> DBItemJoeObject::objectType 
+            // -> new FolderItem("filename of DBItemJoeObject::path", false) collection
+            // filter for non-recursive level
+            Map<Boolean, Map<String, Set<FolderItem>>> folderContent = dbItems.stream().filter(item -> Paths.get(item.getPath()).getParent()
+                    .getNameCount() == parentDepth).collect(Collectors.groupingBy(DBItemJoeObject::operationIsDelete, Collectors.groupingBy(
+                            DBItemJoeObject::getObjectType, Collectors.mapping(item -> new FolderItem(Paths.get(item.getPath()).getFileName()
+                                    .toString(), false), Collectors.toSet()))));
             folderContent.putIfAbsent(Boolean.FALSE, new HashMap<String, Set<FolderItem>>());
             folderContent.putIfAbsent(Boolean.TRUE, new HashMap<String, Set<FolderItem>>());
-
+            
             List<JobSchedulerObjectType> objectTypes = Arrays.asList(JobSchedulerObjectType.FOLDER, JobSchedulerObjectType.JOB,
                     JobSchedulerObjectType.JOBCHAIN, JobSchedulerObjectType.ORDER, JobSchedulerObjectType.PROCESSCLASS,
                     JobSchedulerObjectType.SCHEDULE, JobSchedulerObjectType.LOCK, JobSchedulerObjectType.MONITOR, JobSchedulerObjectType.NODEPARAMS,
@@ -97,37 +95,65 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                 folderContentToAdd.putIfAbsent(objectType.value(), new HashSet<FolderItem>());
                 folderContentToDel.putIfAbsent(objectType.value(), new HashSet<FolderItem>());
             }
+            
+            //Add folders of recursive objects because it could exist these objects but not the objectType==FOLDER in the non-recursive set
+            Set<FolderItem> furtherFolders = dbItems.stream().filter(item -> Paths.get(item.getPath()).getParent().getNameCount() > parentDepth).map(
+                    item -> new FolderItem(Paths.get(item.getPath()).getName(parentDepth).toString(), false)).collect(Collectors.toSet());
+            folderContentToAdd.get(JobSchedulerObjectType.FOLDER.value()).addAll(furtherFolders);
 
             for (FolderItem folder : folderContentToAdd.get(JobSchedulerObjectType.FOLDER.value())) {
                 if (!folderPermissions.isPermittedForFolder(path + folder.getName())) {
                     folderContentToDel.get(JobSchedulerObjectType.FOLDER.value()).add(folder);
                 }
             }
-
-            try {
-                JOCHotFolder httpClient = new JOCHotFolder(this);
-                JsonArray folder = httpClient.getFolder(path);
-
-                for (JsonString jsonStr : folder.getValuesAs(JsonString.class)) {
-                    String s = jsonStr.getString();
-                    if (s.startsWith(".")) {
+            
+            //offline version: doesn't know external files such as monitor, holidays and others
+            InventoryFilesDBLayer dbInventoryFilesLayer = new InventoryFilesDBLayer(connection);
+            List<DBItemInventoryFile> inventoryFiles = dbInventoryFilesLayer.getFiles(dbItemInventoryInstance.getId(), body.getPath());
+            if (inventoryFiles != null) {
+                for (DBItemInventoryFile inventoryFile : inventoryFiles) {
+                    String objectType = inventoryFile.getFileType().replaceAll("_", "").toUpperCase();
+                    if ("AGENTCLUSTER".equals(objectType)) {
+                        objectType = "PROCESSCLASS";
+                    }
+                    if (!Helper.CLASS_MAPPING.containsKey(objectType)) {
                         continue;
                     }
-                    for (JobSchedulerObjectType objectType : objectTypes) {
-                        if (Helper.pathIsObjectOf(s, objectType)) {
-                            if (objectType == JobSchedulerObjectType.FOLDER && !folderPermissions.isPermittedForFolder(path + s)) {
-                                break;
-                            }
-                            folderContentToAdd.get(objectType.value()).add(new FolderItem(Helper.getPathWithoutExtension(s, objectType), true));
-                            break;
-                        }
-                    }
+                    folderContentToAdd.get(objectType).add(new FolderItem(Helper.getPathWithoutExtension(inventoryFile.getFileBaseName(),
+                            JobSchedulerObjectType.fromValue(objectType)), true));
                 }
-            } catch (JocException e) {
-                LOGGER.warn(e.toString());
             }
-
+            //end of offline
+            
             Folder entity = new Folder();
+            
+//            //online version: needs connection timeout (default=2s), if not available
+//            try {
+//                JOCHotFolder httpClient = new JOCHotFolder(this);
+//                JsonArray folder = httpClient.getFolder(path);
+//
+//                for (JsonString jsonStr : folder.getValuesAs(JsonString.class)) {
+//                    String s = jsonStr.getString();
+//                    if (s.startsWith(".")) {
+//                        continue;
+//                    }
+//                    for (JobSchedulerObjectType objectType : objectTypes) {
+//                        if (Helper.pathIsObjectOf(s, objectType)) {
+//                            if (objectType == JobSchedulerObjectType.FOLDER && !folderPermissions.isPermittedForFolder(path + s)) {
+//                                break;
+//                            }
+//                            folderContentToAdd.get(objectType.value()).add(new FolderItem(Helper.getPathWithoutExtension(s, objectType), true));
+//                            break;
+//                        }
+//                    }
+//                }
+//            } catch (JobSchedulerObjectNotExistException e) {
+//                entity.set_message(e.toString());
+//            } catch (JocException e) {
+//                LOGGER.warn(e.toString());
+//            }
+//            //end of online
+
             for (JobSchedulerObjectType objectType : objectTypes) {
                 folderContentToAdd.get(objectType.value()).removeAll(folderContentToDel.get(objectType.value()));
                 if (!folderContentToAdd.get(objectType.value()).isEmpty()) {

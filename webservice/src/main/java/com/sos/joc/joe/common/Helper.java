@@ -41,7 +41,7 @@ public class Helper {
             put("OTHER", Other.class);
         }
     });
-
+    
     public static boolean hasPermission(JobSchedulerObjectType objectType, SOSPermissionJocCockpit sosPermission) {
         switch (objectType) {
         case MONITOR:

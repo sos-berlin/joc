@@ -109,7 +109,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             JOCHotFolder httpClient = new JOCHotFolder(this);
             String processClassPath = agentFilter.getPath() + FILE_EXTENSION;
-            httpClient.delete(processClassPath);
+            httpClient.deleteFile(processClassPath);
 
             storeAuditLogEntry(audit);
 

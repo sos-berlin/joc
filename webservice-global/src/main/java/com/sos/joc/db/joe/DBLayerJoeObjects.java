@@ -1,8 +1,11 @@
 package com.sos.joc.db.joe;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.query.Query;
 
@@ -17,6 +20,7 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 public class DBLayerJoeObjects {
 
     private final SOSHibernateSession sosHibernateSession;
+    private static final String FOLDERS_BY_PATH = FoldersByPath.class.getName();
 
     public DBLayerJoeObjects(SOSHibernateSession session) {
         this.sosHibernateSession = session;
@@ -126,8 +130,6 @@ public class DBLayerJoeObjects {
         }
     }
 
-   
-
     public Integer deleteFolderContentRecursive(final String schedulerId, final String path) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
@@ -140,6 +142,85 @@ public class DBLayerJoeObjects {
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("path", path + "/%");
             return sosHibernateSession.executeUpdate(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public Set<String> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select new ").append(FOLDERS_BY_PATH).append("(path, objectType) from ").append(DBLayer.DBITEM_JOE_OBJECT);
+            sql.append(" where schedulerId = :schedulerId");
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                sql.append(" and ( path = :folderName or path like :likeFolderName )");
+            }
+            if (objectTypes.size() == 1) {
+                sql.append(" and objectType = :objectType");
+            } else {
+                sql.append(" and objectType in (:objectType)");
+            }
+            sql.append(" and operation != 'delete'");
+            Query<FoldersByPath> query = sosHibernateSession.createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            if (objectTypes.size() == 1) {
+                query.setParameter("objectType", objectTypes.iterator().next());
+            } else {
+                query.setParameterList("objectType", objectTypes);
+            }
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                query.setParameter("folderName", folderName);
+                query.setParameter("likeFolderName", folderName + "/%");
+            }
+            List<FoldersByPath> paths = sosHibernateSession.getResultList(query);
+            if (paths != null) {
+                return paths.stream().map(FoldersByPath::getFolder).collect(Collectors.toSet());
+            }
+            return null;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public List<String> getFoldersByFolderToDelete(final String schedulerId, final String folderName) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select path from ").append(DBLayer.DBITEM_JOE_OBJECT);
+            sql.append(" where schedulerId = :schedulerId");
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                sql.append(" and ( path = :folderName or path like :likeFolderName )");
+            }
+            sql.append(" and objectType = :objectType");
+            sql.append(" and operation = 'delete'");
+            Query<String> query = sosHibernateSession.createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("objectType", "FOLDER");
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                query.setParameter("folderName", folderName);
+                query.setParameter("likeFolderName", folderName + "/%");
+            }
+            return sosHibernateSession.getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public Boolean folderExists(String schedulerId, String path) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select count(*) from ").append(DBLayer.DBITEM_JOE_OBJECT);
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and path like :likePath");
+            Query<Long> query = sosHibernateSession.createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("likePath", path + "/%");
+            return sosHibernateSession.getSingleResult(query) > 0;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

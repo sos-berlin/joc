@@ -3,6 +3,7 @@ package com.sos.joc.classes.tree;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
+import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -33,6 +35,34 @@ public class TreePermanent {
 		
 		for (JobSchedulerObjectType type : treeBody.getTypes()) {
 			switch (type) {
+			case JOE:
+                if (sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView()) {
+                    if (sosPermission.getJob().getChange().isHotfolder()) {
+                        types.add(JobSchedulerObjectType.JOB);
+                        types.add(JobSchedulerObjectType.MONITOR);
+                    }
+                    if (sosPermission.getJobChain().getChange().isHotFolder()) {
+                        types.add(JobSchedulerObjectType.JOBCHAIN);
+                        types.add(JobSchedulerObjectType.NODEPARAMS);
+                    }
+                    if (sosPermission.getOrder().getChange().isHotFolder()) {
+                        types.add(JobSchedulerObjectType.ORDER);
+                    }
+                    if (sosPermission.getProcessClass().getChange().isHotFolder()) {
+                        types.add(JobSchedulerObjectType.PROCESSCLASS);
+                        types.add(JobSchedulerObjectType.AGENTCLUSTER);
+                    }
+                    if (sosPermission.getLock().getChange().isHotFolder()) {
+                        types.add(JobSchedulerObjectType.LOCK);
+                    }
+                    if (sosPermission.getSchedule().getChange().isHotFolder()) {
+                        types.add(JobSchedulerObjectType.SCHEDULE);
+                        types.add(JobSchedulerObjectType.HOLIDAYS);
+                    }
+                    types.add(JobSchedulerObjectType.FOLDER);
+                    types.add(JobSchedulerObjectType.OTHER);
+                }
+			    
 			case MONITOR:
 			case JOB:
 				if (sosPermission.getJob().getView().isStatus()) {
@@ -81,7 +111,7 @@ public class TreePermanent {
 		return types;
 	}
 
-	public static SortedSet<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId, String schedulerId)
+	public static SortedSet<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId, String schedulerId, boolean treeForJoe)
 			throws JocException {
 		SortedSet<String> folders = new TreeSet<String>(new Comparator<String>() {
 
@@ -92,19 +122,25 @@ public class TreePermanent {
 		Set<String> bodyTypes = new HashSet<String>();
 		Set<String> calendarTypes = new HashSet<String>();
 		Set<String> docTypes = new HashSet<String>();
+		Set<String> joeTypes = new HashSet<String>();
         if (treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
 			for (JobSchedulerObjectType type : treeBody.getTypes()) {
 				switch (type) {
 				case ORDER:
+				    bodyTypes.add("job_chain");
+				    joeTypes.add(type.value());
+                    break;
 				case JOBCHAIN:
 					bodyTypes.add("job_chain");
+					joeTypes.add(type.value());
 					break;
-				case AGENTCLUSTER:
+                case AGENTCLUSTER:
 					bodyTypes.add("agent_cluster");
 					break;
 				case PROCESSCLASS:
 					bodyTypes.add("process_class");
 					bodyTypes.add("agent_cluster");
+					joeTypes.add(type.value());
 					break;
 				case WORKINGDAYSCALENDAR:
 				    bodyTypes.add("working_days_calendar");
@@ -119,6 +155,7 @@ public class TreePermanent {
 				    docTypes.add("documentation");
 				default:
 					bodyTypes.add(type.name().toLowerCase());
+					joeTypes.add(type.value());
 					break;
 				}
 			}
@@ -138,9 +175,11 @@ public class TreePermanent {
 			InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(connection);
 			CalendarsDBLayer dbCalendarLayer = new CalendarsDBLayer(connection);
 			DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
-            List<String> results = null;
+			DBLayerJoeObjects dbJoeLayer = new DBLayerJoeObjects(connection);
+            Set<String> results = null;
 			List<String> calendarResults = null;
 			List<String> docResults = null;
+			Collection<String> joeResults = null;
 			if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
 				for (Folder folder : treeBody.getFolders()) {
 					String normalizedFolder = ("/" + folder.getFolder()).replaceAll("//+", "/");
@@ -149,7 +188,7 @@ public class TreePermanent {
 					    calendarResults = dbCalendarLayer.getFoldersByFolder(schedulerId, normalizedFolder, calendarTypes);
 					    if (calendarResults != null && !calendarResults.isEmpty()) {
 					        if (results == null) {
-					            results = new ArrayList<String>();
+					            results = new HashSet<String>();
 					        } 
 					        results.addAll(calendarResults);
 					    }
@@ -158,9 +197,22 @@ public class TreePermanent {
                         docResults = dbDocLayer.getFoldersByFolder(schedulerId, normalizedFolder);
                         if (docResults != null && !docResults.isEmpty()) {
                             if (results == null) {
-                                results = new ArrayList<String>();
+                                results = new HashSet<String>();
                             } 
                             results.addAll(docResults);
+                        }
+                    }
+                    if (treeForJoe) {
+                        joeResults = dbJoeLayer.getFoldersByFolder(schedulerId, normalizedFolder, joeTypes);
+                        if (joeResults != null && !joeResults.isEmpty()) {
+                            if (results == null) {
+                                results = new HashSet<String>();
+                            }
+                            results.addAll(joeResults);
+                        }
+                        joeResults = dbJoeLayer.getFoldersByFolderToDelete(schedulerId, normalizedFolder);
+                        if (results != null && joeResults != null && !joeResults.isEmpty()) {
+                            results.removeAll(joeResults);
                         }
                     }
 					if (results != null && !results.isEmpty()) {
@@ -182,7 +234,7 @@ public class TreePermanent {
                     calendarResults = dbCalendarLayer.getFoldersByFolder(schedulerId, "/", calendarTypes);
                     if (calendarResults != null && !calendarResults.isEmpty()) {
                         if (results == null) {
-                            results = new ArrayList<String>();
+                            results = new HashSet<String>();
                         } 
                         results.addAll(calendarResults);
                     }
@@ -191,9 +243,22 @@ public class TreePermanent {
 				    docResults = dbDocLayer.getFoldersByFolder(schedulerId, "/");
                     if (docResults != null && !docResults.isEmpty()) {
                         if (results == null) {
-                            results = new ArrayList<String>();
+                            results = new HashSet<String>();
                         } 
                         results.addAll(docResults);
+                    }
+                }
+				if (treeForJoe) {
+                    joeResults = dbJoeLayer.getFoldersByFolder(schedulerId, "/", joeTypes);
+                    if (joeResults != null && !joeResults.isEmpty()) {
+                        if (results == null) {
+                            results = new HashSet<String>();
+                        }
+                        results.addAll(joeResults);
+                    }
+                    joeResults = dbJoeLayer.getFoldersByFolderToDelete(schedulerId, "/");
+                    if (results != null && joeResults != null && !joeResults.isEmpty()) {
+                        results.removeAll(joeResults);
                     }
                 }
 				if (results != null && !results.isEmpty()) {

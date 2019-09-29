@@ -12,6 +12,7 @@ import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -49,70 +50,77 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
 
             checkRequiredParameter("path", body.getPath());
             checkRequiredParameter("oldPath", body.getOldPath());
-            String path = normalizePath(body.getPath());
-            String oldPath = normalizePath(body.getOldPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
-
+            
             if (isDirectory) {
-                if (!this.folderPermissions.isPermittedForFolder(path)) {
+                body.setPath(normalizeFolder(body.getPath()));
+                body.setOldPath(normalizeFolder(body.getOldPath()));
+                if (!this.folderPermissions.isPermittedForFolder(body.getPath())) {
                     return accessDeniedResponse();
                 }
 
             } else {
-                if (!this.folderPermissions.isPermittedForFolder(getParent(path))) {
+                body.setPath(normalizePath(body.getPath()));
+                body.setOldPath(normalizePath(body.getOldPath()));
+                if (!this.folderPermissions.isPermittedForFolder(getParent(body.getPath()))) {
                     return accessDeniedResponse();
                 }
             }
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(connection);
-            FilterJoeObjects filter = new FilterJoeObjects();
-            filter.setConstraint(body);
-            DBItemJoeObject item = dbLayer.getJoeObject(filter);
-
-            if (item != null) {
-                throw new JocObjectAlreadyExistException(path);
-            } else if (isDirectory) {
-                // TODO count(*) statement
-                FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
-                filterJoeObjects.setSchedulerId(body.getJobschedulerId());
-                filterJoeObjects.setPath(body.getPath());
-
-                List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filterJoeObjects);
-                if (children != null && children.size() > 0) {
-                    throw new JocObjectAlreadyExistException(path);
-                }
+            DBLayerJoeObjects dbJoeLayer = new DBLayerJoeObjects(connection);
+            InventoryFilesDBLayer dbInventoryFilesLayer = new InventoryFilesDBLayer(connection);
+            
+            FilterJoeObjects oldPathFilter = new FilterJoeObjects();
+            oldPathFilter.setConstraint(body);
+            oldPathFilter.setPath(body.getOldPath());
+            DBItemJoeObject oldItem = dbJoeLayer.getJoeObject(oldPathFilter);
+            if (oldItem == null) {
+                throw new JobSchedulerObjectNotExistException(body.getOldPath());
             }
-
-            filter.setPath(oldPath);
-            item = dbLayer.getJoeObject(filter);
-
-            if (item != null) {
-                item.setOperation("rename");
-                item.setAccount(getAccount());
-                item.setPath(path);
-                if (!isDirectory) {
-                    dbLayer.update(item);
-                } else {
-                    item.setConfiguration(null);
-                    dbLayer.update(item);
-                    // TODO executeUpdate
-                    int oldPathLength = oldPath.length();
-                    filter.setObjectType(null);
-                    List<DBItemJoeObject> children = dbLayer.getRecursiveJoeObjectList(filter);
-                    for (DBItemJoeObject child : children) {
-                        child.setOperation("rename");
-                        child.setAccount(getAccount());
-                        child.setPath(path + child.getPath().substring(oldPathLength));
-                        dbLayer.update(child);
-                    }
+            
+            FilterJoeObjects newPathFilter = new FilterJoeObjects();
+            newPathFilter.setConstraint(body);
+            DBItemJoeObject newItem = dbJoeLayer.getJoeObject(newPathFilter);
+            if (isDirectory) {
+                if (newItem != null || dbInventoryFilesLayer.folderExists(dbItemInventoryInstance.getId(), body.getPath()) || dbJoeLayer.folderExists(
+                        body.getJobschedulerId(), body.getPath())) {
+                    throw new JocObjectAlreadyExistException(body.getPath());
                 }
-
             } else {
-                throw new JobSchedulerObjectNotExistException(oldPath);
+                if (newItem != null || dbInventoryFilesLayer.fileExists(dbItemInventoryInstance.getId(), body.getPath() + Helper.getFileExtension(body
+                        .getObjectType()))) {
+                    throw new JocObjectAlreadyExistException(body.getPath());
+                }
             }
-
+            
+            newItem = setNewDBItemfromOld(oldItem, body.getPath());
+            dbJoeLayer.save(newItem);
+            
+            oldItem.setOperation("delete");
+            oldItem.setAccount(getAccount());
+            oldItem.setModified(Date.from(Instant.now()));
+            dbJoeLayer.update(oldItem);
+            
+            if (isDirectory) {
+                oldPathFilter.setObjectType(null);
+                int oldPathLength = body.getOldPath().length();
+                List<DBItemJoeObject> children = dbJoeLayer.getRecursiveJoeObjectList(oldPathFilter);
+                for (DBItemJoeObject child : children) {
+                    if (child.operationIsDelete()) {
+                       continue; 
+                    }
+                    DBItemJoeObject newDbItem = setNewDBItemfromOld(child, body.getPath() + child.getPath().substring(oldPathLength));
+                    dbJoeLayer.save(newDbItem);
+                    
+                    child.setOperation("delete");
+                    child.setAccount(getAccount());
+                    child.setModified(Date.from(Instant.now()));
+                    dbJoeLayer.update(child);
+                }
+            }
+            
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -122,6 +130,20 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
         } finally {
             Globals.disconnect(connection);
         }
+    }
+    
+    private DBItemJoeObject setNewDBItemfromOld(DBItemJoeObject oldItem, String newPath) {
+        DBItemJoeObject newItem = new DBItemJoeObject();
+        newItem.setId(null);
+        newItem.setObjectType(oldItem.getObjectType());
+        newItem.setAccount(getAccount());
+        newItem.setCreated(oldItem.getCreated());
+        newItem.setConfiguration(oldItem.getConfiguration());
+        newItem.setOperation("store");
+        newItem.setPath(newPath);
+        newItem.setAuditLogId(oldItem.getAuditLogId());
+        newItem.setSchedulerId(oldItem.getSchedulerId());
+        return newItem;
     }
 
 }

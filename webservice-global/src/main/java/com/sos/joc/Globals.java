@@ -70,7 +70,8 @@ public class Globals {
     public static boolean rollbackJobHistoryWithJSON = false;
     public static boolean rollbackJobChainWithJSON = false;
     public static Validator schemaValidator = null;
-    public static ObjectMapper xmlMapper = new XmlMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).configure(SerializationFeature.INDENT_OUTPUT, true);
+    public static ObjectMapper xmlMapper = new XmlMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).configure(
+            SerializationFeature.INDENT_OUTPUT, true);
     public static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
