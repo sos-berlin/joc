@@ -33,7 +33,6 @@ public class DBLayerJoeObjects {
     public FilterJoeObjects resetFilter() {
         FilterJoeObjects filter = new FilterJoeObjects();
         filter.setAccount("");
-        filter.setObjectType("");
         filter.setPath("");
         filter.setSchedulerId("");
         return filter;
@@ -57,7 +56,7 @@ public class DBLayerJoeObjects {
             and = " and ";
         }
 
-        if (filter.getObjectType() != null && !"".equals(filter.getObjectType())) {
+        if (filter.getObjectType() != null) {
             where += and + " objectType = :objectType";
             and = " and ";
         }
@@ -81,8 +80,8 @@ public class DBLayerJoeObjects {
         if (filter.getAccount() != null && !"".equals(filter.getAccount())) {
             query.setParameter("account", filter.getAccount());
         }
-        if (filter.getObjectType() != null && !"".equals(filter.getObjectType())) {
-            query.setParameter("objectType", filter.getObjectType());
+        if (filter.getObjectType() != null ) {
+            query.setParameter("objectType", filter.getObjectType().value());
         }
         if (filter.getPath() != null && !"".equals(filter.getPath())) {
             query.setParameter("path", filter.getPath());

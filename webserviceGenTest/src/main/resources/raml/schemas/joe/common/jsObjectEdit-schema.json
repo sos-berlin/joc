@@ -9,9 +9,6 @@
   	"deliveryDate": {
     	"$ref": "../../common/deliveryDate-schema.json"
     },
-    "_message": {
-    	"type": "string"
-    },
     "configurationDate": {
       	"$ref": "../../common/timestamp-schema.json"
     },
@@ -27,9 +24,11 @@
     "objectType": {
       	"$ref": "../../common/type-schema.json"
     },
-    "deployed": {
-      	"type": "boolean"
+    
+    "objectVersionStatus": {
+      	"$ref": "joe-object-status-schema.json"
     },
+    
     "configuration": {
       	"description": "interface for different json representations of a configuration item",
       	"type": "object",

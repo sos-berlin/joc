@@ -1,12 +1,14 @@
 package com.sos.joc.db.joe;
 
+import com.sos.joc.Globals;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.common.JSObjectEdit;
 
 public class FilterJoeObjects {
 
     private String schedulerId;
-    private String objectType;
+    private JobSchedulerObjectType objectType;
     private String account;
     private String path;
     private Object orderCriteria;
@@ -14,7 +16,7 @@ public class FilterJoeObjects {
 
     public void setConstraint(Filter filter) {
         schedulerId = filter.getJobschedulerId();
-        objectType = filter.getObjectType().value();
+        objectType = filter.getObjectType();
         path = filter.getPath();
     }
 
@@ -26,11 +28,11 @@ public class FilterJoeObjects {
         this.schedulerId = schedulerId;
     }
 
-    public String getObjectType() {
+    public JobSchedulerObjectType getObjectType() {
         return objectType;
     }
 
-    public void setObjectType(String objectType) {
+    public void setObjectType(JobSchedulerObjectType objectType) {
         this.objectType = objectType;
     }
 
@@ -52,7 +54,7 @@ public class FilterJoeObjects {
 
     public void setConstraint(JSObjectEdit body) {
         schedulerId = body.getJobschedulerId();
-        objectType = body.getObjectType().value();
+        objectType = body.getObjectType();
         path = body.getPath();
     }
 
@@ -62,7 +64,7 @@ public class FilterJoeObjects {
 
     public void setRecursive() {
         if (!path.endsWith("%")) {
-            path = path + "/%";
+            path = Globals.normalizePath(path + "/%");
         }
     }
     

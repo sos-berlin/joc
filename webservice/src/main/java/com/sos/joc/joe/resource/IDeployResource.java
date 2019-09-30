@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.joe.common.Filter;
+import com.sos.joc.model.joe.common.FilterDeploy;
 
 public interface IDeployResource {
     
@@ -16,6 +16,6 @@ public interface IDeployResource {
     @Path("deploy")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse deploy(@HeaderParam("X-Access-Token") final String accessToken, final Filter body);
+    public JOCDefaultResponse deploy(@HeaderParam("X-Access-Token") final String accessToken, final FilterDeploy body);
 
 }

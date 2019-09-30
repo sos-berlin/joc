@@ -7,8 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.joe.common.Filter;
+import com.sos.joc.model.joe.common.FilterDeploy;
 
-public class DeployJoeAudit extends Filter implements IAuditLog {
+public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
 
     @JsonIgnore
     private String folder;
@@ -33,7 +34,7 @@ public class DeployJoeAudit extends Filter implements IAuditLog {
 
     private Boolean toDelete;
 
-    public DeployJoeAudit(DBItemJoeObject joeObject, Filter filter) {
+    public DeployJoeAudit(DBItemJoeObject joeObject, FilterDeploy filter) {
         setJobschedulerId(filter.getJobschedulerId());
         setObjectType(filter.getObjectType());
         setAuditParams(filter.getAuditLog());

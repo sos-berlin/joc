@@ -14,6 +14,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.ClusterMemberHandler;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -25,7 +26,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeployResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
-import com.sos.joc.model.joe.common.Filter;
+import com.sos.joc.model.joe.common.FilterDeploy;
 
 @Path("joe")
 public class DeployResourceImpl extends JOCResourceImpl implements IDeployResource {
@@ -33,11 +34,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     private static final String API_CALL = "./joe/deploy";
 
     @Override
-    public JOCDefaultResponse deploy(final String accessToken, final Filter body) {
+    public JOCDefaultResponse deploy(final String accessToken, final FilterDeploy body) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-
-            checkRequiredParameter("objectType", body.getObjectType());
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDeploy();
@@ -52,24 +51,14 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
             }
 
-            checkRequiredParameter("path", body.getPath());
-
-            boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
-            if (!isDirectory && !Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
+            checkRequiredParameter("folder", body.getFolder());
+            if (!body.getObjectType().value().isEmpty() && !Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
 
-            String path = "";
-            if (isDirectory) {
-                if (!folderPermissions.isPermittedForFolder(path)) {
-                    return accessDeniedResponse();
-                }
-                path = normalizeFolder(body.getPath());
-            } else {
-                if (!folderPermissions.isPermittedForFolder(getParent(path))) {
-                    return accessDeniedResponse();
-                }
-                path = normalizePath(body.getPath());
+            String folder = normalizeFolder(body.getFolder());
+            if (!folderPermissions.isPermittedForFolder(folder)) {
+                return accessDeniedResponse();
             }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -79,9 +68,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
 
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
-            filterJoeObjects.setPath(path);
+            filterJoeObjects.setPath(folder + "/" + body.getObjectName());
+            filterJoeObjects.setObjectType(body.getObjectType());
             filterJoeObjects.setOrderCriteria("created");
-            if (isDirectory) {
+            if (("".equals(body.getObjectName()) || body.getObjectName() == null) && body.getRecursive()) {
                 filterJoeObjects.setRecursive();
             }
 
@@ -89,7 +79,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
 
             for (DBItemJoeObject joeObject : listOfJoeObjects) {
-                
+
+                String extension = "";
                 DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
                 logAuditMessage(deployJoeAudit);
 
@@ -97,7 +88,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                     if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
                         return accessDeniedResponse();
-                        //continue; ... maybe better?
+                        // continue; ... maybe better?
                     }
 
                     switch (joeObject.getOperation().toLowerCase()) {
@@ -114,32 +105,35 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 } else {
                     if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
                         return accessDeniedResponse();
-                        //continue; ... maybe better?
+                        // continue; ... maybe better?
                     }
 
                     if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
                         throw new JobSchedulerBadRequestException("unsupported objectType found in database: " + joeObject.getObjectType());
-                        //continue; ... maybe better?
+                        // continue; ... maybe better?
                     }
 
-                    String extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
+                    extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
+                    byte[] xmlContent = this.getPojoAsByte(joeObject);
+                    ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath() + extension,
+                            API_CALL);
 
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
                         jocHotFolder.putFile(joeObject.getPath() + extension, this.getPojoAsByte(joeObject));
+                        clusterMemberHandler.updateAtOtherClusterMembers(xmlContent.toString());
                         break;
                     case "delete":
                         jocHotFolder.deleteFile(joeObject.getPath() + extension);
+                        clusterMemberHandler.deleteAtOtherClusterMembers();
                         break;
                     default:
                         break;
                     }
                 }
-                
+
                 storeAuditLogEntry(deployJoeAudit);
-                
-                //TODO update other cluster members if (!dbItemInventoryInstance.standalone())
-                
+
                 dbLayerJoeObjects.delete(joeObject);
             }
             Globals.commit(sosHibernateSession);
@@ -159,8 +153,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
     private byte[] getPojoAsByte(DBItemJoeObject joeObject) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException {
         String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n\n";
-        final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(joeObject.getConfiguration(),
-                Helper.CLASS_MAPPING.get(joeObject.getObjectType())));
+        final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(joeObject.getConfiguration(), Helper.CLASS_MAPPING
+                .get(joeObject.getObjectType())));
 
         return Helper.concatByteArray(xmlHeader.getBytes(), bytes);
     }

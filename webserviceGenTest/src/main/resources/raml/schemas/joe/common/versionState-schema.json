@@ -1,0 +1,12 @@
+{
+  "title": "version state text",
+  "id": "schemas/joe/common/versionStateText",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.VersionStateText",
+  "type": "string",
+  "enum": [
+    "LIVE_IS_NEWER",
+    "DRAFT_IS_NEWER",
+    "LIVE_NOT_EXIST"
+  ]
+}
