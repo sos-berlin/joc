@@ -15,7 +15,7 @@ import org.junit.Test;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.db.DBItemInCondition;
 import com.sos.jobstreams.db.DBItemOutCondition;
-import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
+import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 import com.sos.jobstreams.db.DBLayerInConditions;
 import com.sos.jobstreams.db.DBLayerOutConditions;
 import com.sos.jobstreams.db.FilterInConditions;
