@@ -12,20 +12,21 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jobstreams.db.DBItemEvent;
 import com.sos.jobstreams.db.DBItemOutCondition;
+import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
 import com.sos.jobstreams.db.DBLayerEvents;
 import com.sos.jobstreams.db.DBLayerOutConditions;
 import com.sos.jobstreams.db.FilterEvents;
-import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobstreams.resource.IConditionEventsResource;
 import com.sos.joc.model.jobstreams.ConditionEvent;
 import com.sos.joc.model.jobstreams.ConditionEvents;
 import com.sos.joc.model.jobstreams.ConditionEventsFilter;
-import com.sos.joc.exceptions.JocException;
 
 @Path("jobstreams")
 public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEventsResource {
@@ -41,8 +42,9 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EVENTLIST, conditionEventsFilter, accessToken, conditionEventsFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getJobStream().getView().isEventlist());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EVENTLIST, conditionEventsFilter, accessToken, conditionEventsFilter
+                    .getJobschedulerId(), getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getJobStream().getView()
+                            .isEventlist());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -62,12 +64,13 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             }
 
             filter.setJobStream(conditionEventsFilter.getJobStream());
-            List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
+            List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
             ConditionEvents conditionEvents = new ConditionEvents();
             conditionEvents.setDeliveryDate(new Date());
             conditionEvents.setSession(filter.getSession());
 
-            for (DBItemEvent dbItemEvent : listOfEvents) {
+            for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
+                DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
                 ConditionEvent conditionEvent = new ConditionEvent();
                 DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
                 if (dbItemOutCondition != null) {
@@ -97,8 +100,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
-                    conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(),
+                    getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -135,8 +138,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(), getPermissonsJocCockpit(
-                    conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(),
+                    getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

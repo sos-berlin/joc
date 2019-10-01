@@ -19,7 +19,7 @@ import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jobstreams.db.DBItemInConditionWithCommand;
-import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
+import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 import com.sos.jobstreams.db.DBLayerConsumedInConditions;
 import com.sos.jobstreams.db.DBLayerInConditions;
 import com.sos.jobstreams.db.DBLayerOutConditions;
@@ -185,7 +185,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             }
         }
         if (filterOutConditions.getListOfEvents() != null && filterOutConditions.getListOfEvents().size() > 0) {
-            List<DBItemOutConditionWithEvent> listOfOutConditionsItems = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
+            List<DBItemOutConditionWithConfiguredEvent> listOfOutConditionsItems = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
             JSJobOutConditions jsJobOutConditions = new JSJobOutConditions();
             jsJobOutConditions.setListOfJobOutConditions(listOfOutConditionsItems);
 

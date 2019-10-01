@@ -18,7 +18,7 @@ import com.sos.jitl.reporting.db.DBItemReportTask;
 import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.db.DBItemInCondition;
-import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
+import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 import com.sos.jobstreams.db.DBLayerInConditions;
 import com.sos.jobstreams.db.DBLayerOutConditions;
 import com.sos.jobstreams.db.FilterInConditions;
@@ -98,7 +98,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
                 jsConditionResolver.initEvents();
 
-                List<DBItemOutConditionWithEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
+                List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
                 JSJobOutConditions jsJobOutConditions = new JSJobOutConditions();
                 jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
                 JSJobConditionKey jsJobConditionKey = new JSJobConditionKey();
