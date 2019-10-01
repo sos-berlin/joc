@@ -1,0 +1,18 @@
+{
+  "title": "Deploy message",
+  "id": "schemas/joe/common/deployMessage",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.DeployMessage",
+  "type": "object",
+  "properties": {
+    "permissionDeniedFor": {
+      	"$ref": "../../common/path-schema.json"
+    },
+    "wrongObjectType": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    }
+  }
+}

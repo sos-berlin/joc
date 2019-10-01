@@ -1,6 +1,6 @@
 {
-  "title": "filter for requests",
-  "id": "schemas/joe/common/filter",
+  "title": "joe object status",
+  "id": "schemas/joe/common/joe-object-status",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.common.JoeObjectStatus",
   "type": "object",

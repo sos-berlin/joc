@@ -1,8 +1,8 @@
 {
-  "title": "Filter Deploy",
-  "id": "schemas/joe/common/filter-deploy-schema",
+  "title": "Answer for Deploy",
+  "id": "schemas/joe/common/deploy-schema",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.common.FilterDeploy",
+  "javaType": "com.sos.joc.model.joe.common.DeployAnswer",
   "type": "object",
   "description": "",
   "required": [
@@ -25,8 +25,11 @@
     "objectType": {
       	"$ref": "../../common/type-schema.json"
     },
-    "auditLog": {
-    	"$ref": "../../audit/auditParams-schema.json"
+    "messages": {
+        "type": "array",
+        "items": {
+           "$ref": "deploy-message-schema.json"
+         }
     }
   }
 }

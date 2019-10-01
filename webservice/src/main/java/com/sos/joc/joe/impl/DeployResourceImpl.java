@@ -2,6 +2,7 @@ package com.sos.joc.joe.impl;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,8 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeployResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
+import com.sos.joc.model.joe.common.DeployAnswer;
+import com.sos.joc.model.joe.common.DeployMessage;
 import com.sos.joc.model.joe.common.FilterDeploy;
 
 @Path("joe")
@@ -82,6 +85,14 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             List<DBItemJoeObject> listOfJoeObjects = dbLayerJoeObjects.getJoeObjectList(filterJoeObjects, 0);
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
 
+            DeployAnswer deployAnswer = new DeployAnswer();
+            deployAnswer.setMessages(new ArrayList<DeployMessage>());
+            deployAnswer.setFolder(body.getFolder());
+            deployAnswer.setJobschedulerId(body.getJobschedulerId());
+            deployAnswer.setObjectName(body.getObjectName());
+            deployAnswer.setObjectType(body.getObjectType());
+            deployAnswer.setRecursive(body.getRecursive());
+
             for (DBItemJoeObject joeObject : listOfJoeObjects) {
 
                 String extension = "";
@@ -91,8 +102,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 if ("FOLDER".equals(joeObject.getObjectType())) {
 
                     if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
-                        return accessDeniedResponse();
-                        // continue; ... maybe better?
+                        DeployMessage deployMessage = new DeployMessage();
+                        deployMessage.setMessage("Access denied");
+                        deployMessage.setPermissionDeniedFor(joeObject.getPath());
+                        deployAnswer.getMessages().add(deployMessage);
+                        continue;
                     }
 
                     switch (joeObject.getOperation().toLowerCase()) {
@@ -108,13 +122,19 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     }
                 } else {
                     if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
-                        return accessDeniedResponse();
-                        // continue; ... maybe better?
+                        DeployMessage deployMessage = new DeployMessage();
+                        deployMessage.setMessage("Access denied");
+                        deployMessage.setPermissionDeniedFor(joeObject.getPath());
+                        deployAnswer.getMessages().add(deployMessage);
+                        continue;
                     }
 
                     if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
-                        throw new JobSchedulerBadRequestException("unsupported objectType found in database: " + joeObject.getObjectType());
-                        // continue; ... maybe better?
+                        DeployMessage deployMessage = new DeployMessage();
+                        deployMessage.setMessage("unsupported objectType found in database: " + joeObject.getObjectType());
+                        deployMessage.setWrongObjectType(joeObject.getObjectType());
+                        deployAnswer.getMessages().add(deployMessage);
+                        continue;
                     }
 
                     extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
@@ -142,7 +162,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
             Globals.commit(sosHibernateSession);
 
-            return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
+            return JOCDefaultResponse.responseStatus200(deployAnswer);
 
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

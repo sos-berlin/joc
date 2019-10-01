@@ -22,7 +22,7 @@ import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.joe.schedule.Schedule;
 
 public class Helper {
-    
+
     public static final Map<String, Class<?>> CLASS_MAPPING = Collections.unmodifiableMap(new HashMap<String, Class<?>>() {
 
         private static final long serialVersionUID = 1L;
@@ -41,7 +41,7 @@ public class Helper {
             put("OTHER", Other.class);
         }
     });
-    
+
     public static boolean hasPermission(JobSchedulerObjectType objectType, SOSPermissionJocCockpit sosPermission) {
         switch (objectType) {
         case MONITOR:
@@ -104,21 +104,25 @@ public class Helper {
         }
         return fileExtension;
     }
-    
+
     public static String getPathWithoutExtension(String path, JobSchedulerObjectType jobSchedulerObjectType) {
-        return path.substring(0, path.length() - getFileExtension(jobSchedulerObjectType).length());
+        if (path.length() - getFileExtension(jobSchedulerObjectType).length() < 0) {
+            return path;
+        } else {
+            return path.substring(0, path.length() - getFileExtension(jobSchedulerObjectType).length());
+        }
     }
-    
+
     public static boolean pathIsObjectOf(String path, JobSchedulerObjectType jobSchedulerObjectType) {
         return path.endsWith(Helper.getFileExtension(jobSchedulerObjectType));
     }
-    
-    public static byte[] concatByteArray(byte[] a, byte[] b) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-        outputStream.write( a );
-        outputStream.write( b );
 
-       return outputStream.toByteArray( );
+    public static byte[] concatByteArray(byte[] a, byte[] b) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        outputStream.write(a);
+        outputStream.write(b);
+
+        return outputStream.toByteArray();
     }
 
 }

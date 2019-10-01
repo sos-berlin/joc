@@ -1,8 +1,8 @@
 {
-  "title": "filter for deploy requests",
-  "id": "schemas/joe/common/filterDeploy",
+  "title": "filter for joe requests",
+  "id": "schemas/joe/common/Filter",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.common.FilterDeploy",
+  "javaType": "com.sos.joc.model.joe.common.Filter",
   "type": "object",
   "description": "oldPath is used for a move/rename, auditLog only for deploy, forceLive only for read/file",
   "required": [
@@ -19,7 +19,7 @@
     "oldPath": {
       	"$ref": "../../common/path-schema.json"
     },
-    "forcLiveeLive": {
+    "forceLive": {
       "type": "boolean"
     },
     
