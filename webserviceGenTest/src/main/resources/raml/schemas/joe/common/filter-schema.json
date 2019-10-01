@@ -19,7 +19,7 @@
     "oldPath": {
       	"$ref": "../../common/path-schema.json"
     },
-    "forceLive": {
+    "forcLiveeLive": {
       "type": "boolean"
     },
     

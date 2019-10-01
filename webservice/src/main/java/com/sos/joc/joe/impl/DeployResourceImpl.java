@@ -68,10 +68,14 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
 
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
-            filterJoeObjects.setPath(folder + "/" + body.getObjectName());
+            if (body.getObjectName() != null) {
+                filterJoeObjects.setPath(folder + "/" + body.getObjectName());
+            } else {
+                filterJoeObjects.setPath(folder);
+            }
             filterJoeObjects.setObjectType(body.getObjectType());
             filterJoeObjects.setOrderCriteria("created");
-            if (("".equals(body.getObjectName()) || body.getObjectName() == null) && body.getRecursive()) {
+            if (("".equals(body.getObjectName()) || body.getObjectName() == null) && (body.getRecursive() != null && body.getRecursive())) {
                 filterJoeObjects.setRecursive();
             }
 

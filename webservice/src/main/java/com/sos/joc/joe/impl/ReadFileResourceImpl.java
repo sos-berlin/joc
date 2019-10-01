@@ -26,6 +26,9 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.common.JSObjectEdit;
+import com.sos.joc.model.joe.common.JoeMessage;
+import com.sos.joc.model.joe.common.JoeObjectStatus;
+import com.sos.joc.model.joe.common.VersionStateText;
 
 @Path("joe")
 public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileResource {
@@ -37,10 +40,10 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
     public JOCDefaultResponse readFile(final String accessToken, final Filter body) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-             
+
             checkRequiredParameter("objectType", body.getObjectType());
-            
-            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 
+
+            SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
             boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
 
@@ -67,57 +70,80 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
+            JSObjectEdit jsObjectEdit = new JSObjectEdit();
+            jsObjectEdit.setObjectVersionStatus(new JoeObjectStatus());
+            jsObjectEdit.getObjectVersionStatus().setMessage(new JoeMessage());
+            
+            byte[] fileContent = null;
+            byte[] fileLiveContent = null;
+
             DBLayerJoeObjects dbLayerJoeObjects = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
             filterJoeObjects.setConstraint(body);
 
-            DBItemJoeObject dbItemJoeObject = dbLayerJoeObjects.getJoeObject(filterJoeObjects);
+            DBItemJoeObject dbItemJoeObject = null;
+            dbItemJoeObject = dbLayerJoeObjects.getJoeObject(filterJoeObjects);
 
-            JSObjectEdit jsObjectEdit = new JSObjectEdit();
+            Date lastModifiedDate = null;
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-            byte[] fileContent = null;
             try {
-                fileContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
+                fileLiveContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
             } catch (JobSchedulerObjectNotExistException e) {
-                LOGGER.warn(e.toString()); //maybe for this case something special?
+                LOGGER.warn(e.toString()); // maybe for this case something special?
             } catch (JocException e) {
                 LOGGER.warn(e.toString());
             }
 
-            if (fileContent != null) {
-                if (dbItemJoeObject == null || dbItemJoeObject.getConfiguration() == null) {
-                    jsObjectEdit.setConfigurationDate(jocHotFolder.getLastModifiedDate());
-                    jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText("Using version in live folder. No draft version found in database");
-                    jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1000");
+            if (dbItemJoeObject == null || (body.getForceLive() != null && body.getForceLive())) {
+                fileContent = fileLiveContent;
+                if (fileContent != null) {
                     jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType()
                             .value())));
+                    lastModifiedDate = jocHotFolder.getLastModifiedDate();
+                }
+            } else {
+                fileContent = dbItemJoeObject.getConfiguration().getBytes();
+                if (fileContent != null) {
+                    jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(dbItemJoeObject.getConfiguration(), Helper.CLASS_MAPPING
+                            .get(body.getObjectType().value())));
+                    lastModifiedDate = dbItemJoeObject.getModified();
+                }
+            }
+
+            if (fileContent != null) {
+                jsObjectEdit.getObjectVersionStatus().setDeployed(dbItemJoeObject == null);
+                jsObjectEdit.setConfigurationDate(lastModifiedDate);
+
+                if (dbItemJoeObject == null) {
+                    jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText(
+                            "Using version in live folder. No draft version found in database");
+                    jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1000");
+                    jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.DRAFT_NOT_EXIST);
                 } else {
-                    if (jocHotFolder.getLastModifiedDate() != null && jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
-                        jsObjectEdit.setConfigurationDate(jocHotFolder.getLastModifiedDate());
-                        jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText("Version in live folder is newer then draft version in database");
+                    if (fileLiveContent == null) {
+                        jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText("No live version found");
                         jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1001");
-                        jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body
-                                .getObjectType().value())));
+                        jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.LIVE_NOT_EXIST);
                     } else {
-                        jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
-                        jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(dbItemJoeObject.getConfiguration(),
-                                Helper.CLASS_MAPPING.get(body.getObjectType().value())));
-                        jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText("Draft version in database is newer then the version in the live folder");
-                        jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1002");
+                        if (jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
+                            jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText(
+                                    "Version in live folder is newer then draft version in database");
+                            jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1002");
+                            jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.LIVE_IS_NEWER);
+                        } else {
+                            jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText(
+                                    "Draft version in database is newer then the version in the live folder");
+                            jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1003");
+                            jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.DRAFT_IS_NEWER);
+                        }
                     }
                 }
             } else {
-                if (dbItemJoeObject != null && dbItemJoeObject.getConfiguration() != null) {
-                    jsObjectEdit.setConfigurationDate(dbItemJoeObject.getModified());
-                    jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText("Using Draft version in database. No configuration found in the live folder");
-                    jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1003");
-                    jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(dbItemJoeObject.getConfiguration(), Helper.CLASS_MAPPING
-                            .get(body.getObjectType().value())));
-                } else {
-                    fileContent = null;
-                }
+                jsObjectEdit.getObjectVersionStatus().setDeployed(false);
+                jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText("No configuration found");
+                jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1004");
+                jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.NO_CONFIGURATION_EXIST);
             }
-            jsObjectEdit.getObjectVersionStatus().setDeployed(dbItemJoeObject == null);
             jsObjectEdit.setJobschedulerId(body.getJobschedulerId());
             jsObjectEdit.setPath(path);
             jsObjectEdit.setObjectType(body.getObjectType());
