@@ -1,9 +1,7 @@
 package com.sos.joc.joe.impl;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;

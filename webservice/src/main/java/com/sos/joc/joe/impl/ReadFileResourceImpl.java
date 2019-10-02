@@ -73,7 +73,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             JSObjectEdit jsObjectEdit = new JSObjectEdit();
             jsObjectEdit.setObjectVersionStatus(new JoeObjectStatus());
             jsObjectEdit.getObjectVersionStatus().setMessage(new JoeMessage());
-            
+
             byte[] fileContent = null;
             byte[] fileLiveContent = null;
 

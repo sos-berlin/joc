@@ -6,5 +6,11 @@
   "type": "object",
   "extends": {
     "javaType": "com.sos.joc.model.joe.common.JSObjectEdit"
+  },
+  "properties": {
+    "configuration": {
+      "$ref": "../job/job-schema.json"
+    }
   }
 }
+ 
