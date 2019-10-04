@@ -181,6 +181,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 JSEventKey jsEventKey = new JSEventKey();
                 jsEventKey.setEvent(jsCondition.getEventName());
                 jsEventKey.setJobStream(jsCondition.getConditionJobStream());
+                jsEventKey.setSchedulerId(schedulerId);
                 filterOutConditions.addEvent(jsEventKey);
             }
         }
