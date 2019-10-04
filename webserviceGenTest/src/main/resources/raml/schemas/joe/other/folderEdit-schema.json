@@ -9,7 +9,7 @@
   },
   "properties": {
     "configuration": {
-      "$ref": "../job/job-schema.json"
+      "$ref": "empty-configuration-schema.json"
     }
   }
 }
