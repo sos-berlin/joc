@@ -20,6 +20,9 @@
     "exists": {
       "type": "boolean"
     },
+    "globalEvent": {
+      "type": "boolean"
+    },
     "existsInJobStream": {
       "type": "boolean"
     },

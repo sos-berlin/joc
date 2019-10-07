@@ -121,6 +121,11 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             filter.setSession(conditionEvent.getSession());
             filter.setJobStream(conditionEvent.getJobStream());
             filter.setOutConditionId(conditionEvent.getOutConditionId());
+            if (conditionEvent.getGlobalEvent() != null) {
+                filter.setGlobalEvent(conditionEvent.getGlobalEvent());
+            } else {
+                filter.setGlobalEvent(false);
+            }
 
             notifyEventHandler(accessToken, "AddEvent", filter);
             return JOCDefaultResponse.responseStatus200(conditionEvent);
@@ -158,6 +163,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             filter.setEvent(conditionEvent.getEvent());
             filter.setSession(conditionEvent.getSession());
             filter.setJobStream(conditionEvent.getJobStream());
+            filter.setGlobalEvent(conditionEvent.getGlobalEvent());
 
             notifyEventHandler(accessToken, "RemoveEvent", filter);
             return JOCDefaultResponse.responseStatus200(conditionEvent);
@@ -177,6 +183,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             parameters.put("event", filter.getEvent());
             parameters.put("session", filter.getSession());
             parameters.put("jobStream", filter.getJobStream());
+            parameters.put("globalEvent", filter.getGlobalEventAsString());
         }
         customEventsUtil.addEvent(eventKey, parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
