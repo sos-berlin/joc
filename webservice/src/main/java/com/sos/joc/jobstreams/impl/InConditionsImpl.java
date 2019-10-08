@@ -176,11 +176,12 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
         filterOutConditions.setJobSchedulerId(schedulerId);
         for (JSCondition jsCondition : listOfConditions) {
-            if ("event".equals(jsCondition.getConditionType())) {
+            if (jsCondition.typeIsEvent()) {
                 JSEventKey jsEventKey = new JSEventKey();
                 jsEventKey.setEvent(jsCondition.getEventName());
                 jsEventKey.setJobStream(jsCondition.getConditionJobStream());
                 jsEventKey.setSchedulerId(schedulerId);
+                jsEventKey.setGlobalEvent(jsCondition.typeIsGlobalEvent());
                 filterOutConditions.addEvent(jsEventKey);
             }
         }

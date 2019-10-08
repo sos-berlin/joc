@@ -149,8 +149,6 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("jobStream", conditionEvent.getJobStream());
-            this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());
 
             if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
@@ -179,10 +177,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ConditionEventsImpl.class.getName());
         Map<String, String> parameters = new HashMap<String, String>();
         if (filter != null) {
-            parameters.put("outConditionId", String.valueOf(filter.getOutConditionId()));
             parameters.put("event", filter.getEvent());
             parameters.put("session", filter.getSession());
-            parameters.put("jobStream", filter.getJobStream());
+            if (filter.getOutConditionId() != null) {
+                parameters.put("outConditionId", String.valueOf(filter.getOutConditionId()));
+            }
+            if (filter.getJobStream() != null) {
+                parameters.put("jobStream", filter.getJobStream());
+            }
             parameters.put("globalEvent", filter.getGlobalEventAsString());
         }
         customEventsUtil.addEvent(eventKey, parameters);
