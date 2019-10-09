@@ -125,10 +125,10 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                         List<JSCondition> listOfConditions = jsConditions.getListOfConditions(jsInCondition.getExpression());
                         for (JSCondition jsCondition : listOfConditions) {
-                            if (!conditionExpression.getJobStreamEvents().contains(jsCondition.getEventName())) {
+                            if (!conditionExpression.getJobStreamEvents().contains(jsCondition.getEventNameWithType())) {
                                 if (jsCondition.getConditionJobStream().isEmpty() || jsInCondition.getJobStream().equals(jsCondition
                                         .getConditionJobStream())) {
-                                    conditionExpression.getJobStreamEvents().add(jsCondition.getEventName());
+                                    conditionExpression.getJobStreamEvents().add(jsCondition.getEventNameWithType());
                                 }
                             }
                         }
@@ -195,7 +195,6 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
             Map<JSJobConditionKey, JSOutConditions> mapOfjsOutConditions = jsJobOutConditions.getListOfJobOutConditions();
             Map<String, HashMap<String, ArrayList<String>>> listOfJobstreams = new HashMap<String, HashMap<String, ArrayList<String>>>();
-            // List<> listOfJobs = new HashMap<String,LinkedHashSet<OutConditionRef>>();
 
             for (JSOutConditions jsOutConditions : mapOfjsOutConditions.values()) {
                 for (JSOutCondition jsOutCondition : jsOutConditions.getListOfOutConditions().values()) {

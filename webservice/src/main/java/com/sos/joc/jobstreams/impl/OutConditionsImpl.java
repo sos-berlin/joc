@@ -126,6 +126,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             OutConditionEvent outConditionEvent = new OutConditionEvent();
                             outConditionEvent.setEvent(jsOutConditionEvent.getEventValue());
                             outConditionEvent.setCommand(jsOutConditionEvent.getCommand());
+                            outConditionEvent.setGlobalEvent(jsOutConditionEvent.isGlobal());
                             jsEventKey.setEvent(jsOutConditionEvent.getEvent());
                             jsEventKey.setGlobalEvent(jsOutConditionEvent.isGlobal());
                             jsEventKey.setSchedulerId(jobFilterSchema.getJobschedulerId());
@@ -164,7 +165,6 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
         List<JobstreamConditions> listOfJobStreamConditions = new ArrayList<JobstreamConditions>();
         Map<String, HashMap<String, ArrayList<String>>> listOfJobstreams = new HashMap<String, HashMap<String, ArrayList<String>>>();
-
         for (DBItemInCondition dbItemInCondition : listOfInConditionsItems) {
             String expression = " " + dbItemInCondition.getExpression() + " ";
             String jobStream = dbItemInCondition.getJobStream();
@@ -175,7 +175,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             for (OutConditionEvent event : outCondition.getOutconditionEvents()) {
                 boolean eventIsUsedInExpression = false;
                 for (JSCondition jsCondition : listOfConditions) {
-                    if ("event".equals(jsCondition.getConditionType())) {
+                    if (jsCondition.typeIsEvent() && (jsCondition.typeIsGlobalEvent() == event.getGlobalEvent())) {
                         if (jsCondition.getEventName().equals(event.getEvent()) && ("".equals(jsCondition.getConditionJobStream()) || outCondition.getJobStream().equals(jsCondition.getConditionJobStream()))){
                             eventIsUsedInExpression = true;
                             continue;
@@ -199,7 +199,9 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                         listOfExpressions = listOfJobs.get(dbItemInCondition.getJob());
                     }
 
-                    listOfExpressions.add(expression);
+                    if (!listOfExpressions.contains(expression)){
+                        listOfExpressions.add(expression);
+                    }
                     listOfJobs.put(dbItemInCondition.getJob(), listOfExpressions);
                     listOfJobstreams.put(jobStream, listOfJobs);
                 }

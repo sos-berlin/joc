@@ -53,6 +53,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             FilterEvents filter = new FilterEvents();
+            filter.setIncludingGlobalEvent(true);
             filter.setSchedulerId(conditionEventsFilter.getJobschedulerId());
             filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
 
@@ -79,6 +80,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                     conditionEvent.setSession(dbItemEvent.getSession());
                     conditionEvent.setJobStream(dbItemEvent.getJobStream());
                     conditionEvent.setPath(dbItemOutCondition.getPath());
+                    conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
+
                     if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getPath().equals(
                             conditionEventsFilter.getPath())) {
                         conditionEvents.getConditionEvents().add(conditionEvent);
