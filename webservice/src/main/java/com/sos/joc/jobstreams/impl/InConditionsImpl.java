@@ -118,12 +118,11 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 if (jsJobInConditions.getInConditions(jsJobConditionKey) != null) {
                     for (JSInCondition jsInCondition : jsJobInConditions.getInConditions(jsJobConditionKey).getListOfInConditions().values()) {
                         InCondition inCondition = new InCondition();
-                        JSConditions jsConditions = new JSConditions();
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsInCondition.getExpression());
                         conditionExpression.setValue(jsConditionResolver.validate(null, jsInCondition));
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
-                        List<JSCondition> listOfConditions = jsConditions.getListOfConditions(jsInCondition.getExpression());
+                        List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
                         for (JSCondition jsCondition : listOfConditions) {
                             if (!conditionExpression.getJobStreamEvents().contains(jsCondition.getEventNameWithType())) {
                                 if (jsCondition.getConditionJobStream().isEmpty() || jsInCondition.getJobStream().equals(jsCondition
@@ -168,9 +167,8 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
     private List<JobstreamConditions> getOutConditions(JSJobConditionKey jsJobConditionKey, String schedulerId, JSInCondition jsInCondition)
             throws SOSHibernateException {
-        JSConditions jsConditions = new JSConditions();
         List<JobstreamConditions> listOfJobStreamConditions = new ArrayList<JobstreamConditions>();
-        List<JSCondition> listOfConditions = jsConditions.getListOfConditions(jsInCondition.getExpression());
+        List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
         DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
         FilterOutConditions filterOutConditions = new FilterOutConditions();
 

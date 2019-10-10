@@ -74,7 +74,6 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback(sosHibernateSession);
             Globals.disconnect(sosHibernateSession);
         }
     }

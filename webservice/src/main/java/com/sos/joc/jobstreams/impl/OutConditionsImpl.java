@@ -169,8 +169,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             String expression = " " + dbItemInCondition.getExpression() + " ";
             String jobStream = dbItemInCondition.getJobStream();
 
-            JSConditions jsConditions = new JSConditions();
-            List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expression);
+            List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expression);
 
             for (OutConditionEvent event : outCondition.getOutconditionEvents()) {
                 boolean eventIsUsedInExpression = false;
