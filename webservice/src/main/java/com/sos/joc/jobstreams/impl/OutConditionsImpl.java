@@ -130,7 +130,15 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             jsEventKey.setEvent(jsOutConditionEvent.getEvent());
                             jsEventKey.setGlobalEvent(jsOutConditionEvent.isGlobal());
                             jsEventKey.setSchedulerId(jobFilterSchema.getJobschedulerId());
+                            jsEventKey.setJobStream(outCondition.getJobStream());
                             if (jsOutConditionEvent.isCreateCommand()) {
+                                if (jsOutConditionEvent.isGlobal()) {
+                                    jsEventKey.setSchedulerId(null);
+                                    jsEventKey.setGlobalEvent(true);
+                                } else {
+                                    jsEventKey.setSchedulerId(jobFilterSchema.getJobschedulerId());
+                                    jsEventKey.setGlobalEvent(false);
+                                }
                                 outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey, outCondition.getJobStream()));
                                 outConditionEvent.setExists(jsConditionResolver.eventExists(jsEventKey, ""));
                             } else {
@@ -175,7 +183,8 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 boolean eventIsUsedInExpression = false;
                 for (JSCondition jsCondition : listOfConditions) {
                     if (jsCondition.typeIsEvent() && (jsCondition.typeIsGlobalEvent() == event.getGlobalEvent())) {
-                        if (jsCondition.getEventName().equals(event.getEvent()) && ("".equals(jsCondition.getConditionJobStream()) || outCondition.getJobStream().equals(jsCondition.getConditionJobStream()))){
+                        if (jsCondition.getEventName().equals(event.getEvent()) && ("".equals(jsCondition.getConditionJobStream()) || outCondition
+                                .getJobStream().equals(jsCondition.getConditionJobStream()))) {
                             eventIsUsedInExpression = true;
                             continue;
                         }
@@ -198,7 +207,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                         listOfExpressions = listOfJobs.get(dbItemInCondition.getJob());
                     }
 
-                    if (!listOfExpressions.contains(expression)){
+                    if (!listOfExpressions.contains(expression)) {
                         listOfExpressions.add(expression);
                     }
                     listOfJobs.put(dbItemInCondition.getJob(), listOfExpressions);

@@ -14,54 +14,57 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobstreams.resource.IResetJobStreamResource;
 import com.sos.joc.model.jobstreams.ResetJobStream;
+import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 
 @Path("jobstreams")
 public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStreamResource {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ResetJobStreamImpl.class);
-	private static final String API_CALL = "./conditions/resetjobstreams";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResetJobStreamImpl.class);
+    private static final String API_CALL = "./conditions/resetjobstreams";
 
-	@Override
-	public JOCDefaultResponse resetJobStream(String accessToken, ResetJobStream resetJobStream) throws Exception {
-		try {
+    @Override
+    public JOCDefaultResponse resetJobStream(String accessToken, ResetJobStream resetJobStream) throws Exception {
+        try {
 
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetJobStream, accessToken,
-					resetJobStream.getJobschedulerId(),
-					getPermissonsJocCockpit(resetJobStream.getJobschedulerId(), accessToken).getJobStream().getChange()
-							.isConditions());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
-			notifyEventHandler(accessToken, resetJobStream);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetJobStream, accessToken, resetJobStream.getJobschedulerId(),
+                    getPermissonsJocCockpit(resetJobStream.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
-			return JOCDefaultResponse.responseStatus200(resetJobStream);
+            try {
+                notifyEventHandler(accessToken, resetJobStream);
+            } catch (JobSchedulerConnectionRefusedException e) {
+                LOGGER.warn(
+                        "Reset Job Stream: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Job Stream not resetted");
+            }
 
-		} catch (Exception e) {
-			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		} finally {
+            return JOCDefaultResponse.responseStatus200(resetJobStream);
 
-		}
-	}
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
 
-	private String notifyEventHandler(String accessToken, ResetJobStream resetJobStream)
-			throws JsonProcessingException, JocException {
-		CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
+        }
+    }
 
-		Map<String, String> parameters = new HashMap<String, String>();
-		if (resetJobStream.getJob() != null) {
-			parameters.put("job", resetJobStream.getJob());
-		}
-		parameters.put("session", com.sos.jobstreams.classes.Constants.getSession());
-		if (resetJobStream.getJobStream() != null) {
-			parameters.put("jobStream", resetJobStream.getJobStream());
-		}
+    private String notifyEventHandler(String accessToken, ResetJobStream resetJobStream) throws JsonProcessingException, JocException {
+        CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
 
-		customEventsUtil.addEvent("ResetConditionResolver", parameters);
-		String notifyCommand = customEventsUtil.getEventCommandAsXml();
-		com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(
-				dbItemInventoryInstance);
-		return jocXmlCommand.executePost(notifyCommand, accessToken);
-	}
+        Map<String, String> parameters = new HashMap<String, String>();
+        if (resetJobStream.getJob() != null) {
+            parameters.put("job", resetJobStream.getJob());
+        }
+        parameters.put("session", com.sos.jobstreams.classes.Constants.getSession());
+        if (resetJobStream.getJobStream() != null) {
+            parameters.put("jobStream", resetJobStream.getJobStream());
+        }
+
+        customEventsUtil.addEvent("ResetConditionResolver", parameters);
+        String notifyCommand = customEventsUtil.getEventCommandAsXml();
+        com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
+        return jocXmlCommand.executePost(notifyCommand, accessToken);
+    }
 
 }

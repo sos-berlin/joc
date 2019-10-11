@@ -1,4 +1,5 @@
 package com.sos.joc.jobstreams.impl;
+
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobstreams.resource.IStartConditionResolverResource;
 import com.sos.joc.model.jobstreams.StartResolver;
+import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 
 @Path("jobstreams")
@@ -22,12 +24,18 @@ public class StartConditionResolverImpl extends JOCResourceImpl implements IStar
     public JOCDefaultResponse startConditionResolver(String accessToken, StartResolver startResolver) throws Exception {
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, startResolver, accessToken, startResolver.getJobschedulerId(), getPermissonsJocCockpit(
-                    null, accessToken).getJobStream().getChange().isConditions());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, startResolver, accessToken, startResolver.getJobschedulerId(),
+                    getPermissonsJocCockpit(null, accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            notifyEventHandler(accessToken);
+
+            try {
+                notifyEventHandler(accessToken);
+            } catch (JobSchedulerConnectionRefusedException e) {
+                LOGGER.warn(
+                        "Start Condition Resolver: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Conditions not resolved");
+            }
 
             return JOCDefaultResponse.responseStatusJSOk(null);
 

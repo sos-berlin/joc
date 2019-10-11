@@ -1,4 +1,5 @@
 package com.sos.joc.jobstreams.impl;
+
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
@@ -13,8 +14,9 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobstreams.resource.IEditInConditionsResource;
 import com.sos.joc.model.jobstreams.InConditions;
+import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
- 
+
 @Path("jobstreams/edit")
 public class EditInConditionsImpl extends JOCResourceImpl implements IEditInConditionsResource {
 
@@ -26,8 +28,8 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
         SOSHibernateSession sosHibernateSession = null;
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, inConditions, accessToken, inConditions.getJobschedulerId(), getPermissonsJocCockpit(
-                    inConditions.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, inConditions, accessToken, inConditions.getJobschedulerId(),
+                    getPermissonsJocCockpit(inConditions.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -37,8 +39,12 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
             sosHibernateSession.beginTransaction();
             dbLayerInConditions.deleteInsert(inConditions);
             sosHibernateSession.commit();
-            notifyEventHandler(accessToken);
-
+            try {
+                notifyEventHandler(accessToken);
+            } catch (JobSchedulerConnectionRefusedException e) {
+                LOGGER.warn(
+                        "Edit In Conditon: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Data are stored in Database");
+            }
             return JOCDefaultResponse.responseStatus200(inConditions);
 
         } catch (JocException e) {

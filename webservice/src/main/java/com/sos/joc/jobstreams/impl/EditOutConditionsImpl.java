@@ -1,4 +1,5 @@
 package com.sos.joc.jobstreams.impl;
+
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobstreams.resource.IEditOutConditionsResource;
 import com.sos.joc.model.jobstreams.OutConditions;
+import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 
 @Path("jobstreams/edit")
@@ -26,8 +28,8 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
         SOSHibernateSession sosHibernateSession = null;
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, outConditions, accessToken, outConditions.getJobschedulerId(), getPermissonsJocCockpit(
-                    outConditions.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, outConditions, accessToken, outConditions.getJobschedulerId(),
+                    getPermissonsJocCockpit(outConditions.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -38,7 +40,11 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
             sosHibernateSession.beginTransaction();
             dbLayerOutConditions.deleteInsert(outConditions);
             sosHibernateSession.commit();
-            notifyEventHandler(accessToken);
+            try {
+                notifyEventHandler(accessToken);
+            } catch (JobSchedulerConnectionRefusedException e) {
+                LOGGER.warn("Edit Out Conditon: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Data are stored in Database");
+            }
             return JOCDefaultResponse.responseStatus200(outConditions);
 
         } catch (JocException e) {
@@ -52,7 +58,7 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
         }
     }
 
-    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException{
+    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(EditOutConditionsImpl.class.getName());
         customEventsUtil.addEvent("InitConditionResolver");
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
