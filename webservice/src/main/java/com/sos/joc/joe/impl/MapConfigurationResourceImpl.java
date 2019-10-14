@@ -33,10 +33,6 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
                 return jocDefaultResponse;
             }
             
-            if (versionIsOlderThan("1.13.1")) {
-                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
-            }
-
             SAXReader reader = new SAXReader();
             reader.setValidation(false);
             final String rootElementName = reader.read(new ByteArrayInputStream(requestBody)).getRootElement().getName().toLowerCase();
@@ -107,10 +103,6 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
                 return jocDefaultResponse;
             }
             
-            if (versionIsOlderThan("1.13.1")) {
-                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
-            }
-
             String objType = objectType.replaceAll("_", "").toUpperCase();
             
             if (!Helper.CLASS_MAPPING.containsKey(objType)) {
