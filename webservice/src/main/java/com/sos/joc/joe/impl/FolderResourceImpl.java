@@ -51,9 +51,10 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                 return jocDefaultResponse;
             }
 
-            if (versionIsOlderThan("1.13.1")) {
-                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
-            }
+//            This check is only necessary if JobScheduler API is used (online version)
+//            if (versionIsOlderThan("1.13.1")) {
+//                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
+//            }
 
             checkRequiredParameter("path", body.getPath());
             body.setPath(normalizeFolder(body.getPath()));
@@ -127,7 +128,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             
             Folder entity = new Folder();
             
-//            //online version: needs connection timeout (default=2s), if not available
+//            //online version: needs too much time -> connection timeout (default=2s), if not available
 //            try {
 //                JOCHotFolder httpClient = new JOCHotFolder(this);
 //                JsonArray folder = httpClient.getFolder(path);
