@@ -24,7 +24,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IFolderResource;
@@ -114,6 +113,9 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             if (inventoryFiles != null) {
                 for (DBItemInventoryFile inventoryFile : inventoryFiles) {
                     String objectType = inventoryFile.getFileType().replaceAll("_", "").toUpperCase();
+                    if ("/".equals(body.getPath()) && "PROCESSCLASS".equals(objectType) && "(default)".equals(inventoryFile.getFileBaseName())) {
+                        continue;
+                    }
                     if ("AGENTCLUSTER".equals(objectType)) {
                         objectType = "PROCESSCLASS";
                     }
