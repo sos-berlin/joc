@@ -53,7 +53,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
 
             checkRequiredParameter("folder", body.getFolder());
-            if (!body.getObjectType().value().isEmpty() && !Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
+            if (body.getObjectType() != null && !body.getObjectType().value().isEmpty() && !Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
 

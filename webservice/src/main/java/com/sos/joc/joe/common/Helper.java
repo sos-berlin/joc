@@ -43,6 +43,12 @@ public class Helper {
     });
 
     public static boolean hasPermission(JobSchedulerObjectType objectType, SOSPermissionJocCockpit sosPermission) {
+        if (objectType == null) {
+            return sosPermission.getJob().getChange().isHotfolder() && sosPermission.getJobChain().getChange().isHotFolder() && sosPermission
+                    .getProcessClass().getChange().isHotFolder() && sosPermission.getOrder().getChange().isHotFolder() && sosPermission.getSchedule()
+                            .getChange().isHotFolder() && sosPermission.getLock().getChange().isHotFolder();
+        }
+
         switch (objectType) {
         case MONITOR:
         case JOB:
