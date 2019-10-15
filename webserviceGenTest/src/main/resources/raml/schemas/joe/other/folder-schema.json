@@ -15,9 +15,6 @@
 		"path": {
 			"$ref": "../../common/path-schema.json"
 		},
-		"_message": {
-			"type": "string"
-		},
 		"folders": {
 			"type": "array",
 			"items": {

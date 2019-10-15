@@ -6,8 +6,6 @@
   "javaInterfaces" : [
     "com.sos.joc.model.joe.common.IJSObject"
   ],
-  "type": "object",
-  "properties": {
-    }
+  "type": "object"
     
 }

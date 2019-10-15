@@ -299,7 +299,7 @@
 									<propertyWordDelimiters>- </propertyWordDelimiters>
 									<initializeCollections>false</initializeCollections>
 									<includeAdditionalProperties>false</includeAdditionalProperties>
-									<includeConstructors>true</includeConstructors>
+									<!-- includeConstructors>true</includeConstructors -->
 									<includes>
 										<include>joe/**/*.json</include>
 									</includes>

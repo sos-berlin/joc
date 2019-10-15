@@ -15,6 +15,47 @@
 		"deployed": {
 			"type": "boolean",
 			"default": false
+		},
+		"title": {
+			"type": "string"
+		},
+		"processClass": {
+			"description": "for jobs and job chains",
+			"type": "string"
+		},
+    	"isOrderJob": {
+      		"description": "for jobs: possible values: yes, no, 1, 0, true, false",
+      		"type": "string"
+    	},
+    	"priority": {
+      		"description": "for orders",
+      		"type": "string"
+    	},
+	    "state": {
+	    	"description": "for orders",
+	    	"type": "string"
+	    },
+	    "endState": {
+	    	"description": "for orders",
+	    	"type": "string"
+	    },
+	    "maxProcesses": {
+	    	"$ref": "../../common/nonNegativeInteger-schema.json"
+	    },
+	    "maxNonExclusive": {
+			"$ref": "../../common/nonNegativeInteger-schema.json"
+		},
+		"validFrom": {
+			"description": "for schedule: yyyy-mm-dd HH:MM[:SS]",
+			"type": "string"
+		},
+		"validTo": {
+			"description": "for schedule: yyyy-mm-dd HH:MM[:SS]",
+			"type": "string"
+		},
+		"substitute": {
+			"description": "for schedule: path to another schedule",
+			"type": "string"
 		}
 	}
 }
