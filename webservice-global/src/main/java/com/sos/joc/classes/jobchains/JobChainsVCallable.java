@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.classes.JobVolatileJson;
+import com.sos.joc.classes.JobsVCallable;
 import com.sos.joc.classes.filters.FilterAfterResponse;
-import com.sos.joc.classes.jobs.JobVolatileJson;
-import com.sos.joc.classes.jobs.JobsVCallable;
 import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;

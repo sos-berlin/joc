@@ -1,4 +1,4 @@
-package com.sos.joc.classes.jobs;
+package com.sos.joc.classes;
 
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -14,10 +14,6 @@ import javax.json.JsonValue.ValueType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.classes.JOCJsonCommand;
-import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.orders.OrdersSnapshotCallable;
 import com.sos.joc.classes.orders.OrdersSnapshotEvent;
@@ -35,9 +31,8 @@ import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.TaskCause;
 import com.sos.joc.model.order.OrdersSummary;
 
-
 public class JobVolatileJson extends JobV {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobVolatileJson.class);
     private final JsonObject job;
     private final JsonObject overview;
@@ -47,7 +42,7 @@ public class JobVolatileJson extends JobV {
     private JOCResourceImpl jocResourceImpl;
     private String accessToken = null;
     private JsonObject summary = null;
-    
+
     public JobVolatileJson(JsonObject job, Boolean compactView, JsonObject summary) {
         this.job = job;
         this.overview = getJobOverview();
@@ -56,7 +51,7 @@ public class JobVolatileJson extends JobV {
         this.summary = summary;
         this.compactView = compactView;
     }
-    
+
     public JobVolatileJson(JsonObject job, Boolean compactView, Boolean withOrderQueue) {
         this.job = job;
         this.overview = getJobOverview();
@@ -65,11 +60,11 @@ public class JobVolatileJson extends JobV {
         this.summary = null;
         this.compactView = compactView;
     }
-    
+
     public boolean isOrderJob() {
         return orderJob;
     }
-    
+
     public void setPath() {
         if (getPath() == null) {
             setPath(this.overview.getString(WebserviceConstants.PATH, null));
@@ -95,22 +90,23 @@ public class JobVolatileJson extends JobV {
                 } catch (Exception e) {
                     getState().set_text(JobStateText.fromValue("UNKNOWN"));
                 }
-                Optional<JsonValue> obstacleWaitingTypeObject = obstacles.stream().filter(p -> ((JsonObject) p).getString("TYPE", "").startsWith("Waiting")).findFirst();
+                Optional<JsonValue> obstacleWaitingTypeObject = obstacles.stream().filter(p -> ((JsonObject) p).getString("TYPE", "").startsWith(
+                        "Waiting")).findFirst();
                 if (obstacleWaitingTypeObject.isPresent()) {
                     String obstacleWaitingType = ((JsonObject) obstacleWaitingTypeObject.get()).getString("TYPE");
                     if (obstacleWaitingType.equals("WaitingForLocks")) {
-                        getState().set_text(JobStateText.WAITING_FOR_LOCK); 
+                        getState().set_text(JobStateText.WAITING_FOR_LOCK);
                     } else if (obstacleWaitingType.equals("WaitingForProcessClass")) {
                         getState().set_text(JobStateText.WAITING_FOR_PROCESS);
                     }
                 } else if (isWaitingForAgent()) {
                     getState().set_text(JobStateText.WAITING_FOR_AGENT);
-                //} else if (false) { //TODO condition for WAITING_FOR_TASK
+                    // } else if (false) { //TODO condition for WAITING_FOR_TASK
                     // TODO: WaitingForTask has to be improved
                     // Look into queue items where start_time in the past
                     // it could be that a task is queued caused of a delayed
                     // start instead of max tasks is reached
-                //    getState().set_text(JobStateText.WAITING_FOR_TASK);
+                    // getState().set_text(JobStateText.WAITING_FOR_TASK);
                 } else if (isOrderJob() && getState().get_text() == JobStateText.PENDING && !overview.getBoolean("isInPeriod", true)) {
                     getState().set_text(JobStateText.NOT_IN_PERIOD);
                 }
@@ -118,13 +114,14 @@ public class JobVolatileJson extends JobV {
             setSeverity(getState());
         }
     }
-    
+
     private boolean isWaitingForAgent() {
         JsonObject taskObstacles = overview.getJsonObject("taskObstacles");
         if (taskObstacles != null) {
             for (JsonValue j : taskObstacles.values()) {
                 if (j.getValueType() == ValueType.ARRAY) {
-                    if (((JsonArray) j).stream().filter(p -> ((JsonObject) p).getString("TYPE", "").equals("WaitingForAgent")).findFirst().isPresent()) {
+                    if (((JsonArray) j).stream().filter(p -> ((JsonObject) p).getString("TYPE", "").equals("WaitingForAgent")).findFirst()
+                            .isPresent()) {
                         return true;
                     }
                 } else {
@@ -134,8 +131,8 @@ public class JobVolatileJson extends JobV {
         }
         return false;
     }
-    
-    //JOC-89, order job is pending for some states if node doesn't have a running order
+
+    // JOC-89, order job is pending for some states if node doesn't have a running order
     public void setState(boolean hasRunningOrWaitingOrder) {
         if (getState() == null) {
             setState();
@@ -152,14 +149,14 @@ public class JobVolatileJson extends JobV {
                 state.set_text(JobStateText.PENDING);
                 state.setSeverity(1);
                 setState(state);
-                //setRunningTasks(null);
-                //setNumOfRunningTasks(0);
+                // setRunningTasks(null);
+                // setNumOfRunningTasks(0);
             default:
                 break;
             }
         }
     }
-    
+
     public void setFields(boolean compact, JOCResourceImpl jocResourceImpl, String accessToken) throws JocException {
         this.accessToken = accessToken;
         this.jocResourceImpl = jocResourceImpl;
@@ -185,7 +182,7 @@ public class JobVolatileJson extends JobV {
         setTaskQueue();
         setRunningTasks();
         setTemporary(null);
-        //TODO check if field is correct
+        // TODO check if field is correct
         if (isOrderJob()) {
             setDelayUntil(null);
         } else {
@@ -197,7 +194,7 @@ public class JobVolatileJson extends JobV {
         setPath();
         setState();
         setName(Paths.get(getPath()).getFileName().toString());
-        setLocks(null); //is not displayed in JOC Cockpit
+        setLocks(null); // is not displayed in JOC Cockpit
         setStateText(overview.getString("stateText", ""));
         setNextStartTime(JobSchedulerDate.getDateFromISO8601String(overview.getString("nextStartTime", Instant.EPOCH.toString())));
         if (!isOrderJob() && getNextStartTime() == null) {
@@ -214,7 +211,7 @@ public class JobVolatileJson extends JobV {
             setOrderQueue(null);
         }
     }
-    
+
     private void setErr(JsonObject errorElem) {
         if (errorElem != null) {
             Err err = new Err();
@@ -256,11 +253,11 @@ public class JobVolatileJson extends JobV {
             break;
         }
     }
-    
+
     private void setTaskQueue() {
         JsonArray taskList = job.getJsonArray("queuedTasks");
         if (taskList != null && !taskList.isEmpty()) {
-            List<QueuedTask> queuedTasks = new ArrayList<QueuedTask>(); 
+            List<QueuedTask> queuedTasks = new ArrayList<QueuedTask>();
             for (JsonObject queuedTask : taskList.getValuesAs(JsonObject.class)) {
                 QueuedTask taskQueue = new QueuedTask();
                 taskQueue.setTaskId(queuedTask.getString("taskId", null));
@@ -273,7 +270,7 @@ public class JobVolatileJson extends JobV {
             setTaskQueue(null);
         }
     }
-    
+
     private void setRunningTasks() {
         JsonArray taskList = job.getJsonArray("runningTasks");
         if (taskList != null && !taskList.isEmpty()) {
@@ -284,25 +281,25 @@ public class JobVolatileJson extends JobV {
                     task.set_cause(TaskCause.fromValue(runningTask.getString("cause", "").toUpperCase()));
                 } catch (Exception e) {
                 }
-                task.setIdleSince(null); //not displayed in JOC, missing in JSON answer
+                task.setIdleSince(null); // not displayed in JOC, missing in JSON answer
                 task.setStartedAt(JobSchedulerDate.getDateFromISO8601String(runningTask.getString("startedAt", Instant.EPOCH.toString())));
-                task.setEnqueued(JobSchedulerDate.getDateFromISO8601String(runningTask.getString("enqueuedAt", Instant.EPOCH.toString()))); 
-                //task.setPlannedStart(JobSchedulerDate.getDateFromISO8601String(runningTask.getString("startAt", Instant.EPOCH.toString())));
+                task.setEnqueued(JobSchedulerDate.getDateFromISO8601String(runningTask.getString("enqueuedAt", Instant.EPOCH.toString())));
+                // task.setPlannedStart(JobSchedulerDate.getDateFromISO8601String(runningTask.getString("startAt", Instant.EPOCH.toString())));
                 if (task.getEnqueued() == null) {
-                    task.setEnqueued(task.getStartedAt()); 
+                    task.setEnqueued(task.getStartedAt());
                 }
                 task.setPid(runningTask.getInt("pid", 0));
-                task.setSteps(0); //TODO missing in JSON answer
+                task.setSteps(0); // TODO missing in JSON answer
                 task.setTaskId(runningTask.getString("taskId", null));
                 JsonObject jsonOrder = runningTask.getJsonObject("order");
                 if (jsonOrder != null) {
                     OrderOfTask order = new OrderOfTask();
-                    order.setInProcessSince(null); //not displayed in JOC, missing in JSON answer
+                    order.setInProcessSince(null); // not displayed in JOC, missing in JSON answer
                     order.setJobChain(jsonOrder.getString("jobChainPath", null));
                     order.setOrderId(jsonOrder.getString("orderId", null));
-                    order.setPath(order.getJobChain()+","+order.getOrderId());
-                    order.setState(null); //not displayed in JOC, missing in JSON answer
-                    order.setTitle(null); //not displayed in JOC, missing in JSON answer
+                    order.setPath(order.getJobChain() + "," + order.getOrderId());
+                    order.setState(null); // not displayed in JOC, missing in JSON answer
+                    order.setTitle(null); // not displayed in JOC, missing in JSON answer
                     task.setOrder(order);
                 }
                 runningTasks.add(task);
@@ -312,7 +309,7 @@ public class JobVolatileJson extends JobV {
             setRunningTasks((List<RunningTask>) null);
         }
     }
-    
+
     private void setSummary() throws JocException {
         if (isOrderJob() && compactView != Boolean.TRUE) {
             JsonObject j = null;
@@ -330,22 +327,24 @@ public class JobVolatileJson extends JobV {
                         "inTaskProcess", 0));
                 setOrdersSummary(ordersSummary);
             } else {
-                JOCJsonCommand jocJsonCommand = new JOCJsonCommand(jocResourceImpl);
-                jocJsonCommand.setUriBuilderForJobs();
-                jocJsonCommand.addOrderStatisticsQuery(false);
-                OrdersSnapshotEvent o = new OrdersSnapshotCallable(getPath(), jocJsonCommand, accessToken).getOrdersSnapshot();
-                OrdersSummary ordersSummary = new OrdersSummary();
-                ordersSummary.setBlacklist(o.getBlacklist());
-                ordersSummary.setPending(o.getPending());
-                ordersSummary.setSetback(o.getSetback());
-                ordersSummary.setRunning(o.getRunning());
-                ordersSummary.setSuspended(o.getSuspended());
-                ordersSummary.setWaitingForResource(o.getWaitingForResource());
-                setOrdersSummary(ordersSummary);
+                if (jocResourceImpl != null) {
+                    JOCJsonCommand jocJsonCommand = new JOCJsonCommand(jocResourceImpl);
+                    jocJsonCommand.setUriBuilderForJobs();
+                    jocJsonCommand.addOrderStatisticsQuery(false);
+                    OrdersSnapshotEvent o = new OrdersSnapshotCallable(getPath(), jocJsonCommand, accessToken).getOrdersSnapshot();
+                    OrdersSummary ordersSummary = new OrdersSummary();
+                    ordersSummary.setBlacklist(o.getBlacklist());
+                    ordersSummary.setPending(o.getPending());
+                    ordersSummary.setSetback(o.getSetback());
+                    ordersSummary.setRunning(o.getRunning());
+                    ordersSummary.setSuspended(o.getSuspended());
+                    ordersSummary.setWaitingForResource(o.getWaitingForResource());
+                    setOrdersSummary(ordersSummary);
+                }
             }
         }
     }
-    
+
     private JsonObject getJobOverview() {
         return job.containsKey("overview") ? job.getJsonObject("overview") : job;
     }

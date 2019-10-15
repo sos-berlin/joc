@@ -82,7 +82,7 @@ public class Globals {
                 sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getYadeClassMapping());
-                sosHibernateFactory.addClassMapping(com.sos.jobstreams.classes.Constants.getConditionsClassMapping());
+                sosHibernateFactory.addClassMapping(DBLayer.getJobStreamClassMapping());
                 sosHibernateFactory.setAutoCommit(true);
                 sosHibernateFactory.build();
             } catch (SOSHibernateConfigurationException | SOSHibernateFactoryBuildException e) {

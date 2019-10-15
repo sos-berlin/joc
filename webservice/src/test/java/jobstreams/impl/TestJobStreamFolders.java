@@ -12,10 +12,6 @@ import java.util.Set;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.sos.jobstreams.classes.Constants;
-import com.sos.jobstreams.db.DBItemInCondition;
-import com.sos.jobstreams.db.DBItemOutCondition;
-import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 import com.sos.jobstreams.db.DBLayerInConditions;
 import com.sos.jobstreams.db.DBLayerOutConditions;
 import com.sos.jobstreams.db.FilterInConditions;
@@ -26,6 +22,10 @@ import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
+import com.sos.jitl.jobstreams.Constants;
+import com.sos.jitl.jobstreams.db.DBItemInCondition;
+import com.sos.jitl.jobstreams.db.DBItemOutCondition;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 
 public class TestJobStreamFolders {
 

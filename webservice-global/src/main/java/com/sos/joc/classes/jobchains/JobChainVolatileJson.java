@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.classes.JobVolatileJson;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
-import com.sos.joc.classes.jobs.JobVolatileJson;
 import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.ConfigurationState;

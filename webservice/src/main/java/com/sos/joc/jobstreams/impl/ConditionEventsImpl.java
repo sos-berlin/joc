@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jobstreams.db.DBItemEvent;
-import com.sos.jobstreams.db.DBItemOutCondition;
-import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
+import com.sos.jitl.jobstreams.db.DBItemEvent;
+import com.sos.jitl.jobstreams.db.DBItemOutCondition;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
 import com.sos.jobstreams.db.DBLayerEvents;
 import com.sos.jobstreams.db.DBLayerOutConditions;
 import com.sos.jobstreams.db.FilterEvents;
@@ -58,7 +58,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
 
             if (conditionEventsFilter.getSession() == null || conditionEventsFilter.getSession().isEmpty()) {
-                filter.setSession(com.sos.jobstreams.classes.Constants.getSession());
+                filter.setSession(com.sos.jitl.jobstreams.Constants.getSession());
             } else {
                 filter.setSession(conditionEventsFilter.getSession());
 
@@ -110,7 +110,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             }
 
             if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession(com.sos.jobstreams.classes.Constants.getSession());
+                conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());
             } else {
                 conditionEvent.setSession(conditionEvent.getSession());
             }
@@ -155,7 +155,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             this.checkRequiredParameter("event", conditionEvent.getEvent());
 
             if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession(com.sos.jobstreams.classes.Constants.getSession());
+                conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());
             } else {
                 conditionEvent.setSession(conditionEvent.getSession());
             }

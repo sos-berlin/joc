@@ -9,11 +9,11 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.jobstreams.db.DBItemInCondition;
+import com.sos.jitl.jobstreams.db.DBItemOutCondition;
 import com.sos.jitl.reporting.db.DBItemReportTask;
 import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
 import com.sos.jitl.reporting.db.filter.ReportExecutionFilter;
-import com.sos.jobstreams.db.DBItemInCondition;
-import com.sos.jobstreams.db.DBItemOutCondition;
 import com.sos.jobstreams.db.DBLayerInConditions;
 import com.sos.jobstreams.db.DBLayerOutConditions;
 import com.sos.jobstreams.db.FilterInConditions;

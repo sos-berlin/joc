@@ -1,4 +1,4 @@
-package com.sos.joc.classes.jobs;
+package com.sos.joc.classes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,8 +17,6 @@ import javax.json.JsonObjectBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.classes.JOCJsonCommand;
-import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
