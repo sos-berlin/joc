@@ -21,7 +21,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 /** edit JobScheduler object configuration
  * 
  * <p>
- */
+*/
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "objectType", visible = true)
@@ -66,7 +66,7 @@ public class JSObjectEdit {
     private String oldPath;
     /** JobScheduler object type
      * <p>
-     */
+    */
     @JsonProperty("objectType")
     private JobSchedulerObjectType objectType;
     /** joe object status
@@ -81,7 +81,7 @@ public class JSObjectEdit {
     private String account;
     /** auditParams
      * <p>
-     */
+    */
     @JsonProperty("auditLog")
     private AuditParams auditLog;
 
@@ -265,19 +265,17 @@ public class JSObjectEdit {
         this.auditLog = auditLog;
     }
 
-    
-
     @SuppressWarnings({ "unchecked" })
     @JsonIgnore
     public <T> T cast() throws ClassCastException {
         return (T) this;
     }
-   
+
     @JsonIgnore
     public <T> Boolean isInstanceOf(Class<T> clazz) throws ClassCastException {
         return clazz.isInstance(this);
     }
-    
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

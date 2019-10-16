@@ -14,7 +14,8 @@
     "title": {
       "type": "string"
     },
-    "state": {
+    "initialState": {
+      "xmlElement": "state",
       "type": "string"
     },
     "endState": {

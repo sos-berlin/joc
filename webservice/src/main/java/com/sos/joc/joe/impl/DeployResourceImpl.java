@@ -1,14 +1,10 @@
 package com.sos.joc.joe.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
@@ -23,6 +19,7 @@ import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
+import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IDeployResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.DeployAnswer;
@@ -136,14 +133,14 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     }
 
                     extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
-                    byte[] xmlContent = this.getPojoAsByte(joeObject);
                     ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath() + extension,
                             API_CALL);
 
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
-                        jocHotFolder.putFile(joeObject.getPath() + extension, this.getPojoAsByte(joeObject));
-                        clusterMemberHandler.updateAtOtherClusterMembers(xmlContent.toString());
+                        String xmlContent = XmlSerializer.serializeToStringWithHeader(joeObject.getConfiguration(), joeObject.getObjectType());
+                        jocHotFolder.putFile(joeObject.getPath() + extension, xmlContent);
+                        clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
                         break;
                     case "delete":
                         jocHotFolder.deleteFile(joeObject.getPath() + extension);
@@ -172,11 +169,4 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         }
     }
 
-    private byte[] getPojoAsByte(DBItemJoeObject joeObject) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException {
-        String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n\n";
-        final byte[] bytes = Globals.xmlMapper.writeValueAsBytes(Globals.objectMapper.readValue(joeObject.getConfiguration(), Helper.CLASS_MAPPING
-                .get(joeObject.getObjectType())));
-
-        return Helper.concatByteArray(xmlHeader.getBytes(), bytes);
-    }
 }

@@ -2,6 +2,8 @@ package com.sos.joc.joe.impl;
 
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,7 +116,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                                         Job job = Globals.objectMapper.readValue(item.getConfiguration(), Job.class);
                                         folderItem.setTitle(job.getTitle());
                                         folderItem.setProcessClass(job.getProcessClass());
-                                        folderItem.setIsOrderJob(job.getIsOrderJob());
+                                        folderItem.setIsOrderJob(job.getIsOrderJob() != null && "true,1,yes".contains(job.getIsOrderJob()));
                                         break;
                                     case "JOBCHAIN":
                                         JobChain jobChain = Globals.objectMapper.readValue(item.getConfiguration(), JobChain.class);
@@ -124,7 +126,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                                     case "ORDER":
                                         Order order = Globals.objectMapper.readValue(item.getConfiguration(), Order.class);
                                         folderItem.setTitle(order.getTitle());
-                                        folderItem.setState(order.getState());
+                                        folderItem.setInitialState(order.getInitialState());
                                         folderItem.setEndState(order.getEndState());
                                         folderItem.setPriority(order.getPriority());
                                         break;
@@ -208,7 +210,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             DBItemInventoryJob job = jobDbLayer.getInventoryJobByName(filePath, inventoryFile.getInstanceId());
                             folderItem.setTitle(job.getTitle());
                             folderItem.setProcessClass(".".equals(job.getProcessClassName()) ? null : job.getProcessClassName());
-                            folderItem.setIsOrderJob(job.getIsOrderJob() ? "true" : null);
+                            folderItem.setIsOrderJob(job.getIsOrderJob());
                             break;
                         case "JOBCHAIN":
                             if (jobChainDbLayer == null) {
@@ -224,7 +226,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             }
                             DBItemInventoryOrder order = orderDbLayer.getInventoryOrderByName(inventoryFile.getInstanceId(), filePath);
                             folderItem.setTitle(order.getTitle());
-                            folderItem.setState(order.getInitialState());
+                            folderItem.setInitialState(order.getInitialState());
                             folderItem.setEndState(order.getEndState());
                             folderItem.setPriority(order.getPriority() == null ? null : order.getPriority() + "");
                             break;
@@ -251,10 +253,12 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             if (!".".equals(schedule.getSubstituteName())) {
                                 folderItem.setSubstitute(schedule.getSubstituteName());
                                 if (schedule.getSubstituteValidFrom() != null) {
-                                    folderItem.setValidFrom(formatter.format(schedule.getSubstituteValidFrom().toInstant()));
+                                    folderItem.setValidFrom(formatter.format(ZonedDateTime.ofInstant(schedule.getSubstituteValidFrom().toInstant(),
+                                            ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of(dbItemInventoryInstance.getTimeZone()))));
                                 }
                                 if (schedule.getSubstituteValidTo() != null) {
-                                    folderItem.setValidTo(formatter.format(schedule.getSubstituteValidTo().toInstant()));
+                                    folderItem.setValidTo(formatter.format(ZonedDateTime.ofInstant(schedule.getSubstituteValidTo().toInstant(), ZoneId
+                                            .systemDefault()).withZoneSameInstant(ZoneId.of(dbItemInventoryInstance.getTimeZone()))));
                                 }
                             }
                             break;

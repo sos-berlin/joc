@@ -10,7 +10,8 @@
   "properties": {
     "ordersRecoverable": {
       "description": "possible values: yes, no, 1, 0, true, false",
-      "type": "string"
+      "type": "string",
+      "default": "true"
     },
     "title": {
       "type": "string"
@@ -20,7 +21,8 @@
     },
     "distributed": {
       "description": "possible values: yes, no, 1, 0, true, false",
-      "type": "string"
+      "type": "string",
+      "default": "false"
     },
     "processClass": {
       "description": "path of a process class object",
@@ -28,10 +30,6 @@
     },
     "fileWatchingProcessClass": {
       "description": "path of a process class object",
-      "type": "string"
-    },
-    "visible": {
-      "description": "possible values: yes, no, 1, 0, true, false or never",
       "type": "string"
     },
     "fileOrderSources": {

@@ -24,14 +24,14 @@
 			"type": "string"
 		},
     	"isOrderJob": {
-      		"description": "for jobs: possible values: yes, no, 1, 0, true, false",
-      		"type": "string"
+      		"description": "for jobs",
+      		"type": "boolean"
     	},
     	"priority": {
       		"description": "for orders",
       		"type": "string"
     	},
-	    "state": {
+	    "initialState": {
 	    	"description": "for orders",
 	    	"type": "string"
 	    },

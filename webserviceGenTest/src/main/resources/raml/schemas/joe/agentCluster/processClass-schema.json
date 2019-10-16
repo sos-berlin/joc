@@ -31,7 +31,8 @@
       "properties": {
         "select": {
           "description": "first, next",
-          "type": "string"
+          "type": "string",
+          "default": "first"
         },
         "remoteSchedulerList": {
           "type": "array",
