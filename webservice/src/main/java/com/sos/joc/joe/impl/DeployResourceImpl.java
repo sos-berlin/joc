@@ -70,9 +70,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
             if (body.getObjectName() != null) {
-                filterJoeObjects.setPath(folder + "/" + body.getObjectName());
+                filterJoeObjects.setPath(normalizePath(folder + "/" + body.getObjectName()));
             } else {
-                filterJoeObjects.setPath(folder);
+                filterJoeObjects.setPath(normalizeFolder(folder));
             }
             filterJoeObjects.setObjectType(body.getObjectType());
             filterJoeObjects.setOrderCriteria("created");
