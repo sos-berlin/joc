@@ -96,7 +96,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
                 JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, jobFilterSchema.getJobschedulerId());
                 jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
-                jsConditionResolver.initEvents();
+                jsConditionResolver.initEvents(sosHibernateSession);
 
                 List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
                 JSJobOutConditions jsJobOutConditions = new JSJobOutConditions();

@@ -93,7 +93,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
                 jsConditionResolver = new JSConditionResolver(sosHibernateSession, jobFilterSchema.getJobschedulerId());
                 jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
-                jsConditionResolver.initEvents();
+                jsConditionResolver.initEvents(sosHibernateSession);
 
                 List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
                 List<DBItemConsumedInCondition> listOfConsumedInConditions = dbLayerCoumsumedInConditions.getConsumedInConditionsListByJob(
