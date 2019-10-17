@@ -127,12 +127,12 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
                     } else {
                         if (jocHotFolder.getLastModifiedDate().after(dbItemJoeObject.getModified())) {
                             jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText(
-                                    "Version in live folder is newer then draft version in database");
+                                    "Using Version in live folder as is newer then draft version in database");
                             jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1002");
                             jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.LIVE_IS_NEWER);
                         } else {
                             jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText(
-                                    "Draft version in database is newer then the version in the live folder");
+                                    "Using Draft version in database as is newer then the version in the live folder");
                             jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1003");
                             jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.DRAFT_IS_NEWER);
                         }

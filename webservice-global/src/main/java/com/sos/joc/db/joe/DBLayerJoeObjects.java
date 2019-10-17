@@ -14,6 +14,7 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.Globals;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 
@@ -80,7 +81,7 @@ public class DBLayerJoeObjects {
         if (filter.getAccount() != null && !"".equals(filter.getAccount())) {
             query.setParameter("account", filter.getAccount());
         }
-        if (filter.getObjectType() != null ) {
+        if (filter.getObjectType() != null) {
             query.setParameter("objectType", filter.getObjectType().value());
         }
         if (filter.getPath() != null && !"".equals(filter.getPath())) {
@@ -108,8 +109,7 @@ public class DBLayerJoeObjects {
         }
     }
 
-    public List<DBItemJoeObject> getRecursiveJoeObjectList(FilterJoeObjects filter) throws DBConnectionRefusedException,
-            DBInvalidDataException {
+    public List<DBItemJoeObject> getRecursiveJoeObjectList(FilterJoeObjects filter) throws DBConnectionRefusedException, DBInvalidDataException {
         filter.setRecursive();
         return getJoeObjectList(filter, 0);
     }
@@ -147,8 +147,9 @@ public class DBLayerJoeObjects {
             throw new DBInvalidDataException(ex);
         }
     }
-    
-    public Set<String> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes) throws DBConnectionRefusedException, DBInvalidDataException {
+
+    public Set<String> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes)
+            throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(FOLDERS_BY_PATH).append("(path, objectType) from ").append(DBLayer.DBITEM_JOE_OBJECT);
@@ -184,8 +185,9 @@ public class DBLayerJoeObjects {
             throw new DBInvalidDataException(ex);
         }
     }
-    
-    public List<String> getFoldersByFolderToDelete(final String schedulerId, final String folderName) throws DBConnectionRefusedException, DBInvalidDataException {
+
+    public List<String> getFoldersByFolderToDelete(final String schedulerId, final String folderName) throws DBConnectionRefusedException,
+            DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select path from ").append(DBLayer.DBITEM_JOE_OBJECT);
@@ -209,7 +211,7 @@ public class DBLayerJoeObjects {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
     public Boolean folderExists(String schedulerId, String path) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -257,5 +259,5 @@ public class DBLayerJoeObjects {
             throw new DBInvalidDataException(ex);
         }
     }
-
+ 
 }

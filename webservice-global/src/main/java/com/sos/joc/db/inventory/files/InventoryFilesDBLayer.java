@@ -10,6 +10,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryFile;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.Globals;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 
@@ -32,6 +33,25 @@ public class InventoryFilesDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }       
+    }
+    
+    public boolean isEmptyFolder(Long instanceId, String fileDirectory) throws DBConnectionRefusedException, DBInvalidDataException  {
+        try {
+            fileDirectory = Globals.normalizePath(fileDirectory);
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_FILES);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" and fileDirectory = :fileDirectory");
+            Query<DBItemInventoryFile> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("fileDirectory", fileDirectory);
+            List<DBItemInventoryFile> result = getSession().getResultList(query);
+            return result==null || result.size()==0;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

@@ -14,6 +14,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.DeployJoeAudit;
+import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -50,7 +51,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
 
             checkRequiredParameter("folder", body.getFolder());
-            if (body.getObjectType() != null && !body.getObjectType().value().isEmpty() && !Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
+            if (body.getObjectType() != null && !body.getObjectType().value().isEmpty() && !Helper.CLASS_MAPPING.containsKey(body.getObjectType()
+                    .value())) {
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
 
@@ -87,35 +89,16 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             deployAnswer.setObjectName(body.getObjectName());
             deployAnswer.setObjectType(body.getObjectType());
             deployAnswer.setRecursive(body.getRecursive());
+            InventoryFilesDBLayer inventoryFilesDBLayer = new InventoryFilesDBLayer(sosHibernateSession);
 
             for (DBItemJoeObject joeObject : listOfJoeObjects) {
 
-                String extension = "";
-                DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
-                logAuditMessage(deployJoeAudit);
+                if (!"FOLDER".equals(joeObject.getObjectType())) {
 
-                if ("FOLDER".equals(joeObject.getObjectType())) {
+                    String extension = "";
+                    DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
+                    logAuditMessage(deployJoeAudit);
 
-                    if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
-                        DeployMessage deployMessage = new DeployMessage();
-                        deployMessage.setMessage("Access denied");
-                        deployMessage.setPermissionDeniedFor(joeObject.getPath());
-                        deployAnswer.getMessages().add(deployMessage);
-                        continue;
-                    }
-
-                    switch (joeObject.getOperation().toLowerCase()) {
-                    case "store":
-                        jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()));
-                        break;
-                    case "delete":
-                        jocHotFolder.deleteFolder(normalizeFolder(joeObject.getPath()));
-                        break;
-
-                    default:
-                        break;
-                    }
-                } else {
                     if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
                         DeployMessage deployMessage = new DeployMessage();
                         deployMessage.setMessage("Access denied");
@@ -149,17 +132,56 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     default:
                         break;
                     }
+
+                    storeAuditLogEntry(deployJoeAudit);
+                    dbLayerJoeObjects.delete(joeObject);
                 }
 
-                storeAuditLogEntry(deployJoeAudit);
+            }
 
-                dbLayerJoeObjects.delete(joeObject);
+            for (DBItemJoeObject joeObject : listOfJoeObjects) {
+
+                boolean deleteEntry = false;
+                DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
+                logAuditMessage(deployJoeAudit);
+
+                if ("FOLDER".equals(joeObject.getObjectType())) {
+
+                    if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
+                        DeployMessage deployMessage = new DeployMessage();
+                        deployMessage.setMessage("Access denied");
+                        deployMessage.setPermissionDeniedFor(joeObject.getPath());
+                        deployAnswer.getMessages().add(deployMessage);
+                        continue;
+                    }
+
+                    switch (joeObject.getOperation().toLowerCase()) {
+                    case "store":
+                        deleteEntry = !(inventoryFilesDBLayer.isEmptyFolder(this.dbItemInventoryInstance.getId(), joeObject.getPath()));
+                        jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()));
+                        break;
+                    case "delete":
+                        jocHotFolder.deleteFolder(normalizeFolder(joeObject.getPath()));
+                        break;
+
+                    default:
+                        break;
+                    }
+
+                    storeAuditLogEntry(deployJoeAudit);
+
+                    if (deleteEntry) {
+                        dbLayerJoeObjects.delete(joeObject);
+                    }
+                }
             }
             Globals.commit(sosHibernateSession);
 
             return JOCDefaultResponse.responseStatus200(deployAnswer);
 
-        } catch (JocException e) {
+        } catch (
+
+        JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
