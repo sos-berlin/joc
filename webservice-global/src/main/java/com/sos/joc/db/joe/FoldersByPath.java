@@ -2,19 +2,19 @@ package com.sos.joc.db.joe;
 
 import java.nio.file.Paths;
 
-public class FoldersByPath {
+import com.sos.joc.model.tree.Tree;
+
+public class FoldersByPath extends Tree {
     
-    private String folder;
-
-    public FoldersByPath(String path, String objectType) {
+    public FoldersByPath(String path, String objectType, String operation) {
         if ("FOLDER".equals(objectType)) {
-            this.folder = path;
+            setPath(path);
         } else {
-            this.folder = Paths.get(path).getParent().toString().replace('\\', '/');
+            setPath(Paths.get(path).getParent().toString().replace('\\', '/'));
         }
-    }
-
-    public String getFolder() {
-        return folder;
+        if ("delete".equals(operation)) {
+            setDeleted(true);
+        }
+        setFolders(null);
     }
 }

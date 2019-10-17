@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -101,15 +100,16 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             if (dbItems == null) {
                 dbItems = new ArrayList<DBItemJoeObject>();
             }
-            // Map: grouped by DBItemJoeObject::operationIsDelete -> DBItemJoeObject::objectType
+            // Map: grouped by DBItemJoeObject::objectType
             // -> new FolderItem("filename of DBItemJoeObject::path", false) collection
             // filter for non-recursive level
-            Map<Boolean, Map<String, Set<FolderItem>>> folderContent = dbItems.stream().filter(item -> Paths.get(item.getPath()).getParent()
-                    .getNameCount() == parentDepth).collect(Collectors.groupingBy(DBItemJoeObject::operationIsDelete, Collectors.groupingBy(
+            Map<String, Set<FolderItem>> folderContent = dbItems.stream().filter(item -> Paths.get(item.getPath()).getParent()
+                    .getNameCount() == parentDepth).collect(Collectors.groupingBy(
                             DBItemJoeObject::getObjectType, Collectors.mapping(item -> {
                                 FolderItem folderItem = new FolderItem();
                                 folderItem.setName(Paths.get(item.getPath()).getFileName().toString());
                                 folderItem.setDeployed(false);
+                                folderItem.setDeleted(item.operationIsDelete());
                                 try {
                                     switch (item.getObjectType()) {
                                     case "JOB":
@@ -150,36 +150,14 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                                     LOGGER.warn("", e);
                                 }
                                 return folderItem;
-                            }, Collectors.toSet()))));
-            folderContent.putIfAbsent(Boolean.FALSE, new HashMap<String, Set<FolderItem>>());
-            folderContent.putIfAbsent(Boolean.TRUE, new HashMap<String, Set<FolderItem>>());
+                            }, Collectors.toSet())));
 
-            List<JobSchedulerObjectType> objectTypes = Arrays.asList(JobSchedulerObjectType.FOLDER, JobSchedulerObjectType.JOB,
-                    JobSchedulerObjectType.JOBCHAIN, JobSchedulerObjectType.ORDER, JobSchedulerObjectType.PROCESSCLASS,
-                    JobSchedulerObjectType.SCHEDULE, JobSchedulerObjectType.LOCK, JobSchedulerObjectType.MONITOR, JobSchedulerObjectType.NODEPARAMS,
-                    JobSchedulerObjectType.OTHER);
+            List<JobSchedulerObjectType> objectTypes = Arrays.asList(JobSchedulerObjectType.JOB, JobSchedulerObjectType.JOBCHAIN,
+                    JobSchedulerObjectType.ORDER, JobSchedulerObjectType.PROCESSCLASS, JobSchedulerObjectType.SCHEDULE, JobSchedulerObjectType.LOCK,
+                    JobSchedulerObjectType.MONITOR);
 
-            Map<String, Set<FolderItem>> folderContentToAdd = folderContent.get(Boolean.FALSE);
-            Map<String, Set<FolderItem>> folderContentToDel = folderContent.get(Boolean.TRUE);
             for (JobSchedulerObjectType objectType : objectTypes) {
-                folderContentToAdd.putIfAbsent(objectType.value(), new HashSet<FolderItem>());
-                folderContentToDel.putIfAbsent(objectType.value(), new HashSet<FolderItem>());
-            }
-
-            // Add folders of recursive objects because it could exist these objects but not the objectType==FOLDER in the non-recursive set
-            Set<FolderItem> furtherFolders = dbItems.stream().filter(item -> Paths.get(item.getPath()).getParent().getNameCount() > parentDepth).map(
-                    item -> {
-                        FolderItem folderItem = new FolderItem();
-                        folderItem.setName(Paths.get(item.getPath()).getName(parentDepth).toString());
-                        folderItem.setDeployed(false);
-                        return folderItem;
-                    }).collect(Collectors.toSet());
-            folderContentToAdd.get(JobSchedulerObjectType.FOLDER.value()).addAll(furtherFolders);
-
-            for (FolderItem folder : folderContentToAdd.get(JobSchedulerObjectType.FOLDER.value())) {
-                if (!folderPermissions.isPermittedForFolder(path + folder.getName())) {
-                    folderContentToDel.get(JobSchedulerObjectType.FOLDER.value()).add(folder);
-                }
+                folderContent.putIfAbsent(objectType.value(), new HashSet<FolderItem>());
             }
 
             // doesn't know external files such as holidays and others
@@ -197,13 +175,14 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                     if (!Helper.CLASS_MAPPING.containsKey(objectType)) {
                         continue;
                     }
+                    JobSchedulerObjectType objType = JobSchedulerObjectType.fromValue(objectType);
                     FolderItem folderItem = new FolderItem();
-                    folderItem.setName(Helper.getPathWithoutExtension(inventoryFile.getFileBaseName(), JobSchedulerObjectType.fromValue(objectType)));
+                    folderItem.setName(Helper.getPathWithoutExtension(inventoryFile.getFileBaseName(), objType));
                     folderItem.setDeployed(true);
-                    String filePath = Helper.getPathWithoutExtension(inventoryFile.getFileName(), JobSchedulerObjectType.fromValue(objectType));
+                    String filePath = Helper.getPathWithoutExtension(inventoryFile.getFileName(), objType);
                     try {
-                        switch (objectType) {
-                        case "JOB":
+                        switch (objType) {
+                        case JOB:
                             if (jobDbLayer == null) {
                                 jobDbLayer = new InventoryJobsDBLayer(connection);
                             }
@@ -212,7 +191,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             folderItem.setProcessClass(".".equals(job.getProcessClassName()) ? null : job.getProcessClassName());
                             folderItem.setIsOrderJob(job.getIsOrderJob());
                             break;
-                        case "JOBCHAIN":
+                        case JOBCHAIN:
                             if (jobChainDbLayer == null) {
                                 jobChainDbLayer = new InventoryJobChainsDBLayer(connection);
                             }
@@ -220,7 +199,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             folderItem.setTitle(jobChain.getTitle());
                             folderItem.setProcessClass(".".equals(jobChain.getProcessClassName()) ? null : jobChain.getProcessClassName());
                             break;
-                        case "ORDER":
+                        case ORDER:
                             if (orderDbLayer == null) {
                                 orderDbLayer = new InventoryOrdersDBLayer(connection);
                             }
@@ -230,21 +209,21 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             folderItem.setEndState(order.getEndState());
                             folderItem.setPriority(order.getPriority() == null ? null : order.getPriority() + "");
                             break;
-                        case "PROCESSCLASS":
+                        case PROCESSCLASS:
                             if (processClassDbLayer == null) {
                                 processClassDbLayer = new InventoryProcessClassesDBLayer(connection);
                             }
                             DBItemInventoryProcessClass processClass = processClassDbLayer.getProcessClass(filePath, inventoryFile.getInstanceId());
                             folderItem.setMaxProcesses(processClass.getMaxProcesses());
                             break;
-                        case "LOCK":
+                        case LOCK:
                             if (lockDbLayer == null) {
                                 lockDbLayer = new InventoryLocksDBLayer(connection);
                             }
                             DBItemInventoryLock lock = lockDbLayer.getLock(filePath, inventoryFile.getInstanceId());
                             folderItem.setMaxNonExclusive(lock.getMaxNonExclusive());
                             break;
-                        case "SCHEDULE":
+                        case SCHEDULE:
                             if (scheduleDbLayer == null) {
                                 scheduleDbLayer = new InventorySchedulesDBLayer(connection);
                             }
@@ -262,49 +241,41 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                                 }
                             }
                             break;
+                        default:
+                            break;
                         }
                     } catch (Exception e) {
                         LOGGER.warn("", e);
                     }
-                    folderContentToAdd.get(objectType).add(folderItem);
+                    folderContent.get(objectType).add(folderItem);
                 }
             }
 
             Folder entity = new Folder();
 
             for (JobSchedulerObjectType objectType : objectTypes) {
-                folderContentToAdd.get(objectType.value()).removeAll(folderContentToDel.get(objectType.value()));
-                if (!folderContentToAdd.get(objectType.value()).isEmpty()) {
+                if (!folderContent.get(objectType.value()).isEmpty()) {
                     switch (objectType) {
-                    case FOLDER:
-                        entity.setFolders(folderContentToAdd.get(objectType.value()));
-                        break;
                     case JOB:
-                        entity.setJobs(folderContentToAdd.get(objectType.value()));
+                        entity.setJobs(folderContent.get(objectType.value()));
                         break;
                     case JOBCHAIN:
-                        entity.setJobChains(folderContentToAdd.get(objectType.value()));
+                        entity.setJobChains(folderContent.get(objectType.value()));
                         break;
                     case ORDER:
-                        entity.setOrders(folderContentToAdd.get(objectType.value()));
+                        entity.setOrders(folderContent.get(objectType.value()));
                         break;
                     case PROCESSCLASS:
-                        entity.setProcessClasses(folderContentToAdd.get(objectType.value()));
+                        entity.setProcessClasses(folderContent.get(objectType.value()));
                         break;
                     case SCHEDULE:
-                        entity.setSchedules(folderContentToAdd.get(objectType.value()));
+                        entity.setSchedules(folderContent.get(objectType.value()));
                         break;
                     case LOCK:
-                        entity.setLocks(folderContentToAdd.get(objectType.value()));
+                        entity.setLocks(folderContent.get(objectType.value()));
                         break;
                     case MONITOR:
-                        entity.setMonitors(folderContentToAdd.get(objectType.value()));
-                        break;
-                    case NODEPARAMS:
-                        entity.setNodeParams(folderContentToAdd.get(objectType.value()));
-                        break;
-                    case OTHER:
-                        entity.setOthers(folderContentToAdd.get(objectType.value()));
+                        entity.setMonitors(folderContent.get(objectType.value()));
                         break;
                     default:
                         break;

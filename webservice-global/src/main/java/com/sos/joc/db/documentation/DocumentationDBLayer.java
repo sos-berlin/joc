@@ -24,6 +24,7 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.model.common.JobSchedulerObject;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.docu.DocumentationShowFilter;
+import com.sos.joc.model.tree.Tree;
 
 public class DocumentationDBLayer extends DBLayer {
 
@@ -255,7 +256,7 @@ public class DocumentationDBLayer extends DBLayer {
         }
     }
 
-    public List<String> getFoldersByFolder(String schedulerId, String folderName) throws DBConnectionRefusedException, DBInvalidDataException {
+    public Set<Tree> getFoldersByFolder(String schedulerId, String folderName) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select directory from ").append(DBITEM_DOCUMENTATION);
@@ -270,7 +271,15 @@ public class DocumentationDBLayer extends DBLayer {
                 query.setParameter("folderName", folderName);
                 query.setParameter("likeFolderName", MatchMode.START.toMatchString(folderName + "/"));
             }
-            return getSession().getResultList(query);
+            List<String> result = getSession().getResultList(query);
+            if (result != null && !result.isEmpty()) {
+                return result.stream().map(s -> {
+                    Tree tree = new Tree();
+                    tree.setPath(s);
+                    return tree;
+                }).collect(Collectors.toSet());
+            }
+            return null;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

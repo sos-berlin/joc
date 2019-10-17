@@ -1,0 +1,18 @@
+{
+  "title": "folder",
+  "id": "schemas/common/folder",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+      "required": [
+      "folder"
+  ],
+  "properties": {
+      "folder": {
+        "$ref": "path-schema.json"
+      },
+      "recursive": {
+        "type": "boolean",
+        "default": true
+      }
+   }
+}

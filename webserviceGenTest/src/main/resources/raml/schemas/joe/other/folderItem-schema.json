@@ -6,13 +6,18 @@
 	"type": "object",
 	"required": [
 		"name",
-		"deployed"
+		"deployed",
+		"deleted"
 	],
 	"properties": {
 		"name": {
 			"type": "string"
 		},
 		"deployed": {
+			"type": "boolean",
+			"default": false
+		},
+		"deleted": {
 			"type": "boolean",
 			"default": false
 		},

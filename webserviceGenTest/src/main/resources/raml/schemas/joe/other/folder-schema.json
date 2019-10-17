@@ -15,13 +15,6 @@
 		"path": {
 			"$ref": "../../common/path-schema.json"
 		},
-		"folders": {
-			"type": "array",
-			"items": {
-				"$ref": "folderItem-schema.json"
-			},
-			"uniqueItems": true
-		},
 		"jobs": {
 			"type": "array",
 			"items": {
@@ -65,22 +58,6 @@
 			"uniqueItems": true
 		},
 		"monitors": {
-			"type": "array",
-			"items": {
-				"$ref": "folderItem-schema.json"
-			},
-			"uniqueItems": true
-		},
-		"nodeParams": {
-			"description": "[jobChainName].config.xml files with node parameters",
-			"type": "array",
-			"items": {
-				"$ref": "folderItem-schema.json"
-			},
-			"uniqueItems": true
-		},
-		"others": {
-			"description": "external files, e.g. shell scripts to include in job's script, parameter files for jobs and orders, holidays files",
 			"type": "array",
 			"items": {
 				"$ref": "folderItem-schema.json"

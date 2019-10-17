@@ -2843,7 +2843,7 @@ traits:
 /joe:
   description: |
     This is not an API call. Use its children!!
-    
+ #!include documentation/joe/forceLive.md   
   /read/file:
     type:
       postJSON:
@@ -2944,9 +2944,9 @@ traits:
       postJSON:
         description: Deploy configuration files to JobScheduler
         description1: !include documentation/joe/jsObject.md
-        description2: !include documentation/audit/auditLog.md
+        description2: !include documentation/common/folder.md
         description3: " "
-        description4: " "
+        description4: !include documentation/audit/auditLog.md
         description5: " "
         description6: " "
         description7: " "
@@ -2954,10 +2954,17 @@ traits:
         description9: " "
         description10: " "
         description200: " "
-        schema: !include schemas/joe/common/filter-schema.json
-        schema200: ok
-        example: !include examples/joe/jsObjectEdit-example.json
+        schema: !include schemas/joe/common/filter-deploy-schema.json
+        schema200: !include schemas/joe/common/deploy-schema.json
+        example: " "
         example200: " "
+  /deployables:
+    type:
+      postOnlyId:
+        description: Collection of deployable configuration items
+        description200: " "
+        example200: " "
+        schema200: !include examples/joe/common/deployable-schema.json
   
   /{objectType}/toxml:
     type: error

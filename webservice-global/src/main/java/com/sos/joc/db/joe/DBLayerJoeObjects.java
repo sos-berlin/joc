@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.query.Query;
 
@@ -14,9 +12,9 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.Globals;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.tree.Tree;
 
 public class DBLayerJoeObjects {
 
@@ -148,11 +146,10 @@ public class DBLayerJoeObjects {
         }
     }
 
-    public Set<String> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes)
-            throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<Tree> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select new ").append(FOLDERS_BY_PATH).append("(path, objectType) from ").append(DBLayer.DBITEM_JOE_OBJECT);
+            sql.append("select new ").append(FOLDERS_BY_PATH).append("(path, objectType, operation) from ").append(DBLayer.DBITEM_JOE_OBJECT);
             sql.append(" where schedulerId = :schedulerId");
             if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
                 sql.append(" and ( path = :folderName or path like :likeFolderName )");
@@ -163,7 +160,7 @@ public class DBLayerJoeObjects {
                 sql.append(" and objectType in (:objectType)");
             }
             sql.append(" and operation != 'delete'");
-            Query<FoldersByPath> query = sosHibernateSession.createQuery(sql.toString());
+            Query<Tree> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (objectTypes.size() == 1) {
                 query.setParameter("objectType", objectTypes.iterator().next());
@@ -174,30 +171,25 @@ public class DBLayerJoeObjects {
                 query.setParameter("folderName", folderName);
                 query.setParameter("likeFolderName", folderName + "/%");
             }
-            List<FoldersByPath> paths = sosHibernateSession.getResultList(query);
-            if (paths != null) {
-                return paths.stream().map(FoldersByPath::getFolder).collect(Collectors.toSet());
-            }
-            return null;
+            return sosHibernateSession.getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
         }
     }
-
-    public List<String> getFoldersByFolderToDelete(final String schedulerId, final String folderName) throws DBConnectionRefusedException,
-            DBInvalidDataException {
+    
+    public List<Tree> getFoldersByFolderToDelete(final String schedulerId, final String folderName) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select path from ").append(DBLayer.DBITEM_JOE_OBJECT);
+            sql.append("select new ").append(FOLDERS_BY_PATH).append("(path, objectType, operation) from ").append(DBLayer.DBITEM_JOE_OBJECT);
             sql.append(" where schedulerId = :schedulerId");
             if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
                 sql.append(" and ( path = :folderName or path like :likeFolderName )");
             }
             sql.append(" and objectType = :objectType");
             sql.append(" and operation = 'delete'");
-            Query<String> query = sosHibernateSession.createQuery(sql.toString());
+            Query<Tree> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("objectType", "FOLDER");
             if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {

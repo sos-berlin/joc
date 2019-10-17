@@ -24,7 +24,7 @@ import com.sos.joc.model.joe.common.Deployables;
 @Path("joe")
 public class DeployablesResourceImpl extends JOCResourceImpl implements IDeployablesResource {
 
-    private static final String API_CALL = "./joe/deploy";
+    private static final String API_CALL = "./joe/deployables";
 
     @Override
     public JOCDefaultResponse deployables(final String accessToken, final JobSchedulerId body) {

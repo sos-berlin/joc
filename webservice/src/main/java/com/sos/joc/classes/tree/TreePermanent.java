@@ -111,12 +111,12 @@ public class TreePermanent {
 		return types;
 	}
 
-	public static SortedSet<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId, String schedulerId, boolean treeForJoe)
+	public static SortedSet<Tree> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId, String schedulerId, boolean treeForJoe)
 			throws JocException {
-		SortedSet<String> folders = new TreeSet<String>(new Comparator<String>() {
+		SortedSet<Tree> folders = new TreeSet<Tree>(new Comparator<Tree>() {
 
-			public int compare(String a, String b) {
-				return b.compareTo(a);
+			public int compare(Tree a, Tree b) {
+				return b.getPath().compareTo(a.getPath());
 			}
 		});
 		Set<String> bodyTypes = new HashSet<String>();
@@ -176,10 +176,10 @@ public class TreePermanent {
 			CalendarsDBLayer dbCalendarLayer = new CalendarsDBLayer(connection);
 			DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
 			DBLayerJoeObjects dbJoeLayer = new DBLayerJoeObjects(connection);
-            Set<String> results = null;
-			List<String> calendarResults = null;
-			List<String> docResults = null;
-			Collection<String> joeResults = null;
+            Set<Tree> results = null;
+			Set<Tree> calendarResults = null;
+			Set<Tree> docResults = null;
+			Collection<Tree> joeResults = null;
 			if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
 				for (Folder folder : treeBody.getFolders()) {
 					String normalizedFolder = ("/" + folder.getFolder()).replaceAll("//+", "/");
@@ -188,7 +188,7 @@ public class TreePermanent {
 					    calendarResults = dbCalendarLayer.getFoldersByFolder(schedulerId, normalizedFolder, calendarTypes);
 					    if (calendarResults != null && !calendarResults.isEmpty()) {
 					        if (results == null) {
-					            results = new HashSet<String>();
+					            results = new HashSet<Tree>();
 					        } 
 					        results.addAll(calendarResults);
 					    }
@@ -197,7 +197,7 @@ public class TreePermanent {
                         docResults = dbDocLayer.getFoldersByFolder(schedulerId, normalizedFolder);
                         if (docResults != null && !docResults.isEmpty()) {
                             if (results == null) {
-                                results = new HashSet<String>();
+                                results = new HashSet<Tree>();
                             } 
                             results.addAll(docResults);
                         }
@@ -206,7 +206,7 @@ public class TreePermanent {
                         joeResults = dbJoeLayer.getFoldersByFolder(schedulerId, normalizedFolder, joeTypes);
                         if (joeResults != null && !joeResults.isEmpty()) {
                             if (results == null) {
-                                results = new HashSet<String>();
+                                results = new HashSet<Tree>();
                             }
                             results.addAll(joeResults);
                         }
@@ -220,10 +220,11 @@ public class TreePermanent {
 							folders.addAll(results);
 						} else {
 							Path parent = Paths.get(normalizedFolder);
-							for (String result : results) {
-							    Path r = Paths.get(result);
+							for (Tree result : results) {
+							    Path r = Paths.get(result.getPath());
 							    int endIndex = Math.min(r.getNameCount(), parent.getNameCount() + 1);
-								folders.add("/" + r.subpath(0, endIndex).toString().replace('\\', '/'));
+							    result.setPath("/" + r.subpath(0, endIndex).toString().replace('\\', '/'));
+								folders.add(result);
 							}
 						}
 					}
@@ -234,7 +235,7 @@ public class TreePermanent {
                     calendarResults = dbCalendarLayer.getFoldersByFolder(schedulerId, "/", calendarTypes);
                     if (calendarResults != null && !calendarResults.isEmpty()) {
                         if (results == null) {
-                            results = new HashSet<String>();
+                            results = new HashSet<Tree>();
                         } 
                         results.addAll(calendarResults);
                     }
@@ -243,7 +244,7 @@ public class TreePermanent {
 				    docResults = dbDocLayer.getFoldersByFolder(schedulerId, "/");
                     if (docResults != null && !docResults.isEmpty()) {
                         if (results == null) {
-                            results = new HashSet<String>();
+                            results = new HashSet<Tree>();
                         } 
                         results.addAll(docResults);
                     }
@@ -252,7 +253,7 @@ public class TreePermanent {
                     joeResults = dbJoeLayer.getFoldersByFolder(schedulerId, "/", joeTypes);
                     if (joeResults != null && !joeResults.isEmpty()) {
                         if (results == null) {
-                            results = new HashSet<String>();
+                            results = new HashSet<Tree>();
                         }
                         results.addAll(joeResults);
                     }
@@ -273,21 +274,24 @@ public class TreePermanent {
 		}
 	}
 
-	public static Tree getTree(SortedSet<String> folders, SOSShiroFolderPermissions sosShiroFolderPermissions) {
+	public static Tree getTree(SortedSet<Tree> folders, SOSShiroFolderPermissions sosShiroFolderPermissions) {
 		Map<Path, TreeModel> treeMap = new HashMap<Path, TreeModel>();
 		Set<Folder> listOfFolders = sosShiroFolderPermissions.getListOfFolders();
-		for (String folder : folders) {
-			if (sosShiroFolderPermissions.isPermittedForFolder(folder, listOfFolders)) {
+		for (Tree folder : folders) {
+			if (sosShiroFolderPermissions.isPermittedForFolder(folder.getPath(), listOfFolders)) {
 
-				Path pFolder = Paths.get(folder);
+				Path pFolder = Paths.get(folder.getPath());
 				TreeModel tree = new TreeModel();
 				if (treeMap.containsKey(pFolder)) {
 					tree = treeMap.get(pFolder);
 				} else {
-					tree.setPath(folder);
+					tree.setPath(folder.getPath());
 					Path fileName = pFolder.getFileName();
 					tree.setName(fileName == null ? "" : fileName.toString());
 					tree.setFolders(null);
+					if (folder.getDeleted() != null && folder.getDeleted()) {
+					    tree.setDeleted(true); 
+					}
 					treeMap.put(pFolder, tree);
 				}
 				fillTreeMap(treeMap, pFolder, tree);

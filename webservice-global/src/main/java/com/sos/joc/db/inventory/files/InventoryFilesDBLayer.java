@@ -13,6 +13,7 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.tree.Tree;
 
 
 public class InventoryFilesDBLayer extends DBLayer {
@@ -37,7 +38,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
-        }       
+        }
     }
     
     public boolean isEmptyFolder(Long instanceId, String fileDirectory) throws DBConnectionRefusedException, DBInvalidDataException  {
@@ -56,7 +57,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
-        }       
+        }
     }
     
     public List<DBItemInventoryFile> getFiles(Long instanceId, String folder) throws DBConnectionRefusedException, DBInvalidDataException  {
@@ -73,7 +74,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
-        }       
+        }
     }
     
     public boolean fileExists(Long instanceId, String path) throws DBConnectionRefusedException, DBInvalidDataException  {
@@ -90,7 +91,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
-        }       
+        }
     }
     
     public boolean folderExists(Long instanceId, String path) throws DBConnectionRefusedException, DBInvalidDataException  {
@@ -107,7 +108,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
-        }       
+        }
     }
     
     public List<DBItemInventoryFile> getFilesByFileType(Long instanceId, String fileType) throws DBConnectionRefusedException, DBInvalidDataException {
@@ -128,7 +129,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
-        }       
+        }
     }
     
     public List<String> getFolders(Long instanceId) throws DBConnectionRefusedException, DBInvalidDataException {
@@ -147,10 +148,10 @@ public class InventoryFilesDBLayer extends DBLayer {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
-        }       
+        }
     }
     
-    public Set<String> getFoldersByFolderAndType(Long instanceId, String folderName, Set<String> types) throws DBConnectionRefusedException, DBInvalidDataException {
+    public Set<Tree> getFoldersByFolderAndType(Long instanceId, String folderName, Set<String> types) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select fileDirectory from ").append(DBITEM_INVENTORY_FILES);
@@ -181,14 +182,18 @@ public class InventoryFilesDBLayer extends DBLayer {
             }
             List<String> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
-                return result.stream().collect(Collectors.toSet());
+                return result.stream().map(s -> {
+                    Tree tree = new Tree();
+                    tree.setPath(s);
+                    return tree;
+                }).collect(Collectors.toSet());
             }
             return null;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
-        }      
+        }
     }
     
 }

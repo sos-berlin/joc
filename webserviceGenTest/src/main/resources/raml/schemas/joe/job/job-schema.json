@@ -143,6 +143,7 @@
     },
     "monitors": {
       "type": "array",
+      "xmlElement": "monitor",
       "items": {
         "$ref": "monitor-schema.json"
       }

@@ -18,12 +18,14 @@
 		},
 		"letRun": {
 			"description": "possible values: yes, no, 1, 0, true, false",
-			"type": "string"
+			"type": "string",
+			"default": "false"
 		},
 		"runOnce": {
 			"xmlElement": "once",
 			"description": "possible values: yes, no, 1, 0, true, false",
-			"type": "string"
+			"type": "string",
+			"default": "false"
 		},
 		"periods": {
 			"$ref": "periods-schema.json"
@@ -74,7 +76,7 @@
 		"ultimos": {
 			"$ref": "ultimos-schema.json"
 		},
-		"month": {
+		"months": {
 			"$ref": "months-schema.json"
 		},
 		"holidays": {

@@ -11,6 +11,9 @@
     "name": {
       "type": "string"
     },
+    "deleted": {
+      "type": "boolean"
+    },
     "folders": {
       "type": "array",
       "items": {
