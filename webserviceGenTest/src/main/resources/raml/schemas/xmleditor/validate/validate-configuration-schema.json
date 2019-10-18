@@ -1,0 +1,27 @@
+{
+	"title": "xmleditor validate configuration in",
+	"id": "schemas/xmleditor/validate/validate-configuration-schema",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.xmleditor.validate.ValidateConfiguration",
+	"type": "object",
+	"description": "schema only for OTHER",
+	"required": [
+		"jobschedulerId",
+		"objectType",
+		"configuration"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"type": "string"
+		},
+		"objectType": {
+			"$ref": "../common/object-type-schema.json"
+		},
+		"configuration": {
+			"type": "string"
+		},
+		"schema": {
+			"type": "string"
+		}
+	}
+}

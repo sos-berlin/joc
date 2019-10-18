@@ -1,0 +1,13 @@
+{
+	"title": "xmleditor deploy configuration answer",
+	"id": "schemas/xmleditor/deploy/deploy-configuration-answer-schema",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.xmleditor.deploy.DeployConfigurationAnswer",
+	"type": "object",
+	"description": "",
+	"properties": {
+		"deployed": {
+			"$ref": "../../common/timestamp-schema.json"
+		}
+	}
+}

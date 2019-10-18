@@ -1,0 +1,25 @@
+{
+	"title": "xmleditor read configuration answer",
+	"id": "schemas/xmleditor/read/read-configuration-answer-state-schema",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.xmleditor.read.ReadConfigurationAnswerState",
+	"type": "object",
+	"description": "Describes the situation live/draft",
+	"properties": {
+		"deployed": {
+			"type": "boolean"
+		},
+		"versionState": {
+			"$ref": "../common/object-version-state-schema.json"
+		},
+		"message": {
+			"$ref": "../common/answer-message-schema.json"
+		},
+		"warning": {
+			"$ref": "../common/answer-message-schema.json"
+		},
+		"modified": {
+			"$ref": "../../common/timestamp-schema.json"
+		}
+	}
+}

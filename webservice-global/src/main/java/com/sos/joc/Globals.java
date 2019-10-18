@@ -1,6 +1,7 @@
 package com.sos.joc;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,6 +12,7 @@ import java.util.TimeZone;
 
 import javax.json.Json;
 import javax.json.JsonReader;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -73,6 +75,9 @@ public class Globals {
     public static ObjectMapper xmlMapper = new XmlMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).configure(
             SerializationFeature.INDENT_OUTPUT, true);
     public static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    public static String servletContextContextPath = null; // /joc
+    public static String servletContextRealPath = null;
+    public static URI servletBaseUri = null;
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {
@@ -478,6 +483,49 @@ public class Globals {
             return null;
         } else {
             return p.toString().replace('\\', '/');
+        }
+    }
+
+    public static void setServletBaseUri(UriInfo uriInfo) {
+        // request.getServletPath=/api
+        // request.getPathInfo=/xmleditor/validate
+        // [JOC unzipped]request.getPathTranslated=D:\joc\data\webapps\joc\xmleditor\validate
+        // [JOC as war] request.getPathTranslated=D:\joc\data\temp\jetty-0.0.0.0-4446-joc.war-_joc-any-7137785786755971224.dir\webapp\xmleditor\validate
+        // request.getRequestURL=http://localhost:4446/joc/api/xmleditor/validate
+        // request.getRequestURI=/joc/api/xmleditor/validate
+        // request.getServletContext()=/joc
+        //
+        // JocXmlEditor.getBaseUri=http://localhost:4446/joc
+        // return request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
+
+        // uriInfo.getAbsolutePath().toString()=http://localhost:4446/joc/api/xmleditor/validate
+        // uriInfo.getAbsolutePath().getPath()=/joc/api/xmleditor/validate
+        // uriInfo.getPath()= xmleditor/validate
+        // uriInfo.getBaseUri().toString()=http://localhost:4446/joc/api/
+        // uriInfo.getBaseUri().getPath()=/joc/api/
+        // uriInfo.getRequestUri().getPath()=/joc/api/xmleditor/validate
+        // uriInfo.getRequestUri().toString()=http://localhost:4446/joc/api/xmleditor/validate
+
+        if (uriInfo == null) {
+            return;
+        }
+        try {
+            if (servletBaseUri == null) {
+                if (Globals.servletContextContextPath == null) {
+                    servletBaseUri = uriInfo.getBaseUri();
+                } else {
+                    String baseUri = uriInfo.getBaseUri().toString();
+                    // baseUri = http://localhost:4446/joc/api/
+                    // Globals.servletContextContextPath = /joc
+                    int indx = baseUri.indexOf(Globals.servletContextContextPath);
+                    if (indx > -1) {
+                        baseUri = baseUri.substring(0, indx + Globals.servletContextContextPath.length());
+                    }
+                    servletBaseUri = new URI(baseUri);
+                }
+            }
+        } catch (Throwable e) {
+            LOGGER.error(String.format("can't evaluate the base url: %s", e.toString()), e);
         }
     }
 

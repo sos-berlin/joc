@@ -1,0 +1,23 @@
+{
+	"title": "xmleditor deploy configuration in",
+	"id": "schemas/xmleditor/deploy/deploy-configuration-schema",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.xmleditor.deploy.DeployConfiguration",
+	"type": "object",
+	"description": "",
+	"required": [
+		"jobschedulerId",
+		"objectType"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"type": "string"
+		},
+		"objectType": {
+			"$ref": "../common/object-type-schema.json"
+		},
+		"auditLog": {
+			"$ref": "../../audit/auditParams-schema.json"
+		}
+	}
+}
