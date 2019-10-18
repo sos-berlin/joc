@@ -127,23 +127,20 @@ public class DBLayerJoeObjects {
         }
     }
 
-    public Integer deleteFolderContentRecursive(final String schedulerId, final String path) throws DBConnectionRefusedException,
-            DBInvalidDataException {
+    public Integer updateFolderCommand(FilterJoeObjects filter,String command) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("delete from ").append(DBLayer.DBITEM_JOE_OBJECT);
-            sql.append(" where schedulerId = :schedulerId");
-            sql.append(" and path like :path");
+            String q = "update " + DBLayer.DBITEM_JOE_OBJECT + " set operation = '" + command + "' " + getWhere(filter);
 
-            Query<Integer> query = sosHibernateSession.createQuery(sql.toString());
-            query.setParameter("schedulerId", schedulerId);
-            query.setParameter("path", path + "/%");
+            Query<DBItemJoeObject> query = sosHibernateSession.createQuery(q);
+            query = bindParameters(filter, query);
+
             return sosHibernateSession.executeUpdate(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
         }
+
     }
 
     public List<Tree> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes) throws DBConnectionRefusedException, DBInvalidDataException {
@@ -251,5 +248,5 @@ public class DBLayerJoeObjects {
             throw new DBInvalidDataException(ex);
         }
     }
- 
+
 }

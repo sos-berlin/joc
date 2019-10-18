@@ -27,7 +27,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
 
     @Override
     public JOCDefaultResponse delete(final String accessToken, final Filter body) {
-        SOSHibernateSession connection = null;
+        SOSHibernateSession sosHibernateSession = null;
         try {
             checkRequiredParameter("objectType", body.getObjectType());
 
@@ -39,41 +39,35 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 return jocDefaultResponse;
             }
 
-            if (versionIsOlderThan("1.13.1")) {
-                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
-            }
-
             checkRequiredParameter("path", body.getPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
-            String path = isDirectory ? normalizeFolder(body.getPath()) : normalizePath(body.getPath());
 
             if (isDirectory) {
+                String path = normalizeFolder(body.getPath());
                 if (!folderPermissions.isPermittedForFolder(path)) {
                     return accessDeniedResponse();
                 }
             } else {
+                String path = normalizePath(body.getPath());
                 if (!folderPermissions.isPermittedForFolder(getParent(path))) {
                     return accessDeniedResponse();
                 }
             }
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(connection);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
+            sosHibernateSession.setAutoCommit(false);
+            DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filter = new FilterJoeObjects();
             filter.setConstraint(body);
             DBItemJoeObject item = dbLayer.getJoeObject(filter);
 
+            Globals.beginTransaction(sosHibernateSession);
             if (item != null) {
                 item.setOperation("delete");
                 item.setAccount(getAccount());
                 item.setModified(Date.from(Instant.now()));
                 dbLayer.update(item);
-                if (isDirectory) {
-                    Globals.beginTransaction(connection);
-                    dbLayer.deleteFolderContentRecursive(item.getSchedulerId(), item.getPath());
-                    Globals.commit(connection);
-                }
-            } else { 
+            } else {
                 item = new DBItemJoeObject();
                 item.setCreated(Date.from(Instant.now()));
                 item.setId(null);
@@ -86,6 +80,14 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 item.setPath(body.getPath());
                 dbLayer.save(item);
             }
+            if (isDirectory) {
+                filter = new FilterJoeObjects();
+                filter.setSchedulerId(item.getSchedulerId());
+                filter.setPath(item.getPath());
+                filter.setRecursive();
+                dbLayer.updateFolderCommand(filter, "delete");
+            }
+            Globals.commit(sosHibernateSession);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -94,7 +96,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.disconnect(connection);
+            Globals.disconnect(sosHibernateSession);
         }
     }
 

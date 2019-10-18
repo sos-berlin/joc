@@ -91,6 +91,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             deployAnswer.setRecursive(body.getRecursive());
             InventoryFilesDBLayer inventoryFilesDBLayer = new InventoryFilesDBLayer(sosHibernateSession);
 
+            boolean objectsHaveBeenDeployed = false;
             for (DBItemJoeObject joeObject : listOfJoeObjects) {
 
                 if (!"FOLDER".equals(joeObject.getObjectType())) {
@@ -119,6 +120,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath() + extension,
                             API_CALL);
 
+                    objectsHaveBeenDeployed = true;
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
                         String xmlContent = XmlSerializer.serializeToStringWithHeader(joeObject.getConfiguration(), joeObject.getObjectType());
@@ -139,6 +141,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             }
 
+          
+            if (objectsHaveBeenDeployed) {
+                java.lang.Thread.sleep(2000); // waiting for inventory
+            }
+
             for (DBItemJoeObject joeObject : listOfJoeObjects) {
 
                 boolean deleteEntry = false;
@@ -157,10 +164,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                     switch (joeObject.getOperation().toLowerCase()) {
                     case "store":
-                        deleteEntry = !(inventoryFilesDBLayer.isEmptyFolder(this.dbItemInventoryInstance.getId(), joeObject.getPath()));
+                        deleteEntry = !inventoryFilesDBLayer.isEmptyFolder(this.dbItemInventoryInstance.getId(), joeObject.getPath());
                         jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()));
                         break;
                     case "delete":
+                        deleteEntry = true;
                         jocHotFolder.deleteFolder(normalizeFolder(joeObject.getPath()));
                         break;
 

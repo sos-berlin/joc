@@ -59,12 +59,12 @@ public class FilterJoeObjects {
     }
 
     public boolean isRecursive() {
-        return path.endsWith("/%");
+        return path.endsWith("%");
     }
 
     public void setRecursive() {
         if (!path.endsWith("%")) {
-            path = Globals.normalizePath(path + "/%");
+            path = Globals.normalizePath(path + "%");
         }
     }
     
