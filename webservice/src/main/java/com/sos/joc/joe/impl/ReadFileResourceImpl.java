@@ -22,7 +22,6 @@ import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IReadFileResource;
-import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.common.JSObjectEdit;
@@ -58,9 +57,6 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
 
             checkRequiredParameter("path", body.getPath());
             if (!Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
-                throw new JobSchedulerBadRequestException("Unsupported object type: " + body.getObjectType().value());
-            }
-            if (body.getObjectType() == JobSchedulerObjectType.FOLDER) {
                 throw new JobSchedulerBadRequestException("Unsupported object type: " + body.getObjectType().value());
             }
             String path = normalizePath(body.getPath());

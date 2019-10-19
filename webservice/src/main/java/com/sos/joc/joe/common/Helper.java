@@ -32,6 +32,7 @@ public class Helper {
             put("ORDER", Order.class);
             put("JOBCHAIN", JobChain.class);
             put("PROCESSCLASS", ProcessClass.class);
+            put("AGENTCLUSTER", ProcessClass.class);
             put("LOCK", Lock.class);
             put("SCHEDULE", Schedule.class);
             put("MONITOR", Monitor.class);

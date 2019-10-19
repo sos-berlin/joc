@@ -136,6 +136,7 @@ public class TreePermanent {
 					break;
                 case AGENTCLUSTER:
 					bodyTypes.add("agent_cluster");
+					joeTypes.add(type.value());
 					break;
 				case PROCESSCLASS:
 					bodyTypes.add("process_class");
@@ -210,10 +211,6 @@ public class TreePermanent {
                             }
                             results.addAll(joeResults);
                         }
-                        joeResults = dbJoeLayer.getFoldersByFolderToDelete(schedulerId, normalizedFolder);
-                        if (results != null && joeResults != null && !joeResults.isEmpty()) {
-                            results.removeAll(joeResults);
-                        }
                     }
 					if (results != null && !results.isEmpty()) {
 						if (folder.getRecursive() == null || folder.getRecursive()) {
@@ -256,10 +253,6 @@ public class TreePermanent {
                             results = new HashSet<Tree>();
                         }
                         results.addAll(joeResults);
-                    }
-                    joeResults = dbJoeLayer.getFoldersByFolderToDelete(schedulerId, "/");
-                    if (results != null && joeResults != null && !joeResults.isEmpty()) {
-                        results.removeAll(joeResults);
                     }
                 }
 				if (results != null && !results.isEmpty()) {

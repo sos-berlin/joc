@@ -14,6 +14,9 @@
     	* initial state (optional)
     	* end state (optional)
     	* priority (optional)
+    * agent cluster
+    	* status (required: deployed or not and maybe marked as deleted)
+    	* max. processes (required)
     * process classes
     	* status (required: deployed or not and maybe marked as deleted)
     	* max. processes (required)

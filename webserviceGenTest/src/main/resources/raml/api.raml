@@ -2843,13 +2843,13 @@ traits:
 /joe:
   description: |
     This is not an API call. Use its children!!
- #!include documentation/joe/forceLive.md   
+
   /read/file:
     type:
       postJSON:
         description: Read configuration files
         description1: !include documentation/joe/jsObject.md
-        description2: " "
+        description2: !include documentation/joe/forceLive.md
         description3: " "
         description4: " "
         description5: " "
@@ -2964,7 +2964,7 @@ traits:
         description: Collection of deployable configuration items
         description200: " "
         example200: " "
-        schema200: !include examples/joe/common/deployable-schema.json
+        schema200: !include schemas/joe/common/deployable-schema.json
   
   /{objectType}/toxml:
     type: error

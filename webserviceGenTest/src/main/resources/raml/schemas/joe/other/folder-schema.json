@@ -36,6 +36,13 @@
 			},
 			"uniqueItems": true
 		},
+		"agentCluster": {
+			"type": "array",
+			"items": {
+				"$ref": "folderItem-schema.json"
+			},
+			"uniqueItems": true
+		},
 		"processClasses": {
 			"type": "array",
 			"items": {

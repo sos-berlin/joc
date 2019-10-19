@@ -156,7 +156,6 @@ public class DBLayerJoeObjects {
             } else {
                 sql.append(" and objectType in (:objectType)");
             }
-            sql.append(" and operation != 'delete'");
             Query<Tree> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (objectTypes.size() == 1) {
@@ -164,31 +163,6 @@ public class DBLayerJoeObjects {
             } else {
                 query.setParameterList("objectType", objectTypes);
             }
-            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
-                query.setParameter("folderName", folderName);
-                query.setParameter("likeFolderName", folderName + "/%");
-            }
-            return sosHibernateSession.getResultList(query);
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
-        }
-    }
-    
-    public List<Tree> getFoldersByFolderToDelete(final String schedulerId, final String folderName) throws DBConnectionRefusedException, DBInvalidDataException {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select new ").append(FOLDERS_BY_PATH).append("(path, objectType, operation) from ").append(DBLayer.DBITEM_JOE_OBJECT);
-            sql.append(" where schedulerId = :schedulerId");
-            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
-                sql.append(" and ( path = :folderName or path like :likeFolderName )");
-            }
-            sql.append(" and objectType = :objectType");
-            sql.append(" and operation = 'delete'");
-            Query<Tree> query = sosHibernateSession.createQuery(sql.toString());
-            query.setParameter("schedulerId", schedulerId);
-            query.setParameter("objectType", "FOLDER");
             if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
                 query.setParameter("folderName", folderName);
                 query.setParameter("likeFolderName", folderName + "/%");

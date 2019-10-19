@@ -130,6 +130,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                                         folderItem.setEndState(order.getEndState());
                                         folderItem.setPriority(order.getPriority());
                                         break;
+                                    case "AGENTCLUSTER":
                                     case "PROCESSCLASS":
                                         ProcessClass processClass = Globals.objectMapper.readValue(item.getConfiguration(), ProcessClass.class);
                                         folderItem.setMaxProcesses(processClass.getMaxProcesses());
@@ -153,8 +154,8 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             }, Collectors.toSet())));
 
             List<JobSchedulerObjectType> objectTypes = Arrays.asList(JobSchedulerObjectType.JOB, JobSchedulerObjectType.JOBCHAIN,
-                    JobSchedulerObjectType.ORDER, JobSchedulerObjectType.PROCESSCLASS, JobSchedulerObjectType.SCHEDULE, JobSchedulerObjectType.LOCK,
-                    JobSchedulerObjectType.MONITOR);
+                    JobSchedulerObjectType.ORDER, JobSchedulerObjectType.AGENTCLUSTER, JobSchedulerObjectType.PROCESSCLASS,
+                    JobSchedulerObjectType.SCHEDULE, JobSchedulerObjectType.LOCK, JobSchedulerObjectType.MONITOR);
 
             for (JobSchedulerObjectType objectType : objectTypes) {
                 folderContent.putIfAbsent(objectType.value(), new HashSet<FolderItem>());
@@ -168,9 +169,6 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                     String objectType = inventoryFile.getFileType().replaceAll("_", "").toUpperCase();
                     if ("/".equals(body.getPath()) && "PROCESSCLASS".equals(objectType) && "(default)".equals(inventoryFile.getFileBaseName())) {
                         continue;
-                    }
-                    if ("AGENTCLUSTER".equals(objectType)) {
-                        objectType = "PROCESSCLASS";
                     }
                     if (!Helper.CLASS_MAPPING.containsKey(objectType)) {
                         continue;
@@ -209,6 +207,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             folderItem.setEndState(order.getEndState());
                             folderItem.setPriority(order.getPriority() == null ? null : order.getPriority() + "");
                             break;
+                        case AGENTCLUSTER:
                         case PROCESSCLASS:
                             if (processClassDbLayer == null) {
                                 processClassDbLayer = new InventoryProcessClassesDBLayer(connection);
@@ -264,6 +263,9 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                         break;
                     case ORDER:
                         entity.setOrders(folderContent.get(objectType.value()));
+                        break;
+                    case AGENTCLUSTER:
+                        entity.setAgentCluster(folderContent.get(objectType.value()));
                         break;
                     case PROCESSCLASS:
                         entity.setProcessClasses(folderContent.get(objectType.value()));
