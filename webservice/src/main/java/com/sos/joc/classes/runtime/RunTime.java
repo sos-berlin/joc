@@ -40,13 +40,13 @@ public class RunTime {
 
         if (runtimeNodes != null && runtimeNodes.getLength() > 0) { // adhoc and file orders
             Node runtimeNode = runtimeNodes.item(0);
-            runTime.setRunTimeXML(getRuntimeXmlString(parent, runtimeNode));
+            runTime.setRunTime(getRuntimeXmlString(parent, runtimeNode));
         } else {
-            runTime.setRunTimeXML(getRuntimeXmlString(parent, null));
+            runTime.setRunTime(getRuntimeXmlString(parent, null));
         }
         if (!asXML) {
-            runTime.setRunTime(Globals.xmlMapper.readValue(runTime.getRunTimeXML(), com.sos.joc.model.joe.schedule.RunTime.class));
-            runTime.setRunTimeXML(null);
+            runTime.setRunTimeJson(Globals.xmlMapper.readValue(runTime.getRunTime(), com.sos.joc.model.joe.schedule.RunTime.class));
+            runTime.setRunTime(null);
         }
         runTimeAnswer.setRunTime(runTime);
         runTimeAnswer.setDeliveryDate(Date.from(Instant.now()));

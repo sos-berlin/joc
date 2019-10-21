@@ -28,7 +28,7 @@ public class OrderRuntimeResourceImplTest {
         OrderRunTimeResourceImpl orderRunTimeImpl = new OrderRunTimeResourceImpl();
         JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(accessToken, orderFilterSchema);
         RunTime200 orderRunTimeSchema = (RunTime200) ordersResponse.getEntity();
-        assertTrue("postOrderRunTimeTest", orderRunTimeSchema.getRunTime().getRunTimeXML().startsWith("<run_time>"));
+        assertTrue("postOrderRunTimeTest", orderRunTimeSchema.getRunTime().getRunTime().startsWith("<run_time"));
     }
 
 }

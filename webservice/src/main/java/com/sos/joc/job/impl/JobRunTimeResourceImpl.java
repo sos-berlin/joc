@@ -1,13 +1,10 @@
 package com.sos.joc.job.impl;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
@@ -32,7 +29,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 	public JOCDefaultResponse postJobRunTimeWithXML(String accessToken, JobFilter jobFilter) {
 		SOSHibernateSession connection = null;
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL + "_xml", jobFilter, accessToken,
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
 					jobFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
 			if (jocDefaultResponse != null) {
@@ -45,7 +42,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 			String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
 			runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, true);
 
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL + "_xml");
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
             List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(), "JOB",
                     jobPath);
@@ -73,7 +70,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 	public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "_json", jobFilter, accessToken,
                     jobFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -86,7 +83,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
             String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
             runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken);
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL + "_json");
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
             List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(), "JOB",
                     jobPath);
@@ -100,22 +97,8 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
                 runTimeAnswer.getRunTime().setCalendars(calendars);
             }
             final byte[] bytes = Globals.objectMapper.writeValueAsBytes(runTimeAnswer);
-            StreamingOutput streamOut = new StreamingOutput() {
-
-                @Override
-                public void write(OutputStream output) throws IOException {
-                    try {
-                        output.write(bytes);
-                        output.flush();
-                    } finally {
-                        try {
-                            output.close();
-                        } catch (Exception e) {
-                        }
-                    }
-                }
-            };
-            return JOCDefaultResponse.responseStatus200(streamOut, MediaType.APPLICATION_JSON);
+            
+            return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
             //return JOCDefaultResponse.responseStatus200(runTimeAnswer);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

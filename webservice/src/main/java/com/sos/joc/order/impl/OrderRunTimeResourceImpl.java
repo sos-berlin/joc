@@ -1,13 +1,10 @@
 package com.sos.joc.order.impl;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
@@ -19,7 +16,6 @@ import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.configuration.CalendarUsageConfiguration;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Calendar;
-import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.order.resource.IOrderRunTimeResource;
@@ -34,7 +30,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
     public JOCDefaultResponse postOrderRunTimeWithXML(String accessToken, OrderFilter orderFilter) {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "_xml", orderFilter, accessToken, orderFilter.getJobschedulerId(),
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken, orderFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(orderFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -49,7 +45,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
             String orderCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, orderFilter.getOrderId(), "run_time");
             runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken, true);
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL + "_xml");
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
             List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(),
                     "ORDER", jobChainPath + "," + orderFilter.getOrderId());
@@ -78,7 +74,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
     public JOCDefaultResponse postOrderRunTime(String accessToken, OrderFilter orderFilter) {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken, orderFilter.getJobschedulerId(), getPermissonsJocCockpit(
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "_json", orderFilter, accessToken, orderFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     orderFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -93,7 +89,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
             String orderCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, orderFilter.getOrderId(), "run_time");
             runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken);
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL + "_json");
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
             List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(),
                     "ORDER", jobChainPath + "," + orderFilter.getOrderId());
@@ -108,22 +104,8 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
             }
             
             final byte[] bytes = Globals.objectMapper.writeValueAsBytes(runTimeAnswer);
-            StreamingOutput streamOut = new StreamingOutput() {
-
-                @Override
-                public void write(OutputStream output) throws IOException {
-                    try {
-                        output.write(bytes);
-                        output.flush();
-                    } finally {
-                        try {
-                            output.close();
-                        } catch (Exception e) {
-                        }
-                    }
-                }
-            };
-            return JOCDefaultResponse.responseStatus200(streamOut, MediaType.APPLICATION_JSON);
+            
+            return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
             //return JOCDefaultResponse.responseStatus200(runTimeAnswer);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

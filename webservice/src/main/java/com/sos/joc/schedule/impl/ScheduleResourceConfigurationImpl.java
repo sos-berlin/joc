@@ -1,7 +1,5 @@
 package com.sos.joc.schedule.impl;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,7 +7,6 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
@@ -110,7 +107,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             runTime.setRunTimeIsTemporary(false);
             runTime.setSurveyDate(entity.getConfiguration().getSurveyDate());
 
-            runTime.setRunTime(Globals.xmlMapper.readValue(entity.getConfiguration().getContent().getXml(),
+            runTime.setRunTimeJson(Globals.xmlMapper.readValue(entity.getConfiguration().getContent().getXml(),
                     com.sos.joc.model.joe.schedule.RunTime.class));
             runTimeAnswer.setRunTime(runTime);
             runTimeAnswer.setDeliveryDate(Date.from(Instant.now()));
@@ -130,22 +127,8 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             }
 
             final byte[] bytes = Globals.objectMapper.writeValueAsBytes(runTimeAnswer);
-            StreamingOutput streamOut = new StreamingOutput() {
-
-                @Override
-                public void write(OutputStream output) throws IOException {
-                    try {
-                        output.write(bytes);
-                        output.flush();
-                    } finally {
-                        try {
-                            output.close();
-                        } catch (Exception e) {
-                        }
-                    }
-                }
-            };
-            return JOCDefaultResponse.responseStatus200(streamOut, MediaType.APPLICATION_JSON);
+            
+            return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

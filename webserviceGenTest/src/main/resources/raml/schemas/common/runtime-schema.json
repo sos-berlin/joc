@@ -15,10 +15,10 @@
       "$ref": "../common/surveyDate_v-schema.json"
     },
     "runTime": {
-      "$ref": "../joe/schedule/runTime-schema.json"
-    },
-    "runTimeXML": {
       "type": "string"
+    },
+    "runTimeJson": {
+      "$ref": "../joe/schedule/runTime-schema.json"
     },
     "permanentRunTime": {
       "description": "is required iff runTimeIsTemporary = true",
