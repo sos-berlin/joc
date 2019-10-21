@@ -1,6 +1,10 @@
 package com.sos.joc.xmleditor.common;
 
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.Globals;
@@ -18,9 +22,10 @@ public class JocXmlEditor {
     public static final String MESSAGE_UNSUPPORTED_WEB_SERVICE = String.format("Unsupported web service: JobScheduler needs at least version %s",
             AVAILABILITY_STARTING_WITH);
 
-    public static final String JOC_SCHEMA_PATH_YADE = "xsd/yade/YADE_configuration_v1.12.xsd";
-    public static final String JOC_SCHEMA_PATH_NOTIFICATION = "xsd/notification/SystemMonitorNotification_v1.0.xsd";
-
+    public static final String JOC_SCHEMA_YADE_FILE = "xsd/yade/YADE_configuration_v1.12.xsd";
+    public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/SystemMonitorNotification_v1.0.xsd";
+    public static final String JOC_SCHEMA_OTHER_LOCATION = "xsd/other/";
+    
     public static final String MESSAGE_CODE_DRAFT_NOT_EXIST = "XMLEDITOR-101";
     public static final String MESSAGE_CODE_LIVE_NOT_EXIST = "XMLEDITOR-102";
     public static final String MESSAGE_CODE_LIVE_IS_NEWER = "XMLEDITOR-103";
@@ -35,6 +40,8 @@ public class JocXmlEditor {
     public static final String ERROR_CODE_DEPLOY_ERROR = "XMLEDITOR-406";
     public static final String ERROR_CODE_DEPLOY_ERROR_UNSUPPORTED_OBJECT_TYPE = "XMLEDITOR-407";
 
+    public static final String NEW_LINE = "\r\n";
+
     public static String getResourceImplPath(final String path) {
         return String.format("./%s/%s", APPLICATION_PATH, path);
     }
@@ -44,9 +51,9 @@ public class JocXmlEditor {
             return null;
         }
         if (type.equals(ObjectType.YADE)) {
-            return JOC_SCHEMA_PATH_YADE;
+            return JOC_SCHEMA_YADE_FILE;
         } else if (type.equals(ObjectType.NOTIFICATION)) {
-            return JOC_SCHEMA_PATH_NOTIFICATION;
+            return JOC_SCHEMA_NOTIFICATION_FILE;
         }
         return otherSchema;
     }
@@ -57,7 +64,10 @@ public class JocXmlEditor {
             return null;
         }
         if (type.equals(ObjectType.OTHER)) {
-            return new URI(schemaLocation);
+            URI uri = new URI(schemaLocation);
+            if (uri.isAbsolute()) {
+                return uri;
+            }
         }
         return Globals.servletBaseUri.resolve(schemaLocation);
     }
@@ -98,4 +108,14 @@ public class JocXmlEditor {
         }
         return validator;
     }
+
+    public static List<Path> getXsdFilesOther() throws Exception {
+        return getFiles(Globals.servletContextRealPath.resolve(JOC_SCHEMA_OTHER_LOCATION), "xsd");
+    }
+
+    public static List<Path> getFiles(Path dir, String extension) throws Exception {
+        return Files.walk(dir).filter(s -> s.toString().toLowerCase().endsWith("." + extension.toLowerCase())).map(Path::getFileName).sorted()
+                .collect(Collectors.toList());
+    }
+
 }

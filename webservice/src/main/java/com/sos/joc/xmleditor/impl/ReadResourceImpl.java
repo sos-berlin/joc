@@ -1,7 +1,9 @@
 package com.sos.joc.xmleditor.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
@@ -25,8 +27,10 @@ import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.common.ObjectVersionState;
 import com.sos.joc.model.xmleditor.read.ReadConfiguration;
-import com.sos.joc.model.xmleditor.read.ReadConfigurationAnswer;
-import com.sos.joc.model.xmleditor.read.ReadConfigurationAnswerState;
+import com.sos.joc.model.xmleditor.read.other.AnswerConfiguration;
+import com.sos.joc.model.xmleditor.read.other.ReadOtherConfigurationAnswer;
+import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
+import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswerState;
 import com.sos.joc.xmleditor.common.JocXmlEditor;
 import com.sos.joc.xmleditor.resource.IReadResource;
 
@@ -46,13 +50,13 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
-                ReadConfigurationAnswer answer = createAnswer(in);
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    handleOtherConfigurations(in, answer);
+                    ReadOtherConfigurationAnswer answer = handleOtherConfigurations(in);
+                    response = JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(answer));
                 } else {
-                    handleStandardConfiguration(in, answer);
+                    ReadStandardConfigurationAnswer answer = handleStandardConfiguration(in);
+                    response = JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(answer));
                 }
-                response = JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(answer));
             }
             return response;
         } catch (JocException e) {
@@ -80,12 +84,20 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         return response;
     }
 
-    private ReadConfigurationAnswer handleStandardConfiguration(ReadConfiguration in, ReadConfigurationAnswer answer) throws Exception {
+    private ReadStandardConfigurationAnswer handleStandardConfiguration(ReadConfiguration in) throws Exception {
+        ReadStandardConfigurationAnswer answer = new ReadStandardConfigurationAnswer();
+        answer.setState(new ReadStandardConfigurationAnswerState());
+        answer.getState().setMessage(new AnswerMessage());
+
         JOCHotFolder hotFolder = new JOCHotFolder(this);
         byte[] liveFile = getLiveFile(hotFolder, in, answer);
 
         DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in.getObjectType(),
                 in.getName()));
+
+        if (item != null && item.getConfiguration() == null) {
+            item = null;
+        }
 
         String configuration = null;
         Date modified = null;
@@ -103,7 +115,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
         answer.setSchema(JocXmlEditor.getSchemaLocation(in.getObjectType(), null));
         answer.setConfiguration(configuration);
-        answer.getState().setModified(modified);
+        answer.setModified(modified);
 
         if (configuration == null) {
             answer.getState().setDeployed(false);
@@ -112,7 +124,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             answer.getState().setVersionState(ObjectVersionState.NO_CONFIGURATION_EXIST);
         } else {
             if (item == null) {
-                answer.getState().setDeployed(false);
+                answer.getState().setDeployed(true);
                 answer.getState().getMessage().setMessage("Using version in live folder. No draft version found in database");
                 answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_NOT_EXIST);
                 answer.getState().setVersionState(ObjectVersionState.DRAFT_NOT_EXIST);
@@ -139,7 +151,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         return answer;
     }
 
-    private byte[] getLiveFile(JOCHotFolder hotFolder, ReadConfiguration in, ReadConfigurationAnswer answer) throws Exception {
+    private byte[] getLiveFile(JOCHotFolder hotFolder, ReadConfiguration in, ReadStandardConfigurationAnswer answer) throws Exception {
         String file = JobSchedulerXmlEditor.getLivePathXml(in.getObjectType());
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[%s][%s]get file...", in.getJobschedulerId(), file));
@@ -153,9 +165,9 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             }
         } catch (JobSchedulerConnectionRefusedException e) {
             LOGGER.warn(String.format("[%s]JobScheduler could't be connected", in.getJobschedulerId()), e);
-            answer.getState().setWarning(new AnswerMessage());
-            answer.getState().getWarning().setCode(JocXmlEditor.ERROR_CODE_JOBSCHEDULER_NOT_CONNECTED);
-            answer.getState().getWarning().setMessage(e.toString());
+            answer.setWarning(new AnswerMessage());
+            answer.getWarning().setCode(JocXmlEditor.ERROR_CODE_JOBSCHEDULER_NOT_CONNECTED);
+            answer.getWarning().setMessage(e.toString());
         } catch (JobSchedulerObjectNotExistException e) {
             if (isDebugEnabled) {
                 LOGGER.debug(String.format("[%s][%s]file not found", in.getJobschedulerId(), file));
@@ -164,28 +176,51 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         return result;
     }
 
-    private ReadConfigurationAnswer handleOtherConfigurations(ReadConfiguration in, ReadConfigurationAnswer answer) throws Exception {
+    private ReadOtherConfigurationAnswer handleOtherConfigurations(ReadConfiguration in) throws Exception {
+
+        ReadOtherConfigurationAnswer answer = new ReadOtherConfigurationAnswer();
 
         if (SOSString.isEmpty(in.getName())) {
-            answer.getState().setVersionState(ObjectVersionState.NO_CONFIGURATION_EXIST);
+            List<DBItemXmlEditorObject> items = getOthers(in.getJobschedulerId(), in.getObjectType().name());
+            if (items != null && items.size() > 0) {
+                ArrayList<AnswerConfiguration> list = new ArrayList<AnswerConfiguration>();
+                for (int i = 0; i < items.size(); i++) {
+                    DBItemXmlEditorObject item = items.get(i);
+
+                    AnswerConfiguration ac = new AnswerConfiguration();
+                    ac.setExists(true);
+                    ac.setName(item.getName());
+                    ac.setSchema(item.getSchemaLocation());
+                    ac.setConfiguration(item.getConfiguration());
+                    ac.setModified(item.getModified());
+                    list.add(ac);
+                }
+                answer.setConfigurations(list);
+            }
+
+            List<java.nio.file.Path> files = JocXmlEditor.getXsdFilesOther();
+            if (files != null && files.size() > 0) {
+                ArrayList<String> list = new ArrayList<String>();
+                for (int i = 0; i < files.size(); i++) {
+                    java.nio.file.Path path = files.get(i);
+                    list.add(JocXmlEditor.JOC_SCHEMA_OTHER_LOCATION + path.getFileName());
+                }
+                answer.setSchemas(list);
+            }
         } else {
             DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), in.getName());
+            answer.setConfiguration(new AnswerConfiguration());
             if (item == null) {
-                answer.getState().setVersionState(ObjectVersionState.NO_CONFIGURATION_EXIST);
+                answer.getConfiguration().setExists(false);
+                answer.getConfiguration().setName(in.getName());
             } else {
-                answer.setConfiguration(item.getConfiguration());
-                answer.setSchema(item.getSchemaLocation());
-                answer.getState().setModified(item.getModified());
-                answer.getState().setVersionState(ObjectVersionState.LIVE_NOT_EXIST);
+                answer.getConfiguration().setExists(true);
+                answer.getConfiguration().setName(item.getName());
+                answer.getConfiguration().setSchema(item.getSchemaLocation());
+                answer.getConfiguration().setConfiguration(item.getConfiguration());
+                answer.getConfiguration().setModified(item.getModified());
             }
         }
-        return answer;
-    }
-
-    private ReadConfigurationAnswer createAnswer(ReadConfiguration in) {
-        ReadConfigurationAnswer answer = new ReadConfigurationAnswer();
-        answer.setState(new ReadConfigurationAnswerState());
-        answer.getState().setMessage(new AnswerMessage());
         return answer;
     }
 
@@ -213,4 +248,21 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         }
     }
 
+    private List<DBItemXmlEditorObject> getOthers(String schedulerId, String objectType) throws Exception {
+        SOSHibernateSession session = null;
+        try {
+            session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
+
+            session.beginTransaction();
+            DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
+            List<DBItemXmlEditorObject> items = dbLayer.getObjects(schedulerId, objectType);
+            session.commit();
+            return items;
+        } catch (Throwable e) {
+            Globals.rollback(session);
+            throw e;
+        } finally {
+            Globals.disconnect(session);
+        }
+    }
 }
