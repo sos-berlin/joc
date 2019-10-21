@@ -29,6 +29,9 @@
           "javaType": "com.sos.joc.model.joe.nodeparams.ConfigOrder",
           "xmlElement": "order",
           "properties": {
+            "params": {
+              "$ref": "nodeParams-schema.json"
+            },
             "jobChainNodes": {
               "xmlElement": "process",
               "type": "array",
