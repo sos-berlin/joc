@@ -76,7 +76,7 @@ public class Globals {
             SerializationFeature.INDENT_OUTPUT, true);
     public static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     public static String servletContextContextPath = null; // /joc
-    public static String servletContextRealPath = null;
+    public static Path servletContextRealPath = null;
     public static URI servletBaseUri = null;
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
@@ -511,18 +511,20 @@ public class Globals {
         }
         try {
             if (servletBaseUri == null) {
-                if (Globals.servletContextContextPath == null) {
+                if (servletContextContextPath == null) {
                     servletBaseUri = uriInfo.getBaseUri();
                 } else {
                     String baseUri = uriInfo.getBaseUri().toString();
                     // baseUri = http://localhost:4446/joc/api/
                     // Globals.servletContextContextPath = /joc
-                    int indx = baseUri.indexOf(Globals.servletContextContextPath);
+                    LOGGER.debug(String.format("servletContextContextPath=%s, baseUri=%s", servletContextContextPath, baseUri));
+                    int indx = baseUri.indexOf(servletContextContextPath);
                     if (indx > -1) {
-                        baseUri = baseUri.substring(0, indx + Globals.servletContextContextPath.length());
+                        baseUri = baseUri.substring(0, indx + servletContextContextPath.length());
                     }
-                    servletBaseUri = new URI(baseUri);
+                    servletBaseUri = new URI(baseUri + "/");
                 }
+                LOGGER.info("servletBaseUri=" + servletBaseUri);
             }
         } catch (Throwable e) {
             LOGGER.error(String.format("can't evaluate the base url: %s", e.toString()), e);

@@ -42,7 +42,12 @@ public class JocServletContainer extends ServletContainer {
         }
 
         Globals.servletContextContextPath = getServletContext().getContextPath();
-        Globals.servletContextRealPath = getServletContext().getRealPath("/");
+        try {
+            Globals.servletContextRealPath = Paths.get(getServletContext().getRealPath("/"));
+        } catch (Throwable e) {
+            LOGGER.warn("servletContextRealPath:", e);
+        }
+        LOGGER.info(String.format("servletContextRealPath=%s", Globals.servletContextRealPath));
     }
 
     @Override
