@@ -265,7 +265,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                         entity.setOrders(folderContent.get(objectType.value()));
                         break;
                     case AGENTCLUSTER:
-                        entity.setAgentCluster(folderContent.get(objectType.value()));
+                        entity.setAgentClusters(folderContent.get(objectType.value()));
                         break;
                     case PROCESSCLASS:
                         entity.setProcessClasses(folderContent.get(objectType.value()));

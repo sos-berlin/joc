@@ -36,7 +36,7 @@
 			},
 			"uniqueItems": true
 		},
-		"agentCluster": {
+		"agentClusters": {
 			"type": "array",
 			"items": {
 				"$ref": "folderItem-schema.json"
