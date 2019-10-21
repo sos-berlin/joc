@@ -135,8 +135,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
             return deployed;
         } catch (Throwable e) {
-            throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format("[%s][%s]could't put file", in
-                    .getJobschedulerId(), file)), e);
+            LOGGER.error(String.format("[%s][%s]%s could't put configuration: %s", in.getJobschedulerId(), file, JocXmlEditor.ERROR_CODE_DEPLOY_ERROR,
+                    e.toString()), e);
+            throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format("[%s][%s]could't put configuration", in
+                    .getJobschedulerId(), file)));
         }
     }
 
