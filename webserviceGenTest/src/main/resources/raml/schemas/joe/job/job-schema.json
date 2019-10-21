@@ -87,7 +87,7 @@
       "type": "object",
       "javaType": "com.sos.joc.model.joe.job.Description",
       "properties": {
-        "inculdes": {
+        "includes": {
           "$ref": "../common/includes-schema.json"
         }
       }
