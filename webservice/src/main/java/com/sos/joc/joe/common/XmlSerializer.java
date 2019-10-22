@@ -27,8 +27,9 @@ import com.sos.joc.model.joe.schedule.Weekdays;
 
 public class XmlSerializer {
 
-    private static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n\n";
-    private static final List<String> objectsWithSpecialSerialization = Arrays.asList("JOB", "JOBCHAIN", "ORDER", "PROCESSCLASS");
+    private static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" + System.lineSeparator() + System.lineSeparator();
+    private static final List<String> objectsWithSpecialSerialization = Arrays.asList("JOB", "JOBCHAIN", "ORDER", "PROCESSCLASS", "AGENTCLUSTER",
+            "SCHEDULE", "RUNTIME");
 
     public static String serializeToStringWithHeader(String json, String objType) throws JsonParseException, JsonMappingException,
             JsonProcessingException, IOException, JobSchedulerBadRequestException {
@@ -143,14 +144,14 @@ public class XmlSerializer {
                 }
             }
             return (T) processClass;
-            
+
         case "Schedule":
         case "RunTime":
             return (T) serializeAbstractSchedule((AbstractSchedule) obj);
         }
         return obj;
     }
-    
+
     @SuppressWarnings("unchecked")
     private static <T extends AbstractSchedule> T serializeAbstractSchedule(AbstractSchedule runtime) {
         if (runtime.getLetRun() != null && "false,0,no".contains(runtime.getLetRun())) {
@@ -193,7 +194,7 @@ public class XmlSerializer {
         }
         return (T) runtime;
     }
-    
+
     private static List<Period> serializePeriod(List<Period> periods) {
         if (periods == null || periods.isEmpty()) {
             return null;
@@ -211,7 +212,7 @@ public class XmlSerializer {
             return period;
         }).collect(Collectors.toList());
     }
-    
+
     private static List<Day> serializeDays(List<Day> days) {
         if (days == null || days.isEmpty()) {
             return null;
@@ -221,7 +222,7 @@ public class XmlSerializer {
             return item;
         }).collect(Collectors.toList());
     }
-    
+
     private static Weekdays serializeWeekdays(Weekdays weekdays) {
         if (weekdays == null) {
             return null;
@@ -229,7 +230,7 @@ public class XmlSerializer {
         weekdays.setDays(serializeDays(weekdays.getDays()));
         return weekdays;
     }
-    
+
     private static Ultimos serializeUltimos(Ultimos ultimos) {
         if (ultimos == null) {
             return null;
@@ -237,7 +238,7 @@ public class XmlSerializer {
         ultimos.setDays(serializeDays(ultimos.getDays()));
         return ultimos;
     }
-    
+
     private static List<WeekdayOfMonth> serializeWeekdaysOfMonth(List<WeekdayOfMonth> weekdays) {
         if (weekdays == null || weekdays.isEmpty()) {
             return null;
@@ -247,7 +248,7 @@ public class XmlSerializer {
             return item;
         }).collect(Collectors.toList());
     }
-    
+
     private static Monthdays serializeMonthdays(Monthdays monthdays) {
         if (monthdays == null) {
             return null;
@@ -256,5 +257,5 @@ public class XmlSerializer {
         monthdays.setWeekdays(serializeWeekdaysOfMonth(monthdays.getWeekdays()));
         return monthdays;
     }
-    
+
 }

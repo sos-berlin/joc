@@ -29,6 +29,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
         @JsonSubTypes.Type(value = com.sos.joc.model.joe.jobchain.JobChainEdit.class, name = "JOBCHAIN"),
         @JsonSubTypes.Type(value = com.sos.joc.model.joe.order.OrderEdit.class, name = "ORDER"),
         @JsonSubTypes.Type(value = com.sos.joc.model.joe.processclass.ProcessClassEdit.class, name = "PROCESSCLASS"),
+        @JsonSubTypes.Type(value = com.sos.joc.model.joe.processclass.AgentClusterEdit.class, name = "AGENTCLUSTER"),
         @JsonSubTypes.Type(value = com.sos.joc.model.joe.lock.LockEdit.class, name = "LOCK"),
         @JsonSubTypes.Type(value = com.sos.joc.model.joe.schedule.ScheduleEdit.class, name = "SCHEDULE"),
         @JsonSubTypes.Type(value = com.sos.joc.model.joe.other.FolderEdit.class, name = "FOLDER"),
