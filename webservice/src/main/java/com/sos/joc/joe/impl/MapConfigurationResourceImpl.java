@@ -42,7 +42,7 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
             if (!Helper.CLASS_MAPPING.containsKey(objType)) {
                 throw new JobSchedulerBadRequestException("unsupported xml: " + rootElementName);
             }
-            if (!"settings".equals(objType)) {
+            if (!"NODEPARAMS".equals(objType)) {
                 ValidateXML.validateAgainstJobSchedulerSchema(new ByteArrayInputStream(requestBody));
             }
 
