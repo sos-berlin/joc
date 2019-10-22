@@ -4,12 +4,16 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
+import com.sos.jobscheduler.model.event.CustomEvent;
+import com.sos.jobscheduler.model.event.CustomEventVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -46,16 +50,17 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             }
 
             checkRequiredParameter("path", body.getPath());
-            String path = normalizePath(body.getPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
 
             if (isDirectory) {
-                if (!this.folderPermissions.isPermittedForFolder(path)) {
+                body.setPath(normalizeFolder(body.getPath()));
+                if (!this.folderPermissions.isPermittedForFolder(body.getPath())) {
                     return accessDeniedResponse();
                 }
 
             } else {
-                if (!this.folderPermissions.isPermittedForFolder(getParent(path))) {
+                body.setPath(normalizePath(body.getPath()));
+                if (!this.folderPermissions.isPermittedForFolder(getParent(body.getPath()))) {
                     return accessDeniedResponse();
                 }
             }
@@ -97,6 +102,15 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setOperation("store");
                 item.setPath(body.getPath());
                 dbLayer.save(item);
+            }
+            
+            try {
+                CustomEvent evt = Helper.sendEvent(body.getPath(), body.getObjectType().value());
+                SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
+                evt = Helper.sendEvent(body.getOldPath(), body.getObjectType().value());
+                SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
+            } catch (Exception e) {
+                //
             }
 
             return JOCDefaultResponse.responseStatusJSOk(item.getModified());

@@ -7,9 +7,11 @@ import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
@@ -40,13 +42,14 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             checkRequiredParameter("path", body.getPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
 
-            String path = normalizePath(body.getPath());
             if (isDirectory) {
-                if (!folderPermissions.isPermittedForFolder(path)) {
+                body.setPath(normalizeFolder(body.getPath()));
+                if (!folderPermissions.isPermittedForFolder(body.getPath())) {
                     return accessDeniedResponse();
                 }
             } else {
-                if (!folderPermissions.isPermittedForFolder(getParent(path))) {
+                body.setPath(normalizePath(body.getPath()));
+                if (!folderPermissions.isPermittedForFolder(getParent(body.getPath()))) {
                     return accessDeniedResponse();
                 }
             }
@@ -59,7 +62,7 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             filter = new FilterJoeObjects();
             filter.setSchedulerId(body.getJobschedulerId());
             if (isDirectory) {
-                filter.setPath(path);
+                filter.setPath(body.getPath());
                 filter.setRecursive();
             } else {
                 filter.setConstraint(body);
@@ -67,6 +70,13 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             sosHibernateSession.beginTransaction();
             dbLayer.updateFolderCommand(filter, "store");
             Globals.commit(sosHibernateSession);
+            
+            try {
+                CustomEvent evt = Helper.sendEvent(body.getPath(), body.getObjectType().value());
+                SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
+            } catch (Exception e) {
+                //
+            }
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

@@ -8,9 +8,11 @@ import javax.ws.rs.Path;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
+import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -43,13 +45,13 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
 
             if (isDirectory) {
-                String path = normalizeFolder(body.getPath());
-                if (!folderPermissions.isPermittedForFolder(path)) {
+                body.setPath(normalizeFolder(body.getPath()));
+                if (!folderPermissions.isPermittedForFolder(body.getPath())) {
                     return accessDeniedResponse();
                 }
             } else {
-                String path = normalizePath(body.getPath());
-                if (!folderPermissions.isPermittedForFolder(getParent(path))) {
+                body.setPath(normalizePath(body.getPath()));
+                if (!folderPermissions.isPermittedForFolder(getParent(body.getPath()))) {
                     return accessDeniedResponse();
                 }
             }
@@ -88,6 +90,13 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 dbLayer.updateFolderCommand(filter, "delete");
             }
             Globals.commit(sosHibernateSession);
+            
+            try {
+                CustomEvent evt = Helper.sendEvent(body.getPath(), body.getObjectType().value());
+                SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
+            } catch (Exception e) {
+                //
+            }
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

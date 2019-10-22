@@ -8,6 +8,8 @@ import java.util.Map;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.helper.EConfigFileExtensions;
+import com.sos.jobscheduler.model.event.CustomEvent;
+import com.sos.jobscheduler.model.event.CustomEventVariables;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.job.Monitor;
@@ -130,6 +132,16 @@ public class Helper {
         outputStream.write(b);
 
         return outputStream.toByteArray();
+    }
+    
+    public static CustomEvent sendEvent(String path, String objectType) {
+        CustomEvent evt = new CustomEvent();
+        evt.setKey("JoeUpdated");
+        CustomEventVariables evtVars = new CustomEventVariables();
+        evtVars.setAdditionalProperty("path", path);
+        evtVars.setAdditionalProperty("objectType", objectType);
+        evt.setVariables(evtVars);
+        return evt;
     }
 
 }

@@ -336,6 +336,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setPath(variables.getString("path", null));
                         eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
                         eventSnapshots.put(createJobChainEventOfOrder(eventSnapshot));
+                    } else if (eventKey.equals("JoeUpdated")) {
+                        eventSnapshot.setEventType(eventKey);
+                        eventSnapshot.setPath(variables.getString("path", null));
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(variables.getString("objectType", JobSchedulerObjectType.OTHER
+                                .value())));
                     } else {
                         continue;
                     }
