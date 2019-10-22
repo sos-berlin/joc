@@ -22,10 +22,12 @@ public class JocXmlEditor {
     public static final String MESSAGE_UNSUPPORTED_WEB_SERVICE = String.format("Unsupported web service: JobScheduler needs at least version %s",
             AVAILABILITY_STARTING_WITH);
 
+    public static final String CHARSET = "UTF-8";
+
     public static final String JOC_SCHEMA_YADE_FILE = "xsd/yade/YADE_configuration_v1.12.xsd";
     public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/SystemMonitorNotification_v1.0.xsd";
     public static final String JOC_SCHEMA_OTHER_LOCATION = "xsd/other/";
-    
+
     public static final String MESSAGE_CODE_DRAFT_NOT_EXIST = "XMLEDITOR-101";
     public static final String MESSAGE_CODE_LIVE_NOT_EXIST = "XMLEDITOR-102";
     public static final String MESSAGE_CODE_LIVE_IS_NEWER = "XMLEDITOR-103";

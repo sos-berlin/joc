@@ -2,8 +2,10 @@ package com.sos.joc.xmleditor.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 
@@ -181,32 +183,41 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         ReadOtherConfigurationAnswer answer = new ReadOtherConfigurationAnswer();
 
         if (SOSString.isEmpty(in.getName())) {
-            List<DBItemXmlEditorObject> items = getOthers(in.getJobschedulerId(), in.getObjectType().name());
-            if (items != null && items.size() > 0) {
-                ArrayList<AnswerConfiguration> list = new ArrayList<AnswerConfiguration>();
-                for (int i = 0; i < items.size(); i++) {
-                    DBItemXmlEditorObject item = items.get(i);
+            ArrayList<String> schemas = new ArrayList<String>();
 
-                    AnswerConfiguration ac = new AnswerConfiguration();
-                    ac.setExists(true);
-                    ac.setName(item.getName());
-                    ac.setSchema(item.getSchemaLocation());
-                    ac.setConfiguration(item.getConfiguration());
-                    ac.setModified(item.getModified());
-                    list.add(ac);
+            List<Map<String, String>> items = getOtherProperties(in, "name,schemaLocation");
+            if (items != null && items.size() > 0) {
+                ArrayList<AnswerConfiguration> configurations = new ArrayList<AnswerConfiguration>();
+                for (int i = 0; i < items.size(); i++) {
+                    Map<String, String> item = items.get(i);
+                    AnswerConfiguration configuration = new AnswerConfiguration();
+                    configuration.setExists(true);
+                    configuration.setName(item.get("0"));
+                    configurations.add(configuration);
+
+                    if (!schemas.contains(item.get("1"))) {
+                        schemas.add(item.get("1"));
+                    }
                 }
-                answer.setConfigurations(list);
+                answer.setConfigurations(configurations);
             }
 
             List<java.nio.file.Path> files = JocXmlEditor.getXsdFilesOther();
             if (files != null && files.size() > 0) {
-                ArrayList<String> list = new ArrayList<String>();
                 for (int i = 0; i < files.size(); i++) {
                     java.nio.file.Path path = files.get(i);
-                    list.add(JocXmlEditor.JOC_SCHEMA_OTHER_LOCATION + path.getFileName());
+                    String schema = JocXmlEditor.JOC_SCHEMA_OTHER_LOCATION + path.getFileName();
+                    if (!schemas.contains(schema)) {
+                        schemas.add(schema);
+                    }
                 }
-                answer.setSchemas(list);
             }
+
+            if (schemas.size() > 0) {
+                Collections.sort(schemas);
+                answer.setSchemas(schemas);
+            }
+
         } else {
             DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), in.getName());
             answer.setConfiguration(new AnswerConfiguration());
@@ -248,14 +259,14 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         }
     }
 
-    private List<DBItemXmlEditorObject> getOthers(String schedulerId, String objectType) throws Exception {
+    private List<Map<String, String>> getOtherProperties(ReadConfiguration in, String properties) throws Exception {
         SOSHibernateSession session = null;
         try {
             session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
 
             session.beginTransaction();
             DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
-            List<DBItemXmlEditorObject> items = dbLayer.getObjects(schedulerId, objectType);
+            List<Map<String, String>> items = dbLayer.getObjectProperties(in.getJobschedulerId(), ObjectType.OTHER.name(), properties);
             session.commit();
             return items;
         } catch (Throwable e) {
