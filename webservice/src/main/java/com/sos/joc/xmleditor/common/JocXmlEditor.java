@@ -25,8 +25,8 @@ public class JocXmlEditor {
 
     public static final String CHARSET = "UTF-8";
 
-    public static final String JOC_SCHEMA_YADE_FILE = "xsd/yade/YADE_configuration_v1.12.xsd";
-    public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/SystemMonitorNotification_v1.0.xsd";
+    public static final String JOC_SCHEMA_YADE_FILE = "xsd/yade/" + JobSchedulerXmlEditor.SCHEMA_YADE;
+    public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/" + JobSchedulerXmlEditor.SCHEMA_NOTIFICATION;
     public static final String JOC_SCHEMA_OTHER_LOCATION = "xsd/other/";
 
     public static final String MESSAGE_CODE_DRAFT_NOT_EXIST = "XMLEDITOR-101";
