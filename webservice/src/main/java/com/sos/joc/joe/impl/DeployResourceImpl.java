@@ -1,34 +1,50 @@
 package com.sos.joc.joe.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Path;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
+import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.ClusterMemberHandler;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.DeployJoeAudit;
+import com.sos.joc.db.calendars.CalendarUsageDBLayer;
+import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IDeployResource;
+import com.sos.joc.model.calendar.Calendar;
+import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.DeployAnswer;
 import com.sos.joc.model.joe.common.DeployMessage;
 import com.sos.joc.model.joe.common.FilterDeploy;
+
+import sos.xml.SOSXMLXPath;
 
 @Path("joe")
 public class DeployResourceImpl extends JOCResourceImpl implements IDeployResource {
@@ -65,7 +81,6 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
-            Globals.beginTransaction(sosHibernateSession);
 
             DBLayerJoeObjects dbLayerJoeObjects = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
@@ -116,18 +131,19 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
                                 continue;
                             }
-
                             String extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
                             ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath() + extension, API_CALL);
 
                             objectsHaveBeenDeployed = true;
                             switch (joeObject.getOperation().toLowerCase()) {
                             case "store":
-                                String xmlContent = XmlSerializer.serializeToStringWithHeader(joeObject.getConfiguration(), joeObject.getObjectType());
+                                String xmlContent = XmlSerializer.serializeToStringWithHeader(joeObject.getConfiguration(), objType);
+                                updateCalendarUsedBy(xmlContent, sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
                                 jocHotFolder.putFile(joeObject.getPath() + extension, xmlContent);
                                 clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
                                 break;
                             case "delete":
+                                deleteCalendarUsedBy(sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
                                 jocHotFolder.deleteFile(joeObject.getPath() + extension);
                                 clusterMemberHandler.deleteAtOtherClusterMembers();
                                 break;
@@ -179,13 +195,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     }
                 }
             }
-            Globals.commit(sosHibernateSession);
 
             return JOCDefaultResponse.responseStatus200(deployAnswer);
 
-        } catch (
-
-        JocException e) {
+        } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
@@ -195,6 +208,73 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         }
     }
     
+    private void deleteCalendarUsedBy(SOSHibernateSession sosHibernateSession, String schedulerId, String objType, String path)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        if ("JOB".equals(objType) || "ORDER".equals(objType) || "SCHEDULE".equals(objType)) {
+            CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(sosHibernateSession);
+            List<DBItemInventoryClusterCalendarUsage> dbCalendarUsage = calendarUsageDBLayer.getCalendarUsagesOfAnObject(schedulerId, objType, path);
+
+            for (DBItemInventoryClusterCalendarUsage dbItem : dbCalendarUsage) {
+                calendarUsageDBLayer.deleteCalendarUsage(dbItem);
+            }
+        }
+    }
+
+    public void updateCalendarUsedBy(String xmlContent, SOSHibernateSession sosHibernateSession, String schedulerId, String objType, String path)
+            throws Exception {
+        if ("JOB".equals(objType) || "ORDER".equals(objType) || "SCHEDULE".equals(objType)) {
+            SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(xmlContent));
+            Set<String> calendarPaths = new HashSet<String>();
+            NodeList calendarNodes = sosxml.selectNodeList("//date/@calendar|//holiday/@calendar");
+            Node calendarsNode = sosxml.selectSingleNode("//calendars");
+            Map<String, Calendar> calendars = new HashMap<String, Calendar>();
+            if (calendarsNode != null) {
+                calendars = Globals.objectMapper.readValue(calendarsNode.getNodeValue(), Calendars.class).getCalendars().stream().filter(cal -> cal
+                        .getBasedOn() != null).collect(Collectors.toMap(Calendar::getPath, Function.identity()));
+            }
+
+            CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(sosHibernateSession);
+            CalendarsDBLayer calendarsDBLayer = new CalendarsDBLayer(sosHibernateSession);
+            List<DBItemInventoryClusterCalendarUsage> dbCalendarUsage = calendarUsageDBLayer.getCalendarUsagesOfAnObject(schedulerId, objType, path);
+            DBItemInventoryClusterCalendarUsage calendarUsageDbItem = new DBItemInventoryClusterCalendarUsage();
+            calendarUsageDbItem.setSchedulerId(schedulerId);
+            calendarUsageDbItem.setObjectType(objType);
+            calendarUsageDbItem.setEdited(false);
+            calendarUsageDbItem.setPath(path);
+
+            for (int i = 0; i < calendarNodes.getLength(); i++) {
+                String calendarPath = calendarNodes.item(i).getNodeValue();
+                if (calendarPath != null && !calendarPaths.contains(calendarPath)) {
+                    calendarPaths.add(calendarPath);
+                    DBItemInventoryClusterCalendar calendarDbItem = calendarsDBLayer.getCalendar(schedulerId, calendarPath);
+                    if (calendarDbItem != null) {
+                        calendarUsageDbItem.setCalendarId(calendarDbItem.getId());
+                        Calendar calendar = calendars.get(calendarPath);
+                        if (calendar != null) {
+                            calendar.setBasedOn(null);
+                            calendar.setType(null);
+                            // check if periods exist for working day calendar
+                            calendarUsageDbItem.setConfiguration(Globals.objectMapper.writeValueAsString(calendar));
+                        }
+                        int index = dbCalendarUsage.indexOf(calendarUsageDbItem);
+                        if (index == -1) {
+                            calendarUsageDBLayer.saveCalendarUsage(calendarUsageDbItem);
+                        } else {
+                            DBItemInventoryClusterCalendarUsage dbItem = dbCalendarUsage.remove(index);
+                            dbItem.setEdited(false);
+                            dbItem.setConfiguration(calendarUsageDbItem.getConfiguration());
+                            calendarUsageDBLayer.updateCalendarUsage(dbItem);
+                        }
+                    }
+                }
+            }
+            for (DBItemInventoryClusterCalendarUsage dbItem : dbCalendarUsage) {
+                calendarUsageDBLayer.deleteCalendarUsage(dbItem);
+            }
+
+        }
+    }
+
     private DeployMessage getAccessDeniedMessage(String path) {
         DeployMessage deployMessage = new DeployMessage();
         deployMessage.setMessage("Access denied");
