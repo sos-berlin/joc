@@ -24,6 +24,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
@@ -122,7 +123,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         if (configuration == null) {
             answer.getState().setDeployed(false);
             answer.getState().getMessage().setMessage("No configuration found");
-            answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_NO_CONFIGURATION_EXIST);
+            answer.getState().getMessage().setCode(JocXmlEditor.CODE_NO_CONFIGURATION_EXIST);
             answer.getState().setVersionState(ObjectVersionState.NO_CONFIGURATION_EXIST);
         } else {
             if (item == null) {
@@ -191,7 +192,6 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 for (int i = 0; i < items.size(); i++) {
                     Map<String, String> item = items.get(i);
                     AnswerConfiguration configuration = new AnswerConfiguration();
-                    configuration.setExists(true);
                     configuration.setName(item.get("0"));
                     configurations.add(configuration);
 
@@ -222,10 +222,9 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), in.getName());
             answer.setConfiguration(new AnswerConfiguration());
             if (item == null) {
-                answer.getConfiguration().setExists(false);
-                answer.getConfiguration().setName(in.getName());
+                throw new JocException(new JocError(JocXmlEditor.CODE_NO_CONFIGURATION_EXIST, String.format("[%s][%s][%s]no configuration found", in
+                        .getJobschedulerId(), in.getObjectType().name(), in.getName())));
             } else {
-                answer.getConfiguration().setExists(true);
                 answer.getConfiguration().setName(item.getName());
                 answer.getConfiguration().setSchema(item.getSchemaLocation());
                 answer.getConfiguration().setConfiguration(item.getConfiguration());

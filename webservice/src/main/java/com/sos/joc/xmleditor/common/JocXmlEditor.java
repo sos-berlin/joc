@@ -32,7 +32,7 @@ public class JocXmlEditor {
     public static final String MESSAGE_CODE_LIVE_NOT_EXIST = "XMLEDITOR-102";
     public static final String MESSAGE_CODE_LIVE_IS_NEWER = "XMLEDITOR-103";
     public static final String MESSAGE_CODE_DRAFT_IS_NEWER = "XMLEDITOR-104";
-    public static final String MESSAGE_CODE_NO_CONFIGURATION_EXIST = "XMLEDITOR-105";
+    public static final String CODE_NO_CONFIGURATION_EXIST = "XMLEDITOR-105";
 
     public static final String ERROR_CODE_JOBSCHEDULER_NOT_CONNECTED = "XMLEDITOR-401";
     public static final String ERROR_CODE_WRONG_OBJECT_TYPE = "XMLEDITOR-402";

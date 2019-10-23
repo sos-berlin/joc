@@ -51,7 +51,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             if (in.getObjectType().equals(ObjectType.OTHER)) {
                 throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR_UNSUPPORTED_OBJECT_TYPE, String.format(
-                        "unsupported object type for deployment: %s", in.getObjectType().name())));
+                        "[%s][%s]unsupported object type for deployment", in.getJobschedulerId(), in.getObjectType().name())));
             }
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
@@ -116,8 +116,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
     private void checkConfiguration(DBItemXmlEditorObject item, DeployConfiguration in) throws Exception {
         if (item == null || SOSString.isEmpty(item.getConfiguration())) {
-            throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format("[%s] configuration not found", in.getObjectType()
-                    .name())));
+            throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format("[%s][%s]no configuration found", in
+                    .getJobschedulerId(), in.getObjectType().name())));
         }
     }
 
@@ -144,10 +144,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
             return deployed;
         } catch (Throwable e) {
-            LOGGER.error(String.format("[%s][%s]%s could't put configuration: %s", in.getJobschedulerId(), file, JocXmlEditor.ERROR_CODE_DEPLOY_ERROR,
-                    e.toString()), e);
-            throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format("[%s][%s]could't put configuration", in
-                    .getJobschedulerId(), file)));
+            LOGGER.error(String.format("[%s][%s][%s]%s could't put configuration: %s", in.getJobschedulerId(), in.getObjectType().name(), file,
+                    JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, e.toString()), e);
+            throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format("[%s][%s][%s]could't put configuration", in
+                    .getJobschedulerId(), in.getObjectType().name(), file)));
         }
     }
 
