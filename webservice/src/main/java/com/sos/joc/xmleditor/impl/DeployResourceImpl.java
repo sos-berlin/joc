@@ -13,7 +13,6 @@ import com.sos.DataExchange.converter.JadeXml2IniConverter;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemXmlEditorObject;
-import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.jitl.xmleditor.db.DbLayerXmlEditor;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -132,14 +131,13 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             } catch (Exception e) {
             }
 
+            file = JocXmlEditor.getLivePathXml(in.getObjectType());
             if (in.getObjectType().equals(ObjectType.YADE)) {
-                file = JobSchedulerXmlEditor.getLivePathYadeXml();
                 hotFolder.putFile(file, getXmlFileContent(in.getObjectType(), configuration, deployedDateTime));
 
-                file = JobSchedulerXmlEditor.getLivePathYadeIni();
+                file = JocXmlEditor.getLivePathYadeIni();
                 hotFolder.putFile(file, convertXml2Ini(configuration, deployedDateTime));
             } else {
-                file = JobSchedulerXmlEditor.getLivePathNotificationXml();
                 hotFolder.putFile(file, getXmlFileContent(in.getObjectType(), configuration, deployedDateTime));
             }
             return deployed;

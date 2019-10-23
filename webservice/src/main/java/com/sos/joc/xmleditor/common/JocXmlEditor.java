@@ -3,6 +3,7 @@ package com.sos.joc.xmleditor.common;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +25,8 @@ public class JocXmlEditor {
 
     public static final String CHARSET = "UTF-8";
 
-    public static final String JOC_SCHEMA_YADE_FILE = "xsd/yade/YADE_configuration_v1.12.xsd";
-    public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/SystemMonitorNotification_v1.0.xsd";
+    public static final String JOC_SCHEMA_YADE_FILE = "xsd/yade/" + JobSchedulerXmlEditor.SCHEMA_YADE;
+    public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/" + JobSchedulerXmlEditor.SCHEMA_NOTIFICATION;
     public static final String JOC_SCHEMA_OTHER_LOCATION = "xsd/other/";
 
     public static final String MESSAGE_CODE_DRAFT_NOT_EXIST = "XMLEDITOR-101";
@@ -82,7 +83,7 @@ public class JocXmlEditor {
         if (type.equals(ObjectType.OTHER)) {
             return name;
         }
-        return JobSchedulerXmlEditor.getBaseName(type) + ".xml";
+        return getBaseName(type) + ".xml";
     }
 
     public static boolean checkRequiredParameter(final String paramKey, final ObjectType paramVal) throws JocMissingRequiredParameterException {
@@ -111,8 +112,37 @@ public class JocXmlEditor {
         return validator;
     }
 
+    public static String getBaseName(ObjectType type) {
+        if (type == null) {
+            return null;
+        }
+        if (type.equals(ObjectType.YADE)) {
+            return JobSchedulerXmlEditor.CONFIGURATION_BASENAME_YADE;
+        } else if (type.equals(ObjectType.NOTIFICATION)) {
+            return JobSchedulerXmlEditor.CONFIGURATION_BASENAME_NOTIFICATION;
+        }
+        return null;
+    }
+
+    public static String getLivePathXml(ObjectType type) {
+        if (type == null) {
+            return null;
+        }
+        if (type.equals(ObjectType.YADE)) {
+            return "/" + JobSchedulerXmlEditor.getLivePathYadeXml();
+        } else if (type.equals(ObjectType.NOTIFICATION)) {
+            return "/" + JobSchedulerXmlEditor.getLivePathNotificationXml();
+        }
+        return null;
+    }
+
+    public static String getLivePathYadeIni() {
+        return "/" + JobSchedulerXmlEditor.getLivePathYadeIni();
+    }
+
     public static List<Path> getXsdFilesOther() throws Exception {
-        return getFiles(Globals.servletContextRealPath.resolve(JOC_SCHEMA_OTHER_LOCATION), "xsd");
+        Path path = Globals.servletContextRealPath == null ? Paths.get(System.getProperty("user.dir")) : Globals.servletContextRealPath;
+        return getFiles(path.resolve(JOC_SCHEMA_OTHER_LOCATION), "xsd");
     }
 
     public static List<Path> getFiles(Path dir, String extension) throws Exception {
