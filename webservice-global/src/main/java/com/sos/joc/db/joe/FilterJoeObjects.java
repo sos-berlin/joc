@@ -1,5 +1,8 @@
 package com.sos.joc.db.joe;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.sos.joc.Globals;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
@@ -9,6 +12,7 @@ public class FilterJoeObjects {
 
     private String schedulerId;
     private JobSchedulerObjectType objectType;
+    private List<String> objectTypes;
     private String account;
     private String path;
     private Object orderCriteria;
@@ -34,6 +38,18 @@ public class FilterJoeObjects {
 
     public void setObjectType(JobSchedulerObjectType objectType) {
         this.objectType = objectType;
+    }
+    
+    public List<String> getObjectTypes() {
+        return objectTypes;
+    }
+
+    public void setObjectTypes(String ...objectTypes) {
+        this.objectTypes = Arrays.asList(objectTypes);
+    }
+    
+    public void setObjectTypes(List<String> objectTypes) {
+        this.objectTypes = objectTypes;
     }
 
     public String getAccount() {

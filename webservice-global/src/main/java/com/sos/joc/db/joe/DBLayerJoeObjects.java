@@ -59,6 +59,15 @@ public class DBLayerJoeObjects {
             where += and + " objectType = :objectType";
             and = " and ";
         }
+        
+        if (filter.getObjectTypes() != null && filter.getObjectTypes().size() > 0) {
+            if (filter.getObjectTypes().size() == 1) {
+                where += and + " objectType = :objectTypes";
+            } else {
+                where += and + " objectType in (:objectTypes)";
+            }
+            and = " and ";
+        }
 
         if (filter.getAccount() != null && !"".equals(filter.getAccount())) {
             where += and + " account = :account";
@@ -81,6 +90,13 @@ public class DBLayerJoeObjects {
         }
         if (filter.getObjectType() != null) {
             query.setParameter("objectType", filter.getObjectType().value());
+        }
+        if (filter.getObjectTypes() != null && filter.getObjectTypes().size() > 0) {
+            if (filter.getObjectTypes().size() == 1) {
+                query.setParameter("objectTypes", filter.getObjectTypes().get(0));
+            } else {
+                query.setParameterList("objectTypes", filter.getObjectTypes());
+            }
         }
         if (filter.getPath() != null && !"".equals(filter.getPath())) {
             query.setParameter("path", filter.getPath());

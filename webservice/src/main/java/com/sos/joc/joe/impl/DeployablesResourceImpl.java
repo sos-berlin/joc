@@ -14,7 +14,9 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeployablesResource;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -53,15 +55,25 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
             Deployables deployables = new Deployables();
             deployables.setDeployables(new ArrayList<Deployable>());
             for (DBItemJoeObject joeObject : listOfJoeObjects) {
+                if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
+                    continue;
+                }
                 Deployable deployable = new Deployable();
                 deployable.setAccount(joeObject.getAccount());
                 deployable.setFolder(getParent(joeObject.getPath()));
                 deployable.setJobschedulerId(joeObject.getSchedulerId());
                 deployable.setModified(joeObject.getModified());
-
                 deployable.setObjectName(Paths.get(joeObject.getPath()).getFileName().toString());
-                deployable.setObjectType(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
                 deployable.setOperation(joeObject.getOperation());
+                JobSchedulerObjectType objType = JobSchedulerObjectType.fromValue(joeObject.getObjectType());
+                if (objType == JobSchedulerObjectType.NODEPARAMS) {
+                    if (deployable.getObjectName().contains(",")) {
+                        objType = JobSchedulerObjectType.ORDER;
+                    } else {
+                        objType = JobSchedulerObjectType.JOBCHAIN;
+                    }
+                }
+                deployable.setObjectType(objType);
                 deployables.getDeployables().add(deployable);
             }
             Globals.commit(sosHibernateSession);
