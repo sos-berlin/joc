@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemXmlEditorObject;
-import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.jitl.xmleditor.db.DbLayerXmlEditor;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -155,7 +154,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
     }
 
     private byte[] getLiveFile(JOCHotFolder hotFolder, ReadConfiguration in, ReadStandardConfigurationAnswer answer) throws Exception {
-        String file = JobSchedulerXmlEditor.getLivePathXml(in.getObjectType());
+        String file = JocXmlEditor.getLivePathXml(in.getObjectType());
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[%s][%s]get file...", in.getJobschedulerId(), file));
         }
