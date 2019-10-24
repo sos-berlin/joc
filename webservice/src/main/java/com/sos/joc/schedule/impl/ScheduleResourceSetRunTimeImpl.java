@@ -17,6 +17,7 @@ import com.sos.jobscheduler.model.event.CalendarEvent;
 import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
@@ -27,6 +28,8 @@ import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.joe.common.XmlSerializer;
+import com.sos.joc.model.joe.schedule.Schedule;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
 
@@ -59,15 +62,26 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 			ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTime());
 
 			String schedulePath = normalizePath(modifyRuntime.getSchedule());
-			XMLBuilder command = new XMLBuilder("modify_hot_folder");
+			
+            if (versionIsOlderThan("1.13.1")) {
 
-			Element scheduleElement = XMLBuilder.parse(modifyRuntime.getRunTime());
-			scheduleElement.addAttribute("name", Paths.get(schedulePath).getFileName().toString());
-			command.addAttribute("folder", getParent(schedulePath)).add(scheduleElement);
+                XMLBuilder command = new XMLBuilder("modify_hot_folder");
 
-			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-			String commandAsXml = command.asXML();
-			jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
+                Element scheduleElement = XMLBuilder.parse(modifyRuntime.getRunTime());
+                scheduleElement.addAttribute("name", Paths.get(schedulePath).getFileName().toString());
+                command.addAttribute("folder", getParent(schedulePath)).add(scheduleElement);
+
+                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+                jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
+
+            } else {
+
+                Schedule schedulePojo = Globals.xmlMapper.readValue(modifyRuntime.getRunTime(), Schedule.class);
+                schedulePojo.setCalendars(Globals.objectMapper.writeValueAsString(modifyRuntime.getCalendars()));
+                schedulePojo = XmlSerializer.serialize(schedulePojo, Schedule.class);
+                JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                jocHotFolder.putFile(schedulePath + ".schedule.xml", XmlSerializer.serializeToStringWithHeader(schedulePojo));
+            }
 
 			session = Globals.createSosHibernateStatelessConnection(API_CALL);
 			CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session,

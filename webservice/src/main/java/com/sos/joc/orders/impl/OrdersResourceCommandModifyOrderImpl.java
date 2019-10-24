@@ -29,6 +29,7 @@ import com.sos.jobscheduler.model.event.CalendarEvent;
 import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
@@ -50,8 +51,10 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
+import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
+import com.sos.joc.model.joe.order.Order;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
@@ -283,14 +286,28 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
                         updateDailyPlan(dailyPlanCalender2DBFilter);
                     } else {
+                        
                         ValidateXML.validateAgainstJobSchedulerSchema(configuration.getRunTime());
-                        XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                        Element orderElement = XMLBuilder.parse(configuration.getRunTime());
-                        orderElement.addAttribute("job_chain", Paths.get(configuration.getJobChain()).getFileName().toString());
-                        orderElement.addAttribute("id", order.getOrderId());
+                        
+                        if (versionIsOlderThan("1.13.1")) {
 
-                        xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
-                        jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
+                            XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
+                            Element orderElement = XMLBuilder.parse(configuration.getRunTime());
+                            orderElement.addAttribute("job_chain", Paths.get(configuration.getJobChain()).getFileName().toString());
+                            orderElement.addAttribute("id", order.getOrderId());
+                            xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+                            jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
+                        } else {
+
+                            Order orderPojo = Globals.xmlMapper.readValue(configuration.getRunTime(), Order.class);
+                            if (orderPojo.getRunTime() != null) {
+                                orderPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(order.getCalendars()));
+                            }
+                            orderPojo = XmlSerializer.serialize(orderPojo, Order.class);
+                            JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                            jocHotFolder.putFile(jobChainPath + "," + order.getOrderId() + ".order.xml", XmlSerializer.serializeToStringWithHeader(
+                                    orderPojo));
+                        }
 
                         if (session == null) {
                             session = Globals.createSosHibernateStatelessConnection(API_CALL);

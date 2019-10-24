@@ -31,6 +31,10 @@ public class XmlSerializer {
     private static final List<String> objectsWithSpecialSerialization = Arrays.asList("JOB", "JOBCHAIN", "ORDER", "PROCESSCLASS", "AGENTCLUSTER",
             "SCHEDULE", "RUNTIME");
 
+    public static String serializeToStringWithHeader(Object jsonPojo) throws JsonProcessingException {
+        return xmlHeader + Globals.xmlMapper.writeValueAsString(jsonPojo);
+    }
+
     public static String serializeToStringWithHeader(String json, String objType) throws JsonParseException, JsonMappingException,
             JsonProcessingException, IOException, JobSchedulerBadRequestException {
         return xmlHeader + serializeToString(json, objType);
@@ -79,7 +83,7 @@ public class XmlSerializer {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T serialize(T obj, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
+    public static <T> T serialize(T obj, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
         switch (clazz.getSimpleName()) {
         case "Job":
             Job job = (Job) obj;

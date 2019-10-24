@@ -15,6 +15,7 @@ import com.sos.jobscheduler.model.event.CalendarEvent;
 import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
@@ -29,9 +30,11 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
+import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
+import com.sos.joc.model.joe.job.Job;
 
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {
@@ -170,14 +173,25 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
                     JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
                     String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTime(), this, jobPath);
-
                     ValidateXML.validateAgainstJobSchedulerSchema(configuration);
-                    XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                    Element jobElement = XMLBuilder.parse(configuration);
-                    jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
-                    xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
-                    String commandAsXml = xmlBuilder.asXML();
-                    jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
+                    
+                    if (versionIsOlderThan("1.13.1")) {
+
+                        XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
+                        Element jobElement = XMLBuilder.parse(configuration);
+                        jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
+                        xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
+                        jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
+                    } else {
+                        
+                        Job jobPojo = Globals.xmlMapper.readValue(configuration, Job.class);
+                        if (jobPojo.getRunTime() != null) {
+                            jobPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(modifyJob.getCalendars())); 
+                        }
+                        jobPojo = XmlSerializer.serialize(jobPojo, Job.class);
+                        JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                        jocHotFolder.putFile(jobPath + ".job.xml", XmlSerializer.serializeToStringWithHeader(jobPojo));
+                    }
 
                     CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(connection, dbItemInventoryInstance.getSchedulerId(),
                             CalendarObjectType.JOB, jobPath, modifyJob.getRunTime(), modifyJob.getCalendars());
