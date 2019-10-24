@@ -115,7 +115,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             }
         }
 
-        answer.setSchema(JocXmlEditor.getSchemaLocation(in.getObjectType(), null));
+        answer.setSchema(JocXmlEditor.getSchemaURI(in.getObjectType(), null).toString());
         answer.setConfiguration(configuration);
         answer.setModified(modified);
 
@@ -194,8 +194,9 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                     configuration.setName(item.get("0"));
                     configurations.add(configuration);
 
-                    if (!schemas.contains(item.get("1"))) {
-                        schemas.add(item.get("1"));
+                    String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.get("1")).toString();
+                    if (!schemas.contains(uri)) {
+                        schemas.add(uri);
                     }
                 }
                 answer.setConfigurations(configurations);
@@ -206,8 +207,9 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 for (int i = 0; i < files.size(); i++) {
                     java.nio.file.Path path = files.get(i);
                     String schema = JocXmlEditor.JOC_SCHEMA_OTHER_LOCATION + path.getFileName();
-                    if (!schemas.contains(schema)) {
-                        schemas.add(schema);
+                    String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, schema).toString();
+                    if (!schemas.contains(uri)) {
+                        schemas.add(uri);
                     }
                 }
             }
@@ -225,7 +227,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                         .getJobschedulerId(), in.getObjectType().name(), in.getName())));
             } else {
                 answer.getConfiguration().setName(item.getName());
-                answer.getConfiguration().setSchema(item.getSchemaLocation());
+                answer.getConfiguration().setSchema(JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.getSchemaLocation()).toString());
                 answer.getConfiguration().setConfiguration(item.getConfiguration());
                 answer.getConfiguration().setModified(item.getModified());
             }

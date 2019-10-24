@@ -19,6 +19,8 @@ import com.sos.joc.model.xmleditor.store.StoreConfigurationAnswer;
 import com.sos.joc.xmleditor.common.JocXmlEditor;
 import com.sos.joc.xmleditor.resource.IStoreResource;
 
+import sos.util.SOSString;
+
 @Path(JocXmlEditor.APPLICATION_PATH)
 public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource {
 
@@ -52,7 +54,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                     session.save(item);
 
                 } else {
-                    item.setConfiguration(in.getConfiguration());
+                    item.setConfiguration(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
                     item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
 
                     item.setAuditLogId(new Long(0));// TODO
