@@ -21,9 +21,6 @@
     "endState": {
       "type": "string"
     },
-    "webService": {
-      "type": "string"
-    },
     "params": {
       "$ref": "../common/params-schema.json"
     },

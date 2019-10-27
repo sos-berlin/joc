@@ -5,7 +5,7 @@
   "javaType": "com.sos.joc.model.joe.order.AddOrder",
   "type": "object",
   "extends" : {
-    "javaType": "Order"
+    "$ref": "order-schema.json"
   },
   "required": [
     "jobChain"

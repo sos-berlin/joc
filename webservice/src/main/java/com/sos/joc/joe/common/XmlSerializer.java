@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.model.joe.job.Job;
+import com.sos.joc.model.joe.jobchain.FileOrderSource;
 import com.sos.joc.model.joe.jobchain.JobChain;
 import com.sos.joc.model.joe.order.Order;
 import com.sos.joc.model.joe.processclass.ProcessClass;
@@ -108,6 +109,9 @@ public class XmlSerializer {
             if (job.getStderrLogLevel() != null && "info".equals(job.getStderrLogLevel())) {
                 job.setStderrLogLevel(null);
             }
+            if (job.getLoadUserProfile() != null && "false,0,no".contains(job.getLoadUserProfile())) {
+                job.setLoadUserProfile(null);
+            }
             if (job.getRunTime() == null) {
                 job.setRunTime(new RunTime());
             } else {
@@ -123,6 +127,13 @@ public class XmlSerializer {
             }
             if (jobChain.getDistributed() != null && "false,0,no".contains(jobChain.getDistributed())) {
                 jobChain.setDistributed(null);
+            }
+            if (jobChain.getFileOrderSources() != null) {
+                for (FileOrderSource orderSource : jobChain.getFileOrderSources()) {
+                    if (orderSource.getAlertWhenDirectoryMissing() != null && "true,1,yes".contains(orderSource.getAlertWhenDirectoryMissing())) {
+                        orderSource.setAlertWhenDirectoryMissing(null);
+                    }
+                }
             }
             return (T) jobChain;
 

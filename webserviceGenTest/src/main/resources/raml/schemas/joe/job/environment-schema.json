@@ -10,17 +10,7 @@
       "type": "array",
       "xmlElement": "variable",
       "items": {
-        "type": "object",
-        "javaType": "com.sos.joc.model.joe.job.EnviromentVariable",
-        "xmlElement": "variable",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          }
-        }
+        "$ref": "envvar-schema.json"
       }
     }
   }

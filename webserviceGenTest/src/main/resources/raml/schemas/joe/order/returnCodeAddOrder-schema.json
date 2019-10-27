@@ -4,16 +4,24 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.order.ReturnCodeAddOrder",
   "type": "object",
-  "extends" : {
-    "javaType": "AddOrder"
-  },
   "required": [
-    "xmlns"
+    "xmlns",
+    "jobChain",
+    "id"
   ],
   "properties": {
     "xmlns": {
       "type": "string",
       "default": "https://jobscheduler-plugins.sos-berlin.com/NodeOrderPlugin"
+    },
+    "jobChain": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "params": {
+      "$ref": "../common/params-schema.json"
     }
   }
 }

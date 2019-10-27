@@ -14,7 +14,10 @@
       	"type": "string"
     },
     "folder": {
-      	"$ref": "../../common/folder-schema.json"
+      	"$ref": "../../common/path-schema.json"
+    },
+  	"recursive": {
+      	"type": "boolean"
     },
     "objectName": {
       	"type": "string"

@@ -29,7 +29,8 @@
     },
     "alertWhenDirectoryMissing": {
       "description": "possible values: yes, no, 1, 0, true, false",
-      "type": "string"
+      "type": "string",
+      "default": "true"
     }
   }
 }
