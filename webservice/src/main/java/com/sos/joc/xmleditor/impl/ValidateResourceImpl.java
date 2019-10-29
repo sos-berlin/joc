@@ -43,9 +43,9 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
             return response;
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseHTMLStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseHTMLStatusJSError(e, getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 

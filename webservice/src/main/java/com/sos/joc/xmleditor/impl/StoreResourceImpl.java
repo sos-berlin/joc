@@ -70,10 +70,10 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         } catch (JocException e) {
             Globals.rollback(session);
             e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseHTMLStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             Globals.rollback(session);
-            return JOCDefaultResponse.responseHTMLStatusJSError(e, getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.disconnect(session);
         }
