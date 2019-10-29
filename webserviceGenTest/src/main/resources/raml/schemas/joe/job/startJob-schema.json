@@ -15,9 +15,6 @@
     "after": {
       "type": "string"
     },
-    "webService": {
-      "type": "string"
-    },
     "force": {
       "description": "possible values: yes, no, 1, 0, true, false",
       "type": "string"

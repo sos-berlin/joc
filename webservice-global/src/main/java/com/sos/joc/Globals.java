@@ -13,11 +13,8 @@ import java.util.TimeZone;
 import javax.json.Json;
 import javax.json.JsonReader;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
@@ -71,7 +68,7 @@ public class Globals {
     public static TimeZone jocTimeZone = TimeZone.getDefault();
     public static boolean rollbackJobHistoryWithJSON = false;
     public static boolean rollbackJobChainWithJSON = false;
-    public static Validator schemaValidator = null;
+    public static Source jobSchedulerSchema = null;
     public static ObjectMapper xmlMapper = new XmlMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).configure(
             SerializationFeature.INDENT_OUTPUT, true);
     public static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -188,25 +185,19 @@ public class Globals {
         // setMaxSizeOfLogsToDisplay();
         setTimeoutForTempFiles();
         setConfigurationProperties();
-        initSchemaValidator();
+        initSchema();
     }
 
-    public static void initSchemaValidator() {
-        if (schemaValidator == null) {
+    public static void initSchema() {
+        if (jobSchedulerSchema == null) {
+            InputStream inputStream = null;
             try {
-                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                InputStream inputStream = null;
-                try {
-                    inputStream = Globals.class.getResourceAsStream("/scheduler.xsd");
-                } catch (Exception e) {
-                    LOGGER.error("scheduler.xsd read error", e);
-                }
-                if (inputStream != null) {
-                    Schema schema = factory.newSchema(new StreamSource(inputStream));
-                    schemaValidator = schema.newValidator();
-                }
+                inputStream = Globals.class.getResourceAsStream("/scheduler.xsd");
             } catch (Exception e) {
-                LOGGER.error("XML Schema Validator couldn't be initialised", e);
+                LOGGER.error("scheduler.xsd read error", e);
+            }
+            if (inputStream != null) {
+                jobSchedulerSchema = new StreamSource(inputStream);
             }
         }
     }

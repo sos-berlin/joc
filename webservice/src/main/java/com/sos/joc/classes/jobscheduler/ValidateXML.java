@@ -4,7 +4,11 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import com.sos.joc.Globals;
 import com.sos.joc.classes.XMLBuilder;
@@ -14,9 +18,12 @@ public class ValidateXML {
 
     public static boolean validateAgainstJobSchedulerSchema(String xml) throws JobSchedulerBadRequestException {
 
-        if (Globals.schemaValidator != null) {
+        if (Globals.jobSchedulerSchema != null) {
             try {
-                Globals.schemaValidator.validate(new StreamSource(new StringReader(xml)));
+                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                Schema schema = factory.newSchema(Globals.jobSchedulerSchema);
+                Validator schemaValidator = schema.newValidator();
+                schemaValidator.validate(new StreamSource(new StringReader(xml)));
             } catch (Exception e) {
                 throw new JobSchedulerBadRequestException(e);
             }
@@ -26,9 +33,12 @@ public class ValidateXML {
     
     public static boolean validateAgainstJobSchedulerSchema(InputStream xml) throws JobSchedulerBadRequestException {
 
-        if (Globals.schemaValidator != null) {
+        if (Globals.jobSchedulerSchema != null) {
             try {
-                Globals.schemaValidator.validate(new StreamSource(xml));
+                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                Schema schema = factory.newSchema(Globals.jobSchedulerSchema);
+                Validator schemaValidator = schema.newValidator();
+                schemaValidator.validate(new StreamSource(xml));
             } catch (Exception e) {
                 throw new JobSchedulerBadRequestException(e);
             }
@@ -38,9 +48,12 @@ public class ValidateXML {
     
     public static boolean validateAgainstJobSchedulerSchema(Reader xml) throws JobSchedulerBadRequestException {
 
-        if (Globals.schemaValidator != null) {
+        if (Globals.jobSchedulerSchema != null) {
             try {
-                Globals.schemaValidator.validate(new StreamSource(xml));
+                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                Schema schema = factory.newSchema(Globals.jobSchedulerSchema);
+                Validator schemaValidator = schema.newValidator();
+                schemaValidator.validate(new StreamSource(xml));
             } catch (Exception e) {
                 throw new JobSchedulerBadRequestException(e);
             }

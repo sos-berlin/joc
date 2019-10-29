@@ -188,9 +188,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                         if (jobPojo.getRunTime() != null) {
                             jobPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(modifyJob.getCalendars())); 
                         }
-                        jobPojo = XmlSerializer.serialize(jobPojo, Job.class);
                         JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-                        jocHotFolder.putFile(jobPath + ".job.xml", XmlSerializer.serializeToStringWithHeader(jobPojo));
+                        jocHotFolder.putFile(jobPath + ".job.xml", XmlSerializer.serializeToStringWithHeader(XmlSerializer.serializeJob(jobPojo)));
                     }
 
                     CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(connection, dbItemInventoryInstance.getSchedulerId(),

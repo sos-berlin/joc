@@ -78,7 +78,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
                 Schedule schedulePojo = Globals.xmlMapper.readValue(modifyRuntime.getRunTime(), Schedule.class);
                 schedulePojo.setCalendars(Globals.objectMapper.writeValueAsString(modifyRuntime.getCalendars()));
-                schedulePojo = XmlSerializer.serialize(schedulePojo, Schedule.class);
+                schedulePojo = XmlSerializer.serializeAbstractSchedule(schedulePojo);
                 JOCHotFolder jocHotFolder = new JOCHotFolder(this);
                 jocHotFolder.putFile(schedulePath + ".schedule.xml", XmlSerializer.serializeToStringWithHeader(schedulePojo));
             }

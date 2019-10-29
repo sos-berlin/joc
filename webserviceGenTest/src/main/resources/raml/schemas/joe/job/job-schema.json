@@ -9,6 +9,7 @@
   "type": "object",
   "properties": {
     "priority": {
+      "description": "possible values windows: idle, below_normal, normal, above_normal, high; possible values unix: integer from -20 to 20",
       "type": "string"
     },
     "title": {
@@ -68,7 +69,7 @@
       "type": "string"
     },
     "stderrLogLevel": {
-      "description": "possible values: error, warn, info, debug or debug[0-9]",
+      "description": "possible values: error and info",
       "type": "string",
       "default": "info"
     },
@@ -204,6 +205,7 @@
             "$ref": "../../common/nonNegativeInteger-schema.json"
           },
           "delay": {
+            "description": "possible values: stop or a delay in the format [hh:mm:]ss",
             "type": "string"
           }
         }
@@ -215,6 +217,7 @@
       "items": {
 		"type": "object",
         "javaType": "com.sos.joc.model.joe.job.DelayOrderAfterSetback",
+        "description": "Only one item of this array can have isMaximum=true",
         "required": [
           "setbackCount"
         ],
@@ -227,7 +230,8 @@
           },
           "isMaximum": {
             "description": "possible values: yes, no, 1, 0, true, false",
-            "type": "string"
+            "type": "string",
+            "default": "false"
           }
         }
       }

@@ -4,12 +4,10 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jobscheduler.model.event.CustomEvent;
-import com.sos.jobscheduler.model.event.CustomEventVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -19,6 +17,7 @@ import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
+import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IStoreFileResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.JSObjectEdit;
@@ -77,7 +76,8 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setAccount(getAccount());
                 if (!isDirectory) {
                     if (body.getConfiguration() != null) {
-                        item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                        item.setConfiguration(Globals.objectMapper.writeValueAsString(XmlSerializer.serialize(body.getConfiguration(),
+                                Helper.CLASS_MAPPING.get(body.getObjectType().value()))));
                     }
                 } else {
                     item.setConfiguration(null);
@@ -93,7 +93,8 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setCreated(new Date());
                 if (!isDirectory) {
                     if (body.getConfiguration() != null) {
-                        item.setConfiguration(Globals.objectMapper.writeValueAsString(body.getConfiguration()));
+                        item.setConfiguration(Globals.objectMapper.writeValueAsString(XmlSerializer.serialize(body.getConfiguration(),
+                                Helper.CLASS_MAPPING.get(body.getObjectType().value()))));
                     }
                 } else {
                     item.setConfiguration(null);

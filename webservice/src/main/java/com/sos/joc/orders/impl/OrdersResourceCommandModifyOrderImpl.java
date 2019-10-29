@@ -303,10 +303,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                             if (orderPojo.getRunTime() != null) {
                                 orderPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(order.getCalendars()));
                             }
-                            orderPojo = XmlSerializer.serialize(orderPojo, Order.class);
                             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
                             jocHotFolder.putFile(jobChainPath + "," + order.getOrderId() + ".order.xml", XmlSerializer.serializeToStringWithHeader(
-                                    orderPojo));
+                                    XmlSerializer.serializeOrder(orderPojo)));
                         }
 
                         if (session == null) {
