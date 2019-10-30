@@ -3,6 +3,7 @@ package com.sos.joc.joe.impl;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,6 +90,8 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
                     deployable.setObjectType(objType);
                     return deployable;
                 }).collect(Collectors.toSet()));
+            } else {
+                deployables.setDeployables(new HashSet<Deployable>());
             }
             deployables.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(deployables);

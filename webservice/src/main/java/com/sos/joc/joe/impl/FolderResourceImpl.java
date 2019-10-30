@@ -155,7 +155,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
 
             List<JobSchedulerObjectType> objectTypes = Arrays.asList(JobSchedulerObjectType.JOB, JobSchedulerObjectType.JOBCHAIN,
                     JobSchedulerObjectType.ORDER, JobSchedulerObjectType.AGENTCLUSTER, JobSchedulerObjectType.PROCESSCLASS,
-                    JobSchedulerObjectType.SCHEDULE, JobSchedulerObjectType.LOCK, JobSchedulerObjectType.MONITOR);
+                    JobSchedulerObjectType.SCHEDULE, JobSchedulerObjectType.LOCK, JobSchedulerObjectType.MONITOR, JobSchedulerObjectType.NODEPARAMS);
 
             for (JobSchedulerObjectType objectType : objectTypes) {
                 folderContent.putIfAbsent(objectType.value(), new HashSet<FolderItem>());
@@ -196,6 +196,9 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             DBItemInventoryJobChain jobChain = jobChainDbLayer.getJobChainByPath(filePath, inventoryFile.getInstanceId());
                             folderItem.setTitle(jobChain.getTitle());
                             folderItem.setProcessClass(".".equals(jobChain.getProcessClassName()) ? null : jobChain.getProcessClassName());
+                            if (folderContent.get("NODEPARAMS").contains(folderItem)) {
+                                folderItem.setDeployed(false);
+                            }
                             break;
                         case ORDER:
                             if (orderDbLayer == null) {
@@ -206,6 +209,9 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                             folderItem.setInitialState(order.getInitialState());
                             folderItem.setEndState(order.getEndState());
                             folderItem.setPriority(order.getPriority() == null ? null : order.getPriority() + "");
+                            if (folderContent.get("NODEPARAMS").contains(folderItem)) {
+                                folderItem.setDeployed(false);
+                            }
                             break;
                         case AGENTCLUSTER:
                         case PROCESSCLASS:
