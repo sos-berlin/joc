@@ -33,7 +33,7 @@ import com.sos.joc.model.xmleditor.read.other.AnswerConfiguration;
 import com.sos.joc.model.xmleditor.read.other.ReadOtherConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswerState;
-import com.sos.joc.xmleditor.common.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.xmleditor.resource.IReadResource;
 
 import sos.util.SOSString;
@@ -115,7 +115,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             }
         }
 
-        answer.setSchema(JocXmlEditor.getSchemaURI(in.getObjectType(), null).toString());
+        answer.setSchema(JocXmlEditor.getSchemaURI(in.getObjectType()).toString());
         answer.setConfiguration(configuration);
         answer.setModified(modified);
 

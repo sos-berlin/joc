@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.xmleditor.deploy.DeployConfiguration;
-import com.sos.joc.xmleditor.common.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.JocXmlEditor;
 
 public interface IDeployResource {
 

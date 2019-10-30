@@ -1,4 +1,4 @@
-package com.sos.joc.xmleditor.common;
+package com.sos.joc.classes.xmleditor;
 
 import java.io.StringReader;
 import java.net.URI;

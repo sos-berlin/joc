@@ -16,7 +16,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.store.StoreConfiguration;
 import com.sos.joc.model.xmleditor.store.StoreConfigurationAnswer;
-import com.sos.joc.xmleditor.common.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.xmleditor.resource.IStoreResource;
 
 import sos.util.SOSString;

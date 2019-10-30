@@ -15,8 +15,8 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.validate.ValidateConfiguration;
 import com.sos.joc.model.xmleditor.validate.ValidateConfigurationAnswer;
-import com.sos.joc.xmleditor.common.JocXmlEditor;
-import com.sos.joc.xmleditor.common.XsdValidator;
+import com.sos.joc.classes.xmleditor.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.XsdValidator;
 import com.sos.joc.xmleditor.resource.IValidateResource;
 
 @Path(JocXmlEditor.APPLICATION_PATH)

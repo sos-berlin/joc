@@ -12,19 +12,21 @@ import org.xml.sax.InputSource;
 import com.sos.DataExchange.converter.JadeXml2IniConverter;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBItemXmlEditorObject;
 import com.sos.jitl.xmleditor.db.DbLayerXmlEditor;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.audit.XmlEditorAudit;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.deploy.DeployConfiguration;
 import com.sos.joc.model.xmleditor.deploy.DeployConfigurationAnswer;
-import com.sos.joc.xmleditor.common.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.xmleditor.resource.IDeployResource;
 
 import sos.util.SOSDate;
@@ -46,6 +48,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     public JOCDefaultResponse deploy(final String accessToken, final DeployConfiguration in) {
         SOSHibernateSession session = null;
         try {
+            // TODO check folder permissions
             checkRequiredParameters(in);
 
             if (in.getObjectType().equals(ObjectType.OTHER)) {
@@ -55,8 +58,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
-                // TODO check folder permissions
-                // TODO use audit log
+                XmlEditorAudit audit = new XmlEditorAudit(in);
+                logAuditMessage(audit);
 
                 session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
                 session.beginTransaction();
@@ -70,10 +73,16 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                 Date deployed = putFile(in, item.getConfiguration());
 
+                audit.setStartTime(deployed);
+                DBItemAuditLog auditItem = storeAuditLogEntry(audit);
+                if (auditItem != null) {
+                    item.setAuditLogId(auditItem.getId());
+                }
                 item.setConfiguration(null);
                 item.setAccount(getAccount());
                 item.setModified(new Date());
                 session.update(item);
+
                 session.commit();
                 response = JOCDefaultResponse.responseStatus200(getSuccess(deployed));
             }
@@ -165,7 +174,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
     private byte[] convertXml2Ini(String configuration, String deployedDateTime) throws Exception {
         JadeXml2IniConverter converter = new JadeXml2IniConverter();
-        InputSource schemaInputSource = new InputSource(JocXmlEditor.getSchemaURI(ObjectType.YADE, null).toString());
+        InputSource schemaInputSource = new InputSource(JocXmlEditor.getSchemaURI(ObjectType.YADE).toString());
         InputSource configurationInputSource = new InputSource();
         configurationInputSource.setCharacterStream(new StringReader(configuration));
         return converter.process(schemaInputSource, configurationInputSource, getIniFileHeader(deployedDateTime));

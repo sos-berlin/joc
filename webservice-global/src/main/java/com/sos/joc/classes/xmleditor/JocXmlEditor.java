@@ -1,4 +1,4 @@
-package com.sos.joc.xmleditor.common;
+package com.sos.joc.classes.xmleditor;
 
 import java.net.URI;
 import java.nio.file.Files;
@@ -49,6 +49,10 @@ public class JocXmlEditor {
         return String.format("./%s/%s", APPLICATION_PATH, path);
     }
 
+    public static String getSchemaLocation(final ObjectType type) {
+        return getSchemaLocation(type, null);
+    }
+
     public static String getSchemaLocation(final ObjectType type, final String otherSchema) {
         if (type == null || SOSString.isEmpty(type.name())) {
             return null;
@@ -59,6 +63,10 @@ public class JocXmlEditor {
             return JOC_SCHEMA_NOTIFICATION_FILE;
         }
         return otherSchema;
+    }
+
+    public static URI getSchemaURI(final ObjectType type) throws Exception {
+        return getSchemaURI(type, null);
     }
 
     public static URI getSchemaURI(final ObjectType type, final String otherSchema) throws Exception {
