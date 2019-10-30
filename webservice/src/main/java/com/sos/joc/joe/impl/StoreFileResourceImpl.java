@@ -106,9 +106,9 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             }
             
             try {
-                CustomEvent evt = Helper.sendEvent(body.getPath(), body.getObjectType().value());
+                CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
-                evt = Helper.sendEvent(body.getOldPath(), body.getObjectType().value());
+                evt = Helper.getJoeUpdatedEvent(body.getOldPath(), body.getObjectType().value());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
             } catch (Exception e) {
                 //

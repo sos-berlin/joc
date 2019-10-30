@@ -1,17 +1,17 @@
 package com.sos.joc.classes.audit;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.model.audit.AuditParams;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.FilterDeploy;
 
 public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
-
-    @JsonIgnore
-    private String folder;
 
     @JsonIgnore
     private String job;
@@ -31,31 +31,42 @@ public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
     @JsonIgnore
     private String ticketLink;
 
+    @JsonProperty("toDelete")
     private Boolean toDelete;
 
     public DeployJoeAudit(DBItemJoeObject joeObject, FilterDeploy filter) {
         setJobschedulerId(filter.getJobschedulerId());
-        setObjectType(filter.getObjectType());
+        try {
+            setObjectType(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
+        } catch (Exception e) {
+            setObjectType(filter.getObjectType());
+        }
         setAuditParams(filter.getAuditLog());
         setToDelete(joeObject.operationIsDelete());
+        Path path = Paths.get(joeObject.getPath());
         switch (joeObject.getObjectType()) {
         case "JOB":
             this.job = joeObject.getPath();
-            this.folder = Paths.get(joeObject.getPath()).getParent().toString().replace('\\', '/');
+            setFolder(path.getParent().toString().replace('\\', '/'));
+            setObjectName(path.getFileName().toString());
             break;
         case "JOBCHAIN":
             this.jobChain = joeObject.getPath();
-            this.folder = Paths.get(joeObject.getPath()).getParent().toString().replace('\\', '/');
+            setFolder(path.getParent().toString().replace('\\', '/'));
+            setObjectName(path.getFileName().toString());
             break;
         case "ORDER":
             this.order = joeObject.getPath();
-            this.folder = Paths.get(joeObject.getPath()).getParent().toString().replace('\\', '/');
+            setFolder(path.getParent().toString().replace('\\', '/'));
+            setObjectName(path.getFileName().toString());
             break;
         case "FOLDER":
-            this.folder = joeObject.getPath();
+            setFolder(joeObject.getPath());
+            setObjectName(null);
             break;
         default:
-            this.folder = Paths.get(joeObject.getPath()).getParent().toString().replace('\\', '/');
+            setFolder(path.getParent().toString().replace('\\', '/'));
+            setObjectName(path.getFileName().toString());
             break;
         }
     }
@@ -72,12 +83,6 @@ public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
     @JsonIgnore
     public String getComment() {
         return comment;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getFolder() {
-        return folder;
     }
 
     @Override
@@ -119,10 +124,12 @@ public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
         return order;
     }
 
+    @JsonProperty("toDelete")
     public Boolean getToDelete() {
         return toDelete;
     }
 
+    @JsonProperty("toDelete")
     public void setToDelete(Boolean toDelete) {
         this.toDelete = toDelete;
     }

@@ -72,7 +72,7 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             Globals.commit(sosHibernateSession);
             
             try {
-                CustomEvent evt = Helper.sendEvent(body.getPath(), body.getObjectType().value());
+                CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
             } catch (Exception e) {
                 //

@@ -323,6 +323,7 @@
 									<!-- includeConstructors>true</includeConstructors -->
 									<includes>
 										<include>joe/common/param-schema.json</include>
+										<include>joe/jobChain/nodeParams-schema.json</include>
 										<include>joe/job/envvar-schema.json</include>
 									</includes>
 								</configuration>
@@ -397,6 +398,16 @@
 											match="(\s*return new EqualsBuilder).*"
 											replace="\1().append(name, rhs.name).isEquals();"
 											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/other/FolderItem.java"
+											preserveLastModified="true" />
+										<replaceregexp flags="ig" byline="true"
+											match="(\s*return new HashCodeBuilder).*"
+											replace="\1().append(folder).append(objectName).append(jobschedulerId).append(objectType).toHashCode();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/common/Deployable.java"
+											preserveLastModified="true" />
+										<replaceregexp flags="ig" byline="true"
+											match="(\s*return new EqualsBuilder).*"
+											replace="\1().append(folder, rhs.folder).append(objectName, rhs.objectName).append(jobschedulerId, rhs.jobschedulerId).append(objectType, rhs.objectType).isEquals();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/common/Deployable.java"
 											preserveLastModified="true" />
 									</target>
 								</configuration>

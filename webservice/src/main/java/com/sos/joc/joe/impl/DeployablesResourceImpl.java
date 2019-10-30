@@ -1,8 +1,10 @@
 package com.sos.joc.joe.impl;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Path;
 
@@ -50,33 +52,45 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
             filterJoeObjects.setOrderCriteria("created");
 
             List<DBItemJoeObject> listOfJoeObjects = dbLayerJoeObjects.getJoeObjectList(filterJoeObjects, 0);
-
-            Deployables deployables = new Deployables();
-            deployables.setDeployables(new ArrayList<Deployable>());
-            for (DBItemJoeObject joeObject : listOfJoeObjects) {
-                if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
-                    continue;
-                }
-                Deployable deployable = new Deployable();
-                deployable.setAccount(joeObject.getAccount());
-                deployable.setFolder(getParent(joeObject.getPath()));
-                deployable.setJobschedulerId(joeObject.getSchedulerId());
-                deployable.setModified(joeObject.getModified());
-                deployable.setObjectName(Paths.get(joeObject.getPath()).getFileName().toString());
-                deployable.setOperation(joeObject.getOperation());
-                JobSchedulerObjectType objType = JobSchedulerObjectType.fromValue(joeObject.getObjectType());
-                if (objType == JobSchedulerObjectType.NODEPARAMS) {
-                    if (deployable.getObjectName().contains(",")) {
-                        objType = JobSchedulerObjectType.ORDER;
-                    } else {
-                        objType = JobSchedulerObjectType.JOBCHAIN;
-                    }
-                }
-                deployable.setObjectType(objType);
-                deployables.getDeployables().add(deployable);
-            }
             Globals.commit(sosHibernateSession);
 
+            Deployables deployables = new Deployables();
+            if (listOfJoeObjects != null) {
+                deployables.setDeployables(listOfJoeObjects.stream().filter(joeObject -> {
+                    if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
+                        return false;
+                    }
+                    if ("FOLDER".equals(joeObject.getObjectType())) {
+                        if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
+                            return false;
+                        }
+                    } else {
+                        if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }).map(joeObject -> {
+                    Deployable deployable = new Deployable();
+                    deployable.setAccount(joeObject.getAccount());
+                    deployable.setFolder(getParent(joeObject.getPath()));
+                    deployable.setJobschedulerId(joeObject.getSchedulerId());
+                    deployable.setModified(joeObject.getModified());
+                    deployable.setObjectName(Paths.get(joeObject.getPath()).getFileName().toString());
+                    deployable.setOperation(joeObject.getOperation());
+                    JobSchedulerObjectType objType = JobSchedulerObjectType.fromValue(joeObject.getObjectType());
+                    if (objType == JobSchedulerObjectType.NODEPARAMS) {
+                        if (deployable.getObjectName().contains(",")) {
+                            objType = JobSchedulerObjectType.ORDER;
+                        } else {
+                            objType = JobSchedulerObjectType.JOBCHAIN;
+                        }
+                    }
+                    deployable.setObjectType(objType);
+                    return deployable;
+                }).collect(Collectors.toSet()));
+            }
+            deployables.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(deployables);
 
         } catch (JocException e) {

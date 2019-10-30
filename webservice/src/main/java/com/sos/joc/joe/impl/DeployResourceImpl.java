@@ -36,6 +36,7 @@ import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.common.XmlSerializer;
@@ -141,12 +142,25 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             switch (joeObject.getOperation().toLowerCase()) {
                             case "store":
                                 String xmlContent = XmlSerializer.serializeToStringWithHeader(joeObject.getConfiguration(), objType);
-                                jocHotFolder.putFile(joeObject.getPath() + extension, xmlContent);
-                                clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
-                                updateCalendarUsedBy(xmlContent, sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
+                                if ("NODEPARAMS".equals(objType) && xmlContent.trim().equals(XmlSerializer.xmlHeader + "<settings/>")) {
+                                    //TODO delete configuration monitor in corresponding jobs
+                                    try {
+                                        jocHotFolder.deleteFile(joeObject.getPath() + extension);
+                                    } catch (JobSchedulerObjectNotExistException e) {
+                                    }
+                                    clusterMemberHandler.deleteAtOtherClusterMembers();
+                                } else {
+                                    //TODO add configuration monitor in corresponding jobs if objType == NODEPARAMS
+                                    jocHotFolder.putFile(joeObject.getPath() + extension, xmlContent);
+                                    clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
+                                    updateCalendarUsedBy(xmlContent, sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
+                                }
                                 break;
                             case "delete":
-                                jocHotFolder.deleteFile(joeObject.getPath() + extension);
+                                try {
+                                    jocHotFolder.deleteFile(joeObject.getPath() + extension);
+                                } catch (JobSchedulerObjectNotExistException e) {
+                                }
                                 clusterMemberHandler.deleteAtOtherClusterMembers();
                                 deleteCalendarUsedBy(sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
                                 break;
@@ -183,7 +197,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             break;
                         case "delete":
                             deleteEntry = true;
-                            jocHotFolder.deleteFolder(normalizeFolder(joeObject.getPath()));
+                            try {
+                                jocHotFolder.deleteFolder(normalizeFolder(joeObject.getPath()));
+                            } catch (JobSchedulerObjectNotExistException e) {
+                            }
                             break;
 
                         default:

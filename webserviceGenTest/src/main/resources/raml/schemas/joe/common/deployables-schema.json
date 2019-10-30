@@ -5,11 +5,15 @@
   "javaType": "com.sos.joc.model.joe.common.Deployables",
   "type": "object",
   "properties": {
-      "deployables": {
-        "type": "array",
-        "items": {
-      	"$ref": "deployable-schema.json"
-         }
-    }
-  }
+    "deliveryDate": {
+      "$ref": "../../common/deliveryDate-schema.json"
+    },
+    "deployables": {
+       "type": "array",
+       "items": {
+         "$ref": "deployable-schema.json"
+       },
+       "uniqueItems": true
+	 }
+   }
 }

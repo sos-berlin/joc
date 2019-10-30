@@ -22,6 +22,7 @@ import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IReadFileResource;
+import com.sos.joc.model.joe.common.EmptyConfiguration;
 import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.common.JSObjectEdit;
@@ -82,15 +83,15 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
 
             Date lastModifiedDate = null;
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-            try {
-                fileLiveContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
-            } catch (JobSchedulerObjectNotExistException e) {
-                LOGGER.warn(e.toString()); // maybe for this case something special?
-            } catch (JocException e) {
-                LOGGER.warn(e.toString());
-            }
 
             if (dbItemJoeObject == null || (body.getForceLive() != null && body.getForceLive())) {
+                try {
+                    fileLiveContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
+                } catch (JobSchedulerObjectNotExistException e) {
+                    LOGGER.warn(e.toString()); // maybe for this case something special?
+                } catch (JocException e) {
+                    LOGGER.warn(e.toString());
+                }
                 fileContent = fileLiveContent;
                 if (fileContent != null) {
                     jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType()
@@ -139,6 +140,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
                 jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText("No configuration found");
                 jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1004");
                 jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.NO_CONFIGURATION_EXIST);
+                jsObjectEdit.setConfiguration(new EmptyConfiguration());
             }
             jsObjectEdit.setJobschedulerId(body.getJobschedulerId());
             jsObjectEdit.setPath(path);

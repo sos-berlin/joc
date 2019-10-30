@@ -134,7 +134,7 @@ public class Helper {
         return outputStream.toByteArray();
     }
     
-    public static CustomEvent sendEvent(String path, String objectType) {
+    public static CustomEvent getJoeUpdatedEvent(String path, String objectType) {
         CustomEvent evt = new CustomEvent();
         evt.setKey("JoeUpdated");
         CustomEventVariables evtVars = new CustomEventVariables();

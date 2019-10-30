@@ -20,10 +20,12 @@ import com.sos.joc.model.joe.job.Script;
 import com.sos.joc.model.joe.job.StartJob;
 import com.sos.joc.model.joe.jobchain.FileOrderSource;
 import com.sos.joc.model.joe.jobchain.JobChain;
+import com.sos.joc.model.joe.nodeparams.Config;
+import com.sos.joc.model.joe.nodeparams.ConfigNode;
+import com.sos.joc.model.joe.nodeparams.ConfigOrder;
 import com.sos.joc.model.joe.order.AddOrder;
 import com.sos.joc.model.joe.order.Order;
 import com.sos.joc.model.joe.processclass.ProcessClass;
-import com.sos.joc.model.joe.processclass.RemoteScheduler;
 import com.sos.joc.model.joe.processclass.RemoteSchedulers;
 import com.sos.joc.model.joe.schedule.AbstractSchedule;
 import com.sos.joc.model.joe.schedule.Day;
@@ -36,12 +38,12 @@ import com.sos.joc.model.joe.schedule.Weekdays;
 
 public class XmlSerializer {
 
-    private static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" + System.lineSeparator() + System.lineSeparator();
     private static final List<String> objectsWithSpecialSerialization = Arrays.asList("JOB", "JOBCHAIN", "ORDER", "PROCESSCLASS", "AGENTCLUSTER",
-            "SCHEDULE", "RUNTIME", "MONITOR");
+            "SCHEDULE", "RUNTIME", "MONITOR", "NODEPARAMS");
     private static final List<String> trueValues = Arrays.asList("true", "1", "yes");
     private static final List<String> falseValues = Arrays.asList("false", "0", "no");
-
+    public static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" + System.lineSeparator() + System.lineSeparator();
+    
     public static String serializeToStringWithHeader(Object jsonPojo) throws JsonProcessingException {
         return xmlHeader + Globals.xmlMapper.writeValueAsString(jsonPojo);
     }
@@ -118,6 +120,9 @@ public class XmlSerializer {
         
         case "Monitor":
             return (T) serializeMonitor((Monitor) obj);
+        
+        case "Config":
+            return (T) serializeNodeParams((Config) obj);
         }
         return obj;
     }
@@ -241,12 +246,20 @@ public class XmlSerializer {
     public static ProcessClass serializeProcessClass(ProcessClass processClass) {
         RemoteSchedulers agents = processClass.getRemoteSchedulers();
         if (agents != null) {
-            List<RemoteScheduler> agentList = agents.getRemoteSchedulerList();
-            if (agentList == null || agentList.isEmpty()) {
-                processClass.setRemoteSchedulers(null);
-            } else if (agents.getSelect() != null && "first".equals(agents.getSelect())) {
-                processClass.getRemoteSchedulers().setSelect(null);
+            if (agents.getRemoteSchedulerList() != null) {
+                agents.setRemoteSchedulerList(agents.getRemoteSchedulerList().stream().filter(i -> i.getRemoteScheduler() != null && !i
+                        .getRemoteScheduler().isEmpty()).collect(Collectors.toList()));
+                if (agents.getRemoteSchedulerList().size() == 0) {
+                    agents = null;
+                }
             }
+            if (agents != null && agents.getSelect() != null && "first".equals(agents.getSelect())) {
+                agents.setSelect(null);
+            }
+            processClass.setRemoteSchedulers(agents);
+        }
+        if (processClass.getTimeout() != null && processClass.getTimeout() == 0) {
+            processClass.setTimeout(null);
         }
         return processClass;
     }
@@ -254,6 +267,31 @@ public class XmlSerializer {
     public static Monitor serializeMonitor(Monitor monitor) {
         monitor.setScript(serializeScript(monitor.getScript()));
         return monitor;
+    }
+    
+    public static Config serializeNodeParams(Config nodeParams) {
+        if (nodeParams.getJobChain() != null) {
+            ConfigOrder orderElem = nodeParams.getJobChain().getOrder();
+            if (orderElem != null) {
+                orderElem.setParams(serializeNodeParams(orderElem.getParams()));
+                if (orderElem.getJobChainNodes() != null) {
+                    for (ConfigNode node : orderElem.getJobChainNodes()) {
+                        node.setParams(serializeNodeParams(node.getParams()));
+                    }
+                    orderElem.setJobChainNodes(orderElem.getJobChainNodes().stream().filter(i -> i.getParams() != null && i.getParams()
+                            .getParamList() != null && i.getParams().getParamList().size() > 0).collect(Collectors.toList()));
+                    if (orderElem.getJobChainNodes().size() == 0) {
+                        orderElem.setJobChainNodes(null); 
+                    }
+                }
+                if (orderElem.getParams() == null && orderElem.getJobChainNodes() == null) {
+                    nodeParams.setJobChain(null);
+                } else {
+                    nodeParams.getJobChain().setOrder(orderElem);
+                }
+            }
+        }
+        return nodeParams;
     }
 
     @SuppressWarnings("unchecked")
@@ -379,6 +417,22 @@ public class XmlSerializer {
                 }
             }
             if (params.getIncludes() == null && params.getParamList() == null) {
+                params = null;
+            }
+        }
+        return params;
+    }
+    
+    private static com.sos.joc.model.joe.nodeparams.Params serializeNodeParams(com.sos.joc.model.joe.nodeparams.Params params) {
+        if (params != null) {
+            if (params.getParamList() != null) {
+                params.setParamList(params.getParamList().stream().filter(i -> i.getName() != null && !i.getName().isEmpty()).collect(Collectors
+                        .toList()));
+                if (params.getParamList().size() == 0) {
+                    params.setParamList(null);
+                }
+            }
+            if (params.getParamList() == null) {
                 params = null;
             }
         }
