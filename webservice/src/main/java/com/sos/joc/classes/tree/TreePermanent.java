@@ -20,6 +20,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
+import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
@@ -113,12 +114,8 @@ public class TreePermanent {
 
 	public static SortedSet<Tree> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId, String schedulerId, boolean treeForJoe)
 			throws JocException {
-		SortedSet<Tree> folders = new TreeSet<Tree>(new Comparator<Tree>() {
-
-			public int compare(Tree a, Tree b) {
-				return b.getPath().compareTo(a.getPath());
-			}
-		});
+	    Comparator<Tree> byPath = Comparator.comparing(Tree::getPath).reversed();
+		SortedSet<Tree> folders = new TreeSet<Tree>(byPath);
 		Set<String> bodyTypes = new HashSet<String>();
 		Set<String> calendarTypes = new HashSet<String>();
 		Set<String> docTypes = new HashSet<String>();
@@ -176,7 +173,7 @@ public class TreePermanent {
 			InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(connection);
 			CalendarsDBLayer dbCalendarLayer = new CalendarsDBLayer(connection);
 			DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
-			DBLayerJoeObjects dbJoeLayer = new DBLayerJoeObjects(connection);
+			DBLayerJoeObjects dbJoeObjectLayer = new DBLayerJoeObjects(connection);
             Set<Tree> results = null;
 			Set<Tree> calendarResults = null;
 			Set<Tree> docResults = null;
@@ -204,7 +201,7 @@ public class TreePermanent {
                         }
                     }
                     if (treeForJoe) {
-                        joeResults = dbJoeLayer.getFoldersByFolder(schedulerId, normalizedFolder, joeTypes);
+                        joeResults = dbJoeObjectLayer.getFoldersByFolder(schedulerId, normalizedFolder, joeTypes);
                         if (joeResults != null && !joeResults.isEmpty()) {
                             if (results == null) {
                                 results = new HashSet<Tree>();
@@ -247,7 +244,7 @@ public class TreePermanent {
                     }
                 }
 				if (treeForJoe) {
-                    joeResults = dbJoeLayer.getFoldersByFolder(schedulerId, "/", joeTypes);
+                    joeResults = dbJoeObjectLayer.getFoldersByFolder(schedulerId, "/", joeTypes);
                     if (joeResults != null && !joeResults.isEmpty()) {
                         if (results == null) {
                             results = new HashSet<Tree>();
@@ -258,6 +255,10 @@ public class TreePermanent {
 				if (results != null && !results.isEmpty()) {
 					folders.addAll(results);
 				}
+			}
+			if (treeForJoe) {
+			    DBLayerJoeLocks dbJoeLockLayer = new DBLayerJoeLocks(connection);
+			    folders = dbJoeLockLayer.setLockedBy(schedulerId, folders, byPath);
 			}
 			return folders;
 		} catch (JocException e) {
@@ -277,6 +278,12 @@ public class TreePermanent {
 				TreeModel tree = new TreeModel();
 				if (treeMap.containsKey(pFolder)) {
 					tree = treeMap.get(pFolder);
+					if (folder.getDeleted() != null && folder.getDeleted()) {
+                        tree.setDeleted(true); 
+                    }
+                    if (folder.getLockedBy() != null && !folder.getLockedBy().isEmpty()) {
+                        tree.setLockedBy(folder.getLockedBy()); 
+                    }
 				} else {
 					tree.setPath(folder.getPath());
 					Path fileName = pFolder.getFileName();
@@ -285,6 +292,9 @@ public class TreePermanent {
 					if (folder.getDeleted() != null && folder.getDeleted()) {
 					    tree.setDeleted(true); 
 					}
+					if (folder.getLockedBy() != null && !folder.getLockedBy().isEmpty()) {
+                        tree.setLockedBy(folder.getLockedBy()); 
+                    }
 					treeMap.put(pFolder, tree);
 				}
 				fillTreeMap(treeMap, pFolder, tree);

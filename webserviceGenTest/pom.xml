@@ -409,6 +409,16 @@
 											replace="\1().append(folder, rhs.folder).append(objectName, rhs.objectName).append(jobschedulerId, rhs.jobschedulerId).append(objectType, rhs.objectType).isEquals();"
 											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/common/Deployable.java"
 											preserveLastModified="true" />
+										<replaceregexp flags="ig" byline="true"
+											match="(\s*return new HashCodeBuilder).*"
+											replace="\1().append(path).toHashCode();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/tree/Tree.java"
+											preserveLastModified="true" />
+										<replaceregexp flags="ig" byline="true"
+											match="(\s*return new EqualsBuilder).*"
+											replace="\1().append(path, rhs.path).isEquals();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/tree/Tree.java"
+											preserveLastModified="true" />
 									</target>
 								</configuration>
 							</execution>

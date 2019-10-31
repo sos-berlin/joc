@@ -90,6 +90,7 @@ resourceTypes:
   - modifyCalendar: !include resourceTypes/calendar/modify.raml
   - loginConfiguration: !include resourceTypes/configuration/login.raml
   - editProcessClass: !include resourceTypes/processClass/edit.raml
+  - postJoeLock: !include resourceTypes/joe/postLock.raml
   
 
 traits:
@@ -2843,7 +2844,31 @@ traits:
 /joe:
   description: |
     This is not an API call. Use its children!!
-
+  
+  /lock:
+    type:
+      postJoeLock:
+        description: Locks a folder
+        description1: !include documentation/joe/forceLock.md
+        description200: !include documentation/joe/lockInfoAnswer.md
+        schema: !include schemas/joe/lock/lockFilter-schema.json
+        schema200: !include schemas/joe/lock/lockInfo-schema.json
+    /release:
+      type:
+        postJoeLock:
+          description: Release a locked folder
+          description1: " "
+          description200: !include documentation/joe/lockInfoAnswer.md
+          schema: !include schemas/joe/lock/lockFilter-schema.json
+          schema200: !include schemas/joe/lock/lockInfo-schema.json
+    /info:
+      type:
+        postJoeLock:
+          description: Shows if folder is locked
+          description1: " "
+          description200: !include documentation/joe/lockInfoAnswer.md
+          schema: !include schemas/joe/lock/lockFilter-schema.json
+          schema200: !include schemas/joe/lock/lockInfo-schema.json
   /read/file:
     type:
       postJSON:

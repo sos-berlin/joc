@@ -14,6 +14,9 @@
     "deleted": {
       "type": "boolean"
     },
+    "lockedBy": {
+      "type": "string"
+    },
     "folders": {
       "type": "array",
       "items": {

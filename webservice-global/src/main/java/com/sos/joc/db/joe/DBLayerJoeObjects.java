@@ -26,7 +26,7 @@ public class DBLayerJoeObjects {
     }
 
     public DBItemJoeObject getJoeObjectDbItem(final Long id) throws SOSHibernateException {
-        return (DBItemJoeObject) sosHibernateSession.get(DBItemJoeObject.class, id);
+        return sosHibernateSession.get(DBItemJoeObject.class, id);
     }
 
     public FilterJoeObjects resetFilter() {
