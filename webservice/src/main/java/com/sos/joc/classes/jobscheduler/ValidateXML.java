@@ -18,45 +18,36 @@ public class ValidateXML {
 
     public static boolean validateAgainstJobSchedulerSchema(String xml) throws JobSchedulerBadRequestException {
 
-        if (Globals.jobSchedulerSchema != null) {
-            try {
-                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                Schema schema = factory.newSchema(Globals.jobSchedulerSchema);
-                Validator schemaValidator = schema.newValidator();
-                schemaValidator.validate(new StreamSource(new StringReader(xml)));
-            } catch (Exception e) {
-                throw new JobSchedulerBadRequestException(e);
-            }
+        try {
+            getValidator().validate(new StreamSource(new StringReader(xml)));
+        } catch (JobSchedulerBadRequestException e) {
+            // LOGGER.
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(e);
         }
         return true;
     }
-    
+
     public static boolean validateAgainstJobSchedulerSchema(InputStream xml) throws JobSchedulerBadRequestException {
 
-        if (Globals.jobSchedulerSchema != null) {
-            try {
-                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                Schema schema = factory.newSchema(Globals.jobSchedulerSchema);
-                Validator schemaValidator = schema.newValidator();
-                schemaValidator.validate(new StreamSource(xml));
-            } catch (Exception e) {
-                throw new JobSchedulerBadRequestException(e);
-            }
+        try {
+            getValidator().validate(new StreamSource(xml));
+        } catch (JobSchedulerBadRequestException e) {
+            // LOGGER.
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(e);
         }
         return true;
     }
-    
+
     public static boolean validateAgainstJobSchedulerSchema(Reader xml) throws JobSchedulerBadRequestException {
 
-        if (Globals.jobSchedulerSchema != null) {
-            try {
-                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                Schema schema = factory.newSchema(Globals.jobSchedulerSchema);
-                Validator schemaValidator = schema.newValidator();
-                schemaValidator.validate(new StreamSource(xml));
-            } catch (Exception e) {
-                throw new JobSchedulerBadRequestException(e);
-            }
+        try {
+            getValidator().validate(new StreamSource(xml));
+        } catch (JobSchedulerBadRequestException e) {
+            // LOGGER.
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(e);
         }
         return true;
     }
@@ -81,5 +72,16 @@ public class ValidateXML {
 
     public static boolean validateScheduleAgainstJobSchedulerSchema(String xml) throws JobSchedulerBadRequestException {
         return validateAgainstJobSchedulerSchema(xml, "schedule");
+    }
+
+    private static Validator getValidator() throws JobSchedulerBadRequestException {
+        try {
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(new StreamSource(Globals.class.getResourceAsStream("/scheduler.xsd")));
+            Validator schemaValidator = schema.newValidator();
+            return schemaValidator;
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(e);
+        }
     }
 }

@@ -300,7 +300,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         } else {
 
                             Order orderPojo = Globals.xmlMapper.readValue(configuration.getRunTime(), Order.class);
-                            if (orderPojo.getRunTime() != null) {
+                            if (orderPojo.getRunTime() != null && order.getCalendars() != null && !order.getCalendars().isEmpty()) {
                                 orderPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(order.getCalendars()));
                             }
                             JOCHotFolder jocHotFolder = new JOCHotFolder(this);

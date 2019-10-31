@@ -13,8 +13,6 @@ import java.util.TimeZone;
 import javax.json.Json;
 import javax.json.JsonReader;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
@@ -68,7 +66,6 @@ public class Globals {
     public static TimeZone jocTimeZone = TimeZone.getDefault();
     public static boolean rollbackJobHistoryWithJSON = false;
     public static boolean rollbackJobChainWithJSON = false;
-    public static Source jobSchedulerSchema = null;
     public static ObjectMapper xmlMapper = new XmlMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).configure(
             SerializationFeature.INDENT_OUTPUT, true);
     public static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -185,21 +182,6 @@ public class Globals {
         // setMaxSizeOfLogsToDisplay();
         setTimeoutForTempFiles();
         setConfigurationProperties();
-        initSchema();
-    }
-
-    public static void initSchema() {
-        if (jobSchedulerSchema == null) {
-            InputStream inputStream = null;
-            try {
-                inputStream = Globals.class.getResourceAsStream("/scheduler.xsd");
-            } catch (Exception e) {
-                LOGGER.error("scheduler.xsd read error", e);
-            }
-            if (inputStream != null) {
-                jobSchedulerSchema = new StreamSource(inputStream);
-            }
-        }
     }
 
     public static void beginTransaction(SOSHibernateSession connection) {

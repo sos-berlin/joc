@@ -31,6 +31,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
 import com.sos.joc.joe.common.XmlSerializer;
+import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
@@ -185,7 +186,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     } else {
                         
                         Job jobPojo = Globals.xmlMapper.readValue(configuration, Job.class);
-                        if (jobPojo.getRunTime() != null) {
+                        if (jobPojo.getRunTime() != null && modifyJob.getCalendars() != null && !modifyJob.getCalendars().isEmpty()) {
                             jobPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(modifyJob.getCalendars())); 
                         }
                         JOCHotFolder jocHotFolder = new JOCHotFolder(this);
