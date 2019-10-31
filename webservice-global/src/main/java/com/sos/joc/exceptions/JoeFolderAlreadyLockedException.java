@@ -1,10 +1,13 @@
 package com.sos.joc.exceptions;
 
+import java.util.Date;
 
 public class JoeFolderAlreadyLockedException extends JocException {
     
     private static final long serialVersionUID = 1L;
     private static final String ERROR_CODE = "JOC-430";
+    private Date lockedSince = null;
+    private String lockedBy = null;
 
     public JoeFolderAlreadyLockedException() {
     }
@@ -15,6 +18,20 @@ public class JoeFolderAlreadyLockedException extends JocException {
 
     public JoeFolderAlreadyLockedException(String message) {
         super(new JocError(ERROR_CODE, message));
+    }
+    
+    public JoeFolderAlreadyLockedException(Date lockedSince, String lockedBy) {
+        super(new JocError(ERROR_CODE, lockedBy));
+        this.lockedSince = lockedSince;
+        this.lockedBy = lockedBy;
+    }
+    
+    public String getLockedBy() {
+        return lockedBy;
+    }
+    
+    public Date getLockedSince() {
+        return lockedSince;
     }
     
     public JoeFolderAlreadyLockedException(JocError error) {

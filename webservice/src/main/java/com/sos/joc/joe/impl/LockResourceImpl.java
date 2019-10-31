@@ -80,8 +80,13 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JoeFolderAlreadyLockedException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatus434JSError(e);
+            LockInfo entity = new LockInfo();
+            entity.setIsLocked(true);
+            entity.setLockedSince(e.getLockedSince());
+            entity.setLockedBy(e.getLockedBy());
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            //e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatus434(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -109,8 +114,8 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
                 dbItem.setSchedulerId(schedulerId);
                 dbLayerJoeLocks.save(dbItem);
             } else {
-                if (lock && !forceLock && !account.equals(dbItem.getAccount())) {
-                    throw new JoeFolderAlreadyLockedException(dbItem.getAccount());
+                if (dbItem.getIsLocked() && !forceLock && !account.equals(dbItem.getAccount())) {
+                    throw new JoeFolderAlreadyLockedException(dbItem.getModified(), dbItem.getAccount());
                 }
                 dbItem.setAccount(account);
                 dbItem.setIsLocked(lock);
