@@ -23,6 +23,7 @@ import com.sos.joc.classes.audit.XmlEditorAudit;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.deploy.DeployConfiguration;
 import com.sos.joc.model.xmleditor.deploy.DeployConfigurationAnswer;
@@ -121,6 +122,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     private DeployConfigurationAnswer getSuccess(Date deployed) {
         DeployConfigurationAnswer answer = new DeployConfigurationAnswer();
         answer.setDeployed(deployed);
+        answer.setMessage(new AnswerMessage());
+        answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_IS_NEWER);
+        answer.getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_IS_NEWER);
         return answer;
     }
 

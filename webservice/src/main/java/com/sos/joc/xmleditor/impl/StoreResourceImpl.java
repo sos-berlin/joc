@@ -13,6 +13,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.store.StoreConfiguration;
 import com.sos.joc.model.xmleditor.store.StoreConfigurationAnswer;
@@ -104,6 +105,9 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
     private StoreConfigurationAnswer getSuccess(Date date) {
         StoreConfigurationAnswer answer = new StoreConfigurationAnswer();
         answer.setModified(date);
+        answer.setMessage(new AnswerMessage());
+        answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_IS_NEWER);
+        answer.getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_IS_NEWER);
         return answer;
     }
 

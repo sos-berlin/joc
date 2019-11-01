@@ -8,6 +8,9 @@
 	"properties": {
 		"modified": {
 			"$ref": "../../common/timestamp-schema.json"
+		},
+		"message": {
+			"$ref": "../common/answer-message-schema.json"
 		}
 	}
 }
