@@ -29,6 +29,12 @@ public class JocXmlEditor {
     public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/" + JobSchedulerXmlEditor.SCHEMA_NOTIFICATION;
     public static final String JOC_SCHEMA_OTHER_LOCATION = "xsd/other/";
 
+    public static final String MESSAGE_DRAFT_NOT_EXIST = "Using version in live folder. No draft version found in database";
+    public static final String MESSAGE_LIVE_NOT_EXIST = "No live version found";
+    public static final String MESSAGE_LIVE_IS_NEWER = "Version in live folder is newer then draft version in database";
+    public static final String MESSAGE_DRAFT_IS_NEWER = "Draft version in database is newer then the version in the live folder";
+    public static final String MESSAGE_NO_CONFIGURATION_EXIST = "No configuration found";
+
     public static final String MESSAGE_CODE_DRAFT_NOT_EXIST = "XMLEDITOR-101";
     public static final String MESSAGE_CODE_LIVE_NOT_EXIST = "XMLEDITOR-102";
     public static final String MESSAGE_CODE_LIVE_IS_NEWER = "XMLEDITOR-103";

@@ -97,7 +97,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in.getObjectType(),
                 in.getName()));
 
-        if (item != null && item.getConfiguration() == null) {
+        if (item != null && item.getConfigurationDraft() == null) {
             item = null;
         }
 
@@ -110,7 +110,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             }
         } else {
             if (item != null) {
-                configuration = item.getConfiguration();
+                configuration = item.getConfigurationDraft();
                 modified = item.getModified();
             }
         }
@@ -121,29 +121,29 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
         if (configuration == null) {
             answer.getState().setDeployed(false);
-            answer.getState().getMessage().setMessage("No configuration found");
+            answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_NO_CONFIGURATION_EXIST);
             answer.getState().getMessage().setCode(JocXmlEditor.CODE_NO_CONFIGURATION_EXIST);
             answer.getState().setVersionState(ObjectVersionState.NO_CONFIGURATION_EXIST);
         } else {
             if (item == null) {
                 answer.getState().setDeployed(true);
-                answer.getState().getMessage().setMessage("Using version in live folder. No draft version found in database");
+                answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_NOT_EXIST);
                 answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_NOT_EXIST);
                 answer.getState().setVersionState(ObjectVersionState.DRAFT_NOT_EXIST);
             } else {
                 if (liveFile == null) {
                     answer.getState().setDeployed(false);
-                    answer.getState().getMessage().setMessage("No live version found");
+                    answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_NOT_EXIST);
                     answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
                     answer.getState().setVersionState(ObjectVersionState.LIVE_NOT_EXIST);
                 } else {
                     answer.getState().setDeployed(true);
                     if (hotFolder.getLastModifiedDate().after(item.getModified())) {
-                        answer.getState().getMessage().setMessage("Version in live folder is newer then draft version in database");
+                        answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_IS_NEWER);
                         answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_IS_NEWER);
                         answer.getState().setVersionState(ObjectVersionState.LIVE_IS_NEWER);
                     } else {
-                        answer.getState().getMessage().setMessage("Draft version in database is newer then the version in the live folder");
+                        answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_IS_NEWER);
                         answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_IS_NEWER);
                         answer.getState().setVersionState(ObjectVersionState.DRAFT_IS_NEWER);
                     }
@@ -228,7 +228,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             } else {
                 answer.getConfiguration().setName(item.getName());
                 answer.getConfiguration().setSchema(JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.getSchemaLocation()).toString());
-                answer.getConfiguration().setConfiguration(item.getConfiguration());
+                answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
                 answer.getConfiguration().setModified(item.getModified());
             }
         }
