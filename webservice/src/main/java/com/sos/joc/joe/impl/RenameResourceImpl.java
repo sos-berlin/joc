@@ -126,6 +126,8 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             try {
                 CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
+                evt = Helper.getJoeUpdatedEvent(body.getOldPath(), body.getObjectType().value());
+                SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
             } catch (Exception e) {
                 //
             }
