@@ -44,7 +44,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                     item.setSchedulerId(in.getJobschedulerId());
                     item.setObjectType(in.getObjectType().name());
                     item.setName(JocXmlEditor.getConfigurationName(in.getObjectType(), in.getName()));
-                    item.setConfiguration(in.getConfiguration());
+                    item.setConfigurationDraft(in.getConfiguration());
                     item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
 
                     item.setAuditLogId(new Long(0));// TODO
@@ -54,7 +54,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                     session.save(item);
 
                 } else {
-                    item.setConfiguration(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
+                    item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
                     item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
 
                     item.setAuditLogId(new Long(0));// TODO

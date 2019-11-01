@@ -97,7 +97,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in.getObjectType(),
                 in.getName()));
 
-        if (item != null && item.getConfiguration() == null) {
+        if (item != null && item.getConfigurationDraft() == null) {
             item = null;
         }
 
@@ -110,7 +110,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             }
         } else {
             if (item != null) {
-                configuration = item.getConfiguration();
+                configuration = item.getConfigurationDraft();
                 modified = item.getModified();
             }
         }
@@ -228,7 +228,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             } else {
                 answer.getConfiguration().setName(item.getName());
                 answer.getConfiguration().setSchema(JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.getSchemaLocation()).toString());
-                answer.getConfiguration().setConfiguration(item.getConfiguration());
+                answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
                 answer.getConfiguration().setModified(item.getModified());
             }
         }

@@ -69,17 +69,19 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         .getObjectType()));
 
                 checkConfiguration(item, in);
-                JocXmlEditor.validate(in.getObjectType(), item.getConfiguration());
+                JocXmlEditor.validate(in.getObjectType(), item.getConfigurationDraft());
 
-                Date deployed = putFile(in, item.getConfiguration());
+                Date deployed = putFile(in, item.getConfigurationDraft());
 
                 audit.setStartTime(deployed);
                 DBItemAuditLog auditItem = storeAuditLogEntry(audit);
                 if (auditItem != null) {
                     item.setAuditLogId(auditItem.getId());
                 }
-                item.setConfiguration(null);
+                item.setConfigurationDeployed(item.getConfigurationDraft());
+                item.setConfigurationDraft(null);
                 item.setAccount(getAccount());
+                item.setDeployed(deployed);
                 item.setModified(new Date());
                 session.update(item);
 
@@ -123,7 +125,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     }
 
     private void checkConfiguration(DBItemXmlEditorObject item, DeployConfiguration in) throws Exception {
-        if (item == null || SOSString.isEmpty(item.getConfiguration())) {
+        if (item == null || SOSString.isEmpty(item.getConfigurationDraft())) {
             throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format("[%s][%s]no configuration found", in
                     .getJobschedulerId(), in.getObjectType().name())));
         }
