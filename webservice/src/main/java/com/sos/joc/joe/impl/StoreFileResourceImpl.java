@@ -1,5 +1,6 @@
 package com.sos.joc.joe.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -7,11 +8,9 @@ import javax.ws.rs.Path;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
-import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -72,7 +71,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             DBItemJoeObject item = dbLayer.getJoeObject(filter);
             if (item != null) {
                 item.setOperation("store");
-                item.setModified(new Date());
+                item.setModified(Date.from(Instant.now()));
                 item.setAccount(getAccount());
                 if (!isDirectory) {
                     if (body.getConfiguration() != null) {
@@ -90,7 +89,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setAccount(getAccount());
                 item.setSchedulerId(body.getJobschedulerId());
                 item.setAuditLogId(null);
-                item.setCreated(new Date());
+                item.setCreated(Date.from(Instant.now()));
                 if (!isDirectory) {
                     if (body.getConfiguration() != null) {
                         item.setConfiguration(Globals.objectMapper.writeValueAsString(XmlSerializer.serialize(body.getConfiguration(),
@@ -103,15 +102,6 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setOperation("store");
                 item.setPath(body.getPath());
                 dbLayer.save(item);
-            }
-            
-            try {
-                CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
-                SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
-                evt = Helper.getJoeUpdatedEvent(body.getOldPath(), body.getObjectType().value());
-                SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
-            } catch (Exception e) {
-                //
             }
 
             return JOCDefaultResponse.responseStatusJSOk(item.getModified());

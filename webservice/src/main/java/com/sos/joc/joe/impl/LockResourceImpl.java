@@ -117,6 +117,9 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
                 if (dbItem.getIsLocked() && !forceLock && !account.equals(dbItem.getAccount())) {
                     throw new JoeFolderAlreadyLockedException(dbItem.getModified(), dbItem.getAccount());
                 }
+                if (lock == dbItem.getIsLocked() && account.equals(dbItem.getAccount())) {
+                    return dbItem;
+                }
                 dbItem.setAccount(account);
                 dbItem.setIsLocked(lock);
                 dbLayerJoeLocks.update(dbItem);

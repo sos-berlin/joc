@@ -52,6 +52,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.joe.common.XmlSerializer;
+import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.joe.order.Order;
@@ -301,7 +302,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
                             Order orderPojo = Globals.xmlMapper.readValue(configuration.getRunTime(), Order.class);
                             if (orderPojo.getRunTime() != null && order.getCalendars() != null && !order.getCalendars().isEmpty()) {
-                                orderPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(order.getCalendars()));
+                                Calendars calendars = new Calendars();
+                                calendars.setCalendars(order.getCalendars());
+                                orderPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(calendars));
                             }
                             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
                             jocHotFolder.putFile(jobChainPath + "," + order.getOrderId() + ".order.xml", XmlSerializer.serializeToStringWithHeader(

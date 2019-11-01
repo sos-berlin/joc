@@ -29,6 +29,7 @@ import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.XmlSerializer;
+import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.joe.schedule.Schedule;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
@@ -78,7 +79,9 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
                 Schedule schedulePojo = Globals.xmlMapper.readValue(modifyRuntime.getRunTime(), Schedule.class);
                 if (modifyRuntime.getCalendars() != null && !modifyRuntime.getCalendars().isEmpty()) {
-                    schedulePojo.setCalendars(Globals.objectMapper.writeValueAsString(modifyRuntime.getCalendars()));
+                    Calendars calendars = new Calendars();
+                    calendars.setCalendars(modifyRuntime.getCalendars());
+                    schedulePojo.setCalendars(Globals.objectMapper.writeValueAsString(calendars));
                 }
                 schedulePojo = XmlSerializer.serializeAbstractSchedule(schedulePojo);
                 JOCHotFolder jocHotFolder = new JOCHotFolder(this);
