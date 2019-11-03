@@ -9,6 +9,7 @@
   ],
   "properties": {
     "name": {
+      "description": "this field is only used for a monitor inside a job; not inside an external monitor file",
       "type": "string"
     },
     "ordering": {

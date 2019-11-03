@@ -197,9 +197,11 @@ public class DBLayerJoeObjects {
             sql.append("select count(*) from ").append(DBLayer.DBITEM_JOE_OBJECT);
             sql.append(" where schedulerId = :schedulerId");
             sql.append(" and path like :likePath");
+            sql.append(" and operation = :operation");
             Query<Long> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
-            query.setParameter("likePath", path + "/%");
+            query.setParameter("likePath", (path + "/").replaceAll("/+", "/") + "%");
+            query.setParameter("operation", "store");
             return sosHibernateSession.getSingleResult(query) > 0;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

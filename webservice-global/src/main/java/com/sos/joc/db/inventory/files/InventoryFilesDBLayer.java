@@ -82,7 +82,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
-            sql.append(" where fileName = :path");
+            sql.append(" and fileName = :path");
             Query<DBItemInventoryFile> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("path", path);
@@ -99,10 +99,11 @@ public class InventoryFilesDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("select count(*) from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
-            sql.append(" where fileDirectory = :path");
+            sql.append(" and (fileDirectory = :path or fileDirectory like :likePath)");
             Query<Long> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("path", path);
+            query.setParameter("likePath", (path+"/").replaceAll("/+", "/") + "%");
             return getSession().getSingleResult(query) > 0;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

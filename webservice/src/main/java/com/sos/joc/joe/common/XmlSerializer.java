@@ -20,6 +20,7 @@ import com.sos.joc.model.joe.job.Script;
 import com.sos.joc.model.joe.job.StartJob;
 import com.sos.joc.model.joe.jobchain.FileOrderSource;
 import com.sos.joc.model.joe.jobchain.JobChain;
+import com.sos.joc.model.joe.jobchain.OnReturnCodes;
 import com.sos.joc.model.joe.nodeparams.Config;
 import com.sos.joc.model.joe.nodeparams.ConfigNode;
 import com.sos.joc.model.joe.nodeparams.ConfigOrder;
@@ -43,7 +44,7 @@ public class XmlSerializer {
     private static final List<String> trueValues = Arrays.asList("true", "1", "yes");
     private static final List<String> falseValues = Arrays.asList("false", "0", "no");
     public static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" + System.lineSeparator() + System.lineSeparator();
-    
+
     public static String serializeToStringWithHeader(Object jsonPojo) throws JsonProcessingException {
         return xmlHeader + Globals.xmlMapper.writeValueAsString(jsonPojo);
     }
@@ -94,7 +95,7 @@ public class XmlSerializer {
             return Globals.objectMapper.readValue(json, clazz);
         }
     }
-    
+
     public static <T> T serialize(IJSObject obj, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
         return serialize(clazz.cast(obj), clazz);
     }
@@ -110,23 +111,23 @@ public class XmlSerializer {
 
         case "Order":
             return (T) serializeOrder((Order) obj);
-            
+
         case "ProcessClass":
             return (T) serializeProcessClass((ProcessClass) obj);
-            
+
         case "Schedule":
         case "RunTime":
             return (T) serializeAbstractSchedule((AbstractSchedule) obj);
-        
+
         case "Monitor":
             return (T) serializeMonitor((Monitor) obj);
-        
+
         case "Config":
             return (T) serializeNodeParams((Config) obj);
         }
         return obj;
     }
-    
+
     public static Job serializeJob(Job job) {
         if (job.getEnabled() != null && trueValues.contains(job.getEnabled())) {
             job.setEnabled(null);
@@ -169,27 +170,27 @@ public class XmlSerializer {
         if (job.getMonitorUses() != null) {
             job.setMonitorUses(job.getMonitorUses().stream().filter(i -> i.getMonitor() != null && !i.getMonitor().isEmpty()).collect(Collectors
                     .toList()));
-            if (job.getMonitorUses().size() == 0) {
+            if (job.getMonitorUses().isEmpty()) {
                 job.setMonitorUses(null);
             }
         }
         if (job.getLockUses() != null) {
             job.setLockUses(job.getLockUses().stream().filter(i -> i.getLock() != null && !i.getLock().isEmpty()).collect(Collectors.toList()));
-            if (job.getLockUses().size() == 0) {
+            if (job.getLockUses().isEmpty()) {
                 job.setLockUses(null);
             }
         }
         if (job.getDelayOrderAfterSetbacks() != null) {
             job.setDelayOrderAfterSetbacks(job.getDelayOrderAfterSetbacks().stream().filter(i -> i.getSetbackCount() != null && ((i.getDelay() != null
                     && !i.getDelay().isEmpty()) || (i.getIsMaximum() != null && !i.getIsMaximum().isEmpty()))).collect(Collectors.toList()));
-            if (job.getDelayOrderAfterSetbacks().size() == 0) {
+            if (job.getDelayOrderAfterSetbacks().isEmpty()) {
                 job.setDelayOrderAfterSetbacks(null);
             }
         }
         if (job.getStartWhenDirectoriesChanged() != null) {
             job.setStartWhenDirectoriesChanged(job.getStartWhenDirectoriesChanged().stream().filter(i -> i.getDirectory() != null && !i.getDirectory()
                     .isEmpty()).collect(Collectors.toList()));
-            if (job.getStartWhenDirectoriesChanged().size() == 0) {
+            if (job.getStartWhenDirectoriesChanged().isEmpty()) {
                 job.setStartWhenDirectoriesChanged(null);
             }
         }
@@ -211,10 +212,10 @@ public class XmlSerializer {
             }
         }
         job.setScript(serializeScript(job.getScript()));
-        
+
         return job;
     }
-    
+
     public static JobChain serializeJobChain(JobChain jobChain) {
         if (jobChain.getOrdersRecoverable() != null && trueValues.contains(jobChain.getOrdersRecoverable())) {
             jobChain.setOrdersRecoverable(null);
@@ -229,9 +230,15 @@ public class XmlSerializer {
                 }
             }
         }
+        if (jobChain.getJobChainNodes() != null) {
+            jobChain.getJobChainNodes().stream().map(item -> {
+                item.setOnReturnCodes(serializeOnReturnCodes(item.getOnReturnCodes()));
+                return item;
+            }).collect(Collectors.toList());
+        }
         return jobChain;
     }
-    
+
     public static Order serializeOrder(Order order) {
         if (order.getRunTime() == null) {
             order.setRunTime(new RunTime());
@@ -242,14 +249,14 @@ public class XmlSerializer {
         order.setParams(serializeParams(order.getParams()));
         return order;
     }
-    
+
     public static ProcessClass serializeProcessClass(ProcessClass processClass) {
         RemoteSchedulers agents = processClass.getRemoteSchedulers();
         if (agents != null) {
             if (agents.getRemoteSchedulerList() != null) {
                 agents.setRemoteSchedulerList(agents.getRemoteSchedulerList().stream().filter(i -> i.getRemoteScheduler() != null && !i
                         .getRemoteScheduler().isEmpty()).collect(Collectors.toList()));
-                if (agents.getRemoteSchedulerList().size() == 0) {
+                if (agents.getRemoteSchedulerList().isEmpty()) {
                     agents = null;
                 }
             }
@@ -263,12 +270,13 @@ public class XmlSerializer {
         }
         return processClass;
     }
-    
+
     public static Monitor serializeMonitor(Monitor monitor) {
+        monitor.setName(null);
         monitor.setScript(serializeScript(monitor.getScript()));
         return monitor;
     }
-    
+
     public static Config serializeNodeParams(Config nodeParams) {
         if (nodeParams.getJobChain() != null) {
             ConfigOrder orderElem = nodeParams.getJobChain().getOrder();
@@ -279,9 +287,9 @@ public class XmlSerializer {
                         node.setParams(serializeNodeParams(node.getParams()));
                     }
                     orderElem.setJobChainNodes(orderElem.getJobChainNodes().stream().filter(i -> i.getParams() != null && i.getParams()
-                            .getParamList() != null && i.getParams().getParamList().size() > 0).collect(Collectors.toList()));
-                    if (orderElem.getJobChainNodes().size() == 0) {
-                        orderElem.setJobChainNodes(null); 
+                            .getParamList() != null && !i.getParams().getParamList().isEmpty()).collect(Collectors.toList()));
+                    if (orderElem.getJobChainNodes().isEmpty()) {
+                        orderElem.setJobChainNodes(null);
                     }
                 }
                 if (orderElem.getParams() == null && orderElem.getJobChainNodes() == null) {
@@ -405,14 +413,14 @@ public class XmlSerializer {
             if (params.getIncludes() != null) {
                 params.setIncludes(params.getIncludes().stream().filter(i -> (i.getFile() != null && !i.getFile().isEmpty()) || (i
                         .getLiveFile() != null && !i.getLiveFile().isEmpty())).collect(Collectors.toList()));
-                if (params.getIncludes().size() == 0) {
+                if (params.getIncludes().isEmpty()) {
                     params.setIncludes(null);
                 }
             }
             if (params.getParamList() != null) {
                 params.setParamList(params.getParamList().stream().filter(i -> i.getName() != null && !i.getName().isEmpty()).collect(Collectors
                         .toList()));
-                if (params.getParamList().size() == 0) {
+                if (params.getParamList().isEmpty()) {
                     params.setParamList(null);
                 }
             }
@@ -422,13 +430,13 @@ public class XmlSerializer {
         }
         return params;
     }
-    
+
     private static com.sos.joc.model.joe.nodeparams.Params serializeNodeParams(com.sos.joc.model.joe.nodeparams.Params params) {
         if (params != null) {
             if (params.getParamList() != null) {
                 params.setParamList(params.getParamList().stream().filter(i -> i.getName() != null && !i.getName().isEmpty()).collect(Collectors
                         .toList()));
-                if (params.getParamList().size() == 0) {
+                if (params.getParamList().isEmpty()) {
                     params.setParamList(null);
                 }
             }
@@ -438,24 +446,24 @@ public class XmlSerializer {
         }
         return params;
     }
-    
+
     private static EnviromentVariables serializeEnvironment(EnviromentVariables variables) {
         if (variables != null) {
             if (variables.getVariables() != null) {
                 variables.setVariables(variables.getVariables().stream().filter(i -> i.getName() != null && !i.getName().isEmpty()).collect(Collectors
                         .toList()));
-                if (variables.getVariables().size() == 0) {
+                if (variables.getVariables().isEmpty()) {
                     variables = null;
                 }
             }
         }
         return variables;
     }
-    
+
     private static Script serializeScript(Script script) {
         if (script != null) {
             if (script.getLanguage() == null) {
-                script.setLanguage("shell"); 
+                script.setLanguage("shell");
             }
             if (script.getLanguage().contains("java")) {
                 script.setComClass(null);
@@ -471,12 +479,31 @@ public class XmlSerializer {
             } else {
                 script.setJavaClass(null);
                 script.setJavaClassPath(null);
-                //script.setComClass(null);
+                // script.setComClass(null);
                 script.setDll(null);
                 script.setDotnetClass(null);
             }
         }
         return script;
+    }
+
+    private static OnReturnCodes serializeOnReturnCodes(OnReturnCodes onReturnCodes) {
+        if (onReturnCodes != null) {
+            if (onReturnCodes.getOnReturnCodeList() != null) {
+                onReturnCodes.setOnReturnCodeList(onReturnCodes.getOnReturnCodeList().stream().filter(i -> i.getReturnCode() != null && ((i
+                        .getToState() != null && i.getToState().getState() != null && !i.getToState().getState().isEmpty()) || (i
+                                .getAddOrder() != null && i.getAddOrder().getJobChain() != null && !i.getAddOrder().getJobChain().isEmpty())))
+                        .collect(Collectors.toList()));
+                if (onReturnCodes.getOnReturnCodeList().isEmpty()) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+        return onReturnCodes;
     }
 
 }
