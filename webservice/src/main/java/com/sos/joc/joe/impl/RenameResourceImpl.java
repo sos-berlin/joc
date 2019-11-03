@@ -57,6 +57,9 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             if (isDirectory) {
                 body.setPath(normalizeFolder(body.getPath()));
                 body.setOldPath(normalizeFolder(body.getOldPath()));
+                if (body.getPath().equals(body.getOldPath())) {
+                    return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
+                }
                 if (!this.folderPermissions.isPermittedForFolder(body.getPath())) {
                     return accessDeniedResponse();
                 }
@@ -64,6 +67,9 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             } else {
                 body.setPath(normalizePath(body.getPath()));
                 body.setOldPath(normalizePath(body.getOldPath()));
+                if (body.getPath().equals(body.getOldPath())) {
+                    return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
+                }
                 if (!this.folderPermissions.isPermittedForFolder(getParent(body.getPath()))) {
                     return accessDeniedResponse();
                 }
@@ -85,41 +91,70 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             FilterJoeObjects newPathFilter = new FilterJoeObjects();
             newPathFilter.setConstraint(body);
             DBItemJoeObject newItem = dbJoeLayer.getJoeObject(newPathFilter);
+            boolean newItemExistsWithDeleteOperation = newItem != null && newItem.operationIsDelete();
             if (isDirectory) {
-                if (newItem != null || dbInventoryFilesLayer.folderExists(dbItemInventoryInstance.getId(), body.getPath()) || dbJoeLayer.folderExists(
-                        body.getJobschedulerId(), body.getPath())) {
+                if ((newItem != null && !newItem.operationIsDelete()) || (newItem == null && dbInventoryFilesLayer.folderExists(
+                        dbItemInventoryInstance.getId(), body.getPath()))) {
                     throw new JocObjectAlreadyExistException(body.getPath());
                 }
             } else {
-                if (newItem != null || dbInventoryFilesLayer.fileExists(dbItemInventoryInstance.getId(), body.getPath() + Helper.getFileExtension(body
-                        .getObjectType()))) {
+                if ((newItem != null && !newItem.operationIsDelete()) || (newItem == null && dbInventoryFilesLayer.fileExists(dbItemInventoryInstance
+                        .getId(), body.getPath() + Helper.getFileExtension(body.getObjectType())))) {
                     throw new JocObjectAlreadyExistException(body.getPath());
                 }
             }
             
-            newItem = setNewDBItemfromOld(oldItem, body.getPath());
-            dbJoeLayer.save(newItem);
-            
-            oldItem.setOperation("delete");
-            oldItem.setAccount(getAccount());
-            oldItem.setModified(Date.from(Instant.now()));
-            dbJoeLayer.update(oldItem);
+            if (newItemExistsWithDeleteOperation) {
+                dbJoeLayer.update(updateDBItemfromOld(newItem, oldItem));
+            } else {
+                dbJoeLayer.save(setNewDBItemfromOld(oldItem, body.getPath()));
+            }
             
             if (isDirectory) {
                 oldPathFilter.setObjectType(null);
                 int oldPathLength = body.getOldPath().length();
                 List<DBItemJoeObject> children = dbJoeLayer.getRecursiveJoeObjectList(oldPathFilter);
-                for (DBItemJoeObject child : children) {
-                    if (child.operationIsDelete()) {
-                       continue; 
+                if (dbInventoryFilesLayer.folderExists(dbItemInventoryInstance.getId(), body.getOldPath())) {
+                    oldItem.setOperation("delete");
+                    oldItem.setAccount(getAccount());
+                    oldItem.setModified(Date.from(Instant.now()));
+                    dbJoeLayer.update(oldItem);
+                    for (DBItemJoeObject child : children) {
+                        boolean childExistsInInventory = false;
+                        if ("FOLDER".equals(child.getObjectType())) {
+                            childExistsInInventory = dbInventoryFilesLayer.folderExists(dbItemInventoryInstance.getId(), child.getPath());
+                        } else {
+                            childExistsInInventory = dbInventoryFilesLayer.fileExists(dbItemInventoryInstance.getId(), child.getPath() + Helper.getFileExtension(body.getObjectType()));
+                        }
+                        if (childExistsInInventory) {
+                            DBItemJoeObject newDbItem = setNewDBItemfromOld(child, body.getPath() + child.getPath().substring(oldPathLength));
+                            dbJoeLayer.save(newDbItem);
+                            child.setOperation("delete");
+                            child.setAccount(getAccount());
+                            child.setModified(Date.from(Instant.now()));
+                            dbJoeLayer.update(child);
+                        } else {
+                            child.setPath(body.getPath() + child.getPath().substring(oldPathLength));
+                            dbJoeLayer.update(child);
+                        }
+                        
                     }
-                    DBItemJoeObject newDbItem = setNewDBItemfromOld(child, body.getPath() + child.getPath().substring(oldPathLength));
-                    dbJoeLayer.save(newDbItem);
-                    
-                    child.setOperation("delete");
-                    child.setAccount(getAccount());
-                    child.setModified(Date.from(Instant.now()));
-                    dbJoeLayer.update(child);
+                } else {
+                    dbJoeLayer.delete(oldItem);
+                    for (DBItemJoeObject child : children) {
+                        child.setPath(body.getPath() + child.getPath().substring(oldPathLength));
+                        dbJoeLayer.update(child);
+                    }
+                }
+            } else {
+                if (dbInventoryFilesLayer.fileExists(dbItemInventoryInstance.getId(), body.getOldPath() + Helper.getFileExtension(body
+                        .getObjectType()))) {
+                    oldItem.setOperation("delete");
+                    oldItem.setAccount(getAccount());
+                    oldItem.setModified(Date.from(Instant.now()));
+                    dbJoeLayer.update(oldItem);
+                } else {
+                    dbJoeLayer.delete(oldItem);
                 }
             }
             
@@ -155,6 +190,14 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
         newItem.setAuditLogId(oldItem.getAuditLogId());
         newItem.setSchedulerId(oldItem.getSchedulerId());
         return newItem;
+    }
+    
+    private DBItemJoeObject updateDBItemfromOld(DBItemJoeObject updatedItem, DBItemJoeObject oldItem) {
+        updatedItem.setAccount(getAccount());
+        updatedItem.setConfiguration(oldItem.getConfiguration());
+        updatedItem.setOperation("store");
+        updatedItem.setAuditLogId(oldItem.getAuditLogId());
+        return updatedItem;
     }
 
 }

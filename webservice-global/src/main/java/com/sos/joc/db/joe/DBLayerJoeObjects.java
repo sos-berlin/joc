@@ -200,7 +200,7 @@ public class DBLayerJoeObjects {
             sql.append(" and operation = :operation");
             Query<Long> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
-            query.setParameter("likePath", (path + "/").replaceAll("/+", "/") + "%");
+            query.setParameter("likePath", (path + "/").replaceAll("//+", "/") + "%");
             query.setParameter("operation", "store");
             return sosHibernateSession.getSingleResult(query) > 0;
         } catch (SOSHibernateInvalidSessionException ex) {

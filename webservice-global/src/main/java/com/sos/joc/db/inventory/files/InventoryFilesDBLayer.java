@@ -103,7 +103,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             Query<Long> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("path", path);
-            query.setParameter("likePath", (path+"/").replaceAll("/+", "/") + "%");
+            query.setParameter("likePath", (path+"/").replaceAll("//+", "/") + "%");
             return getSession().getSingleResult(query) > 0;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

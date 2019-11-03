@@ -32,6 +32,11 @@
 
 		"folders": {
 			"$ref": "../common/folders-schema.json"
+		},
+
+		"forJoe": {
+			"type": "boolean",
+			"default": false
 		}
 	}
 }

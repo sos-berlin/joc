@@ -3,7 +3,6 @@ package com.sos.joc.db.joe;
 import java.util.Arrays;
 import java.util.List;
 
-import com.sos.joc.Globals;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.common.JSObjectEdit;
@@ -80,7 +79,7 @@ public class FilterJoeObjects {
 
     public void setRecursive() {
         if (!path.endsWith("%")) {
-            path = Globals.normalizePath(path + "%");
+            path = (path + "/").replace("//+", "/") + "%";
         }
     }
     
