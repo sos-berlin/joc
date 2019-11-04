@@ -110,12 +110,14 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
         DBItemJoeLock dbItem = dbLayerJoeLocks.getJoeLock(schedulerId, path);
         if (lock != null) {
             if (dbItem == null) {
-                dbItem = new DBItemJoeLock();
-                dbItem.setAccount(account);
-                dbItem.setIsLocked(lock);
-                dbItem.setFolder(path);
-                dbItem.setSchedulerId(schedulerId);
-                dbLayerJoeLocks.save(dbItem);
+                if (lock) {
+                    dbItem = new DBItemJoeLock();
+                    dbItem.setAccount(account);
+                    dbItem.setIsLocked(lock);
+                    dbItem.setFolder(path);
+                    dbItem.setSchedulerId(schedulerId);
+                    dbLayerJoeLocks.save(dbItem);
+                }
             } else {
                 if (dbItem.getIsLocked() && !forceLock && !account.equals(dbItem.getAccount())) {
                     throw new JoeFolderAlreadyLockedException(dbItem.getModified(), dbItem.getAccount());

@@ -1,5 +1,6 @@
 package com.sos.joc.joe.impl;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
+import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -91,9 +93,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
             if (body.getObjectName() != null) {
-                filterJoeObjects.setPath(normalizePath(folder) + "/" + body.getObjectName());
+                filterJoeObjects.setPath(folder + "/" + body.getObjectName());
             } else {
-                filterJoeObjects.setPath(normalizeFolder(folder));
+                filterJoeObjects.setPath(folder);
             }
             if (JobSchedulerObjectType.ORDER == body.getObjectType() || JobSchedulerObjectType.JOBCHAIN == body.getObjectType()) {
                 filterJoeObjects.setObjectTypes(body.getObjectType().value(), JobSchedulerObjectType.NODEPARAMS.value());
@@ -110,7 +112,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             DeployAnswer deployAnswer = new DeployAnswer();
             deployAnswer.setMessages(new ArrayList<DeployMessage>());
-            deployAnswer.setFolder(body.getFolder());
+            deployAnswer.setFolder(folder);
             deployAnswer.setJobschedulerId(body.getJobschedulerId());
             deployAnswer.setObjectName(body.getObjectName());
             deployAnswer.setObjectType(body.getObjectType());
@@ -214,6 +216,20 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         }
                     }
                 }
+            }
+            
+            //release folder if no further drafts in folder
+            FilterJoeObjects filterObj = new FilterJoeObjects();
+            filterObj.setSchedulerId(body.getJobschedulerId());
+            filterObj.setPath(folder);
+            final int parentDepth = Paths.get(folder).getNameCount();
+            List<DBItemJoeObject> dbItems = dbLayerJoeObjects.getRecursiveJoeObjectList(filterObj);
+            boolean folderIsEmpty = true;
+            if (dbItems != null) {
+                folderIsEmpty = dbItems.stream().filter(item -> Paths.get(item.getPath()).getParent().getNameCount() == parentDepth).count() == 0L;
+            }
+            if (folderIsEmpty) {
+                LockResourceImpl.release(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), folder, getAccount());
             }
 
             return JOCDefaultResponse.responseStatus200(deployAnswer);

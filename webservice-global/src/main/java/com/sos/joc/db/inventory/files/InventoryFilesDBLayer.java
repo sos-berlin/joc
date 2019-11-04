@@ -43,7 +43,6 @@ public class InventoryFilesDBLayer extends DBLayer {
     
     public boolean isEmptyFolder(Long instanceId, String fileDirectory) throws DBConnectionRefusedException, DBInvalidDataException  {
         try {
-            fileDirectory = Globals.normalizePath(fileDirectory);
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
