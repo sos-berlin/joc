@@ -84,14 +84,15 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             Date lastModifiedDate = null;
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
 
+            try {
+                fileLiveContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
+            } catch (JobSchedulerObjectNotExistException e) {
+                LOGGER.info(e.toString());
+            } catch (JocException e) {
+                LOGGER.warn(e.toString());
+            }
+
             if (dbItemJoeObject == null || (body.getForceLive() != null && body.getForceLive())) {
-                try {
-                    fileLiveContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
-                } catch (JobSchedulerObjectNotExistException e) {
-                    LOGGER.warn(e.toString()); // maybe for this case something special?
-                } catch (JocException e) {
-                    LOGGER.warn(e.toString());
-                }
                 fileContent = fileLiveContent;
                 if (fileContent != null) {
                     jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType()
@@ -118,7 +119,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
                     jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.DRAFT_NOT_EXIST);
                 } else {
                     if (fileLiveContent == null) {
-                        jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText("No live version found");
+                        jsObjectEdit.getObjectVersionStatus().getMessage().setMessageText("Using Draft version in database as no live version found");
                         jsObjectEdit.getObjectVersionStatus().getMessage().set_messageCode("JOE1001");
                         jsObjectEdit.getObjectVersionStatus().setVersionState(VersionStateText.LIVE_NOT_EXIST);
                     } else {
