@@ -34,11 +34,11 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
 			List<JobSchedulerObjectType> types = null;
 			boolean permission = false;
 			SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(treeBody.getJobschedulerId(), accessToken);
-			boolean treeForJoe = treeBody.getTypes().contains(JobSchedulerObjectType.JOE);
+			boolean treeForJoe = (treeBody.getForJoe() != null && treeBody.getForJoe()) || treeBody.getTypes().contains(JobSchedulerObjectType.JOE);
 			if (treeBody.getTypes() == null || treeBody.getTypes().isEmpty()) {
 				permission = true;
 			} else {
-				types = TreePermanent.getAllowedTypes(treeBody, sosPermission);
+				types = TreePermanent.getAllowedTypes(treeBody, sosPermission, treeForJoe);
 				treeBody.setTypes(types);
 				permission = types.size() > 0;
 			}

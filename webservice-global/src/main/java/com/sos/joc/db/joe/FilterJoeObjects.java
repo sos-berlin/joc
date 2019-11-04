@@ -79,7 +79,7 @@ public class FilterJoeObjects {
 
     public void setRecursive() {
         if (!path.endsWith("%")) {
-            path = (path + "/").replace("//+", "/") + "%";
+            path = (path + "/").replaceAll("//+", "/") + "%";
         }
     }
     

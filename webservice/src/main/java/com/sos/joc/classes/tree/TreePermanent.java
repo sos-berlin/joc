@@ -31,7 +31,7 @@ import com.sos.joc.model.tree.TreeFilter;
 public class TreePermanent {
 
 	public static List<JobSchedulerObjectType> getAllowedTypes(TreeFilter treeBody,
-			SOSPermissionJocCockpit sosPermission) {
+			SOSPermissionJocCockpit sosPermission, boolean treeForJoe) {
 		List<JobSchedulerObjectType> types = new ArrayList<JobSchedulerObjectType>();
 		
 		for (JobSchedulerObjectType type : treeBody.getTypes()) {
@@ -66,40 +66,82 @@ public class TreePermanent {
 			    
 			case MONITOR:
 			case JOB:
-				if (sosPermission.getJob().getView().isStatus()) {
-					types.add(type);
-				}
+                if (treeForJoe) {
+                    if (sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView()) {
+                        types.add(type);
+                    }
+                } else {
+                    if (sosPermission.getJob().getView().isStatus()) {
+                        types.add(type);
+                    }
+                }
 				break;
 			case JOBCHAIN:
-				if (sosPermission.getJobChain().getView().isStatus()) {
-					types.add(type);
-				}
+				if (treeForJoe) {
+                    if (sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView()) {
+                        types.add(type);
+                    }
+                } else {
+                    if (sosPermission.getJobChain().getView().isStatus()) {
+                        types.add(type);
+                    }
+                }
 				break;
 			case ORDER:
-				if (sosPermission.getOrder().getView().isStatus()) {
-					types.add(type);
-				}
+				if (treeForJoe) {
+                    if (sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView()) {
+                        types.add(type);
+                    }
+                } else {
+                    if (sosPermission.getOrder().getView().isStatus()) {
+                        types.add(type);
+                    }
+                }
 				break;
 			case PROCESSCLASS:
 			case AGENTCLUSTER:
-				if (sosPermission.getProcessClass().getView().isStatus()) {
-					types.add(type);
-				}
+				if (treeForJoe) {
+                    if (sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView()) {
+                        types.add(type);
+                    }
+                } else {
+                    if (sosPermission.getProcessClass().getView().isStatus()) {
+                        types.add(type);
+                    }
+                }
 				break;
 			case LOCK:
-				if (sosPermission.getLock().getView().isStatus()) {
-					types.add(type);
-				}
+				if (treeForJoe) {
+                    if (sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView()) {
+                        types.add(type);
+                    }
+                } else {
+                    if (sosPermission.getLock().getView().isStatus()) {
+                        types.add(type);
+                    }
+                }
 				break;
 			case SCHEDULE:
-				if (sosPermission.getSchedule().getView().isStatus()) {
-					types.add(type);
-				}
+				if (treeForJoe) {
+                    if (sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView()) {
+                        types.add(type);
+                    }
+                } else {
+                    if (sosPermission.getSchedule().getView().isStatus()) {
+                        types.add(type);
+                    }
+                }
 				break;
 			case WORKINGDAYSCALENDAR:
 			case NONWORKINGDAYSCALENDAR:
-                if (sosPermission.getCalendar().getView().isStatus()) {
-                    types.add(type);
+                if (treeForJoe) {
+                    if (sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView()) {
+                        types.add(type);
+                    }
+                } else {
+                    if (sosPermission.getCalendar().getView().isStatus()) {
+                        types.add(type);
+                    }
                 }
                 break;
             case FOLDER:

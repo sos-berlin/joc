@@ -52,8 +52,11 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
-            checkRequiredParameter("path", body.getFolder());
+            
+            if (body.getFolder() == null || body.getFolder().isEmpty()) {
+               body.setFolder(body.getPath()); //path is alias for folder
+            }
+            checkRequiredParameter("folder", body.getFolder());
             body.setFolder(normalizeFolder(body.getFolder()));
             if (!folderPermissions.isPermittedForFolder(body.getFolder())) {
                 return accessDeniedResponse();
