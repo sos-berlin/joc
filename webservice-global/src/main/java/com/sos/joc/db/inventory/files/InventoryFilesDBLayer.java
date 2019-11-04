@@ -1,5 +1,6 @@
 package com.sos.joc.db.inventory.files;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -10,7 +11,6 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryFile;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.Globals;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.model.tree.Tree;
@@ -188,7 +188,7 @@ public class InventoryFilesDBLayer extends DBLayer {
                     return tree;
                 }).collect(Collectors.toSet());
             }
-            return null;
+            return new HashSet<Tree>();
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

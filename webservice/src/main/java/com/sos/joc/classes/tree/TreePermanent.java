@@ -3,7 +3,6 @@ package com.sos.joc.classes.tree;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -216,39 +215,30 @@ public class TreePermanent {
 			CalendarsDBLayer dbCalendarLayer = new CalendarsDBLayer(connection);
 			DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
 			DBLayerJoeObjects dbJoeObjectLayer = new DBLayerJoeObjects(connection);
-            Set<Tree> results = null;
+            Set<Tree> results = new HashSet<Tree>();
 			Set<Tree> calendarResults = null;
 			Set<Tree> docResults = null;
-			Collection<Tree> joeResults = null;
+			List<Tree> joeResults = null;
 			if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
 				for (Folder folder : treeBody.getFolders()) {
 					String normalizedFolder = ("/" + folder.getFolder()).replaceAll("//+", "/");
-					results = dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes);
+					if (treeForJoe) {
+                        joeResults = dbJoeObjectLayer.getFoldersByFolder(schedulerId, normalizedFolder, joeTypes);
+                        if (joeResults != null && !joeResults.isEmpty()) {
+                            results.addAll(joeResults);
+                        }
+                    }
+					results.addAll(dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes));
 					if (!calendarTypes.isEmpty()) {
 					    calendarResults = dbCalendarLayer.getFoldersByFolder(schedulerId, normalizedFolder, calendarTypes);
 					    if (calendarResults != null && !calendarResults.isEmpty()) {
-					        if (results == null) {
-					            results = new HashSet<Tree>();
-					        } 
 					        results.addAll(calendarResults);
 					    }
 					}
 					if (!docTypes.isEmpty()) {
                         docResults = dbDocLayer.getFoldersByFolder(schedulerId, normalizedFolder);
                         if (docResults != null && !docResults.isEmpty()) {
-                            if (results == null) {
-                                results = new HashSet<Tree>();
-                            } 
                             results.addAll(docResults);
-                        }
-                    }
-                    if (treeForJoe) {
-                        joeResults = dbJoeObjectLayer.getFoldersByFolder(schedulerId, normalizedFolder, joeTypes);
-                        if (joeResults != null && !joeResults.isEmpty()) {
-                            if (results == null) {
-                                results = new HashSet<Tree>();
-                            }
-                            results.addAll(joeResults);
                         }
                     }
 					if (results != null && !results.isEmpty()) {
@@ -266,32 +256,23 @@ public class TreePermanent {
 					}
 				}
 			} else {
-				results = dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes);
+			    if (treeForJoe) {
+                    joeResults = dbJoeObjectLayer.getFoldersByFolder(schedulerId, "/", joeTypes);
+                    if (joeResults != null && !joeResults.isEmpty()) {
+                        results.addAll(joeResults);
+                    }
+                }
+				results.addAll(dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes));
 				if (!calendarTypes.isEmpty()) {
                     calendarResults = dbCalendarLayer.getFoldersByFolder(schedulerId, "/", calendarTypes);
                     if (calendarResults != null && !calendarResults.isEmpty()) {
-                        if (results == null) {
-                            results = new HashSet<Tree>();
-                        } 
                         results.addAll(calendarResults);
                     }
                 }
 				if (!docTypes.isEmpty()) {
 				    docResults = dbDocLayer.getFoldersByFolder(schedulerId, "/");
                     if (docResults != null && !docResults.isEmpty()) {
-                        if (results == null) {
-                            results = new HashSet<Tree>();
-                        } 
                         results.addAll(docResults);
-                    }
-                }
-				if (treeForJoe) {
-                    joeResults = dbJoeObjectLayer.getFoldersByFolder(schedulerId, "/", joeTypes);
-                    if (joeResults != null && !joeResults.isEmpty()) {
-                        if (results == null) {
-                            results = new HashSet<Tree>();
-                        }
-                        results.addAll(joeResults);
                     }
                 }
 				if (results != null && !results.isEmpty()) {
