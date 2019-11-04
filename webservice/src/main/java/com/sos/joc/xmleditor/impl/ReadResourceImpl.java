@@ -91,54 +91,71 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         answer.setState(new ReadStandardConfigurationAnswerState());
         answer.getState().setMessage(new AnswerMessage());
 
-        JOCHotFolder hotFolder = new JOCHotFolder(this);
-        byte[] liveFile = getLiveFile(hotFolder, in, answer);
+        String configurationLive = null;
+        String configurationDraft = null;
+        Date configurationLiveModified = null;
+        Date configurationDraftModified = null;
+        boolean isForceLive = in.getForceLive() != null && in.getForceLive();
+
+        boolean deployed = false;
 
         DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in.getObjectType(),
                 in.getName()));
+        if (item != null) {
+            configurationDraft = item.getConfigurationDraft();
+            configurationDraftModified = item.getModified();
+            deployed = item.getDeployed() != null;
+        }
 
-        if (item != null && item.getConfigurationDraft() == null) {
-            item = null;
+        JOCHotFolder hotFolder = new JOCHotFolder(this);
+        byte[] liveFile = getLiveFile(hotFolder, in, answer); // always try to read
+        if (liveFile == null) {
+            if (deployed) {
+                if (answer.getWarning() == null) { // not found
+                    deployed = false;
+                } else { // connection refused
+                    configurationLive = item.getConfigurationDeployed();
+                    configurationLiveModified = item.getDeployed();
+                }
+            }
+        } else {
+            deployed = true;
+            configurationLive = new String(liveFile);
+            configurationLiveModified = hotFolder.getLastModifiedDate();
         }
 
         String configuration = null;
         Date modified = null;
-        if (item == null || (in.getForceLive() != null && in.getForceLive())) {
-            if (liveFile != null) {
-                configuration = new String(liveFile);
-                modified = hotFolder.getLastModifiedDate();
-            }
-        } else {
-            if (item != null) {
-                configuration = item.getConfigurationDraft();
-                modified = item.getModified();
-            }
+        if (isForceLive || configurationDraft == null) {
+            configuration = configurationLive;
+            modified = configurationLiveModified;
+        }
+        if (configuration == null) {
+            configuration = configurationDraft;
+            modified = configurationDraftModified;
         }
 
         answer.setSchema(JocXmlEditor.getSchemaURI(in.getObjectType()).toString());
         answer.setConfiguration(configuration);
         answer.setModified(modified);
+        answer.getState().setDeployed(deployed);
 
         if (configuration == null) {
-            answer.getState().setDeployed(false);
             answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_NO_CONFIGURATION_EXIST);
             answer.getState().getMessage().setCode(JocXmlEditor.CODE_NO_CONFIGURATION_EXIST);
             answer.getState().setVersionState(ObjectVersionState.NO_CONFIGURATION_EXIST);
         } else {
-            if (item == null) {
-                answer.getState().setDeployed(true);
+            if (configurationDraft == null) {
                 answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_NOT_EXIST);
                 answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_NOT_EXIST);
                 answer.getState().setVersionState(ObjectVersionState.DRAFT_NOT_EXIST);
             } else {
-                if (liveFile == null) {
-                    answer.getState().setDeployed(false);
+                if (configurationLive == null) {
                     answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_NOT_EXIST);
                     answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
                     answer.getState().setVersionState(ObjectVersionState.LIVE_NOT_EXIST);
                 } else {
-                    answer.getState().setDeployed(true);
-                    if (hotFolder.getLastModifiedDate().after(item.getModified())) {
+                    if (configurationLiveModified.after(configurationDraftModified)) {
                         answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_IS_NEWER);
                         answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_IS_NEWER);
                         answer.getState().setVersionState(ObjectVersionState.LIVE_IS_NEWER);
@@ -174,6 +191,8 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             if (isDebugEnabled) {
                 LOGGER.debug(String.format("[%s][%s]file not found", in.getJobschedulerId(), file));
             }
+        } catch (JocException e) {
+            throw e;
         }
         return result;
     }

@@ -1,0 +1,15 @@
+{
+	"title": "xmleditor yade read profiles answer",
+	"id": "schemas/yade/xmleditor/profiles-answer-schema",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.yade.xmleditor.ProfilesAnswer",
+	"type": "object",
+	"description": "",
+	"properties": {
+		"profiles": {
+			"items": {
+				"$ref": "common/profile-schema.json"
+			}
+		}
+	}
+}
