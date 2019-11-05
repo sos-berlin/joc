@@ -53,7 +53,7 @@ public class XmlEditorAudit implements IAuditLog {
     public XmlEditorAudit(ReadConfiguration in) {
         jobschedulerId = in.getJobschedulerId();
         objectType = in.getObjectType();
-        name = in.getName();
+        name = in.getId() + "";
         folder = JobSchedulerXmlEditor.getNormalizedLiveFolder(objectType);
     }
 

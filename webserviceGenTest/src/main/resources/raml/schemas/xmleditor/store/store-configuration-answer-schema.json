@@ -6,6 +6,9 @@
 	"type": "object",
 	"description": "",
 	"properties": {
+		"id": {
+			"type": "integer"
+		},
 		"modified": {
 			"$ref": "../../common/timestamp-schema.json"
 		},

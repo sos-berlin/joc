@@ -4,7 +4,7 @@
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"javaType": "com.sos.joc.model.xmleditor.read.ReadConfiguration",
 	"type": "object",
-	"description": "name only for OTHER",
+	"description": "id only for OTHER",
 	"required": [
 		"jobschedulerId",
 		"objectType"
@@ -16,8 +16,8 @@
 		"objectType": {
 			"$ref": "../common/object-type-schema.json"
 		},
-		"name": {
-			"type": "string"
+		"id": {
+			"type": "integer"
 		},
 		"forceLive": {
 			"type": "boolean"

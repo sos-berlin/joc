@@ -4,7 +4,7 @@
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"javaType": "com.sos.joc.model.xmleditor.store.StoreConfiguration",
 	"type": "object",
-	"description": "name amd schema only for OTHER",
+	"description": "id, name and schema only for OTHER",
 	"required": [
 		"jobschedulerId",
 		"objectType",
@@ -19,6 +19,9 @@
 		},
 		"configuration": {
 			"type": "string"
+		},
+		"id": {
+			"type": "integer"
 		},
 		"name": {
 			"type": "string"
