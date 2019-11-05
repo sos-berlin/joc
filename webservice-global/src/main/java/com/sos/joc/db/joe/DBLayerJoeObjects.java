@@ -188,9 +188,8 @@ public class DBLayerJoeObjects {
                 query.setParameter("likeFolderName", folderName + "/%");
             }
             List<Tree> result = sosHibernateSession.getResultList(query);
-            if (result != null) {
-                Set<String> folders = result.stream().map(Tree::getPath).collect(Collectors.toSet());
-                return getFoldersByFolder(schedulerId, folders);
+            if (result != null && !result.isEmpty()) {
+                return getFoldersByFolder(schedulerId, result.stream().map(Tree::getPath).collect(Collectors.toSet()));
             }
             return new ArrayList<Tree>();
         } catch (SOSHibernateInvalidSessionException ex) {
@@ -201,7 +200,7 @@ public class DBLayerJoeObjects {
     }
 
     private List<Tree> getFoldersByFolder(String schedulerId, Set<String> folders) throws DBConnectionRefusedException, DBInvalidDataException {
-        if (folders == null) {
+        if (folders == null || folders.isEmpty()) {
             return new ArrayList<Tree>();
         }
         try {
