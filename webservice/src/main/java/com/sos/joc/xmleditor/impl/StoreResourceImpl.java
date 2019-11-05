@@ -35,25 +35,32 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
             if (response == null) {
                 session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
                 session.beginTransaction();
-
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
-                DBItemXmlEditorObject item = null;
 
+                DBItemXmlEditorObject item = null;
                 boolean setAnswerMessage = false;
+                String name = null;
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
                     if (in.getId() != null && in.getId() > 0) {
                         item = dbLayer.getObject(in.getId().longValue());
                     }
+                    name = in.getName();
+                    if (name.startsWith("Edit") && !name.toLowerCase().endsWith(".xml")) {
+                        name = name + ".xml";
+                    }
+
                 } else {
                     setAnswerMessage = true;
                     item = dbLayer.getObject(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in.getObjectType(),
                             in.getName()));
+                    name = JocXmlEditor.getConfigurationName(in.getObjectType());
                 }
+
                 if (item == null) {
                     item = new DBItemXmlEditorObject();
                     item.setSchedulerId(in.getJobschedulerId());
                     item.setObjectType(in.getObjectType().name());
-                    item.setName(JocXmlEditor.getConfigurationName(in.getObjectType(), in.getName()));
+                    item.setName(name);
                     item.setConfigurationDraft(in.getConfiguration());
                     item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
 
@@ -64,7 +71,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                     session.save(item);
 
                 } else {
-                    item.setName(JocXmlEditor.getConfigurationName(in.getObjectType(), in.getName()));
+                    item.setName(name);
                     item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
                     item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
 

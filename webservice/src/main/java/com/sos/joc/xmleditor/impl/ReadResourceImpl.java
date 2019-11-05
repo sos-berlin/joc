@@ -263,16 +263,15 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         SOSHibernateSession session = null;
         try {
             session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
-
-            session.beginTransaction();
             DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
+            
+            session.beginTransaction();
             DBItemXmlEditorObject item = dbLayer.getObject(id.longValue());
             session.commit();
 
             if (isTraceEnabled) {
                 LOGGER.trace(String.format("[%s]%s", id, SOSString.toString(item, Arrays.asList("configuration"))));
             }
-
             return item;
         } catch (Throwable e) {
             Globals.rollback(session);
@@ -286,17 +285,15 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         SOSHibernateSession session = null;
         try {
             session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
-
-            session.beginTransaction();
             DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
+            
+            session.beginTransaction();
             DBItemXmlEditorObject item = dbLayer.getObject(schedulerId, objectType, name);
             session.commit();
-
             if (isTraceEnabled) {
                 LOGGER.trace(String.format("[%s][%s][%s]%s", schedulerId, objectType, name, SOSString.toString(item, Arrays.asList(
                         "configuration"))));
             }
-
             return item;
         } catch (Throwable e) {
             Globals.rollback(session);
@@ -310,9 +307,9 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         SOSHibernateSession session = null;
         try {
             session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
-
-            session.beginTransaction();
             DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
+            
+            session.beginTransaction();
             List<Map<String, Object>> items = dbLayer.getObjectProperties(in.getJobschedulerId(), ObjectType.OTHER.name(), properties);
             session.commit();
             return items;

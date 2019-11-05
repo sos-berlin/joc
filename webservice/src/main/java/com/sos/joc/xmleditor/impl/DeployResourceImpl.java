@@ -62,8 +62,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 logAuditMessage(audit);
 
                 session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
-
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
+
                 DBItemXmlEditorObject item = getItem(dbLayer, in);
 
                 JocXmlEditor.validate(in.getObjectType(), item.getConfigurationDraft());
