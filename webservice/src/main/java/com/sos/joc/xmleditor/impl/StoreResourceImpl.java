@@ -58,7 +58,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                     item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
                     item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
 
-                    item.setAuditLogId(new Long(0));// TODO
+                    // item.setAuditLogId(new Long(0));// TODO
                     item.setAccount(getAccount());
                     item.setModified(new Date());
                     session.update(item);
