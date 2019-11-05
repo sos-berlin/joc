@@ -483,6 +483,9 @@ public class XmlSerializer {
                 script.setDll(null);
                 script.setDotnetClass(null);
             }
+            if (script.getContent() != null) {
+                script.setContent("\n" + script.getContent().trim() + "\n");
+            }
         }
         return script;
     }
