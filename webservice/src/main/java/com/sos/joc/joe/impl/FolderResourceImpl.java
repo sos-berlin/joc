@@ -93,65 +93,64 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             InventorySchedulesDBLayer scheduleDbLayer = null;
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
-            filterJoeObjects.setPath(path);
+            filterJoeObjects.setFolder(path);
 
-            final int parentDepth = Paths.get(body.getPath()).getNameCount();
-            List<DBItemJoeObject> dbItems = dbLayer.getRecursiveJoeObjectList(filterJoeObjects);
+            //final int parentDepth = Paths.get(body.getPath()).getNameCount();
+            List<DBItemJoeObject> dbItems = dbLayer.getJoeObjectList(filterJoeObjects, 0);
             if (dbItems == null) {
                 dbItems = new ArrayList<DBItemJoeObject>();
             }
             // Map: grouped by DBItemJoeObject::objectType
             // -> new FolderItem("filename of DBItemJoeObject::path", false) collection
             // filter for non-recursive level
-            Map<String, Set<FolderItem>> folderContent = dbItems.stream().filter(item -> Paths.get(item.getPath()).getParent()
-                    .getNameCount() == parentDepth).collect(Collectors.groupingBy(
-                            DBItemJoeObject::getObjectType, Collectors.mapping(item -> {
-                                FolderItem folderItem = new FolderItem();
-                                folderItem.setName(Paths.get(item.getPath()).getFileName().toString());
-                                folderItem.setDeployed(false);
-                                folderItem.setDeleted(item.operationIsDelete());
-                                try {
-                                    switch (item.getObjectType()) {
-                                    case "JOB":
-                                        Job job = Globals.objectMapper.readValue(item.getConfiguration(), Job.class);
-                                        folderItem.setTitle(job.getTitle());
-                                        folderItem.setProcessClass(job.getProcessClass());
-                                        folderItem.setIsOrderJob(job.getIsOrderJob() != null && "true,1,yes".contains(job.getIsOrderJob()));
-                                        break;
-                                    case "JOBCHAIN":
-                                        JobChain jobChain = Globals.objectMapper.readValue(item.getConfiguration(), JobChain.class);
-                                        folderItem.setTitle(jobChain.getTitle());
-                                        folderItem.setProcessClass(jobChain.getProcessClass());
-                                        break;
-                                    case "ORDER":
-                                        Order order = Globals.objectMapper.readValue(item.getConfiguration(), Order.class);
-                                        folderItem.setTitle(order.getTitle());
-                                        folderItem.setInitialState(order.getInitialState());
-                                        folderItem.setEndState(order.getEndState());
-                                        folderItem.setPriority(order.getPriority());
-                                        break;
-                                    case "AGENTCLUSTER":
-                                    case "PROCESSCLASS":
-                                        ProcessClass processClass = Globals.objectMapper.readValue(item.getConfiguration(), ProcessClass.class);
-                                        folderItem.setMaxProcesses(processClass.getMaxProcesses());
-                                        break;
-                                    case "LOCK":
-                                        Lock lock = Globals.objectMapper.readValue(item.getConfiguration(), Lock.class);
-                                        folderItem.setMaxNonExclusive(lock.getMaxNonExclusive());
-                                        break;
-                                    case "SCHEDULE":
-                                        Schedule schedule = Globals.objectMapper.readValue(item.getConfiguration(), Schedule.class);
-                                        folderItem.setTitle(schedule.getTitle());
-                                        folderItem.setSubstitute(schedule.getSubstitute());
-                                        folderItem.setValidFrom(schedule.getValidFrom());
-                                        folderItem.setValidTo(schedule.getValidTo());
-                                        break;
-                                    }
-                                } catch (Exception e) {
-                                    LOGGER.warn("", e);
-                                }
-                                return folderItem;
-                            }, Collectors.toSet())));
+            Map<String, Set<FolderItem>> folderContent = dbItems.stream().collect(Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors
+                    .mapping(item -> {
+                        FolderItem folderItem = new FolderItem();
+                        folderItem.setName(Paths.get(item.getPath()).getFileName().toString());
+                        folderItem.setDeployed(false);
+                        folderItem.setDeleted(item.operationIsDelete());
+                        try {
+                            switch (item.getObjectType()) {
+                            case "JOB":
+                                Job job = Globals.objectMapper.readValue(item.getConfiguration(), Job.class);
+                                folderItem.setTitle(job.getTitle());
+                                folderItem.setProcessClass(job.getProcessClass());
+                                folderItem.setIsOrderJob(job.getIsOrderJob() != null && "true,1,yes".contains(job.getIsOrderJob()));
+                                break;
+                            case "JOBCHAIN":
+                                JobChain jobChain = Globals.objectMapper.readValue(item.getConfiguration(), JobChain.class);
+                                folderItem.setTitle(jobChain.getTitle());
+                                folderItem.setProcessClass(jobChain.getProcessClass());
+                                break;
+                            case "ORDER":
+                                Order order = Globals.objectMapper.readValue(item.getConfiguration(), Order.class);
+                                folderItem.setTitle(order.getTitle());
+                                folderItem.setInitialState(order.getInitialState());
+                                folderItem.setEndState(order.getEndState());
+                                folderItem.setPriority(order.getPriority());
+                                break;
+                            case "AGENTCLUSTER":
+                            case "PROCESSCLASS":
+                                ProcessClass processClass = Globals.objectMapper.readValue(item.getConfiguration(), ProcessClass.class);
+                                folderItem.setMaxProcesses(processClass.getMaxProcesses());
+                                break;
+                            case "LOCK":
+                                Lock lock = Globals.objectMapper.readValue(item.getConfiguration(), Lock.class);
+                                folderItem.setMaxNonExclusive(lock.getMaxNonExclusive());
+                                break;
+                            case "SCHEDULE":
+                                Schedule schedule = Globals.objectMapper.readValue(item.getConfiguration(), Schedule.class);
+                                folderItem.setTitle(schedule.getTitle());
+                                folderItem.setSubstitute(schedule.getSubstitute());
+                                folderItem.setValidFrom(schedule.getValidFrom());
+                                folderItem.setValidTo(schedule.getValidTo());
+                                break;
+                            }
+                        } catch (Exception e) {
+                            LOGGER.warn("", e);
+                        }
+                        return folderItem;
+                    }, Collectors.toSet())));
 
             List<JobSchedulerObjectType> objectTypes = Arrays.asList(JobSchedulerObjectType.JOB, JobSchedulerObjectType.JOBCHAIN,
                     JobSchedulerObjectType.ORDER, JobSchedulerObjectType.AGENTCLUSTER, JobSchedulerObjectType.PROCESSCLASS,

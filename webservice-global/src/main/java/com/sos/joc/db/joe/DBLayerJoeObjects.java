@@ -13,7 +13,6 @@ import org.hibernate.query.Query;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
-import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -42,54 +41,58 @@ public class DBLayerJoeObjects {
     }
 
     private String getWhere(FilterJoeObjects filter) {
-        String where = "1=1";
-        String and = " and ";
+        List<String> conditions = new ArrayList<String>();
 
-        if (filter.getSchedulerId() != null && !"".equals(filter.getSchedulerId())) {
-            where += and + " schedulerId = :schedulerId";
-            and = " and ";
+        if (filter.getSchedulerId() != null && !filter.getSchedulerId().isEmpty()) {
+            conditions.add("schedulerId = :schedulerId");
         }
 
-        if (filter.getPath() != null && !"".equals(filter.getPath())) {
+        if (filter.getPath() != null && !filter.getPath().isEmpty()) {
             if (filter.isRecursive()) {
-                where += and + " path like :path or path = :pathabsolut";
+                conditions.add("path like :path or path = :pathabsolut");
             } else {
-                where += and + " path = :path";
+                conditions.add("path = :path");
             }
-            and = " and ";
+        }
+        
+        if (filter.getFolder() != null && !filter.getFolder().isEmpty()) {
+            conditions.add("folder = :folder");
         }
 
         if (filter.getObjectType() != null) {
-            where += and + " objectType = :objectType";
-            and = " and ";
+            conditions.add("objectType = :objectType");
         }
-
+        
         if (filter.getObjectTypes() != null && filter.getObjectTypes().size() > 0) {
             if (filter.getObjectTypes().size() == 1) {
-                where += and + " objectType = :objectTypes";
+                conditions.add("objectType = :objectTypes");
             } else {
-                where += and + " objectType in (:objectTypes)";
+                conditions.add("objectType in (:objectTypes)");
             }
-            and = " and ";
         }
 
-        if (filter.getAccount() != null && !"".equals(filter.getAccount())) {
-            where += and + " account = :account";
-            and = " and ";
+        if (filter.getAccount() != null && !filter.getAccount().isEmpty()) {
+            conditions.add("account = :account");
         }
-
-        if (!"".equals(where.trim())) {
+        
+        if (filter.getOperation() != null && !filter.getOperation().isEmpty()) {
+            conditions.add("operation = :operation");
+        }
+        
+        String where = conditions.stream().collect(Collectors.joining(" and "));
+        if (!where.isEmpty()) {
             where = " where " + where;
         }
+        
         return where;
     }
 
     private <T> Query<T> bindParameters(FilterJoeObjects filter, Query<T> query) {
 
-        if (filter.getSchedulerId() != null && !"".equals(filter.getSchedulerId())) {
+        if (filter.getSchedulerId() != null && !filter.getSchedulerId().isEmpty()) {
             query.setParameter("schedulerId", filter.getSchedulerId());
         }
-        if (filter.getAccount() != null && !"".equals(filter.getAccount())) {
+        if (filter.getAccount() != null && !filter.getAccount().isEmpty()) {
             query.setParameter("account", filter.getAccount());
         }
         if (filter.getObjectType() != null) {
@@ -102,12 +105,17 @@ public class DBLayerJoeObjects {
                 query.setParameterList("objectTypes", filter.getObjectTypes());
             }
         }
-        if (filter.getPath() != null && !"".equals(filter.getPath())) {
+        if (filter.getPath() != null && !filter.getPath().isEmpty()) {
             query.setParameter("path", filter.getPath());
         }
-        
-        if (filter.isRecursive()){
+        if (filter.isRecursive()) {
             query.setParameter("pathabsolut", filter.getPathAbsolut());
+        }
+        if (filter.getFolder() != null && !filter.getFolder().isEmpty()) {
+            query.setParameter("folder", filter.getFolder());
+        }
+        if (filter.getOperation() != null && !filter.getOperation().isEmpty()) {
+            query.setParameter("operation", filter.getOperation());
         }
         return query;
     }

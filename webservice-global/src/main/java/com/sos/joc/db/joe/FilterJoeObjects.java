@@ -94,11 +94,11 @@ public class FilterJoeObjects {
     }
 
     public boolean isRecursive() {
-        return path.endsWith("%");
+        return path != null && path.endsWith("%");
     }
 
     public void setRecursive() {
-        if (!path.endsWith("%")) {
+        if (path != null && !path.endsWith("%")) {
             pathAbsolut = path;
             path = (path + "/").replaceAll("//+", "/") + "%";
         }
