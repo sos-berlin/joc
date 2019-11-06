@@ -17,7 +17,7 @@ public class FilterJoeObjects {
     private String folder;
     private String operation;
     private Object orderCriteria;
-    private String sortMode="asc";
+    private String sortMode = "asc";
 
     public void setConstraint(Filter filter) {
         schedulerId = filter.getJobschedulerId();
@@ -40,15 +40,15 @@ public class FilterJoeObjects {
     public void setObjectType(JobSchedulerObjectType objectType) {
         this.objectType = objectType;
     }
-    
+
     public List<String> getObjectTypes() {
         return objectTypes;
     }
 
-    public void setObjectTypes(String ...objectTypes) {
+    public void setObjectTypes(String... objectTypes) {
         this.objectTypes = Arrays.asList(objectTypes);
     }
-    
+
     public void setObjectTypes(List<String> objectTypes) {
         this.objectTypes = objectTypes;
     }
@@ -60,7 +60,7 @@ public class FilterJoeObjects {
     public void setAccount(String account) {
         this.account = account;
     }
-    
+
     public String getOperation() {
         return operation;
     }
@@ -76,7 +76,7 @@ public class FilterJoeObjects {
     public void setPath(String path) {
         this.path = path;
     }
-    
+
     public String getFolder() {
         return folder;
     }
@@ -97,10 +97,14 @@ public class FilterJoeObjects {
 
     public void setRecursive() {
         if (!path.endsWith("%")) {
-            path = (path + "/").replaceAll("//+", "/") + "%";
+            if (path.endsWith("/")) {
+                path = (path + "/").replaceAll("//+", "/") + "%";
+            } else {
+                path = path + "%";
+            }
         }
     }
-    
+
     public String getSortMode() {
         if (orderCriteria == null || "".equals(orderCriteria) || sortMode == null) {
             return "";
@@ -124,6 +128,5 @@ public class FilterJoeObjects {
     public void setOrderCriteria(String orderCriteria) {
         this.orderCriteria = orderCriteria;
     }
-
 
 }
