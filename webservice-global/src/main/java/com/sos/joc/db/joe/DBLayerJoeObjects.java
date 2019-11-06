@@ -13,6 +13,7 @@ import org.hibernate.query.Query;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
+import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -51,7 +52,7 @@ public class DBLayerJoeObjects {
 
         if (filter.getPath() != null && !"".equals(filter.getPath())) {
             if (filter.isRecursive()) {
-                where += and + " path like :path";
+                where += and + " path like :path or path = :pathabsolut";
             } else {
                 where += and + " path = :path";
             }
@@ -62,7 +63,7 @@ public class DBLayerJoeObjects {
             where += and + " objectType = :objectType";
             and = " and ";
         }
-        
+
         if (filter.getObjectTypes() != null && filter.getObjectTypes().size() > 0) {
             if (filter.getObjectTypes().size() == 1) {
                 where += and + " objectType = :objectTypes";
@@ -103,6 +104,10 @@ public class DBLayerJoeObjects {
         }
         if (filter.getPath() != null && !"".equals(filter.getPath())) {
             query.setParameter("path", filter.getPath());
+        }
+        
+        if (filter.isRecursive()){
+            query.setParameter("pathabsolut", filter.getPathAbsolut());
         }
         return query;
     }
@@ -146,7 +151,7 @@ public class DBLayerJoeObjects {
         }
     }
 
-    public Integer updateFolderCommand(FilterJoeObjects filter,String command) throws DBConnectionRefusedException, DBInvalidDataException {
+    public Integer updateFolderCommand(FilterJoeObjects filter, String command) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             String q = "update " + DBLayer.DBITEM_JOE_OBJECT + " set operation = '" + command + "' " + getWhere(filter);
 
@@ -268,6 +273,19 @@ public class DBLayerJoeObjects {
     public void delete(DBItemJoeObject joeObject) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             sosHibernateSession.delete(joeObject);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public int delete(FilterJoeObjects filter) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            String q = "delete from " + DBLayer.DBITEM_JOE_OBJECT + getWhere(filter);
+            Query<DBItemJoeObject> query = sosHibernateSession.createQuery(q);
+            bindParameters(filter, query);
+            return sosHibernateSession.executeUpdate(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

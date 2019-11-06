@@ -92,6 +92,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
 
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
+            filterJoeObjects.setAccount(body.getAccount());
             if (body.getObjectName() != null && !body.getObjectName().isEmpty()) {
                 filterJoeObjects.setPath((folder + "/").replaceAll("//+", "/") + body.getObjectName());
             } else {

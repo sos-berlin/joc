@@ -24,6 +24,9 @@
     },
     "objectType": {
       	"$ref": "../../common/type-schema.json"
+    },   
+    "account": {
+      	"type": "string"
     },
     "auditLog": {
     	"$ref": "../../audit/auditParams-schema.json"

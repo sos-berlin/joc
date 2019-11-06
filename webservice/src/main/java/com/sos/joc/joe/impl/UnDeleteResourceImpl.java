@@ -54,30 +54,29 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             if (!folderPermissions.isPermittedForFolder(folder)) {
                 return accessDeniedResponse();
             }
-            
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             LockResourceImpl.unForcelock(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), folder, getAccount());
 
-            sosHibernateSession.setAutoCommit(false);
+//            sosHibernateSession.setAutoCommit(false);
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
 
             FilterJoeObjects filter = new FilterJoeObjects();
             filter = new FilterJoeObjects();
             filter.setSchedulerId(body.getJobschedulerId());
-            if (isDirectory) {
-                filter.setPath(body.getPath());
-                filter.setRecursive();
-            } else {
+//            if (isDirectory) {
+//                filter.setPath(body.getPath());
+//                 filter.setRecursive();
+//            } else {
                 filter.setConstraint(body);
-            }
+//            }
             DBItemJoeObject dbItem = dbLayer.getJoeObject(filter);
             if (dbItem != null) {
                 dbItem.setOperation("store");
                 dbLayer.update(dbItem); 
             }
-            sosHibernateSession.beginTransaction();
-            dbLayer.updateFolderCommand(filter, "store");
-            Globals.commit(sosHibernateSession);
+//            sosHibernateSession.beginTransaction();
+//            dbLayer.updateFolderCommand(filter, "store");
+//            Globals.commit(sosHibernateSession);
             
             try {
                 CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
