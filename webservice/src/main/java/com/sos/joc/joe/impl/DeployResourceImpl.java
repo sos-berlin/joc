@@ -1,5 +1,6 @@
 package com.sos.joc.joe.impl;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
+import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -90,10 +92,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
 
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
-            if (body.getObjectName() != null) {
-                filterJoeObjects.setPath(normalizePath(folder) + "/" + body.getObjectName());
+            if (body.getObjectName() != null && !body.getObjectName().isEmpty()) {
+                filterJoeObjects.setPath((folder + "/").replaceAll("//+", "/") + body.getObjectName());
             } else {
-                filterJoeObjects.setPath(normalizeFolder(folder));
+                filterJoeObjects.setPath(folder);
             }
             if (JobSchedulerObjectType.ORDER == body.getObjectType() || JobSchedulerObjectType.JOBCHAIN == body.getObjectType()) {
                 filterJoeObjects.setObjectTypes(body.getObjectType().value(), JobSchedulerObjectType.NODEPARAMS.value());
@@ -101,7 +103,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 filterJoeObjects.setObjectType(body.getObjectType());
             }
             filterJoeObjects.setOrderCriteria("created");
-            if ((body.getObjectName() == null || body.getObjectName().isEmpty()) && (body.getRecursive() != null && body.getRecursive())) {
+            if ((body.getObjectName() == null || body.getObjectName().isEmpty())) {
                 filterJoeObjects.setRecursive();
             }
 
@@ -110,7 +112,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             DeployAnswer deployAnswer = new DeployAnswer();
             deployAnswer.setMessages(new ArrayList<DeployMessage>());
-            deployAnswer.setFolder(body.getFolder());
+            deployAnswer.setFolder(folder);
             deployAnswer.setJobschedulerId(body.getJobschedulerId());
             deployAnswer.setObjectName(body.getObjectName());
             deployAnswer.setObjectType(body.getObjectType());
@@ -121,9 +123,18 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             if (listOfJoeObjects != null) {
                 
+                Map<String, Set<DBItemJoeObject>> groupedJoeObjects = null;
+                if (filterJoeObjects.isRecursive() && (body.getRecursive() == null || !body.getRecursive())) {
+                    //all objects of a folder (non-recursive) 
+                    final int folderDepth = Paths.get(folder).getNameCount();
+                    groupedJoeObjects = listOfJoeObjects.stream().filter(item -> item.getPath().equals(folder) || (!"FOLDER"
+                            .equals(item.getObjectType()) && Paths.get(item.getPath()).getParent().getNameCount() == folderDepth)).collect(Collectors
+                                    .groupingBy(DBItemJoeObject::getObjectType, Collectors.toSet()));
+                } else {
+                    groupedJoeObjects = listOfJoeObjects.stream().collect(Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors.toSet()));
+                }
+                
                 String[] objTypes = {"NODEPARAMS", "PROCESSCLASS", "AGENTCLUSTER", "LOCK", "MONITOR", "SCHEDULE", "JOB", "JOBCHAIN", "ORDER"};
-                Map<String, Set<DBItemJoeObject>> groupedJoeObjects = listOfJoeObjects.stream().collect(Collectors.groupingBy(
-                        DBItemJoeObject::getObjectType, Collectors.toSet()));
                 for (String objType : objTypes) {
                     if (groupedJoeObjects.containsKey(objType)) {
                         for (DBItemJoeObject joeObject : groupedJoeObjects.get(objType)) {
@@ -214,6 +225,20 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         }
                     }
                 }
+            }
+            
+            //release folder if no further drafts in folder
+            FilterJoeObjects filterObj = new FilterJoeObjects();
+            filterObj.setSchedulerId(body.getJobschedulerId());
+            filterObj.setPath(folder);
+            final int parentDepth = Paths.get(folder).getNameCount();
+            List<DBItemJoeObject> dbItems = dbLayerJoeObjects.getRecursiveJoeObjectList(filterObj);
+            boolean folderIsEmpty = true;
+            if (dbItems != null) {
+                folderIsEmpty = dbItems.stream().filter(item -> Paths.get(item.getPath()).getParent().getNameCount() == parentDepth).count() == 0L;
+            }
+            if (folderIsEmpty) {
+                LockResourceImpl.release(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), folder, getAccount());
             }
 
             return JOCDefaultResponse.responseStatus200(deployAnswer);

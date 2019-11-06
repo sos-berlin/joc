@@ -1,8 +1,8 @@
 {
-	"title": "xmleditor read configuration in",
-	"id": "schemas/xmleditor/read/read-configuration-schema",
+	"title": "xmleditor delete draft configuration in",
+	"id": "schemas/xmleditor/delete/delete-draft-schema",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"javaType": "com.sos.joc.model.xmleditor.read.ReadConfiguration",
+	"javaType": "com.sos.joc.model.xmleditor.delete.DeleteDraft",
 	"type": "object",
 	"description": "id only for OTHER",
 	"required": [
@@ -18,9 +18,6 @@
 		},
 		"id": {
 			"type": "integer"
-		},
-		"forceLive": {
-			"type": "boolean"
 		}
 	}
 }

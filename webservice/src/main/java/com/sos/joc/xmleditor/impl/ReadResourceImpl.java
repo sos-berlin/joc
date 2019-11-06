@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemXmlEditorObject;
+import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.jitl.xmleditor.db.DbLayerXmlEditor;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -99,8 +100,8 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
         boolean deployed = false;
 
-        DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in.getObjectType(),
-                in.getName()));
+        DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in
+                .getObjectType()));
         if (item != null) {
             configurationDraft = item.getConfigurationDraft();
             configurationDraftModified = item.getModified();
@@ -201,19 +202,22 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
         ReadOtherConfigurationAnswer answer = new ReadOtherConfigurationAnswer();
 
-        if (SOSString.isEmpty(in.getName())) {
+        if (in.getId() == null || in.getId() <= 0) {
             ArrayList<String> schemas = new ArrayList<String>();
+            schemas.add(JobSchedulerXmlEditor.SCHEMA_URI_NOTIFICATION);
+            schemas.add(JobSchedulerXmlEditor.SCHEMA_URI_YADE);
 
-            List<Map<String, String>> items = getOtherProperties(in, "name,schemaLocation");
+            List<Map<String, Object>> items = getOtherProperties(in, "id,name,schemaLocation");
             if (items != null && items.size() > 0) {
                 ArrayList<AnswerConfiguration> configurations = new ArrayList<AnswerConfiguration>();
                 for (int i = 0; i < items.size(); i++) {
-                    Map<String, String> item = items.get(i);
+                    Map<String, Object> item = items.get(i);
                     AnswerConfiguration configuration = new AnswerConfiguration();
-                    configuration.setName(item.get("0"));
+                    configuration.setId(Integer.parseInt(item.get("0").toString()));
+                    configuration.setName(item.get("1").toString());
                     configurations.add(configuration);
 
-                    String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.get("1")).toString();
+                    String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.get("2").toString()).toString();
                     if (!schemas.contains(uri)) {
                         schemas.add(uri);
                     }
@@ -239,12 +243,13 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             }
 
         } else {
-            DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), in.getName());
+            DBItemXmlEditorObject item = getItem(in.getId());
             answer.setConfiguration(new AnswerConfiguration());
             if (item == null) {
                 throw new JocException(new JocError(JocXmlEditor.CODE_NO_CONFIGURATION_EXIST, String.format("[%s][%s][%s]no configuration found", in
-                        .getJobschedulerId(), in.getObjectType().name(), in.getName())));
+                        .getJobschedulerId(), in.getObjectType().name(), in.getId())));
             } else {
+                answer.getConfiguration().setId(item.getId().intValue());
                 answer.getConfiguration().setName(item.getName());
                 answer.getConfiguration().setSchema(JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.getSchemaLocation()).toString());
                 answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
@@ -254,21 +259,19 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         return answer;
     }
 
-    private DBItemXmlEditorObject getItem(String schedulerId, String objectType, String name) throws Exception {
+    private DBItemXmlEditorObject getItem(Integer id) throws Exception {
         SOSHibernateSession session = null;
         try {
             session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
-
-            session.beginTransaction();
             DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
-            DBItemXmlEditorObject item = dbLayer.getObject(schedulerId, objectType, name);
+            
+            session.beginTransaction();
+            DBItemXmlEditorObject item = dbLayer.getObject(id.longValue());
             session.commit();
 
             if (isTraceEnabled) {
-                LOGGER.trace(String.format("[%s][%s][%s]%s", schedulerId, objectType, name, SOSString.toString(item, Arrays.asList(
-                        "configuration"))));
+                LOGGER.trace(String.format("[%s]%s", id, SOSString.toString(item, Arrays.asList("configuration"))));
             }
-
             return item;
         } catch (Throwable e) {
             Globals.rollback(session);
@@ -278,14 +281,36 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         }
     }
 
-    private List<Map<String, String>> getOtherProperties(ReadConfiguration in, String properties) throws Exception {
+    private DBItemXmlEditorObject getItem(String schedulerId, String objectType, String name) throws Exception {
         SOSHibernateSession session = null;
         try {
             session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
-
-            session.beginTransaction();
             DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
-            List<Map<String, String>> items = dbLayer.getObjectProperties(in.getJobschedulerId(), ObjectType.OTHER.name(), properties);
+            
+            session.beginTransaction();
+            DBItemXmlEditorObject item = dbLayer.getObject(schedulerId, objectType, name);
+            session.commit();
+            if (isTraceEnabled) {
+                LOGGER.trace(String.format("[%s][%s][%s]%s", schedulerId, objectType, name, SOSString.toString(item, Arrays.asList(
+                        "configuration"))));
+            }
+            return item;
+        } catch (Throwable e) {
+            Globals.rollback(session);
+            throw e;
+        } finally {
+            Globals.disconnect(session);
+        }
+    }
+
+    private List<Map<String, Object>> getOtherProperties(ReadConfiguration in, String properties) throws Exception {
+        SOSHibernateSession session = null;
+        try {
+            session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
+            DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
+            
+            session.beginTransaction();
+            List<Map<String, Object>> items = dbLayer.getObjectProperties(in.getJobschedulerId(), ObjectType.OTHER.name(), properties);
             session.commit();
             return items;
         } catch (Throwable e) {

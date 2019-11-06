@@ -13,15 +13,20 @@
       }
     },
     "copyParams": {
-      "decription": "Only valid in start_job and add_order. Possible values task or order.",
-      "type": "object",
-      "javaType": "com.sos.joc.model.joe.common.CopyParams",
-      "required": [
-        "from"
-      ],
-      "properties": {
-        "from": {
-          "type": "string"
+      "decription": "Only valid in start_job and add_order. Possible values for 'from' is task or order.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "javaType": "com.sos.joc.model.joe.common.CopyParams",
+        "xmlElement": "copy_params",
+        "required": [
+          "from"
+        ],
+        "properties": {
+          "from": {
+            "type": "string"
+          }
         }
       }
     },

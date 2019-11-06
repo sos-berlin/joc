@@ -13,6 +13,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
+import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -51,21 +52,22 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
 
             checkRequiredParameter("path", body.getPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
+            String folder = null;
 
             if (isDirectory) {
                 body.setPath(normalizeFolder(body.getPath()));
-                if (!this.folderPermissions.isPermittedForFolder(body.getPath())) {
-                    return accessDeniedResponse();
-                }
+                folder = body.getPath();
 
             } else {
                 body.setPath(normalizePath(body.getPath()));
-                if (!this.folderPermissions.isPermittedForFolder(getParent(body.getPath()))) {
-                    return accessDeniedResponse();
-                }
+                folder = getParent(body.getPath());
+            }
+            if (!this.folderPermissions.isPermittedForFolder(folder)) {
+                return accessDeniedResponse();
             }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
+            LockResourceImpl.unForcelock(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), folder, getAccount());
 
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filter = new FilterJoeObjects();
@@ -103,6 +105,11 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setObjectType(body.getObjectType().value());
                 item.setOperation("store");
                 item.setPath(body.getPath());
+                if ("/".equals(body.getPath())) {
+                    item.setFolder(".");
+                } else {
+                    item.setFolder(getParent(body.getPath()));
+                }
                 dbLayer.save(item);
                 
                 try {

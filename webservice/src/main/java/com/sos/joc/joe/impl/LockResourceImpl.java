@@ -104,18 +104,30 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
             throws DBConnectionRefusedException, DBInvalidDataException, JoeFolderAlreadyLockedException {
         return lockOrReleaseOrInfo(dbLayerJoeLocks, schedulerId, path, false, true, account);
     }
+    
+    public static DBItemJoeLock unForcelock(DBLayerJoeLocks dbLayerJoeLocks, String schedulerId, String path, String account)
+            throws DBConnectionRefusedException, DBInvalidDataException, JoeFolderAlreadyLockedException {
+        return lockOrReleaseOrInfo(dbLayerJoeLocks, schedulerId, path, true, false, account);
+    }
+    
+    public static DBItemJoeLock forcelock(DBLayerJoeLocks dbLayerJoeLocks, String schedulerId, String path, String account)
+            throws DBConnectionRefusedException, DBInvalidDataException, JoeFolderAlreadyLockedException {
+        return lockOrReleaseOrInfo(dbLayerJoeLocks, schedulerId, path, true, true, account);
+    }
 
     public static DBItemJoeLock lockOrReleaseOrInfo(DBLayerJoeLocks dbLayerJoeLocks, String schedulerId, String path, Boolean lock, Boolean forceLock,
             String account) throws DBConnectionRefusedException, DBInvalidDataException, JoeFolderAlreadyLockedException {
         DBItemJoeLock dbItem = dbLayerJoeLocks.getJoeLock(schedulerId, path);
         if (lock != null) {
             if (dbItem == null) {
-                dbItem = new DBItemJoeLock();
-                dbItem.setAccount(account);
-                dbItem.setIsLocked(lock);
-                dbItem.setFolder(path);
-                dbItem.setSchedulerId(schedulerId);
-                dbLayerJoeLocks.save(dbItem);
+                if (lock) {
+                    dbItem = new DBItemJoeLock();
+                    dbItem.setAccount(account);
+                    dbItem.setIsLocked(lock);
+                    dbItem.setFolder(path);
+                    dbItem.setSchedulerId(schedulerId);
+                    dbLayerJoeLocks.save(dbItem);
+                }
             } else {
                 if (dbItem.getIsLocked() && !forceLock && !account.equals(dbItem.getAccount())) {
                     throw new JoeFolderAlreadyLockedException(dbItem.getModified(), dbItem.getAccount());

@@ -3,9 +3,12 @@ package com.sos.joc.db.joe;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -17,6 +20,7 @@ import com.sos.jitl.joe.DBItemJoeLock;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.model.tree.Tree;
 
 public class DBLayerJoeLocks {
@@ -68,6 +72,22 @@ public class DBLayerJoeLocks {
             throw new DBInvalidDataException(ex);
         }
     }
+    
+    public void delete(DBItemJoeLock item) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            if (item != null) {
+                sosHibernateSession.delete(item);
+            }
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public void delete(String schedulerId, String folder) throws DBInvalidDataException, DBConnectionRefusedException {
+        delete(getJoeLock(schedulerId, folder));
+    }
 
     public SortedSet<Tree> setLockedBy(String schedulerId, SortedSet<Tree> folders, Comparator<Tree> byPath) throws DBConnectionRefusedException, DBInvalidDataException {
         if (folders == null) {
@@ -95,6 +115,29 @@ public class DBLayerJoeLocks {
                 }
                 return i;
             }).collect(Collectors.toCollection(supplier));
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public Map<String, DBItemJoeLock> getLocksFromOthers(String schedulerId, String account) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBLayer.DBITEM_JOE_LOCK);
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and account != :account");
+            sql.append(" and isLocked = :isLocked");
+            Query<DBItemJoeLock> query = sosHibernateSession.createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("account", account);
+            query.setParameter("isLocked", true);
+            List<DBItemJoeLock> result = sosHibernateSession.getResultList(query);
+            if (result != null) {
+                result.stream().collect(Collectors.toMap(DBItemJoeLock::getFolder, Function.identity()));
+            }
+            return new HashMap<String, DBItemJoeLock>();
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

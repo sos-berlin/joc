@@ -1,9 +1,12 @@
 package com.sos.joc.db.joe;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.query.Query;
 
@@ -159,7 +162,8 @@ public class DBLayerJoeObjects {
 
     }
 
-    public List<Tree> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes) throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<Tree> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes)
+            throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(FOLDERS_BY_PATH).append("(path, objectType, operation) from ").append(DBLayer.DBITEM_JOE_OBJECT);
@@ -183,7 +187,37 @@ public class DBLayerJoeObjects {
                 query.setParameter("folderName", folderName);
                 query.setParameter("likeFolderName", folderName + "/%");
             }
-            return sosHibernateSession.getResultList(query);
+            List<Tree> result = sosHibernateSession.getResultList(query);
+            if (result != null && !result.isEmpty()) {
+                return getFoldersByFolder(schedulerId, result.stream().map(Tree::getPath).collect(Collectors.toSet()));
+            }
+            return new ArrayList<Tree>();
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    private List<Tree> getFoldersByFolder(String schedulerId, Set<String> folders) throws DBConnectionRefusedException, DBInvalidDataException {
+        if (folders == null || folders.isEmpty()) {
+            return new ArrayList<Tree>();
+        }
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select new ").append(FOLDERS_BY_PATH).append("(path, objectType, operation) from ").append(DBLayer.DBITEM_JOE_OBJECT);
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and objectType = :objectType");
+            sql.append(" and path in (:folders)");
+            Query<Tree> query = sosHibernateSession.createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("objectType", "FOLDER");
+            query.setParameterList("folders", folders);
+            List<Tree> result = sosHibernateSession.getResultList(query);
+            if (result != null) {
+                return result;
+            }
+            return new ArrayList<Tree>();
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

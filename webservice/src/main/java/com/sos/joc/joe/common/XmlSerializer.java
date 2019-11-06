@@ -200,12 +200,12 @@ public class XmlSerializer {
             for (Commands commands : job.getCommands()) {
                 if (commands.getAddOrders() != null) {
                     for (AddOrder addOrder : commands.getAddOrders()) {
-                        addOrder.setParams(serializeParams(addOrder.getParams()));
+                        addOrder.setParams(serializeParams(addOrder.getParams(), true));
                     }
                 }
                 if (commands.getStartJobs() != null) {
                     for (StartJob startJob : commands.getStartJobs()) {
-                        startJob.setParams(serializeParams(startJob.getParams()));
+                        startJob.setParams(serializeParams(startJob.getParams(), true));
                         startJob.setEnvironment(serializeEnvironment(startJob.getEnvironment()));
                     }
                 }
@@ -407,8 +407,12 @@ public class XmlSerializer {
         monthdays.setWeekdays(serializeWeekdaysOfMonth(monthdays.getWeekdays()));
         return monthdays;
     }
-
+    
     private static Params serializeParams(Params params) {
+        return serializeParams(params, false);
+    }
+
+    private static Params serializeParams(Params params, boolean withCopyParams) {
         if (params != null) {
             if (params.getIncludes() != null) {
                 params.setIncludes(params.getIncludes().stream().filter(i -> (i.getFile() != null && !i.getFile().isEmpty()) || (i
@@ -424,7 +428,18 @@ public class XmlSerializer {
                     params.setParamList(null);
                 }
             }
-            if (params.getIncludes() == null && params.getParamList() == null) {
+            if (withCopyParams) {
+                if (params.getCopyParams() != null) {
+                    params.setCopyParams(params.getCopyParams().stream().filter(i -> i.getFrom() != null && ("order".equals(i.getFrom()) || "task"
+                            .equals(i.getFrom()))).collect(Collectors.toSet()));
+                    if (params.getCopyParams().isEmpty()) {
+                        params.setCopyParams(null);
+                    }
+                }
+            } else {
+                params.setCopyParams(null);
+            }
+            if (params.getIncludes() == null && params.getParamList() == null && params.getCopyParams() == null) {
                 params = null;
             }
         }
@@ -482,6 +497,9 @@ public class XmlSerializer {
                 // script.setComClass(null);
                 script.setDll(null);
                 script.setDotnetClass(null);
+            }
+            if (script.getContent() != null) {
+                script.setContent("\n" + script.getContent().trim() + "\n");
             }
         }
         return script;

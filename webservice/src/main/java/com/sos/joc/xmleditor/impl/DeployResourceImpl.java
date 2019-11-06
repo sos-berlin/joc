@@ -20,6 +20,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.XmlEditorAudit;
+import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -27,11 +28,9 @@ import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.deploy.DeployConfiguration;
 import com.sos.joc.model.xmleditor.deploy.DeployConfigurationAnswer;
-import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.xmleditor.resource.IDeployResource;
 
 import sos.util.SOSDate;
-import sos.util.SOSString;
 
 @Path(JocXmlEditor.APPLICATION_PATH)
 public class DeployResourceImpl extends JOCResourceImpl implements IDeployResource {
@@ -63,15 +62,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 logAuditMessage(audit);
 
                 session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
-                session.beginTransaction();
-
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
-                DBItemXmlEditorObject item = dbLayer.getObject(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in
-                        .getObjectType()));
 
-                checkConfiguration(item, in);
+                DBItemXmlEditorObject item = getItem(dbLayer, in);
+
                 JocXmlEditor.validate(in.getObjectType(), item.getConfigurationDraft());
-
                 Date deployed = putFile(in, item.getConfigurationDraft());
 
                 audit.setStartTime(deployed);
@@ -84,8 +79,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 item.setAccount(getAccount());
                 item.setDeployed(deployed);
                 item.setModified(new Date());
-                session.update(item);
 
+                session.beginTransaction();
+                session.update(item);
                 session.commit();
                 response = JOCDefaultResponse.responseStatus200(getSuccess(deployed));
             }
@@ -105,6 +101,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     private void checkRequiredParameters(final DeployConfiguration in) throws Exception {
         checkRequiredParameter("jobschedulerId", in.getJobschedulerId());
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
+        checkRequiredParameter("configuration", in.getConfiguration());
     }
 
     private JOCDefaultResponse checkPermissions(final String accessToken, final DeployConfiguration in) throws Exception {
@@ -119,6 +116,33 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         return response;
     }
 
+    private DBItemXmlEditorObject getItem(DbLayerXmlEditor dbLayer, DeployConfiguration in) throws Exception {
+        dbLayer.getSession().beginTransaction();
+        DBItemXmlEditorObject item = dbLayer.getObject(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in
+                .getObjectType()));
+        if (item == null) {
+            item = new DBItemXmlEditorObject();
+            item.setSchedulerId(in.getJobschedulerId());
+            item.setObjectType(in.getObjectType().name());
+            item.setName(JocXmlEditor.getConfigurationName(in.getObjectType()));
+            item.setConfigurationDraft(in.getConfiguration());
+            item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType()));
+
+            item.setAuditLogId(new Long(0));// TODO
+            item.setAccount(getAccount());
+            item.setCreated(new Date());
+            item.setModified(item.getCreated());
+            dbLayer.getSession().save(item);
+        } else {
+            item.setConfigurationDraft(in.getConfiguration());
+            item.setAccount(getAccount());
+            item.setModified(new Date());
+            dbLayer.getSession().update(item);
+        }
+        dbLayer.getSession().commit();
+        return item;
+    }
+
     private DeployConfigurationAnswer getSuccess(Date deployed) {
         DeployConfigurationAnswer answer = new DeployConfigurationAnswer();
         answer.setDeployed(deployed);
@@ -126,13 +150,6 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_IS_NEWER);
         answer.getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_IS_NEWER);
         return answer;
-    }
-
-    private void checkConfiguration(DBItemXmlEditorObject item, DeployConfiguration in) throws Exception {
-        if (item == null || SOSString.isEmpty(item.getConfigurationDraft())) {
-            throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format("[%s][%s]no configuration found", in
-                    .getJobschedulerId(), in.getObjectType().name())));
-        }
     }
 
     private Date putFile(DeployConfiguration in, String configuration) throws Exception {
