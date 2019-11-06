@@ -92,7 +92,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
                 LOGGER.warn(e.toString());
             }
 
-            if (dbItemJoeObject == null || (body.getForceLive() != null && body.getForceLive())) {
+            if (dbItemJoeObject == null || dbItemJoeObject.getConfiguration() == null || (body.getForceLive() != null && body.getForceLive())) {
                 fileContent = fileLiveContent;
                 if (fileContent != null) {
                     jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType()
