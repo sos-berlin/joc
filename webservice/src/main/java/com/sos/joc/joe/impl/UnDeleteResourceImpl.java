@@ -54,9 +54,10 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             if (!folderPermissions.isPermittedForFolder(folder)) {
                 return accessDeniedResponse();
             }
+            
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             LockResourceImpl.unForcelock(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), folder, getAccount());
 
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 //            sosHibernateSession.setAutoCommit(false);
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
 
