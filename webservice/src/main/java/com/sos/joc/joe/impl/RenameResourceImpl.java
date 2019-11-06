@@ -22,10 +22,12 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocObjectAlreadyExistException;
+import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IRenameResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
+import com.sos.joc.model.joe.lock.LockInfo;
 
 @Path("joe")
 public class RenameResourceImpl extends JOCResourceImpl implements IRenameResource {
@@ -55,6 +57,11 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             checkRequiredParameter("oldPath", body.getOldPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
             String folder = null;
+            //String oldFolder = null;
+            
+            if (isDirectory) { //TODO for later versions
+                throw new JobSchedulerBadRequestException("Renaming of folders are not supported");
+            }
             
             if (isDirectory) {
                 body.setPath(normalizeFolder(body.getPath()));
@@ -63,6 +70,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
                 }
                 folder = body.getPath();
+                //oldFolder = body.getOldPath();
 
             } else {
                 body.setPath(normalizePath(body.getPath()));
@@ -71,6 +79,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
                 }
                 folder = getParent(body.getPath());
+                //oldFolder = getParent(body.getOldPath());
             }
             if (!this.folderPermissions.isPermittedForFolder(folder)) {
                 return accessDeniedResponse();
@@ -80,6 +89,8 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
 
             DBLayerJoeObjects dbJoeLayer = new DBLayerJoeObjects(connection);
             InventoryFilesDBLayer dbInventoryFilesLayer = new InventoryFilesDBLayer(connection);
+            //TODO lock for old path??
+            LockResourceImpl.unForcelock(new DBLayerJoeLocks(connection), body.getJobschedulerId(), folder, getAccount());
             
             FilterJoeObjects oldPathFilter = new FilterJoeObjects();
             oldPathFilter.setConstraint(body);
@@ -104,8 +115,6 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     throw new JocObjectAlreadyExistException(body.getPath());
                 }
             }
-            //TODO lock for old path??
-            LockResourceImpl.unForcelock(new DBLayerJoeLocks(connection), body.getJobschedulerId(), folder, getAccount());
             
             if (newItemExistsWithDeleteOperation) {
                 dbJoeLayer.update(updateDBItemfromOld(newItem, oldItem));
@@ -173,6 +182,14 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             }
             
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
+        } catch (JoeFolderAlreadyLockedException e) {
+            //e.addErrorMetaInfo(getJocError());
+            LockInfo entity = new LockInfo();
+            entity.setIsLocked(true);
+            entity.setLockedSince(e.getLockedSince());
+            entity.setLockedBy(e.getLockedBy());
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            return JOCDefaultResponse.responseStatus434(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
