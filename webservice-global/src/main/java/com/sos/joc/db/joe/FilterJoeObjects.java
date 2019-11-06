@@ -14,6 +14,8 @@ public class FilterJoeObjects {
     private List<String> objectTypes;
     private String account;
     private String path;
+    private String folder;
+    private String operation;
     private Object orderCriteria;
     private String sortMode="asc";
 
@@ -58,6 +60,14 @@ public class FilterJoeObjects {
     public void setAccount(String account) {
         this.account = account;
     }
+    
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
+    }
 
     public String getPath() {
         return path;
@@ -65,6 +75,14 @@ public class FilterJoeObjects {
 
     public void setPath(String path) {
         this.path = path;
+    }
+    
+    public String getFolder() {
+        return folder;
+    }
+
+    public void setFolder(String folder) {
+        this.folder = folder;
     }
 
     public void setConstraint(JSObjectEdit body) {
