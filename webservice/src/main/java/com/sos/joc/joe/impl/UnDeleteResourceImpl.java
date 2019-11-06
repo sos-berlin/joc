@@ -17,10 +17,12 @@ import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IUnDeleteResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
+import com.sos.joc.model.joe.lock.LockInfo;
 
 @Path("joe")
 public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteResource {
@@ -87,6 +89,14 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             }
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
+        } catch (JoeFolderAlreadyLockedException e) {
+            //e.addErrorMetaInfo(getJocError());
+            LockInfo entity = new LockInfo();
+            entity.setIsLocked(true);
+            entity.setLockedSince(e.getLockedSince());
+            entity.setLockedBy(e.getLockedBy());
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            return JOCDefaultResponse.responseStatus434(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
