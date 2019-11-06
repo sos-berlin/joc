@@ -61,13 +61,11 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             LockResourceImpl.unForcelock(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), folder, getAccount());
 
-//            sosHibernateSession.setAutoCommit(false);
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filter = new FilterJoeObjects();
             filter.setConstraint(body);
             DBItemJoeObject item = dbLayer.getJoeObject(filter);
 
-//            Globals.beginTransaction(sosHibernateSession);
             if (item != null) {
                 item.setOperation("delete");
                 item.setAccount(getAccount());
@@ -91,14 +89,6 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 }
                 dbLayer.save(item);
             }
-//            if (isDirectory) { //marks only objects as delete which are in JOE_OBJECTS table
-//                filter = new FilterJoeObjects();
-//                filter.setSchedulerId(item.getSchedulerId());
-//                filter.setPath(item.getPath());
-//                filter.setRecursive();
-//                dbLayer.updateFolderCommand(filter, "delete");
-//            }
-//            Globals.commit(sosHibernateSession);
             
             try {
                 CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());

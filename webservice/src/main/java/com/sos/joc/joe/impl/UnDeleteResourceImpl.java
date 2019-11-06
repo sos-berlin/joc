@@ -59,27 +59,19 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             LockResourceImpl.unForcelock(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), folder, getAccount());
 
-//            sosHibernateSession.setAutoCommit(false);
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
 
             FilterJoeObjects filter = new FilterJoeObjects();
             filter = new FilterJoeObjects();
             filter.setSchedulerId(body.getJobschedulerId());
-//            if (isDirectory) {
-//                filter.setPath(body.getPath());
-//                 filter.setRecursive();
-//            } else {
-                filter.setConstraint(body);
-//            }
+            filter.setConstraint(body);
+
             DBItemJoeObject dbItem = dbLayer.getJoeObject(filter);
             if (dbItem != null) {
                 dbItem.setOperation("store");
-                dbLayer.update(dbItem); 
+                dbLayer.update(dbItem);
             }
-//            sosHibernateSession.beginTransaction();
-//            dbLayer.updateFolderCommand(filter, "store");
-//            Globals.commit(sosHibernateSession);
-            
+
             try {
                 CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
@@ -89,7 +81,7 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JoeFolderAlreadyLockedException e) {
-            //e.addErrorMetaInfo(getJocError());
+            // e.addErrorMetaInfo(getJocError());
             LockInfo entity = new LockInfo();
             entity.setIsLocked(true);
             entity.setLockedSince(e.getLockedSince());
