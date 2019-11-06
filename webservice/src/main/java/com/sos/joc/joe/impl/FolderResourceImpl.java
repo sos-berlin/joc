@@ -95,14 +95,12 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
             filterJoeObjects.setFolder(path);
 
-            //final int parentDepth = Paths.get(body.getPath()).getNameCount();
             List<DBItemJoeObject> dbItems = dbLayer.getJoeObjectList(filterJoeObjects, 0);
             if (dbItems == null) {
                 dbItems = new ArrayList<DBItemJoeObject>();
             }
             // Map: grouped by DBItemJoeObject::objectType
             // -> new FolderItem("filename of DBItemJoeObject::path", false) collection
-            // filter for non-recursive level
             Map<String, Set<FolderItem>> folderContent = dbItems.stream().collect(Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors
                     .mapping(item -> {
                         FolderItem folderItem = new FolderItem();

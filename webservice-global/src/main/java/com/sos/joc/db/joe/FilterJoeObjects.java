@@ -19,6 +19,7 @@ public class FilterJoeObjects {
     private Object orderCriteria;
     private String sortMode="asc";
     private String pathAbsolut;
+    private boolean pathWithChildren = false;
  
     public void setConstraint(Filter filter) {
         schedulerId = filter.getJobschedulerId();
@@ -85,6 +86,18 @@ public class FilterJoeObjects {
 
     public void setFolder(String folder) {
         this.folder = folder;
+    }
+    
+    public boolean getPathWithChildren() {
+        return pathWithChildren;
+    }
+    
+    public void setPathWithChildren(String path) {
+        if (!"/".equals(path)) {
+            this.path = path;
+            this.folder = path;
+            this.pathWithChildren = true;
+        }
     }
 
     public void setConstraint(JSObjectEdit body) {

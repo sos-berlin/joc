@@ -31,7 +31,6 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
 import com.sos.joc.joe.common.XmlSerializer;
-import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;

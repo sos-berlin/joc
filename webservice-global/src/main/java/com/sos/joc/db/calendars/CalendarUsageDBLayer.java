@@ -318,6 +318,24 @@ public class CalendarUsageDBLayer extends DBLayer {
         filter.setEdited(false);
         return getCalendarUsages(filter);
     }
+    
+    public List<DBItemInventoryClusterCalendarUsage> getCalendarUsagesOfFolder(String schedulerId, String folderPath) throws DBInvalidDataException,
+            DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_CLUSTER_CALENDAR_USAGE);
+            sql.append(" where schedulerId = :schedulerId");
+            sql.append(" and path like :folder");
+            Query<DBItemInventoryClusterCalendarUsage> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            query.setParameter("folder", (folderPath + "/").replaceAll("//+", "/") + "%");
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
 
     public DBItemInventoryClusterCalendarUsage getCalendarUsageByConstraint(String schedulerId, Long calendarId, String objectType,
             String calendarPath) throws DBInvalidDataException, DBConnectionRefusedException {

@@ -46,17 +46,22 @@ public class DBLayerJoeObjects {
         if (filter.getSchedulerId() != null && !filter.getSchedulerId().isEmpty()) {
             conditions.add("schedulerId = :schedulerId");
         }
-
-        if (filter.getPath() != null && !filter.getPath().isEmpty()) {
-            if (filter.isRecursive()) {
-                conditions.add("path like :path or path = :pathabsolut");
-            } else {
-                conditions.add("path = :path");
-            }
-        }
         
-        if (filter.getFolder() != null && !filter.getFolder().isEmpty()) {
-            conditions.add("folder = :folder");
+        if (filter.getPathWithChildren()) {
+            conditions.add("(path = :path or folder = :folder)");
+        } else {
+
+            if (filter.getPath() != null && !filter.getPath().isEmpty()) {
+                if (filter.isRecursive()) {
+                    conditions.add("(path like :path or path = :pathabsolut)");
+                } else {
+                    conditions.add("path = :path");
+                }
+            }
+
+            if (filter.getFolder() != null && !filter.getFolder().isEmpty()) {
+                conditions.add("folder = :folder");
+            }
         }
 
         if (filter.getObjectType() != null) {

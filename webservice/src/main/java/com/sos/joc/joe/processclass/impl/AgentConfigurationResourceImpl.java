@@ -13,7 +13,9 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.ModifyProcessClassAudit;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.processclass.resource.IAgentConfigurationResource;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.processclass.ProcessClass;
 import com.sos.joc.model.joe.processclass.ProcessClassEdit;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
@@ -66,23 +68,20 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             if (agent == null) {
                 throw new JocMissingRequiredParameterException("undefined 'configuration'");
             }
-            if (agent.getRemoteSchedulers() != null && (agent.getRemoteSchedulers().getRemoteSchedulerList() == null || agent.getRemoteSchedulers()
-                    .getRemoteSchedulerList() != null && agent.getRemoteSchedulers().getRemoteSchedulerList().isEmpty())) {
-                agent.setRemoteSchedulers(null);
-            }
 
             ModifyProcessClassAudit audit = new ModifyProcessClassAudit(configuration);
             logAuditMessage(audit);
 
             String processClassPath = configuration.getPath() + FILE_EXTENSION;
             JOCHotFolder httpClient = new JOCHotFolder(this);
-            String xmlContent = writeXmlPoJoAsString(agent);
-            
+            String xmlContent = XmlSerializer.serializeToStringWithHeader(XmlSerializer.serializeProcessClass(agent));
+
             httpClient.putFile(processClassPath, xmlContent);
 
             storeAuditLogEntry(audit);
 
-            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath, API_CALL);
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath,
+                    JobSchedulerObjectType.AGENTCLUSTER.value(), API_CALL);
             clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
@@ -113,7 +112,8 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             storeAuditLogEntry(audit);
 
-            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath, API_CALL);
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath,
+                    JobSchedulerObjectType.AGENTCLUSTER.value(), API_CALL);
             clusterMemberHandler.deleteAtOtherClusterMembers();
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));

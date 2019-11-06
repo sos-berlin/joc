@@ -148,7 +148,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 continue;
                             }
                             String extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
-                            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath() + extension, API_CALL);
+                            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath() + extension, objType, API_CALL);
 
                             objectsHaveBeenDeployed = true;
                             switch (joeObject.getOperation().toLowerCase()) {

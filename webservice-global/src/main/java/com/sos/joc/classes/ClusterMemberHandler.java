@@ -14,17 +14,20 @@ import com.sos.joc.db.submissions.SubmissionsDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBOpenSessionException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocConfigurationException;
 
 public class ClusterMemberHandler {
 
     private DBItemInventoryInstance dbItemInventoryInstance;
     private String path;
+    private String objectType;
     private String apiCall;
 
-    public ClusterMemberHandler(DBItemInventoryInstance dbItemInventoryInstance, String path, String apiCall) {
+    public ClusterMemberHandler(DBItemInventoryInstance dbItemInventoryInstance, String path, String objectType, String apiCall) {
         this.dbItemInventoryInstance = dbItemInventoryInstance;
         this.path = path;
+        this.objectType = objectType;
         this.apiCall = apiCall;
     }
 
@@ -35,6 +38,7 @@ public class ClusterMemberHandler {
             DBItemSubmittedObject dbItem = new DBItemSubmittedObject();
             dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
             dbItem.setPath(path);
+            dbItem.setObjectType(objectType);
             dbItem.setToDelete(true);
             updateOtherClusterMembers("delete", dbItem);
         }
@@ -47,6 +51,7 @@ public class ClusterMemberHandler {
             DBItemSubmittedObject dbItem = new DBItemSubmittedObject();
             dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
             dbItem.setPath(path);
+            dbItem.setObjectType(objectType);
             dbItem.setToDelete(false);
             dbItem.setContent(content);
             updateOtherClusterMembers("save", dbItem);
@@ -80,10 +85,20 @@ public class ClusterMemberHandler {
                         clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
                         httpClient = new JOCHotFolder(clusterMember);
                         if ("save".equals(sessionIdentifier)) {
-                            httpClient.putFile(path, dbItem.getContent());
+                            if ("FOLDER".equals(dbItem.getObjectType())) {
+                                httpClient.putFolder(path);
+                            } else {
+                                httpClient.putFile(path, dbItem.getContent());
+                            }
                         } else {
-                            httpClient.deleteFile(path);
+                            if ("FOLDER".equals(dbItem.getObjectType())) {
+                                httpClient.deleteFolder(path);
+                            } else {
+                                httpClient.deleteFile(path);
+                            }
                         }
+                    } catch (JobSchedulerObjectNotExistException e) {
+                        //
                     } catch (Exception e) {
                         // if error then store object conf in db for inventory plugin
                         if (!isUpdated) {
