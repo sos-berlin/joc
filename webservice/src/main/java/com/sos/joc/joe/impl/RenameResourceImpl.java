@@ -15,6 +15,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
+import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -53,6 +54,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             checkRequiredParameter("path", body.getPath());
             checkRequiredParameter("oldPath", body.getOldPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
+            String folder = null;
             
             if (isDirectory) {
                 body.setPath(normalizeFolder(body.getPath()));
@@ -60,9 +62,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 if (body.getPath().equals(body.getOldPath())) {
                     return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
                 }
-                if (!this.folderPermissions.isPermittedForFolder(body.getPath())) {
-                    return accessDeniedResponse();
-                }
+                folder = body.getPath();
 
             } else {
                 body.setPath(normalizePath(body.getPath()));
@@ -70,9 +70,10 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 if (body.getPath().equals(body.getOldPath())) {
                     return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
                 }
-                if (!this.folderPermissions.isPermittedForFolder(getParent(body.getPath()))) {
-                    return accessDeniedResponse();
-                }
+                folder = getParent(body.getPath());
+            }
+            if (!this.folderPermissions.isPermittedForFolder(folder)) {
+                return accessDeniedResponse();
             }
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -103,6 +104,8 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     throw new JocObjectAlreadyExistException(body.getPath());
                 }
             }
+            //TODO lock for old path??
+            LockResourceImpl.unForcelock(new DBLayerJoeLocks(connection), body.getJobschedulerId(), folder, getAccount());
             
             if (newItemExistsWithDeleteOperation) {
                 dbJoeLayer.update(updateDBItemfromOld(newItem, oldItem));
@@ -135,6 +138,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                             dbJoeLayer.update(child);
                         } else {
                             child.setPath(body.getPath() + child.getPath().substring(oldPathLength));
+                            child.setFolder(getParent(child.getPath()));
                             dbJoeLayer.update(child);
                         }
                         
@@ -143,6 +147,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     dbJoeLayer.delete(oldItem);
                     for (DBItemJoeObject child : children) {
                         child.setPath(body.getPath() + child.getPath().substring(oldPathLength));
+                        child.setFolder(getParent(child.getPath()));
                         dbJoeLayer.update(child);
                     }
                 }
@@ -187,6 +192,11 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
         newItem.setConfiguration(oldItem.getConfiguration());
         newItem.setOperation("store");
         newItem.setPath(newPath);
+        if ("/".equals(newPath)) {
+            newItem.setFolder(".");
+        } else {
+            newItem.setFolder(getParent(newPath));
+        }
         newItem.setAuditLogId(oldItem.getAuditLogId());
         newItem.setSchedulerId(oldItem.getSchedulerId());
         return newItem;

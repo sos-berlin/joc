@@ -104,6 +104,16 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
             throws DBConnectionRefusedException, DBInvalidDataException, JoeFolderAlreadyLockedException {
         return lockOrReleaseOrInfo(dbLayerJoeLocks, schedulerId, path, false, true, account);
     }
+    
+    public static DBItemJoeLock unForcelock(DBLayerJoeLocks dbLayerJoeLocks, String schedulerId, String path, String account)
+            throws DBConnectionRefusedException, DBInvalidDataException, JoeFolderAlreadyLockedException {
+        return lockOrReleaseOrInfo(dbLayerJoeLocks, schedulerId, path, true, false, account);
+    }
+    
+    public static DBItemJoeLock forcelock(DBLayerJoeLocks dbLayerJoeLocks, String schedulerId, String path, String account)
+            throws DBConnectionRefusedException, DBInvalidDataException, JoeFolderAlreadyLockedException {
+        return lockOrReleaseOrInfo(dbLayerJoeLocks, schedulerId, path, true, true, account);
+    }
 
     public static DBItemJoeLock lockOrReleaseOrInfo(DBLayerJoeLocks dbLayerJoeLocks, String schedulerId, String path, Boolean lock, Boolean forceLock,
             String account) throws DBConnectionRefusedException, DBInvalidDataException, JoeFolderAlreadyLockedException {

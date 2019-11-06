@@ -13,6 +13,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
+import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
@@ -42,27 +43,28 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
 
             checkRequiredParameter("path", body.getPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
+            String folder = null;
 
             if (isDirectory) {
                 body.setPath(normalizeFolder(body.getPath()));
-                if (!folderPermissions.isPermittedForFolder(body.getPath())) {
-                    return accessDeniedResponse();
-                }
+                folder = body.getPath();
             } else {
                 body.setPath(normalizePath(body.getPath()));
-                if (!folderPermissions.isPermittedForFolder(getParent(body.getPath()))) {
-                    return accessDeniedResponse();
-                }
+                folder = getParent(body.getPath());
             }
+            if (!folderPermissions.isPermittedForFolder(folder)) {
+                return accessDeniedResponse();
+            }
+            LockResourceImpl.unForcelock(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), folder, getAccount());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
-            sosHibernateSession.setAutoCommit(false);
+//            sosHibernateSession.setAutoCommit(false);
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filter = new FilterJoeObjects();
             filter.setConstraint(body);
             DBItemJoeObject item = dbLayer.getJoeObject(filter);
 
-            Globals.beginTransaction(sosHibernateSession);
+//            Globals.beginTransaction(sosHibernateSession);
             if (item != null) {
                 item.setOperation("delete");
                 item.setAccount(getAccount());
@@ -79,16 +81,21 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 item.setObjectType(body.getObjectType().value());
                 item.setOperation("delete");
                 item.setPath(body.getPath());
+                if ("/".equals(body.getPath())) {
+                    item.setFolder(".");
+                } else {
+                    item.setFolder(getParent(body.getPath()));
+                }
                 dbLayer.save(item);
             }
-            if (isDirectory) {
-                filter = new FilterJoeObjects();
-                filter.setSchedulerId(item.getSchedulerId());
-                filter.setPath(item.getPath());
-                filter.setRecursive();
-                dbLayer.updateFolderCommand(filter, "delete");
-            }
-            Globals.commit(sosHibernateSession);
+//            if (isDirectory) { //marks only objects as delete which are in JOE_OBJECTS table
+//                filter = new FilterJoeObjects();
+//                filter.setSchedulerId(item.getSchedulerId());
+//                filter.setPath(item.getPath());
+//                filter.setRecursive();
+//                dbLayer.updateFolderCommand(filter, "delete");
+//            }
+//            Globals.commit(sosHibernateSession);
             
             try {
                 CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());

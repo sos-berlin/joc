@@ -44,7 +44,6 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
             }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
-            Globals.beginTransaction(sosHibernateSession);
 
             DBLayerJoeObjects dbLayerJoeObjects = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
@@ -53,7 +52,6 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
             filterJoeObjects.setOrderCriteria("created");
 
             List<DBItemJoeObject> listOfJoeObjects = dbLayerJoeObjects.getJoeObjectList(filterJoeObjects, 0);
-            Globals.commit(sosHibernateSession);
 
             Deployables deployables = new Deployables();
             if (listOfJoeObjects != null) {
