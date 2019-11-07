@@ -7,6 +7,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.joe.processclass.ProcessClassEdit;
+import com.sos.joc.model.processClass.ConfigurationEdit;
 
 public class ModifyProcessClassAudit extends ProcessClassEdit implements IAuditLog {
 
@@ -28,6 +29,15 @@ public class ModifyProcessClassAudit extends ProcessClassEdit implements IAuditL
         setPath(conf.getPath());
         setConfiguration(conf.getConfiguration());
         Path p = Paths.get(conf.getPath());
+        this.folder = p.getParent().toString().replace('\\', '/');
+    }
+    
+    public ModifyProcessClassAudit(ConfigurationEdit conf) {
+        setAuditParams(conf.getAuditLog());
+        setJobschedulerId(conf.getJobschedulerId());
+        setPath(conf.getProcessClass());
+        setConfiguration(conf.getConfiguration());
+        Path p = Paths.get(conf.getProcessClass());
         this.folder = p.getParent().toString().replace('\\', '/');
     }
 

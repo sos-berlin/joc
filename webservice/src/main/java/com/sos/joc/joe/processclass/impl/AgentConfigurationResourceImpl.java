@@ -15,9 +15,9 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.processclass.resource.IAgentConfigurationResource;
-import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.processclass.ProcessClass;
 import com.sos.joc.model.joe.processclass.ProcessClassEdit;
+import com.sos.joc.model.processClass.ConfigurationEdit;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 
 @Path("process_class")
@@ -45,7 +45,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             entity.setConfigurationDate(httpClient.getLastModifiedDate());
             entity.setDeliveryDate(Date.from(Instant.now()));
 
-            return JOCDefaultResponse.responseStatus200(entity);
+            return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(entity));
 
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -56,14 +56,16 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
     }
 
     @Override
-    public JOCDefaultResponse saveAgentConfiguration(String accessToken, ProcessClassEdit configuration) throws Exception {
+    public JOCDefaultResponse saveAgentConfiguration(String accessToken, ConfigurationEdit configuration) throws Exception {
         try {
+            //ProcessClassEdit configuration = Globals.objectMapper.readValue(bytes, ProcessClassEdit.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "save", configuration, accessToken, configuration.getJobschedulerId(),
                     getPermissonsJocCockpit(configuration.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("processClass", configuration.getPath());
+            //checkRequiredParameter("processClass", configuration.getPath());
+            checkRequiredParameter("processClass", configuration.getProcessClass());
             ProcessClass agent = configuration.getConfiguration();
             if (agent == null) {
                 throw new JocMissingRequiredParameterException("undefined 'configuration'");
@@ -72,7 +74,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             ModifyProcessClassAudit audit = new ModifyProcessClassAudit(configuration);
             logAuditMessage(audit);
 
-            String processClassPath = configuration.getPath() + FILE_EXTENSION;
+            String processClassPath = configuration.getProcessClass() + FILE_EXTENSION;
             JOCHotFolder httpClient = new JOCHotFolder(this);
             String xmlContent = XmlSerializer.serializeToStringWithHeader(XmlSerializer.serializeProcessClass(agent));
 
@@ -80,8 +82,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             storeAuditLogEntry(audit);
 
-            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath,
-                    false, API_CALL);
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath, false, API_CALL);
             clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
@@ -94,26 +95,27 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
     }
 
     @Override
-    public JOCDefaultResponse deleteAgentConfiguration(String accessToken, ProcessClassEdit agentFilter) throws Exception {
+    public JOCDefaultResponse deleteAgentConfiguration(String accessToken, ConfigurationEdit agentFilter) throws Exception {
         try {
+            //ProcessClassEdit agentFilter = Globals.objectMapper.readValue(bytes, ProcessClassEdit.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "delete", agentFilter, accessToken, agentFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("processClass", agentFilter.getPath());
+            //checkRequiredParameter("processClass", agentFilter.getPath());
+            checkRequiredParameter("processClass", agentFilter.getProcessClass());
 
             ModifyProcessClassAudit audit = new ModifyProcessClassAudit(agentFilter);
             logAuditMessage(audit);
 
             JOCHotFolder httpClient = new JOCHotFolder(this);
-            String processClassPath = agentFilter.getPath() + FILE_EXTENSION;
+            String processClassPath = agentFilter.getProcessClass() + FILE_EXTENSION;
             httpClient.deleteFile(processClassPath);
 
             storeAuditLogEntry(audit);
 
-            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath,
-                    false, API_CALL);
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath, false, API_CALL);
             clusterMemberHandler.deleteAtOtherClusterMembers();
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
