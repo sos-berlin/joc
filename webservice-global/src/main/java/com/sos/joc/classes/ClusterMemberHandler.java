@@ -38,7 +38,6 @@ public class ClusterMemberHandler {
             DBItemSubmittedObject dbItem = new DBItemSubmittedObject();
             dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
             dbItem.setPath(path);
-            dbItem.setObjectType(objectType);
             dbItem.setToDelete(true);
             updateOtherClusterMembers("delete", dbItem);
         }
@@ -51,7 +50,6 @@ public class ClusterMemberHandler {
             DBItemSubmittedObject dbItem = new DBItemSubmittedObject();
             dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
             dbItem.setPath(path);
-            dbItem.setObjectType(objectType);
             dbItem.setToDelete(false);
             dbItem.setContent(content);
             updateOtherClusterMembers("save", dbItem);
@@ -85,13 +83,13 @@ public class ClusterMemberHandler {
                         clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
                         httpClient = new JOCHotFolder(clusterMember);
                         if ("save".equals(sessionIdentifier)) {
-                            if ("FOLDER".equals(dbItem.getObjectType())) {
+                            if ("FOLDER".equals(objectType)) {
                                 httpClient.putFolder(path);
                             } else {
                                 httpClient.putFile(path, dbItem.getContent());
                             }
                         } else {
-                            if ("FOLDER".equals(dbItem.getObjectType())) {
+                            if ("FOLDER".equals(objectType)) {
                                 httpClient.deleteFolder(path);
                             } else {
                                 httpClient.deleteFile(path);
