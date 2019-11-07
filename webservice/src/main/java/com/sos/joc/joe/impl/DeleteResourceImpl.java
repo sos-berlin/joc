@@ -10,6 +10,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
@@ -18,7 +19,6 @@ import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeleteResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
@@ -37,7 +37,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDelete();
-            boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
+            boolean permission2 = JOEHelper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -91,7 +91,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             }
             
             try {
-                CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
+                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
             } catch (Exception e) {
                 //

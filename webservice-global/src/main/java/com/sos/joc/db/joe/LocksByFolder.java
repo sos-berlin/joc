@@ -1,11 +1,14 @@
 package com.sos.joc.db.joe;
 
-import com.sos.joc.model.tree.Tree;
+import java.util.Date;
 
-public class LocksByFolder extends Tree {
+import com.sos.joc.model.tree.JoeTree;
+
+public class LocksByFolder extends JoeTree {
     
-    public LocksByFolder(String folder, String account) {
+    public LocksByFolder(String folder, String account, Date lockedSince) {
         setPath(folder);
         setLockedBy(account);
+        setLockedSince(lockedSince);
     }
 }

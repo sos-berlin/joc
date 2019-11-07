@@ -26,6 +26,7 @@ import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.ClusterMemberHandler;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -40,7 +41,6 @@ import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IDeployResource;
 import com.sos.joc.model.calendar.Calendar;
@@ -64,7 +64,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDeploy();
-            boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
+            boolean permission2 = JOEHelper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
@@ -76,7 +76,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
 
             checkRequiredParameter("folder", body.getFolder());
-            if (body.getObjectType() != null && !body.getObjectType().value().isEmpty() && !Helper.CLASS_MAPPING.containsKey(body.getObjectType()
+            if (body.getObjectType() != null && !body.getObjectType().value().isEmpty() && !JOEHelper.CLASS_MAPPING.containsKey(body.getObjectType()
                     .value())) {
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
@@ -147,7 +147,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
                                 continue;
                             }
-                            String extension = Helper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
+                            String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
                             ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath() + extension, objType, API_CALL);
 
                             objectsHaveBeenDeployed = true;

@@ -1,6 +1,5 @@
 package com.sos.joc.joe.impl;
 
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -30,6 +29,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
@@ -41,19 +41,13 @@ import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
+import com.sos.joc.db.joe.FoldersByPath;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IFolderResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
-import com.sos.joc.model.joe.job.Job;
-import com.sos.joc.model.joe.jobchain.JobChain;
-import com.sos.joc.model.joe.lock.Lock;
-import com.sos.joc.model.joe.order.Order;
 import com.sos.joc.model.joe.other.Folder;
 import com.sos.joc.model.joe.other.FolderItem;
-import com.sos.joc.model.joe.processclass.ProcessClass;
-import com.sos.joc.model.joe.schedule.Schedule;
 
 @Path("joe")
 public class FolderResourceImpl extends JOCResourceImpl implements IFolderResource {
@@ -68,7 +62,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
         try {
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
-            boolean permission2 = Helper.hasPermission(JobSchedulerObjectType.FOLDER, sosPermissionJocCockpit);
+            boolean permission2 = JOEHelper.hasPermission(JobSchedulerObjectType.FOLDER, sosPermissionJocCockpit);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
@@ -77,7 +71,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
 
             checkRequiredParameter("path", body.getPath());
             body.setPath(normalizeFolder(body.getPath()));
-            String path = (body.getPath() + "/").replaceAll("//+", "/");
+            //String path = (body.getPath() + "/").replaceAll("//+", "/");
 
             if (!folderPermissions.isPermittedForFolder(body.getPath())) {
                 return accessDeniedResponse();
@@ -93,7 +87,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             InventorySchedulesDBLayer scheduleDbLayer = null;
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
-            filterJoeObjects.setFolder(path);
+            filterJoeObjects.setFolder(body.getPath());
 
             List<DBItemJoeObject> dbItems = dbLayer.getJoeObjectList(filterJoeObjects, 0);
             if (dbItems == null) {
@@ -102,53 +96,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             // Map: grouped by DBItemJoeObject::objectType
             // -> new FolderItem("filename of DBItemJoeObject::path", false) collection
             Map<String, Set<FolderItem>> folderContent = dbItems.stream().collect(Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors
-                    .mapping(item -> {
-                        FolderItem folderItem = new FolderItem();
-                        folderItem.setName(Paths.get(item.getPath()).getFileName().toString());
-                        folderItem.setDeployed(false);
-                        folderItem.setDeleted(item.operationIsDelete());
-                        try {
-                            switch (item.getObjectType()) {
-                            case "JOB":
-                                Job job = Globals.objectMapper.readValue(item.getConfiguration(), Job.class);
-                                folderItem.setTitle(job.getTitle());
-                                folderItem.setProcessClass(job.getProcessClass());
-                                folderItem.setIsOrderJob(job.getIsOrderJob() != null && "true,1,yes".contains(job.getIsOrderJob()));
-                                break;
-                            case "JOBCHAIN":
-                                JobChain jobChain = Globals.objectMapper.readValue(item.getConfiguration(), JobChain.class);
-                                folderItem.setTitle(jobChain.getTitle());
-                                folderItem.setProcessClass(jobChain.getProcessClass());
-                                break;
-                            case "ORDER":
-                                Order order = Globals.objectMapper.readValue(item.getConfiguration(), Order.class);
-                                folderItem.setTitle(order.getTitle());
-                                folderItem.setInitialState(order.getInitialState());
-                                folderItem.setEndState(order.getEndState());
-                                folderItem.setPriority(order.getPriority());
-                                break;
-                            case "AGENTCLUSTER":
-                            case "PROCESSCLASS":
-                                ProcessClass processClass = Globals.objectMapper.readValue(item.getConfiguration(), ProcessClass.class);
-                                folderItem.setMaxProcesses(processClass.getMaxProcesses());
-                                break;
-                            case "LOCK":
-                                Lock lock = Globals.objectMapper.readValue(item.getConfiguration(), Lock.class);
-                                folderItem.setMaxNonExclusive(lock.getMaxNonExclusive());
-                                break;
-                            case "SCHEDULE":
-                                Schedule schedule = Globals.objectMapper.readValue(item.getConfiguration(), Schedule.class);
-                                folderItem.setTitle(schedule.getTitle());
-                                folderItem.setSubstitute(schedule.getSubstitute());
-                                folderItem.setValidFrom(schedule.getValidFrom());
-                                folderItem.setValidTo(schedule.getValidTo());
-                                break;
-                            }
-                        } catch (Exception e) {
-                            LOGGER.warn("", e);
-                        }
-                        return folderItem;
-                    }, Collectors.toSet())));
+                    .mapping(FoldersByPath.joeObjectToFolderItemMapper, Collectors.toSet())));
 
             List<JobSchedulerObjectType> objectTypes = Arrays.asList(JobSchedulerObjectType.JOB, JobSchedulerObjectType.JOBCHAIN,
                     JobSchedulerObjectType.ORDER, JobSchedulerObjectType.AGENTCLUSTER, JobSchedulerObjectType.PROCESSCLASS,
@@ -167,14 +115,14 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
                     if ("/".equals(body.getPath()) && "PROCESSCLASS".equals(objectType) && "(default)".equals(inventoryFile.getFileBaseName())) {
                         continue;
                     }
-                    if (!Helper.CLASS_MAPPING.containsKey(objectType)) {
+                    if (!JOEHelper.CLASS_MAPPING.containsKey(objectType)) {
                         continue;
                     }
                     JobSchedulerObjectType objType = JobSchedulerObjectType.fromValue(objectType);
                     FolderItem folderItem = new FolderItem();
-                    folderItem.setName(Helper.getPathWithoutExtension(inventoryFile.getFileBaseName(), objType));
+                    folderItem.setName(JOEHelper.getPathWithoutExtension(inventoryFile.getFileBaseName(), objType));
                     folderItem.setDeployed(true);
-                    String filePath = Helper.getPathWithoutExtension(inventoryFile.getFileName(), objType);
+                    String filePath = JOEHelper.getPathWithoutExtension(inventoryFile.getFileName(), objType);
                     try {
                         switch (objType) {
                         case JOB:

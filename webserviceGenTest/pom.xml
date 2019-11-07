@@ -419,6 +419,16 @@
 											replace="\1().append(path, rhs.path).isEquals();"
 											file="${project.build.directory}/java-gen/com/sos/joc/model/tree/Tree.java"
 											preserveLastModified="true" />
+										<replaceregexp flags="ig" byline="true"
+											match="(\s*return new HashCodeBuilder).*"
+											replace="\1().appendSuper(super.hashCode()).toHashCode();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/tree/JoeTree.java"
+											preserveLastModified="true" />
+										<replaceregexp flags="ig" byline="true"
+											match="(\s*return new EqualsBuilder).*"
+											replace="\1().appendSuper(super.equals(other)).isEquals();"
+											file="${project.build.directory}/java-gen/com/sos/joc/model/tree/JoeTree.java"
+											preserveLastModified="true" />
 									</target>
 								</configuration>
 							</execution>

@@ -11,6 +11,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
@@ -23,7 +24,6 @@ import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocObjectAlreadyExistException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IRenameResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
@@ -42,7 +42,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
-            boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
+            boolean permission2 = JOEHelper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
@@ -111,7 +111,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 }
             } else {
                 if ((newItem != null && !newItem.operationIsDelete()) || (newItem == null && dbInventoryFilesLayer.fileExists(dbItemInventoryInstance
-                        .getId(), body.getPath() + Helper.getFileExtension(body.getObjectType())))) {
+                        .getId(), body.getPath() + JOEHelper.getFileExtension(body.getObjectType())))) {
                     throw new JocObjectAlreadyExistException(body.getPath());
                 }
             }
@@ -136,7 +136,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                         if ("FOLDER".equals(child.getObjectType())) {
                             childExistsInInventory = dbInventoryFilesLayer.folderExists(dbItemInventoryInstance.getId(), child.getPath());
                         } else {
-                            childExistsInInventory = dbInventoryFilesLayer.fileExists(dbItemInventoryInstance.getId(), child.getPath() + Helper.getFileExtension(body.getObjectType()));
+                            childExistsInInventory = dbInventoryFilesLayer.fileExists(dbItemInventoryInstance.getId(), child.getPath() + JOEHelper.getFileExtension(body.getObjectType()));
                         }
                         if (childExistsInInventory) {
                             DBItemJoeObject newDbItem = setNewDBItemfromOld(child, body.getPath() + child.getPath().substring(oldPathLength));
@@ -161,7 +161,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     }
                 }
             } else {
-                if (dbInventoryFilesLayer.fileExists(dbItemInventoryInstance.getId(), body.getOldPath() + Helper.getFileExtension(body
+                if (dbInventoryFilesLayer.fileExists(dbItemInventoryInstance.getId(), body.getOldPath() + JOEHelper.getFileExtension(body
                         .getObjectType()))) {
                     oldItem.setOperation("delete");
                     oldItem.setAccount(getAccount());
@@ -173,9 +173,9 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             }
             
             try {
-                CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
+                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
-                evt = Helper.getJoeUpdatedEvent(body.getOldPath(), body.getObjectType().value());
+                evt = JOEHelper.getJoeUpdatedEvent(body.getOldPath(), body.getObjectType().value());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
             } catch (Exception e) {
                 //

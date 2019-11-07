@@ -9,6 +9,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeLock;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
@@ -17,7 +18,6 @@ import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.ILockResource;
 import com.sos.joc.model.joe.lock.LockFilter;
 import com.sos.joc.model.joe.lock.LockInfo;
@@ -67,7 +67,7 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
                     body.getForceLock(), getAccount());
             if (lock != null) {
                 try {
-                    CustomEvent evt = Helper.getJoeUpdatedEvent(body.getFolder(), "FOLDER");
+                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getFolder(), "FOLDER");
                     SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
                 } catch (Exception e) {
                 }

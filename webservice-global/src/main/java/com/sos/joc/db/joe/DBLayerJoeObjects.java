@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.tree.JoeTree;
 import com.sos.joc.model.tree.Tree;
 
 public class DBLayerJoeObjects {
@@ -46,7 +48,7 @@ public class DBLayerJoeObjects {
         if (filter.getSchedulerId() != null && !filter.getSchedulerId().isEmpty()) {
             conditions.add("schedulerId = :schedulerId");
         }
-        
+
         if (filter.getPathWithChildren()) {
             conditions.add("(path = :path or folder = :folder)");
         } else {
@@ -67,7 +69,7 @@ public class DBLayerJoeObjects {
         if (filter.getObjectType() != null) {
             conditions.add("objectType = :objectType");
         }
-        
+
         if (filter.getObjectTypes() != null && filter.getObjectTypes().size() > 0) {
             if (filter.getObjectTypes().size() == 1) {
                 conditions.add("objectType = :objectTypes");
@@ -79,16 +81,16 @@ public class DBLayerJoeObjects {
         if (filter.getAccount() != null && !filter.getAccount().isEmpty()) {
             conditions.add("account = :account");
         }
-        
+
         if (filter.getOperation() != null && !filter.getOperation().isEmpty()) {
             conditions.add("operation = :operation");
         }
-        
+
         String where = conditions.stream().collect(Collectors.joining(" and "));
         if (!where.isEmpty()) {
             where = " where " + where;
         }
-        
+
         return where;
     }
 
@@ -180,11 +182,17 @@ public class DBLayerJoeObjects {
 
     }
 
-    public List<Tree> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes)
+    @SuppressWarnings("unchecked")
+    public <T extends Tree> List<T> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes, boolean compact)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select new ").append(FOLDERS_BY_PATH).append("(path, objectType, operation) from ").append(DBLayer.DBITEM_JOE_OBJECT);
+            sql.append("select new ").append(FOLDERS_BY_PATH);
+            if (compact) {
+                sql.append("(path, objectType, operation) from ").append(DBLayer.DBITEM_JOE_OBJECT);
+            } else {
+                sql.append("(joe) from ").append(DBLayer.DBITEM_JOE_OBJECT).append(" joe");
+            }
             sql.append(" where schedulerId = :schedulerId");
             if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
                 sql.append(" and ( path = :folderName or path like :likeFolderName )");
@@ -194,7 +202,7 @@ public class DBLayerJoeObjects {
             } else {
                 sql.append(" and objectType in (:objectType)");
             }
-            Query<Tree> query = sosHibernateSession.createQuery(sql.toString());
+            Query<T> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (objectTypes.size() == 1) {
                 query.setParameter("objectType", objectTypes.iterator().next());
@@ -205,11 +213,37 @@ public class DBLayerJoeObjects {
                 query.setParameter("folderName", folderName);
                 query.setParameter("likeFolderName", folderName + "/%");
             }
-            List<Tree> result = sosHibernateSession.getResultList(query);
+            List<T> result = sosHibernateSession.getResultList(query);
             if (result != null && !result.isEmpty()) {
-                return getFoldersByFolder(schedulerId, result.stream().map(Tree::getPath).collect(Collectors.toSet()));
+                if (compact) {
+                    return getFoldersByFolder(schedulerId, result.stream().map(T::getPath).collect(Collectors.toSet()));
+                } else {
+                    List<T> treeList = new ArrayList<T>();
+                    Map<String, List<T>> groupedResult = result.stream().collect(Collectors.groupingBy(T::getPath));
+                    for (String key : groupedResult.keySet()) {
+                        JoeTree joeTree = new JoeTree();
+                        joeTree.setPath(key);
+                        for (T entry : groupedResult.get(key)) {
+                            JoeTree joe = (JoeTree) entry;
+                            if ("FOLDER".equals(joe.getName())) {
+                                joeTree.setDeleted(joe.getDeleted());
+                            } else {
+                                joeTree.getAgentClusters().addAll(joe.getAgentClusters());
+                                joeTree.getJobChains().addAll(joe.getJobChains());
+                                joeTree.getJobs().addAll(joe.getJobs());
+                                joeTree.getLocks().addAll(joe.getLocks());
+                                joeTree.getMonitors().addAll(joe.getMonitors());
+                                joeTree.getOrders().addAll(joe.getOrders());
+                                joeTree.getProcessClasses().addAll(joe.getProcessClasses());
+                                joeTree.getSchedules().addAll(joe.getSchedules());
+                            }
+                        }
+                        treeList.add((T) joeTree);
+                    }
+                    return treeList;
+                }
             }
-            return new ArrayList<Tree>();
+            return new ArrayList<T>();
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -217,9 +251,10 @@ public class DBLayerJoeObjects {
         }
     }
 
-    private List<Tree> getFoldersByFolder(String schedulerId, Set<String> folders) throws DBConnectionRefusedException, DBInvalidDataException {
+    private <T extends Tree> List<T> getFoldersByFolder(String schedulerId, Set<String> folders) throws DBConnectionRefusedException,
+            DBInvalidDataException {
         if (folders == null || folders.isEmpty()) {
-            return new ArrayList<Tree>();
+            return new ArrayList<T>();
         }
         try {
             StringBuilder sql = new StringBuilder();
@@ -227,15 +262,15 @@ public class DBLayerJoeObjects {
             sql.append(" where schedulerId = :schedulerId");
             sql.append(" and objectType = :objectType");
             sql.append(" and path in (:folders)");
-            Query<Tree> query = sosHibernateSession.createQuery(sql.toString());
+            Query<T> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("objectType", "FOLDER");
             query.setParameterList("folders", folders);
-            List<Tree> result = sosHibernateSession.getResultList(query);
+            List<T> result = sosHibernateSession.getResultList(query);
             if (result != null) {
                 return result;
             }
-            return new ArrayList<Tree>();
+            return new ArrayList<T>();
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

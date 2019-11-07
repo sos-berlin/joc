@@ -3,10 +3,11 @@ package com.sos.joc.classes.tree;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import com.sos.joc.model.tree.JoeTree;
 import com.sos.joc.model.tree.Tree;
 
 
-public class TreeModel extends Tree {
+public class TreeModel extends JoeTree {
     
     @Override
     public int hashCode() {

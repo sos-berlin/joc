@@ -12,6 +12,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -20,7 +21,6 @@ import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IReadFileResource;
 import com.sos.joc.model.joe.common.EmptyConfiguration;
 import com.sos.joc.model.joe.common.Filter;
@@ -45,7 +45,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
-            boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
+            boolean permission2 = JOEHelper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
@@ -57,7 +57,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             }
 
             checkRequiredParameter("path", body.getPath());
-            if (!Helper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
+            if (!JOEHelper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
                 throw new JobSchedulerBadRequestException("Unsupported object type: " + body.getObjectType().value());
             }
             String path = normalizePath(body.getPath());
@@ -85,7 +85,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
 
             try {
-                fileLiveContent = jocHotFolder.getFile(path + Helper.getFileExtension(body.getObjectType()));
+                fileLiveContent = jocHotFolder.getFile(path + JOEHelper.getFileExtension(body.getObjectType()));
             } catch (JobSchedulerObjectNotExistException e) {
                 LOGGER.info(e.toString());
             } catch (JocException e) {
@@ -95,14 +95,14 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             if (dbItemJoeObject == null || dbItemJoeObject.getConfiguration() == null || (body.getForceLive() != null && body.getForceLive())) {
                 fileContent = fileLiveContent;
                 if (fileContent != null) {
-                    jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, Helper.CLASS_MAPPING.get(body.getObjectType()
+                    jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, JOEHelper.CLASS_MAPPING.get(body.getObjectType()
                             .value())));
                     lastModifiedDate = jocHotFolder.getLastModifiedDate();
                 }
             } else {
                 fileContent = dbItemJoeObject.getConfiguration().getBytes();
                 if (fileContent != null) {
-                    jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(dbItemJoeObject.getConfiguration(), Helper.CLASS_MAPPING
+                    jsObjectEdit.setConfiguration((IJSObject) Globals.objectMapper.readValue(dbItemJoeObject.getConfiguration(), JOEHelper.CLASS_MAPPING
                             .get(body.getObjectType().value())));
                     lastModifiedDate = dbItemJoeObject.getModified();
                 }

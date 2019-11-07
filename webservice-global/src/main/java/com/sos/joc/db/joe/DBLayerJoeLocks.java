@@ -20,7 +20,6 @@ import com.sos.jitl.joe.DBItemJoeLock;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.model.tree.Tree;
 
 public class DBLayerJoeLocks {
@@ -89,29 +88,31 @@ public class DBLayerJoeLocks {
         delete(getJoeLock(schedulerId, folder));
     }
 
-    public SortedSet<Tree> setLockedBy(String schedulerId, SortedSet<Tree> folders, Comparator<Tree> byPath) throws DBConnectionRefusedException, DBInvalidDataException {
+    public <T extends Tree> SortedSet<T> setLockedBy(String schedulerId, SortedSet<T> folders, Comparator<T> byPath)
+            throws DBConnectionRefusedException, DBInvalidDataException {
         if (folders == null) {
             return null;
         }
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select new ").append(LOCKS_BY_FOLDER).append("(folder, account) from ").append(DBLayer.DBITEM_JOE_LOCK);
+            sql.append("select new ").append(LOCKS_BY_FOLDER).append("(folder, account, modified) from ").append(DBLayer.DBITEM_JOE_LOCK);
             sql.append(" where schedulerId = :schedulerId");
             sql.append(" and isLocked = :isLocked");
             sql.append(" and folder in (:folders)");
-            Query<Tree> query = sosHibernateSession.createQuery(sql.toString());
+            Query<T> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("isLocked", true);
-            query.setParameter("folders", folders.stream().map(Tree::getPath).collect(Collectors.toSet()));
-            final List<Tree> result = sosHibernateSession.getResultList(query);
+            query.setParameter("folders", folders.stream().map(T::getPath).collect(Collectors.toSet()));
+            final List<T> result = sosHibernateSession.getResultList(query);
             if (result == null) {
-               return folders;
+                return folders;
             }
-            Supplier<TreeSet<Tree>> supplier = () -> new TreeSet<Tree>(byPath);
+            Supplier<TreeSet<T>> supplier = () -> new TreeSet<T>(byPath);
             return folders.stream().map(i -> {
                 int index = result.indexOf(i);
                 if (index > -1) {
                     i.setLockedBy(result.get(index).getLockedBy());
+                    i.setLockedSince(result.get(index).getLockedSince());
                 }
                 return i;
             }).collect(Collectors.toCollection(supplier));

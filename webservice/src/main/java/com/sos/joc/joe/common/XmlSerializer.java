@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.common.Params;
@@ -56,26 +57,26 @@ public class XmlSerializer {
 
     public static String serializeToString(String json, String objType) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException {
-        if (!Helper.CLASS_MAPPING.containsKey(objType)) {
+        if (!JOEHelper.CLASS_MAPPING.containsKey(objType)) {
             throw new JobSchedulerBadRequestException("unsupported json object: " + objType);
         }
-        return Globals.xmlMapper.writeValueAsString(serialize(json, objType, Helper.CLASS_MAPPING.get(objType)));
+        return Globals.xmlMapper.writeValueAsString(serialize(json, objType, JOEHelper.CLASS_MAPPING.get(objType)));
     }
 
     public static byte[] serializeToBytes(String json, String objType) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException {
-        if (!Helper.CLASS_MAPPING.containsKey(objType)) {
+        if (!JOEHelper.CLASS_MAPPING.containsKey(objType)) {
             throw new JobSchedulerBadRequestException("unsupported json object: " + objType);
         }
-        return Globals.xmlMapper.writeValueAsBytes(serialize(json, objType, Helper.CLASS_MAPPING.get(objType)));
+        return Globals.xmlMapper.writeValueAsBytes(serialize(json, objType, JOEHelper.CLASS_MAPPING.get(objType)));
     }
 
     public static byte[] serializeToBytes(byte[] json, String objType) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException {
-        if (!Helper.CLASS_MAPPING.containsKey(objType)) {
+        if (!JOEHelper.CLASS_MAPPING.containsKey(objType)) {
             throw new JobSchedulerBadRequestException("unsupported json object: " + objType);
         }
-        return Globals.xmlMapper.writeValueAsBytes(serialize(json, objType, Helper.CLASS_MAPPING.get(objType)));
+        return Globals.xmlMapper.writeValueAsBytes(serialize(json, objType, JOEHelper.CLASS_MAPPING.get(objType)));
     }
 
     private static <T> T serialize(byte[] json, String objType, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException,

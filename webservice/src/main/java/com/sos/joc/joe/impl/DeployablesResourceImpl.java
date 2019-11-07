@@ -13,12 +13,12 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeployablesResource;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -56,7 +56,7 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
             Deployables deployables = new Deployables();
             if (listOfJoeObjects != null) {
                 deployables.setDeployables(listOfJoeObjects.stream().filter(joeObject -> {
-                    if (!Helper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
+                    if (!JOEHelper.CLASS_MAPPING.containsKey(joeObject.getObjectType())) {
                         return false;
                     }
                     if ("FOLDER".equals(joeObject.getObjectType())) {

@@ -9,13 +9,13 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.resource.IDeleteDraftResource;
 import com.sos.joc.model.joe.common.FilterDeploy;
 
@@ -65,7 +65,7 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
             Globals.commit(sosHibernateSession);
 
             try {
-                CustomEvent evt = Helper.getJoeUpdatedEvent(body.getFolder(), body.getObjectType().value());
+                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getFolder(), body.getObjectType().value());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
             } catch (Exception e) {
                 //

@@ -1,4 +1,4 @@
-package com.sos.joc.joe.common;
+package com.sos.joc.classes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import com.sos.joc.model.joe.schedule.HolidaysFile;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.joe.schedule.Schedule;
 
-public class Helper {
+public class JOEHelper {
 
     public static final Map<String, Class<?>> CLASS_MAPPING = Collections.unmodifiableMap(new HashMap<String, Class<?>>() {
 
@@ -123,7 +123,7 @@ public class Helper {
     }
 
     public static boolean pathIsObjectOf(String path, JobSchedulerObjectType jobSchedulerObjectType) {
-        return path.endsWith(Helper.getFileExtension(jobSchedulerObjectType));
+        return path.endsWith(JOEHelper.getFileExtension(jobSchedulerObjectType));
     }
 
     public static byte[] concatByteArray(byte[] a, byte[] b) throws IOException {
@@ -133,7 +133,7 @@ public class Helper {
 
         return outputStream.toByteArray();
     }
-    
+
     public static CustomEvent getJoeUpdatedEvent(String path, String objectType) {
         CustomEvent evt = new CustomEvent();
         evt.setKey("JoeUpdated");

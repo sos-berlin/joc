@@ -8,12 +8,12 @@ import javax.ws.rs.core.MediaType;
 import org.dom4j.io.SAXReader;
 
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IMapConfigurationResource;
 
@@ -39,14 +39,14 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
                 objType = "NODEPARAMS";
             }
 
-            if (!Helper.CLASS_MAPPING.containsKey(objType)) {
+            if (!JOEHelper.CLASS_MAPPING.containsKey(objType)) {
                 throw new JobSchedulerBadRequestException("unsupported xml: " + rootElementName);
             }
             if (!"NODEPARAMS".equals(objType)) {
                 ValidateXML.validateAgainstJobSchedulerSchema(new ByteArrayInputStream(requestBody));
             }
 
-            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(Globals.xmlMapper.readValue(requestBody, Helper.CLASS_MAPPING.get(objType)));
+            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(Globals.xmlMapper.readValue(requestBody, JOEHelper.CLASS_MAPPING.get(objType)));
             return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

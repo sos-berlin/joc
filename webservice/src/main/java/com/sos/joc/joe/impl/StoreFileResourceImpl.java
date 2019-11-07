@@ -10,6 +10,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
@@ -19,7 +20,6 @@ import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
-import com.sos.joc.joe.common.Helper;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IStoreFileResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -41,7 +41,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
-            boolean permission2 = Helper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
+            boolean permission2 = JOEHelper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
             if (jocDefaultResponse != null) {
@@ -82,7 +82,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 if (!isDirectory) {
                     if (body.getConfiguration() != null) {
                         item.setConfiguration(Globals.objectMapper.writeValueAsString(XmlSerializer.serialize(body.getConfiguration(),
-                                Helper.CLASS_MAPPING.get(body.getObjectType().value()))));
+                                JOEHelper.CLASS_MAPPING.get(body.getObjectType().value()))));
                     }
                 } else {
                     item.setConfiguration(null);
@@ -99,7 +99,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 if (!isDirectory) {
                     if (body.getConfiguration() != null) {
                         item.setConfiguration(Globals.objectMapper.writeValueAsString(XmlSerializer.serialize(body.getConfiguration(),
-                                Helper.CLASS_MAPPING.get(body.getObjectType().value()))));
+                                JOEHelper.CLASS_MAPPING.get(body.getObjectType().value()))));
                     }
                 } else {
                     item.setConfiguration(null);
@@ -115,7 +115,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 dbLayer.save(item);
                 
                 try {
-                    CustomEvent evt = Helper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
+                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
                     SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
                 } catch (Exception e) {
                     //
