@@ -255,7 +255,8 @@ public class InventoryFilesDBLayer extends DBLayer {
             }
             List<DBItemInventoryFile> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
-                Map<String, List<DBItemInventoryFile>> groupedResult = result.stream().collect(Collectors.groupingBy(DBItemInventoryFile::getFileDirectory));
+                Map<String, List<DBItemInventoryFile>> groupedResult = result.stream().collect(Collectors.groupingBy(
+                        DBItemInventoryFile::getFileDirectory));
                 return joeObjectToFolderItemMapper(groupedResult, joeResults, zoneId);
             }
             return new ArrayList<JoeTree>();
@@ -275,11 +276,13 @@ public class InventoryFilesDBLayer extends DBLayer {
         InventorySchedulesDBLayer scheduleDbLayer = null;
         List<JoeTree> treeList = new ArrayList<JoeTree>();
         for (String key : groupedResult.keySet()) {
+            Set<FolderItem> nodeParams = new HashSet<FolderItem>();
             JoeTree joeTree = new JoeTree();
             joeTree.setPath(key);
             int index = joeResults.indexOf(joeTree);
             if (index > -1) {
                 joeTree = joeResults.remove(index);
+                nodeParams = joeTree.getNodeParams();
             }
             for (DBItemInventoryFile item : groupedResult.get(key)) {
                 String objectType = item.getFileType().replaceAll("_", "").toUpperCase();
@@ -313,9 +316,9 @@ public class InventoryFilesDBLayer extends DBLayer {
                         DBItemInventoryJobChain jobChain = jobChainDbLayer.getJobChainByPath(filePath, item.getInstanceId());
                         folderItem.setTitle(jobChain.getTitle());
                         folderItem.setProcessClass(".".equals(jobChain.getProcessClassName()) ? null : jobChain.getProcessClassName());
-//                        if (joeTree.contains(folderItem)) { // TODO
-//                            folderItem.setDeployed(false);
-//                        }
+                        if (nodeParams.contains(folderItem)) {
+                            folderItem.setDeployed(false);
+                        }
                         joeTree.getJobChains().add(folderItem);
                         break;
                     case ORDER:
@@ -327,9 +330,9 @@ public class InventoryFilesDBLayer extends DBLayer {
                         folderItem.setInitialState(order.getInitialState());
                         folderItem.setEndState(order.getEndState());
                         folderItem.setPriority(order.getPriority() == null ? null : order.getPriority() + "");
-//                        if (joeResults.contains(folderItem)) { // TODO
-//                            folderItem.setDeployed(false);
-//                        }
+                        if (nodeParams.contains(folderItem)) {
+                            folderItem.setDeployed(false);
+                        }
                         joeTree.getOrders().add(folderItem);
                         break;
                     case AGENTCLUSTER:
@@ -406,6 +409,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             if (joeTree.getSchedules() != null && joeTree.getSchedules().isEmpty()) {
                 joeTree.setSchedules(null);
             }
+            joeTree.setNodeParams(null);
             treeList.add(joeTree);
         }
         joeResults.addAll(treeList);

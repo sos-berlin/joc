@@ -72,6 +72,9 @@ public class FoldersByPath extends JoeTree {
             case "MONITOR":
                 setMonitors(folderItemSet);
                 break;
+            case "NODEPARAMS":
+                setNodeParams(folderItemSet);
+                break;
             }
         }
         setFolders(null);

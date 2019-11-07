@@ -63,6 +63,13 @@
 				"$ref": "../joe/other/folderItem-schema.json"
 			},
 			"uniqueItems": true
+		},
+		"nodeParams": {
+			"type": "array",
+			"items": {
+				"$ref": "../joe/other/folderItem-schema.json"
+			},
+			"uniqueItems": true
 		}
 	}
 }

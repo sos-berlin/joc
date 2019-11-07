@@ -236,6 +236,7 @@ public class DBLayerJoeObjects {
                                 joeTree.getOrders().addAll(joe.getOrders());
                                 joeTree.getProcessClasses().addAll(joe.getProcessClasses());
                                 joeTree.getSchedules().addAll(joe.getSchedules());
+                                joeTree.getNodeParams().addAll(joe.getNodeParams());
                             }
                         }
                         treeList.add((T) joeTree);

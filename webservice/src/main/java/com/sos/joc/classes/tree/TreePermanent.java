@@ -586,6 +586,7 @@ public class TreePermanent {
         } else {
             tree.setSchedules(null); 
         }
+        tree.setNodeParams(null);
         return tree;
 	}
 
@@ -615,6 +616,7 @@ public class TreePermanent {
                 parentTree.setOrders(null);
                 parentTree.setProcessClasses(null);
                 parentTree.setSchedules(null);
+                parentTree.setNodeParams(null);
                 parentTree.setPath(parent.toString().replace('\\', '/'));
                 Path fileName = parent.getFileName();
                 parentTree.setName(fileName == null ? "" : fileName.toString());
