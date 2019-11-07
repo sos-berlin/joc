@@ -136,7 +136,7 @@ public class DBLayerJoeLocks {
             query.setParameter("isLocked", true);
             List<DBItemJoeLock> result = sosHibernateSession.getResultList(query);
             if (result != null) {
-                result.stream().collect(Collectors.toMap(DBItemJoeLock::getFolder, Function.identity()));
+                return result.stream().collect(Collectors.toMap(DBItemJoeLock::getFolder, Function.identity()));
             }
             return new HashMap<String, DBItemJoeLock>();
         } catch (SOSHibernateInvalidSessionException ex) {

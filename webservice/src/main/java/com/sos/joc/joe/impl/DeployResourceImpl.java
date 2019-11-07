@@ -1,6 +1,5 @@
 package com.sos.joc.joe.impl;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +9,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.json.JsonArray;
 import javax.ws.rs.Path;
 
 import org.w3c.dom.Node;
@@ -18,6 +18,7 @@ import org.w3c.dom.NodeList;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.joe.DBItemJoeLock;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
@@ -26,19 +27,21 @@ import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.ClusterMemberHandler;
-import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.audit.DeployJoeAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
-import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JobSchedulerModifyObjectException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.XmlSerializer;
@@ -89,28 +92,48 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             DBLayerJoeObjects dbLayerJoeObjects = new DBLayerJoeObjects(sosHibernateSession);
+            DBLayerJoeLocks dbLayerJoeLocks = new DBLayerJoeLocks(sosHibernateSession);
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
+            boolean folderDeploy = body.getObjectName() == null || body.getObjectName().isEmpty();
 
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
             filterJoeObjects.setAccount(body.getAccount());
-            if (body.getObjectName() != null && !body.getObjectName().isEmpty()) {
+            if (!folderDeploy) {
                 filterJoeObjects.setPath((folder + "/").replaceAll("//+", "/") + body.getObjectName());
+                if (JobSchedulerObjectType.ORDER == body.getObjectType() || JobSchedulerObjectType.JOBCHAIN == body.getObjectType()) {
+                    filterJoeObjects.setObjectTypes(body.getObjectType().value(), JobSchedulerObjectType.NODEPARAMS.value());
+                } else {
+                    filterJoeObjects.setObjectType(body.getObjectType());
+                }
             } else {
                 filterJoeObjects.setPath(folder);
             }
-            if (JobSchedulerObjectType.ORDER == body.getObjectType() || JobSchedulerObjectType.JOBCHAIN == body.getObjectType()) {
-                filterJoeObjects.setObjectTypes(body.getObjectType().value(), JobSchedulerObjectType.NODEPARAMS.value());
-            } else {
-                filterJoeObjects.setObjectType(body.getObjectType());
-            }
-            filterJoeObjects.setOrderCriteria("created");
-            if ((body.getObjectName() == null || body.getObjectName().isEmpty())) {
-                filterJoeObjects.setRecursive();
+            
+            String[] nonFolderObjects = { "NODEPARAMS", "PROCESSCLASS", "AGENTCLUSTER", "LOCK", "MONITOR", "SCHEDULE", "JOB", "JOBCHAIN", "ORDER" };
+
+            if (folderDeploy) {
+                // It's not allowed to delete the root folder
+                if ("/".equals(body.getFolder())) {
+                    filterJoeObjects.setObjectType(JobSchedulerObjectType.FOLDER);
+                    DBItemJoeObject folderDbItem = dbLayerJoeObjects.getJoeObject(filterJoeObjects);
+                    if (folderDbItem != null && folderDbItem.operationIsDelete()) {
+                        throw new JobSchedulerModifyObjectException("Deleting the root directory is not allowed.");
+                    }
+                    filterJoeObjects.setObjectType(null);
+                }
+                if (body.getRecursive() == null || !body.getRecursive()) {
+                    filterJoeObjects.setPathWithChildren(folder);
+                    filterJoeObjects.setObjectTypes(nonFolderObjects);
+                } else {
+                    filterJoeObjects.setRecursive();
+                }
             }
 
-            List<DBItemJoeObject> listOfJoeObjects = dbLayerJoeObjects.getJoeObjectList(filterJoeObjects, 0);
+            filterJoeObjects.setOrderCriteria("path");
+            filterJoeObjects.setSortMode("desc");
+
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-
+            
             DeployAnswer deployAnswer = new DeployAnswer();
             deployAnswer.setMessages(new ArrayList<DeployMessage>());
             deployAnswer.setFolder(folder);
@@ -118,25 +141,27 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             deployAnswer.setObjectName(body.getObjectName());
             deployAnswer.setObjectType(body.getObjectType());
             deployAnswer.setRecursive(body.getRecursive());
-            InventoryFilesDBLayer inventoryFilesDBLayer = new InventoryFilesDBLayer(sosHibernateSession);
-            
-            boolean objectsHaveBeenDeployed = false;
 
-            if (listOfJoeObjects != null) {
-                
-                Map<String, Set<DBItemJoeObject>> groupedJoeObjects = null;
-                if (filterJoeObjects.isRecursive() && (body.getRecursive() == null || !body.getRecursive())) {
-                    //all objects of a folder (non-recursive) 
-                    final int folderDepth = Paths.get(folder).getNameCount();
-                    groupedJoeObjects = listOfJoeObjects.stream().filter(item -> item.getPath().equals(folder) || (!"FOLDER"
-                            .equals(item.getObjectType()) && Paths.get(item.getPath()).getParent().getNameCount() == folderDepth)).collect(Collectors
-                                    .groupingBy(DBItemJoeObject::getObjectType, Collectors.toSet()));
-                } else {
-                    groupedJoeObjects = listOfJoeObjects.stream().collect(Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors.toSet()));
-                }
-                
-                String[] objTypes = {"NODEPARAMS", "PROCESSCLASS", "AGENTCLUSTER", "LOCK", "MONITOR", "SCHEDULE", "JOB", "JOBCHAIN", "ORDER"};
-                for (String objType : objTypes) {
+            Map<String, DBItemJoeLock> mapOfLocks = null;
+            if (body.getAccount() != null && !body.getAccount().isEmpty()) {
+                mapOfLocks = dbLayerJoeLocks.getLocksFromOthers(body.getJobschedulerId(), body.getAccount());
+            }
+            Set<String> touchedFolders = new HashSet<String>();
+            Set<String> deletedFolders = new HashSet<String>();
+
+            // first delete operation
+            filterJoeObjects.setOperation("delete");
+            List<DBItemJoeObject> listOfJoeObjectsForDelete = dbLayerJoeObjects.getJoeObjectList(filterJoeObjects, 0);
+
+            if (listOfJoeObjectsForDelete != null && !listOfJoeObjectsForDelete.isEmpty()) {
+
+                Map<String, Set<DBItemJoeObject>> groupedJoeObjects = listOfJoeObjectsForDelete.stream().collect(Collectors.groupingBy(
+                        DBItemJoeObject::getObjectType, Collectors.toSet()));
+
+                String[] objTypesToDelete = { "ORDER", "JOBCHAIN", "JOB", "SCHEDULE", "MONITOR", "LOCK", "AGENTCLUSTER", "PROCESSCLASS",
+                        "NODEPARAMS" };
+
+                for (String objType : objTypesToDelete) {
                     if (groupedJoeObjects.containsKey(objType)) {
                         for (DBItemJoeObject joeObject : groupedJoeObjects.get(objType)) {
 
@@ -147,53 +172,38 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
                                 continue;
                             }
-                            String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
-                            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath() + extension, false, API_CALL);
 
-                            objectsHaveBeenDeployed = true;
-                            switch (joeObject.getOperation().toLowerCase()) {
-                            case "store":
-                                String xmlContent = XmlSerializer.serializeToStringWithHeader(joeObject.getConfiguration(), objType);
-                                if ("NODEPARAMS".equals(objType) && xmlContent.trim().equals(XmlSerializer.xmlHeader + "<settings/>")) {
-                                    //TODO delete configuration monitor in corresponding jobs
-                                    try {
-                                        jocHotFolder.deleteFile(joeObject.getPath() + extension);
-                                    } catch (JobSchedulerObjectNotExistException e) {
-                                    }
-                                    clusterMemberHandler.deleteAtOtherClusterMembers();
-                                } else {
-                                    //TODO add configuration monitor in corresponding jobs if objType == NODEPARAMS
-                                    jocHotFolder.putFile(joeObject.getPath() + extension, xmlContent);
-                                    clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
-                                    updateCalendarUsedBy(xmlContent, sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
-                                }
-                                break;
-                            case "delete":
-                                try {
-                                    jocHotFolder.deleteFile(joeObject.getPath() + extension);
-                                } catch (JobSchedulerObjectNotExistException e) {
-                                }
-                                clusterMemberHandler.deleteAtOtherClusterMembers();
-                                deleteCalendarUsedBy(sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
-                                break;
-                            default:
-                                break;
+                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
+                                deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(getParent(joeObject.getPath()))));
+                                continue;
                             }
 
+                            String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
+
+                            boolean objExists = true;
+                            try {
+                                jocHotFolder.deleteFile(joeObject.getPath() + extension);
+                            } catch (JobSchedulerObjectNotExistException e) {
+                                objExists = false;
+                            }
+                            if (objExists) {
+                                if ("NODEPARAMS".equals(objType)) {
+                                    // TODO delete configuration monitor in corresponding jobs
+                                }
+                                ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath()
+                                        + extension, false, API_CALL);
+                                clusterMemberHandler.deleteAtOtherClusterMembers();
+                                deleteCalendarUsedBy(sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
+                            }
                             storeAuditLogEntry(deployJoeAudit);
+                            touchedFolders.add(joeObject.getFolder());
                             dbLayerJoeObjects.delete(joeObject);
                         }
                     }
                 }
-
-                if (objectsHaveBeenDeployed) {
-                    java.lang.Thread.sleep(2000); // waiting for inventory
-                }
-
                 if (groupedJoeObjects.containsKey("FOLDER")) {
                     for (DBItemJoeObject joeObject : groupedJoeObjects.get("FOLDER")) {
 
-                        boolean deleteEntry = false;
                         DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
                         logAuditMessage(deployJoeAudit);
 
@@ -202,44 +212,135 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             continue;
                         }
 
-                        switch (joeObject.getOperation().toLowerCase()) {
-                        case "store":
-                            deleteEntry = !inventoryFilesDBLayer.isEmptyFolder(this.dbItemInventoryInstance.getId(), joeObject.getPath());
-                            jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()));
-                            break;
-                        case "delete":
-                            deleteEntry = true;
-                            try {
-                                jocHotFolder.deleteFolder(normalizeFolder(joeObject.getPath()));
-                            } catch (JobSchedulerObjectNotExistException e) {
-                            }
-                            break;
-
-                        default:
-                            break;
+                        if (mapOfLocks != null && mapOfLocks.containsKey(joeObject.getPath())) {
+                            deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(joeObject.getPath())));
+                            continue;
                         }
+
+                        boolean objExists = true;
+                        try {
+                            jocHotFolder.deleteFolder(joeObject.getPath());
+                        } catch (JobSchedulerObjectNotExistException e) {
+                            objExists = false;
+                        }
+                        if (objExists) {
+                            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath(), true,
+                                    API_CALL);
+                            clusterMemberHandler.deleteAtOtherClusterMembers();
+                            deleteCalendarUsedBy(sosHibernateSession, body.getJobschedulerId(), "FOLDER", joeObject.getPath());
+                        }
+
+                        deletedFolders.add(joeObject.getPath());
+                        dbLayerJoeObjects.delete(joeObject);
+                        // delete all children of deleted folder in the database
+                        deleteWithAllChildren(dbLayerJoeObjects, joeObject);
+                        dbLayerJoeLocks.delete(body.getJobschedulerId(), joeObject.getPath());
+                    }
+                }
+            }
+
+            //second step "store"
+            filterJoeObjects.setOperation("store");
+            List<DBItemJoeObject> listOfJoeObjectsForStore = dbLayerJoeObjects.getJoeObjectList(filterJoeObjects, 0);
+            if (listOfJoeObjectsForStore != null && !listOfJoeObjectsForStore.isEmpty()) {
+                Map<String, Set<DBItemJoeObject>> groupedJoeObjects = listOfJoeObjectsForStore.stream().collect(Collectors.groupingBy(
+                        DBItemJoeObject::getObjectType, Collectors.toSet()));
+
+                String[] objTypesToStore = nonFolderObjects;
+                for (String objType : objTypesToStore) {
+                    if (groupedJoeObjects.containsKey(objType)) {
+                        for (DBItemJoeObject joeObject : groupedJoeObjects.get(objType)) {
+                            
+                            if (joeObject.getConfiguration() == null) {
+                                dbLayerJoeObjects.delete(joeObject);
+                                continue;
+                            }
+
+                            DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
+                            logAuditMessage(deployJoeAudit);
+
+                            if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
+                                deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
+                                continue;
+                            }
+
+                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
+                                deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(getParent(joeObject.getPath()))));
+                                continue;
+                            }
+
+                            String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
+                            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath()
+                                    + extension, false, API_CALL);
+
+                            String xmlContent = XmlSerializer.serializeToStringWithHeader(joeObject.getConfiguration(), objType);
+                            if ("NODEPARAMS".equals(objType) && xmlContent.trim().equals(XmlSerializer.xmlHeader + "<settings/>")) {
+                                // TODO delete configuration monitor in corresponding jobs
+                                try {
+                                    jocHotFolder.deleteFile(joeObject.getPath() + extension);
+                                    clusterMemberHandler.deleteAtOtherClusterMembers();
+                                } catch (JobSchedulerObjectNotExistException e) {
+                                }
+                            } else {
+                                // TODO add configuration monitor in corresponding jobs if objType == NODEPARAMS
+                                jocHotFolder.putFile(joeObject.getPath() + extension, xmlContent);
+                                clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
+                                updateCalendarUsedBy(xmlContent, sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
+                            }
+                            storeAuditLogEntry(deployJoeAudit);
+
+                            touchedFolders.add(joeObject.getFolder());
+                            dbLayerJoeObjects.delete(joeObject);
+                        }
+                    }
+                }
+                if (groupedJoeObjects.containsKey("FOLDER")) {
+                    for (DBItemJoeObject joeObject : groupedJoeObjects.get("FOLDER")) {
+
+                        DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
+                        logAuditMessage(deployJoeAudit);
+
+                        if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
+                            deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
+                            continue;
+                        }
+
+                        if (mapOfLocks != null && mapOfLocks.containsKey(joeObject.getPath())) {
+                            deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(joeObject.getPath())));
+                            continue;
+                        }
+
+                        jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()));
 
                         storeAuditLogEntry(deployJoeAudit);
 
-                        if (deleteEntry) {
+                        JsonArray folderContent = jocHotFolder.getFolder(normalizeFolder(joeObject.getPath()));
+                        boolean emptyFolder = folderContent == null || folderContent.size() == 0;
+
+                        touchedFolders.add(joeObject.getPath());
+                        if (!emptyFolder) {
                             dbLayerJoeObjects.delete(joeObject);
                         }
                     }
                 }
             }
-            
-            //release folder if no further drafts in folder
+
+            // release folder if no further drafts inside of current body.getAccount()
+            touchedFolders.removeAll(deletedFolders);
             FilterJoeObjects filterObj = new FilterJoeObjects();
             filterObj.setSchedulerId(body.getJobschedulerId());
-            filterObj.setPath(folder);
-            final int parentDepth = Paths.get(folder).getNameCount();
-            List<DBItemJoeObject> dbItems = dbLayerJoeObjects.getRecursiveJoeObjectList(filterObj);
-            boolean folderIsEmpty = true;
-            if (dbItems != null) {
-                folderIsEmpty = dbItems.stream().filter(item -> Paths.get(item.getPath()).getParent().getNameCount() == parentDepth).count() == 0L;
-            }
-            if (folderIsEmpty) {
-                LockResourceImpl.release(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), folder, getAccount());
+            filterObj.setAccount(body.getAccount());
+            filterObj.setObjectTypes(nonFolderObjects);
+            for (String touchedFolder : touchedFolders) {
+                if (body.getAccount() != null && !body.getAccount().isEmpty()) {
+                    filterObj.setFolder(touchedFolder);
+                    List<DBItemJoeObject> dbItems = dbLayerJoeObjects.getJoeObjectList(filterObj, 0);
+                    if (dbItems != null && dbItems.size() == 0) {
+                        LockResourceImpl.release(dbLayerJoeLocks, body.getJobschedulerId(), touchedFolder, body.getAccount());
+                    }
+                } else {
+                    LockResourceImpl.release(dbLayerJoeLocks, body.getJobschedulerId(), touchedFolder, getAccount()); 
+                }
             }
 
             return JOCDefaultResponse.responseStatus200(deployAnswer);
@@ -253,7 +354,20 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             Globals.disconnect(sosHibernateSession);
         }
     }
-    
+
+    private void deleteWithAllChildren(DBLayerJoeObjects dbLayerJoeObjects, DBItemJoeObject joeObject) throws DBConnectionRefusedException,
+            DBInvalidDataException {
+        FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
+        filterJoeObjects.setSchedulerId(joeObject.getSchedulerId());
+        filterJoeObjects.setPath(joeObject.getPath());
+        List<DBItemJoeObject> dbItems = dbLayerJoeObjects.getRecursiveJoeObjectList(filterJoeObjects);
+        if (dbItems != null) {
+            for (DBItemJoeObject dbItem : dbItems) {
+                dbLayerJoeObjects.delete(dbItem);
+            }
+        }
+    }
+
     private void deleteCalendarUsedBy(SOSHibernateSession sosHibernateSession, String schedulerId, String objType, String path)
             throws JsonProcessingException, JocException {
         if ("JOB".equals(objType) || "ORDER".equals(objType) || "SCHEDULE".equals(objType)) {
@@ -351,6 +465,13 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         DeployMessage deployMessage = new DeployMessage();
         deployMessage.setMessage("Access denied");
         deployMessage.setPermissionDeniedFor(path);
+        return deployMessage;
+    }
+
+    private DeployMessage getFolderIsLockedMessage(DBItemJoeLock lockItem) {
+        DeployMessage deployMessage = new DeployMessage();
+        deployMessage.setMessage("Folder locked by " + lockItem.getAccount());
+        deployMessage.setPermissionDeniedFor(lockItem.getFolder());
         return deployMessage;
     }
 
