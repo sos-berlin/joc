@@ -81,7 +81,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             storeAuditLogEntry(audit);
 
             ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath,
-                    JobSchedulerObjectType.AGENTCLUSTER.value(), API_CALL);
+                    false, API_CALL);
             clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
@@ -113,7 +113,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             storeAuditLogEntry(audit);
 
             ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath,
-                    JobSchedulerObjectType.AGENTCLUSTER.value(), API_CALL);
+                    false, API_CALL);
             clusterMemberHandler.deleteAtOtherClusterMembers();
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
