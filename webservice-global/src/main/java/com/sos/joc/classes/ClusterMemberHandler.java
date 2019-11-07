@@ -21,13 +21,17 @@ public class ClusterMemberHandler {
 
     private DBItemInventoryInstance dbItemInventoryInstance;
     private String path;
-    private String objectType;
+    private boolean isFolder = false;
     private String apiCall;
 
-    public ClusterMemberHandler(DBItemInventoryInstance dbItemInventoryInstance, String path, String objectType, String apiCall) {
+    public ClusterMemberHandler(DBItemInventoryInstance dbItemInventoryInstance, String path, boolean isFolder, String apiCall) {
         this.dbItemInventoryInstance = dbItemInventoryInstance;
-        this.path = path;
-        this.objectType = objectType;
+        this.isFolder = isFolder;
+        if (isFolder) {
+            this.path = (path + "/").replaceAll("//+", "/");
+        } else {
+            this.path = path;
+        }
         this.apiCall = apiCall;
     }
 
@@ -83,13 +87,13 @@ public class ClusterMemberHandler {
                         clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
                         httpClient = new JOCHotFolder(clusterMember);
                         if ("save".equals(sessionIdentifier)) {
-                            if ("FOLDER".equals(objectType)) {
+                            if (isFolder) {
                                 httpClient.putFolder(path);
                             } else {
                                 httpClient.putFile(path, dbItem.getContent());
                             }
                         } else {
-                            if ("FOLDER".equals(objectType)) {
+                            if (isFolder) {
                                 httpClient.deleteFolder(path);
                             } else {
                                 httpClient.deleteFile(path);
