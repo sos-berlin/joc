@@ -183,12 +183,12 @@ public class DBLayerJoeObjects {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Tree> List<T> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes, boolean compact)
-            throws DBConnectionRefusedException, DBInvalidDataException {
+    public <T extends Tree> List<T> getFoldersByFolder(final String schedulerId, final String folderName, Collection<String> objectTypes,
+            boolean forJoe) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(FOLDERS_BY_PATH);
-            if (compact) {
+            if (forJoe) {
                 sql.append("(path, objectType, operation) from ").append(DBLayer.DBITEM_JOE_OBJECT);
             } else {
                 sql.append("(joe) from ").append(DBLayer.DBITEM_JOE_OBJECT).append(" joe");
@@ -215,7 +215,7 @@ public class DBLayerJoeObjects {
             }
             List<T> result = sosHibernateSession.getResultList(query);
             if (result != null && !result.isEmpty()) {
-                if (compact) {
+                if (forJoe) {
                     return getFoldersByFolder(schedulerId, result.stream().map(T::getPath).collect(Collectors.toSet()));
                 } else {
                     List<T> treeList = new ArrayList<T>();

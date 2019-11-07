@@ -67,9 +67,16 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             filter.setConstraint(body);
 
             DBItemJoeObject dbItem = dbLayer.getJoeObject(filter);
+            
             if (dbItem != null) {
-                dbItem.setOperation("store");
-                dbLayer.update(dbItem);
+                //it happens if an object is marked to delete without any changes in the configuration
+                boolean objectWithNullConfiguration = !"FOLDER".equals(dbItem.getObjectType()) && dbItem.getConfiguration() == null;
+                if (objectWithNullConfiguration) {
+                    dbLayer.delete(dbItem);
+                } else {
+                    dbItem.setOperation("store");
+                    dbLayer.update(dbItem);
+                }
             }
 
             try {
