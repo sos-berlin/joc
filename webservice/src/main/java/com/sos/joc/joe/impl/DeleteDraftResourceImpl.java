@@ -38,7 +38,7 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
 
             checkRequiredParameter("folder", body.getFolder());
 
-            body.setFolder(normalizePath(body.getFolder()));
+            body.setFolder(normalizeFolder(body.getFolder()));
             if (!folderPermissions.isPermittedForFolder(getParent(body.getFolder()))) {
                 return accessDeniedResponse();
             }
@@ -48,9 +48,9 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
             FilterJoeObjects filter = new FilterJoeObjects();
             if (body.getObjectName() != null) {
-                filter.setPath(normalizePath(body.getFolder()) + "/" + body.getObjectName());
+                filter.setPath((body.getFolder() + "/").replaceAll("//+", "/") + body.getObjectName());
             } else {
-                filter.setPath(normalizeFolder(body.getFolder()));
+                filter.setPath(body.getFolder());
             }
 
             filter.setSchedulerId(body.getJobschedulerId());
