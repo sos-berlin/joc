@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,15 +42,9 @@ public class InventoryFilesDBLayer extends DBLayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryFilesDBLayer.class);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private ZoneId zoneId = null;
 
     public InventoryFilesDBLayer(SOSHibernateSession connection) {
         super(connection);
-    }
-
-    public InventoryFilesDBLayer(SOSHibernateSession connection, String timeZone) {
-        super(connection);
-        this.zoneId = ZoneId.of(timeZone);
     }
 
     public List<DBItemInventoryFile> getFiles(Long instanceId) throws DBConnectionRefusedException, DBInvalidDataException {
@@ -229,7 +224,7 @@ public class InventoryFilesDBLayer extends DBLayer {
         }
     }
 
-    public List<JoeTree> getFoldersByFolderAndType(Long instanceId, String folderName, Set<String> types, List<JoeTree> joeResults)
+    public List<JoeTree> getFoldersByFolderAndType(Long instanceId, String folderName, Set<String> types, List<JoeTree> joeResults, ZoneId zoneId)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -260,7 +255,8 @@ public class InventoryFilesDBLayer extends DBLayer {
             }
             List<DBItemInventoryFile> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
-                return joeObjectToFolderItemMapper(result, joeResults);
+                Map<String, List<DBItemInventoryFile>> groupedResult = result.stream().collect(Collectors.groupingBy(DBItemInventoryFile::getFileDirectory));
+                return joeObjectToFolderItemMapper(groupedResult, joeResults, zoneId);
             }
             return new ArrayList<JoeTree>();
         } catch (SOSHibernateInvalidSessionException ex) {
@@ -270,124 +266,149 @@ public class InventoryFilesDBLayer extends DBLayer {
         }
     }
 
-    public List<JoeTree> joeObjectToFolderItemMapper(List<DBItemInventoryFile> result, List<JoeTree> joeResults) {
+    public List<JoeTree> joeObjectToFolderItemMapper(Map<String, List<DBItemInventoryFile>> groupedResult, List<JoeTree> joeResults, ZoneId zoneId) {
         InventoryJobsDBLayer jobDbLayer = null;
         InventoryJobChainsDBLayer jobChainDbLayer = null;
         InventoryOrdersDBLayer orderDbLayer = null;
         InventoryProcessClassesDBLayer processClassDbLayer = null;
         InventoryLocksDBLayer lockDbLayer = null;
         InventorySchedulesDBLayer scheduleDbLayer = null;
-        List<JoeTree> updatedJoeResults = new ArrayList<JoeTree>();
-        for (DBItemInventoryFile item : result) {
+        List<JoeTree> treeList = new ArrayList<JoeTree>();
+        for (String key : groupedResult.keySet()) {
             JoeTree joeTree = new JoeTree();
-            
-            String objectType = item.getFileType().replaceAll("_", "").toUpperCase();
-            if ("PROCESSCLASS".equals(objectType) && "(default)".equals(item.getFileBaseName())) {
-                continue;
-            }
-            if (!JOEHelper.CLASS_MAPPING.containsKey(objectType)) {
-                continue;
-            }
-            JobSchedulerObjectType objType = JobSchedulerObjectType.fromValue(objectType);
-            FolderItem folderItem = new FolderItem();
-            folderItem.setName(JOEHelper.getPathWithoutExtension(item.getFileBaseName(), objType));
-            folderItem.setDeployed(true);
-            String filePath = JOEHelper.getPathWithoutExtension(item.getFileName(), objType);
-            joeTree.setPath(filePath);
+            joeTree.setPath(key);
             int index = joeResults.indexOf(joeTree);
             if (index > -1) {
                 joeTree = joeResults.remove(index);
             }
-            try {
-                switch (objType) {
-                case JOB:
-                    if (jobDbLayer == null) {
-                        jobDbLayer = new InventoryJobsDBLayer(getSession());
-                    }
-                    DBItemInventoryJob job = jobDbLayer.getInventoryJobByName(filePath, item.getInstanceId());
-                    folderItem.setTitle(job.getTitle());
-                    folderItem.setProcessClass(".".equals(job.getProcessClassName()) ? null : job.getProcessClassName());
-                    folderItem.setIsOrderJob(job.getIsOrderJob());
-                    joeTree.getJobs().add(folderItem);
-                    break;
-                case JOBCHAIN:
-                    if (jobChainDbLayer == null) {
-                        jobChainDbLayer = new InventoryJobChainsDBLayer(getSession());
-                    }
-                    DBItemInventoryJobChain jobChain = jobChainDbLayer.getJobChainByPath(filePath, item.getInstanceId());
-                    folderItem.setTitle(jobChain.getTitle());
-                    folderItem.setProcessClass(".".equals(jobChain.getProcessClassName()) ? null : jobChain.getProcessClassName());
-//                    if (joeResults.contains(folderItem)) { // TODO
-//                        folderItem.setDeployed(false);
-//                    }
-                    joeTree.getJobChains().add(folderItem);
-                    break;
-                case ORDER:
-                    if (orderDbLayer == null) {
-                        orderDbLayer = new InventoryOrdersDBLayer(getSession());
-                    }
-                    DBItemInventoryOrder order = orderDbLayer.getInventoryOrderByName(item.getInstanceId(), filePath);
-                    folderItem.setTitle(order.getTitle());
-                    folderItem.setInitialState(order.getInitialState());
-                    folderItem.setEndState(order.getEndState());
-                    folderItem.setPriority(order.getPriority() == null ? null : order.getPriority() + "");
-//                    if (joeResults.contains(folderItem)) { // TODO
-//                        folderItem.setDeployed(false);
-//                    }
-                    joeTree.getOrders().add(folderItem);
-                    break;
-                case AGENTCLUSTER:
-                    if (processClassDbLayer == null) {
-                        processClassDbLayer = new InventoryProcessClassesDBLayer(getSession());
-                    }
-                    DBItemInventoryProcessClass agentCluster = processClassDbLayer.getProcessClass(filePath, item.getInstanceId());
-                    folderItem.setMaxProcesses(agentCluster.getMaxProcesses());
-                    joeTree.getAgentClusters().add(folderItem);
-                    break;
-                case PROCESSCLASS:
-                    if (processClassDbLayer == null) {
-                        processClassDbLayer = new InventoryProcessClassesDBLayer(getSession());
-                    }
-                    DBItemInventoryProcessClass processClass = processClassDbLayer.getProcessClass(filePath, item.getInstanceId());
-                    folderItem.setMaxProcesses(processClass.getMaxProcesses());
-                    joeTree.getProcessClasses().add(folderItem);
-                    break;
-                case LOCK:
-                    if (lockDbLayer == null) {
-                        lockDbLayer = new InventoryLocksDBLayer(getSession());
-                    }
-                    DBItemInventoryLock lock = lockDbLayer.getLock(filePath, item.getInstanceId());
-                    folderItem.setMaxNonExclusive(lock.getMaxNonExclusive());
-                    joeTree.getLocks().add(folderItem);
-                    break;
-                case SCHEDULE:
-                    if (scheduleDbLayer == null) {
-                        scheduleDbLayer = new InventorySchedulesDBLayer(getSession());
-                    }
-                    DBItemInventorySchedule schedule = scheduleDbLayer.getSchedule(filePath, item.getInstanceId());
-                    folderItem.setTitle(schedule.getTitle());
-                    if (!".".equals(schedule.getSubstituteName())) {
-                        folderItem.setSubstitute(schedule.getSubstituteName());
-                        if (schedule.getSubstituteValidFrom() != null) {
-                            folderItem.setValidFrom(formatter.format(ZonedDateTime.ofInstant(schedule.getSubstituteValidFrom().toInstant(), ZoneId
-                                    .systemDefault()).withZoneSameInstant(zoneId)));
-                        }
-                        if (schedule.getSubstituteValidTo() != null) {
-                            folderItem.setValidTo(formatter.format(ZonedDateTime.ofInstant(schedule.getSubstituteValidTo().toInstant(), ZoneId
-                                    .systemDefault()).withZoneSameInstant(zoneId)));
-                        }
-                    }
-                    joeTree.getSchedules().add(folderItem);
-                    break;
-                default:
-                    break;
+            for (DBItemInventoryFile item : groupedResult.get(key)) {
+                String objectType = item.getFileType().replaceAll("_", "").toUpperCase();
+                if ("PROCESSCLASS".equals(objectType) && "(default)".equals(item.getFileBaseName())) {
+                    continue;
                 }
-            } catch (Exception e) {
-                LOGGER.warn("", e);
+                if (!JOEHelper.CLASS_MAPPING.containsKey(objectType)) {
+                    continue;
+                }
+                JobSchedulerObjectType objType = JobSchedulerObjectType.fromValue(objectType);
+                FolderItem folderItem = new FolderItem();
+                folderItem.setName(JOEHelper.getPathWithoutExtension(item.getFileBaseName(), objType));
+                folderItem.setDeployed(true);
+                String filePath = JOEHelper.getPathWithoutExtension(item.getFileName(), objType);
+                try {
+                    switch (objType) {
+                    case JOB:
+                        if (jobDbLayer == null) {
+                            jobDbLayer = new InventoryJobsDBLayer(getSession());
+                        }
+                        DBItemInventoryJob job = jobDbLayer.getInventoryJobByName(filePath, item.getInstanceId());
+                        folderItem.setTitle(job.getTitle());
+                        folderItem.setProcessClass(".".equals(job.getProcessClassName()) ? null : job.getProcessClassName());
+                        folderItem.setIsOrderJob(job.getIsOrderJob());
+                        joeTree.getJobs().add(folderItem);
+                        break;
+                    case JOBCHAIN:
+                        if (jobChainDbLayer == null) {
+                            jobChainDbLayer = new InventoryJobChainsDBLayer(getSession());
+                        }
+                        DBItemInventoryJobChain jobChain = jobChainDbLayer.getJobChainByPath(filePath, item.getInstanceId());
+                        folderItem.setTitle(jobChain.getTitle());
+                        folderItem.setProcessClass(".".equals(jobChain.getProcessClassName()) ? null : jobChain.getProcessClassName());
+//                        if (joeTree.contains(folderItem)) { // TODO
+//                            folderItem.setDeployed(false);
+//                        }
+                        joeTree.getJobChains().add(folderItem);
+                        break;
+                    case ORDER:
+                        if (orderDbLayer == null) {
+                            orderDbLayer = new InventoryOrdersDBLayer(getSession());
+                        }
+                        DBItemInventoryOrder order = orderDbLayer.getInventoryOrderByName(item.getInstanceId(), filePath);
+                        folderItem.setTitle(order.getTitle());
+                        folderItem.setInitialState(order.getInitialState());
+                        folderItem.setEndState(order.getEndState());
+                        folderItem.setPriority(order.getPriority() == null ? null : order.getPriority() + "");
+//                        if (joeResults.contains(folderItem)) { // TODO
+//                            folderItem.setDeployed(false);
+//                        }
+                        joeTree.getOrders().add(folderItem);
+                        break;
+                    case AGENTCLUSTER:
+                        if (processClassDbLayer == null) {
+                            processClassDbLayer = new InventoryProcessClassesDBLayer(getSession());
+                        }
+                        DBItemInventoryProcessClass agentCluster = processClassDbLayer.getProcessClass(filePath, item.getInstanceId());
+                        folderItem.setMaxProcesses(agentCluster.getMaxProcesses());
+                        joeTree.getAgentClusters().add(folderItem);
+                        break;
+                    case PROCESSCLASS:
+                        if (processClassDbLayer == null) {
+                            processClassDbLayer = new InventoryProcessClassesDBLayer(getSession());
+                        }
+                        DBItemInventoryProcessClass processClass = processClassDbLayer.getProcessClass(filePath, item.getInstanceId());
+                        folderItem.setMaxProcesses(processClass.getMaxProcesses());
+                        joeTree.getProcessClasses().add(folderItem);
+                        break;
+                    case LOCK:
+                        if (lockDbLayer == null) {
+                            lockDbLayer = new InventoryLocksDBLayer(getSession());
+                        }
+                        DBItemInventoryLock lock = lockDbLayer.getLock(filePath, item.getInstanceId());
+                        folderItem.setMaxNonExclusive(lock.getMaxNonExclusive());
+                        joeTree.getLocks().add(folderItem);
+                        break;
+                    case SCHEDULE:
+                        if (scheduleDbLayer == null) {
+                            scheduleDbLayer = new InventorySchedulesDBLayer(getSession());
+                        }
+                        DBItemInventorySchedule schedule = scheduleDbLayer.getSchedule(filePath, item.getInstanceId());
+                        folderItem.setTitle(schedule.getTitle());
+                        if (!".".equals(schedule.getSubstituteName())) {
+                            folderItem.setSubstitute(schedule.getSubstituteName());
+                            if (schedule.getSubstituteValidFrom() != null) {
+                                folderItem.setValidFrom(formatter.format(ZonedDateTime.ofInstant(schedule.getSubstituteValidFrom().toInstant(), ZoneId
+                                        .systemDefault()).withZoneSameInstant(zoneId)));
+                            }
+                            if (schedule.getSubstituteValidTo() != null) {
+                                folderItem.setValidTo(formatter.format(ZonedDateTime.ofInstant(schedule.getSubstituteValidTo().toInstant(), ZoneId
+                                        .systemDefault()).withZoneSameInstant(zoneId)));
+                            }
+                        }
+                        joeTree.getSchedules().add(folderItem);
+                        break;
+                    default:
+                        break;
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("", e);
+                }
             }
-            updatedJoeResults.add(joeTree);
+            if (joeTree.getAgentClusters() != null && joeTree.getAgentClusters().isEmpty()) {
+                joeTree.setAgentClusters(null);
+            }
+            if (joeTree.getJobChains() != null && joeTree.getJobChains().isEmpty()) {
+                joeTree.setJobChains(null);
+            }
+            if (joeTree.getJobs() != null && joeTree.getJobs().isEmpty()) {
+                joeTree.setJobs(null);
+            }
+            if (joeTree.getLocks() != null && joeTree.getLocks().isEmpty()) {
+                joeTree.setLocks(null);
+            }
+            if (joeTree.getMonitors() != null && joeTree.getMonitors().isEmpty()) {
+                joeTree.setMonitors(null);
+            }
+            if (joeTree.getOrders() != null && joeTree.getOrders().isEmpty()) {
+                joeTree.setOrders(null);
+            }
+            if (joeTree.getProcessClasses() != null && joeTree.getProcessClasses().isEmpty()) {
+                joeTree.setProcessClasses(null);
+            }
+            if (joeTree.getSchedules() != null && joeTree.getSchedules().isEmpty()) {
+                joeTree.setSchedules(null);
+            }
+            treeList.add(joeTree);
         }
-        joeResults.addAll(updatedJoeResults);
+        joeResults.addAll(treeList);
         return joeResults;
     }
 

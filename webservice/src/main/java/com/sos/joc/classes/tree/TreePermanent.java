@@ -2,6 +2,7 @@ package com.sos.joc.classes.tree;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -367,7 +368,7 @@ public class TreePermanent {
 		}
 	}
 	
-	public static SortedSet<JoeTree> initJoeFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId, String schedulerId)
+	public static SortedSet<JoeTree> initJoeFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId, String schedulerId, ZoneId zoneId)
             throws JocException {
         Comparator<JoeTree> byPath = Comparator.comparing(JoeTree::getPath).reversed();
         SortedSet<JoeTree> folders = new TreeSet<JoeTree>(byPath);
@@ -424,7 +425,7 @@ public class TreePermanent {
                     if (joeResults != null && !joeResults.isEmpty()) {
                         results.addAll(joeResults);
                     }
-                    results.addAll(dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes, joeResults));
+                    results.addAll(dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes, joeResults, zoneId));
                     if (results != null && !results.isEmpty()) {
                         if (folder.getRecursive() == null || folder.getRecursive()) {
                             folders.addAll(results);
@@ -440,7 +441,7 @@ public class TreePermanent {
                 if (joeResults != null && !joeResults.isEmpty()) {
                     results.addAll(joeResults);
                 }
-                results.addAll(dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes, joeResults));
+                results.addAll(dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes, joeResults, zoneId));
                 if (results != null && !results.isEmpty()) {
                     folders.addAll(results);
                 }
@@ -588,33 +589,41 @@ public class TreePermanent {
         return tree;
 	}
 
-	private static void fillTreeMap(Map<Path, TreeModel> treeMap, Path folder, TreeModel tree) {
-		Path parent = folder.getParent();
-		if (parent != null) {
-			TreeModel parentTree = new TreeModel();
-			if (treeMap.containsKey(parent)) {
-				parentTree = treeMap.get(parent);
-				List<Tree> treeList = parentTree.getFolders();
-				if (treeList == null) {
-					treeList = new ArrayList<Tree>();
-					treeList.add(tree);
-					parentTree.setFolders(treeList);
-				} else {
-					if (treeList.contains(tree)) {
-						treeList.remove(tree);
-					}
-					treeList.add(0, tree);
-				}
-			} else {
-				parentTree.setPath(parent.toString().replace('\\', '/'));
-				Path fileName = parent.getFileName();
-				parentTree.setName(fileName == null ? "" : fileName.toString());
-				List<Tree> treeList = new ArrayList<Tree>();
-				treeList.add(tree);
-				parentTree.setFolders(treeList);
-				treeMap.put(parent, parentTree);
-			}
-			fillTreeMap(treeMap, parent, parentTree);
-		}
-	}
+    private static void fillTreeMap(Map<Path, TreeModel> treeMap, Path folder, TreeModel tree) {
+        Path parent = folder.getParent();
+        if (parent != null) {
+            TreeModel parentTree = new TreeModel();
+            if (treeMap.containsKey(parent)) {
+                parentTree = treeMap.get(parent);
+                List<Tree> treeList = parentTree.getFolders();
+                if (treeList == null) {
+                    treeList = new ArrayList<Tree>();
+                    treeList.add(tree);
+                    parentTree.setFolders(treeList);
+                } else {
+                    if (treeList.contains(tree)) {
+                        treeList.remove(tree);
+                    }
+                    treeList.add(0, tree);
+                }
+            } else {
+                parentTree.setAgentClusters(null);
+                parentTree.setJobChains(null);
+                parentTree.setJobs(null);
+                parentTree.setLocks(null);
+                parentTree.setMonitors(null);
+                parentTree.setOrders(null);
+                parentTree.setProcessClasses(null);
+                parentTree.setSchedules(null);
+                parentTree.setPath(parent.toString().replace('\\', '/'));
+                Path fileName = parent.getFileName();
+                parentTree.setName(fileName == null ? "" : fileName.toString());
+                List<Tree> treeList = new ArrayList<Tree>();
+                treeList.add(tree);
+                parentTree.setFolders(treeList);
+                treeMap.put(parent, parentTree);
+            }
+            fillTreeMap(treeMap, parent, parentTree);
+        }
+    }
 }

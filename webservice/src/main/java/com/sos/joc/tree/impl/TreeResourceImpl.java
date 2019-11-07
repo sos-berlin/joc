@@ -1,6 +1,7 @@
 package com.sos.joc.tree.impl;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -106,7 +107,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 checkFoldersFilterParam(treeBody.getFolders());
             }
             SortedSet<JoeTree> folders = TreePermanent.initJoeFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId(), dbItemInventoryInstance
-                    .getSchedulerId());
+                    .getSchedulerId(), ZoneId.of(dbItemInventoryInstance.getTimeZone()));
             folderPermissions.setForce(treeBody.getForce());
 
             JoeTree root = TreePermanent.getJoeTree(folders, folderPermissions);
