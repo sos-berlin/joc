@@ -93,11 +93,11 @@ public class FilterJoeObjects {
     }
     
     public void setPathWithChildren(String path) {
-        if (!"/".equals(path)) {
+        //if (!"/".equals(path)) { //TODO warum hab' ich das gemacht?
             this.path = path;
             this.folder = path;
             this.pathWithChildren = true;
-        }
+        //}
     }
 
     public void setConstraint(JSObjectEdit body) {

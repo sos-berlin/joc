@@ -17,6 +17,7 @@ import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
+import com.sos.joc.exceptions.JobSchedulerModifyObjectException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.resource.IDeleteResource;
@@ -56,6 +57,10 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             }
             if (!folderPermissions.isPermittedForFolder(folder)) {
                 return accessDeniedResponse();
+            }
+            //It's not allowed to delete the root folder
+            if ("/".equals(body.getPath())) {
+                throw new JobSchedulerModifyObjectException("Deleting the root directory is not allowed.");
             }
             
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);

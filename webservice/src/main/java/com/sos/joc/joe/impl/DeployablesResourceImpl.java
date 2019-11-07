@@ -67,6 +67,9 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
                         if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
                             return false;
                         }
+                        if (!joeObject.operationIsDelete() && joeObject.getConfiguration() == null) {
+                            return false;
+                        }
                     }
                     return true;
                 }).map(joeObject -> {
