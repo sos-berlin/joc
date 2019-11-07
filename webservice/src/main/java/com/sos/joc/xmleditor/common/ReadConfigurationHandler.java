@@ -98,7 +98,7 @@ public class ReadConfigurationHandler {
             }
         } else {
             deployed = true;
-            live = new String(liveFile);
+            live = new String(liveFile, JocXmlEditor.CHARSET);
             liveModified = hotFolder.getLastModifiedDate();
         }
         current = live;
