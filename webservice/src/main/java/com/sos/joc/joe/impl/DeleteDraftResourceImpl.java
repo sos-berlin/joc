@@ -88,7 +88,7 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
             entity.setLockedSince(e.getLockedSince());
             entity.setLockedBy(e.getLockedBy());
             entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus434(entity);F
+            return JOCDefaultResponse.responseStatus434(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
