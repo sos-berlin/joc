@@ -1406,25 +1406,6 @@ traits:
         schema200: !include schemas/jobChain/jobChains_p-schema.json
         example: TODO
         example200: !include examples/jobChain/jobChains_p-example.json
-  /tree:
-    type:
-       postJSON:
-         description: This is not a real API Url. Only for mock data. Please use ./tree later with "types":["JOBCHAIN"]
-         description1: " "
-         description2: " "
-         description3: " "
-         description4: " "
-         description5: " "
-         description6: " "
-         description7: " "
-         description8: " "
-         description9: " "
-         description10: " "
-         description200: " "
-         schema: !include schemas/tree/treeFilter-schema.json
-         schema200: !include schemas/tree/treeView-schema.json
-         example: !include examples/tree/filteredtree-example.json
-         example200: !include examples/tree/tree_jobChains-example.json
   /stop:
     type:
       modifyJobChain:
@@ -2026,7 +2007,7 @@ traits:
   type:
     postJSON:
       description: Collections of specified object with folders information in a tree structure
-      description1: !include documentation/common/compact.md
+      description1: " "
       description2: " "
       description3: " "
       description4: " "
@@ -2041,6 +2022,25 @@ traits:
       schema200: !include schemas/tree/treeView-schema.json
       example: !include examples/tree/filteredtree-example.json
       example200: !include examples/tree/tree-example.json
+  /joe:
+    type:
+      postJSON:
+        description: Collections of specified object with folders information in a tree structure
+        description1: " "
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: !include documentation/common/folders.md
+        description7: !include documentation/common/typesParam.md
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/tree/treeJoe.md
+        schema: !include schemas/tree/treeFilter-schema.json
+        schema200: !include schemas/tree/treeViewJoe-schema.json
+        example: !include examples/tree/filteredtree-example.json
+        example200: !include examples/tree/treeJoe-example.json
 
 /configuration:
   type:
@@ -2983,15 +2983,34 @@ traits:
         schema200: ok
         example: " "
         example200: " "
-  /deploy:
+  /deletedraft:
     type:
       postJSON:
-        description: Deploy configuration files to JobScheduler
+        description: Deletes draft version
         description1: !include documentation/joe/jsObject.md
         description2: !include documentation/joe/objectName.md
         description3: !include documentation/joe/folder.md
-        description4: !include documentation/audit/auditLog.md
-        description5: " "
+        description4: !include documentation/joe/account.md
+        description5: !include documentation/audit/auditLog.md
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/joe/common/filter-deploy-schema.json
+        schema200: ok
+        example: " "
+        example200: " "
+  /deploy:
+    type:
+      postJSON:
+        description: Deploys configuration files to JobScheduler
+        description1: !include documentation/joe/jsObject.md
+        description2: !include documentation/joe/objectName.md
+        description3: !include documentation/joe/folder.md
+        description4: !include documentation/joe/account.md
+        description5: !include documentation/audit/auditLog.md
         description6: " "
         description7: " "
         description8: " "

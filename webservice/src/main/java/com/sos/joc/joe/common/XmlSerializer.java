@@ -121,7 +121,7 @@ public class XmlSerializer {
             return (T) serializeAbstractSchedule((AbstractSchedule) obj);
 
         case "Monitor":
-            return (T) serializeMonitor((Monitor) obj);
+            return (T) serializeMonitor((Monitor) obj, false);
 
         case "Config":
             return (T) serializeNodeParams((Config) obj);
@@ -213,6 +213,9 @@ public class XmlSerializer {
             }
         }
         job.setScript(serializeScript(job.getScript()));
+        if (job.getMonitors() != null) {
+            job.setMonitors(job.getMonitors().stream().map(i -> serializeMonitor(i, true)).collect(Collectors.toList()));
+        }
 
         return job;
     }
@@ -272,8 +275,10 @@ public class XmlSerializer {
         return processClass;
     }
 
-    public static Monitor serializeMonitor(Monitor monitor) {
-        monitor.setName(null);
+    public static Monitor serializeMonitor(Monitor monitor, boolean internal) {
+        if (!internal) {
+            monitor.setName(null);
+        }
         monitor.setScript(serializeScript(monitor.getScript()));
         return monitor;
     }

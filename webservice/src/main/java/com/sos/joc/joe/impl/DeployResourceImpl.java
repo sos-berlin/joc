@@ -24,6 +24,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.jobscheduler.model.event.CalendarEvent;
 import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.jobscheduler.model.event.CalendarVariables;
+import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.ClusterMemberHandler;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -229,6 +230,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             deleteCalendarUsedBy(sosHibernateSession, body.getJobschedulerId(), "FOLDER", joeObject.getPath());
                         }
 
+                        touchedFolders.add(joeObject.getPath());
                         deletedFolders.add(joeObject.getPath());
                         dbLayerJoeObjects.delete(joeObject);
                         // delete all children of deleted folder in the database
@@ -282,6 +284,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 }
                             } else {
                                 // TODO add configuration monitor in corresponding jobs if objType == NODEPARAMS
+                                if ("NODEPARAMS".equals(objType)) {
+                                    addConfigurationMonitorToJobs(joeObject.getPath(), joeObject.getConfiguration());
+                                }
                                 jocHotFolder.putFile(joeObject.getPath() + extension, xmlContent);
                                 clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
                                 updateCalendarUsedBy(xmlContent, sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
@@ -323,6 +328,15 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     }
                 }
             }
+            
+            for (String touchedFolder : touchedFolders) {
+                try {
+                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(touchedFolder, JobSchedulerObjectType.FOLDER.value());
+                    SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
+                } catch (Exception e) {
+                    //
+                }
+            }
 
             // release folder if no further drafts inside of current body.getAccount()
             touchedFolders.removeAll(deletedFolders);
@@ -352,6 +366,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         } finally {
             Globals.disconnect(sosHibernateSession);
         }
+    }
+
+    private void addConfigurationMonitorToJobs(String path, String configuration) {
+        // TODO Auto-generated method stub
+        
     }
 
     private void deleteWithAllChildren(DBLayerJoeObjects dbLayerJoeObjects, DBItemJoeObject joeObject) throws DBConnectionRefusedException,

@@ -100,10 +100,14 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             boolean oldItemExists = true;
             if (oldItem == null) {
                 oldItemExists = false;
-                String extension = JOEHelper.getFileExtension(body.getObjectType());
-                JOCHotFolder jocHotFolder = new JOCHotFolder(this);
                 oldItem = new DBItemJoeObject();
-                oldItem.setConfiguration(new String(jocHotFolder.getFile(body.getOldPath() + extension)));
+                if (!isDirectory) {
+                    String extension = JOEHelper.getFileExtension(body.getObjectType());
+                    JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                    oldItem.setConfiguration(new String(jocHotFolder.getFile(body.getOldPath() + extension)));
+                } else {
+                    oldItem.setConfiguration(null);
+                }
                 oldItem.setAccount(getAccount());
                 oldItem.setAuditLogId(null);
                 oldItem.setFolder(Paths.get(body.getOldPath()).getParent().toString().replace('\\', '/'));
