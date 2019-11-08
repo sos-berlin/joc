@@ -1,5 +1,6 @@
 package com.sos.joc.joe.impl;
 
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -11,16 +12,16 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
-import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
-import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocObjectAlreadyExistException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
@@ -96,8 +97,23 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             oldPathFilter.setConstraint(body);
             oldPathFilter.setPath(body.getOldPath());
             DBItemJoeObject oldItem = dbJoeLayer.getJoeObject(oldPathFilter);
+            boolean oldItemExists = true;
             if (oldItem == null) {
-                throw new JobSchedulerObjectNotExistException(body.getOldPath());
+                oldItemExists = false;
+                String extension = JOEHelper.getFileExtension(body.getObjectType());
+                JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                oldItem = new DBItemJoeObject();
+                oldItem.setConfiguration(new String(jocHotFolder.getFile(body.getOldPath() + extension)));
+                oldItem.setAccount(getAccount());
+                oldItem.setAuditLogId(null);
+                oldItem.setFolder(Paths.get(body.getOldPath()).getParent().toString().replace('\\', '/'));
+                oldItem.setPath(body.getOldPath());
+                oldItem.setId(null);
+                oldItem.setCreated(Date.from(Instant.now()));
+                oldItem.setModified(oldItem.getCreated());
+                oldItem.setObjectType(body.getObjectType().value());
+                oldItem.setOperation("store");
+                oldItem.setSchedulerId(body.getJobschedulerId());
             }
             
             FilterJoeObjects newPathFilter = new FilterJoeObjects();
@@ -130,7 +146,11 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     oldItem.setOperation("delete");
                     oldItem.setAccount(getAccount());
                     oldItem.setModified(Date.from(Instant.now()));
-                    dbJoeLayer.update(oldItem);
+                    if (oldItemExists) {
+                        dbJoeLayer.update(oldItem);
+                    } else {
+                        dbJoeLayer.save(oldItem); 
+                    }
                     for (DBItemJoeObject child : children) {
                         boolean childExistsInInventory = false;
                         if ("FOLDER".equals(child.getObjectType())) {
@@ -153,7 +173,9 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                         
                     }
                 } else {
-                    dbJoeLayer.delete(oldItem);
+                    if (oldItemExists) {
+                        dbJoeLayer.delete(oldItem);
+                    }
                     for (DBItemJoeObject child : children) {
                         child.setPath(body.getPath() + child.getPath().substring(oldPathLength));
                         child.setFolder(getParent(child.getPath()));
@@ -166,9 +188,15 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     oldItem.setOperation("delete");
                     oldItem.setAccount(getAccount());
                     oldItem.setModified(Date.from(Instant.now()));
-                    dbJoeLayer.update(oldItem);
+                    if (oldItemExists) {
+                        dbJoeLayer.update(oldItem);
+                    } else {
+                        dbJoeLayer.save(oldItem);
+                    }
                 } else {
-                    dbJoeLayer.delete(oldItem);
+                    if (oldItemExists) {
+                        dbJoeLayer.delete(oldItem);
+                    }
                 }
             }
             

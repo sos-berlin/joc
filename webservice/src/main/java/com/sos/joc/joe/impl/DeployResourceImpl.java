@@ -18,7 +18,6 @@ import org.w3c.dom.NodeList;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.joe.DBItemJoeLock;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
@@ -142,10 +141,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             deployAnswer.setObjectType(body.getObjectType());
             deployAnswer.setRecursive(body.getRecursive());
 
-            Map<String, DBItemJoeLock> mapOfLocks = null;
-            if (body.getAccount() != null && !body.getAccount().isEmpty()) {
-                mapOfLocks = dbLayerJoeLocks.getLocksFromOthers(body.getJobschedulerId(), body.getAccount());
-            }
+//            Map<String, DBItemJoeLock> mapOfLocks = null;
+//            if (body.getAccount() != null && !body.getAccount().isEmpty()) {
+//                mapOfLocks = dbLayerJoeLocks.getLocksFromOthers(body.getJobschedulerId(), body.getAccount());
+//            }
             Set<String> touchedFolders = new HashSet<String>();
             Set<String> deletedFolders = new HashSet<String>();
 
@@ -173,10 +172,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 continue;
                             }
 
-                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
-                                deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(getParent(joeObject.getPath()))));
-                                continue;
-                            }
+//                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
+//                                deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(getParent(joeObject.getPath()))));
+//                                continue;
+//                            }
 
                             String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
 
@@ -212,10 +211,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             continue;
                         }
 
-                        if (mapOfLocks != null && mapOfLocks.containsKey(joeObject.getPath())) {
-                            deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(joeObject.getPath())));
-                            continue;
-                        }
+//                        if (mapOfLocks != null && mapOfLocks.containsKey(joeObject.getPath())) {
+//                            deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(joeObject.getPath())));
+//                            continue;
+//                        }
 
                         boolean objExists = true;
                         try {
@@ -264,10 +263,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 continue;
                             }
 
-                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
-                                deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(getParent(joeObject.getPath()))));
-                                continue;
-                            }
+//                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
+//                                deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(getParent(joeObject.getPath()))));
+//                                continue;
+//                            }
 
                             String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
                             ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath()
@@ -305,10 +304,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             continue;
                         }
 
-                        if (mapOfLocks != null && mapOfLocks.containsKey(joeObject.getPath())) {
-                            deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(joeObject.getPath())));
-                            continue;
-                        }
+//                        if (mapOfLocks != null && mapOfLocks.containsKey(joeObject.getPath())) {
+//                            deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(joeObject.getPath())));
+//                            continue;
+//                        }
 
                         jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()));
 
@@ -468,11 +467,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         return deployMessage;
     }
 
-    private DeployMessage getFolderIsLockedMessage(DBItemJoeLock lockItem) {
-        DeployMessage deployMessage = new DeployMessage();
-        deployMessage.setMessage("Folder locked by " + lockItem.getAccount());
-        deployMessage.setPermissionDeniedFor(lockItem.getFolder());
-        return deployMessage;
-    }
+//    private DeployMessage getFolderIsLockedMessage(DBItemJoeLock lockItem) {
+//        DeployMessage deployMessage = new DeployMessage();
+//        deployMessage.setMessage("Folder locked by " + lockItem.getAccount());
+//        deployMessage.setPermissionDeniedFor(lockItem.getFolder());
+//        return deployMessage;
+//    }
 
 }

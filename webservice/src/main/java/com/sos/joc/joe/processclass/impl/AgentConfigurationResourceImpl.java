@@ -11,6 +11,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.ModifyProcessClassAudit;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.joe.common.XmlSerializer;
@@ -34,6 +35,11 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            if (versionIsOlderThan("1.13.1")) {
+                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
+            }
+            
             checkRequiredParameter("processClass", agentFilter.getProcessClass());
 
             JOCHotFolder httpClient = new JOCHotFolder(this);
@@ -64,6 +70,11 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            if (versionIsOlderThan("1.13.1")) {
+                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
+            }
+            
             //checkRequiredParameter("processClass", configuration.getPath());
             checkRequiredParameter("processClass", configuration.getProcessClass());
             ProcessClass agent = configuration.getConfiguration();
@@ -102,6 +113,10 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
                     getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
+            }
+            
+            if (versionIsOlderThan("1.13.1")) {
+                throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
             }
             //checkRequiredParameter("processClass", agentFilter.getPath());
             checkRequiredParameter("processClass", agentFilter.getProcessClass());
