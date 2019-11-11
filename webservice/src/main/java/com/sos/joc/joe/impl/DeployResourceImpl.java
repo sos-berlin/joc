@@ -100,16 +100,19 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
             filterJoeObjects.setAccount(body.getAccount());
             if (!folderDeploy) {
+                filterJoeObjects.setFolder(folder); 
                 if (body.getObjectName() != null && !body.getObjectName().isEmpty()) {
                     filterJoeObjects.setPath((folder + "/").replaceAll("//+", "/") + body.getObjectName());
-                } else {
-                    filterJoeObjects.setFolder(folder); 
                 }
                 if (JobSchedulerObjectType.JOBCHAIN == body.getObjectType() && (body.getObjectName() == null || body.getObjectName().isEmpty())) {
                     //if clicked deploy in job chain action menu
                     filterJoeObjects.setObjectTypes(body.getObjectType().value(), JobSchedulerObjectType.ORDER.value(),
                             JobSchedulerObjectType.NODEPARAMS.value());
-                } else if (JobSchedulerObjectType.ORDER == body.getObjectType() || JobSchedulerObjectType.JOBCHAIN == body.getObjectType()) {
+                } else if (JobSchedulerObjectType.JOBCHAIN == body.getObjectType()) {
+                    filterJoeObjects.setObjectTypes(body.getObjectType().value(), JobSchedulerObjectType.ORDER.value(),
+                            JobSchedulerObjectType.NODEPARAMS.value());
+                    filterJoeObjects.setJobChainWithOrders(filterJoeObjects.getPath());
+                } else if (JobSchedulerObjectType.ORDER == body.getObjectType()) {
                     filterJoeObjects.setObjectTypes(body.getObjectType().value(), JobSchedulerObjectType.NODEPARAMS.value());
                 } else {
                     filterJoeObjects.setObjectType(body.getObjectType());

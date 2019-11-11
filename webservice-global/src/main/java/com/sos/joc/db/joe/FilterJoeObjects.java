@@ -14,12 +14,14 @@ public class FilterJoeObjects {
     private List<String> objectTypes;
     private String account;
     private String path;
+    private String orderPath;
     private String folder;
     private String operation;
     private Object orderCriteria;
     private String sortMode="asc";
     private String pathAbsolut;
     private boolean pathWithChildren = false;
+    private boolean jobChainWithOrders = false;
  
     public void setConstraint(Filter filter) {
         schedulerId = filter.getJobschedulerId();
@@ -93,11 +95,23 @@ public class FilterJoeObjects {
     }
     
     public void setPathWithChildren(String path) {
-        //if (!"/".equals(path)) { //TODO warum hab' ich das gemacht?
-            this.path = path;
-            this.folder = path;
-            this.pathWithChildren = true;
-        //}
+        this.path = path;
+        this.folder = path;
+        this.pathWithChildren = true;
+    }
+    
+    public boolean isJobChainWithOrders() {
+        return jobChainWithOrders;
+    }
+    
+    public String getOrderPath() {
+        return orderPath;
+    }
+
+    public void setJobChainWithOrders(String path) {
+        this.path = path;
+        this.orderPath = path + ",%";
+        this.jobChainWithOrders = true;
     }
 
     public void setConstraint(JSObjectEdit body) {

@@ -56,6 +56,8 @@ public class DBLayerJoeObjects {
             if (filter.getPath() != null && !filter.getPath().isEmpty()) {
                 if (filter.isRecursive()) {
                     conditions.add("(path like :path or path = :pathabsolut)");
+                } else if (filter.isJobChainWithOrders()) {
+                    conditions.add("(path like :orderPath or path = :path)");
                 } else {
                     conditions.add("path = :path");
                 }
@@ -117,6 +119,9 @@ public class DBLayerJoeObjects {
         }
         if (filter.isRecursive()) {
             query.setParameter("pathabsolut", filter.getPathAbsolut());
+        }
+        if (filter.isJobChainWithOrders()) {
+            query.setParameter("orderPath", filter.getOrderPath());
         }
         if (filter.getFolder() != null && !filter.getFolder().isEmpty()) {
             query.setParameter("folder", filter.getFolder());
