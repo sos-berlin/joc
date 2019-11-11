@@ -93,7 +93,7 @@ public class ConfigurationMonitor {
                         conf = Globals.objectMapper.writeValueAsString(jobPojo);
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("", e);
+                    LOGGER.warn("adding fails with " + curJob + " in the deploy", e);
                 }
                 if (conf != null) {
                     curJob.setConfiguration(conf);
@@ -115,14 +115,14 @@ public class ConfigurationMonitor {
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("", e);
+                    LOGGER.warn("adding fails with " + draftJob + " in the draft table", e);
                 }
                 if (conf != null && dbItem != null) {
                     dbItem.setConfiguration(conf);
                     try {
                         dbLayerJoe.update(dbItem);
                     } catch (Exception e) {
-                        LOGGER.warn("", e);
+                        LOGGER.warn("adding fails with " + draftJob + " in the draft table", e);
                     }
                 }
             }
@@ -136,7 +136,7 @@ public class ConfigurationMonitor {
                         conf = Globals.objectMapper.writeValueAsString(jobPojo);
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("", e);
+                    LOGGER.warn("adding fails with " + liveJob + " in the live folder", e);
                 }
                 if (conf != null) {
                     DBItemJoeObject liveJobItem = new DBItemJoeObject();
@@ -190,7 +190,7 @@ public class ConfigurationMonitor {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("", e);
+            LOGGER.warn("determining Jobs from inventory fails", e);
         }
         return new HashSet<String>();
     }
@@ -217,7 +217,7 @@ public class ConfigurationMonitor {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("", e);
+            LOGGER.warn("determining Jobs from drafts fails", e);
         }
         return new HashSet<String>();
     }
@@ -260,7 +260,7 @@ public class ConfigurationMonitor {
                 return states;
             }
         } catch (Exception e) {
-            LOGGER.warn("", e);
+            LOGGER.warn("reading node parameters in " + nodeParamsConfiguration + " fails", e);
         }
         return null;
     }
