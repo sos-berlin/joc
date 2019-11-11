@@ -115,7 +115,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 dbLayer.save(item);
                 
                 try {
-                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
+                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(folder);
                     SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
                 } catch (Exception e) {
                     //

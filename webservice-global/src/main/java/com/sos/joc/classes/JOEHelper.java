@@ -134,12 +134,12 @@ public class JOEHelper {
         return outputStream.toByteArray();
     }
 
-    public static CustomEvent getJoeUpdatedEvent(String path, String objectType) {
+    public static CustomEvent getJoeUpdatedEvent(String path) {
         CustomEvent evt = new CustomEvent();
         evt.setKey("JoeUpdated");
         CustomEventVariables evtVars = new CustomEventVariables();
         evtVars.setAdditionalProperty("path", path);
-        evtVars.setAdditionalProperty("objectType", objectType);
+        evtVars.setAdditionalProperty("objectType", JobSchedulerObjectType.FOLDER.value());
         evt.setVariables(evtVars);
         return evt;
     }

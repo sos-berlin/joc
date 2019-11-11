@@ -151,7 +151,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             deployAnswer.setJobschedulerId(body.getJobschedulerId());
             deployAnswer.setObjectName(body.getObjectName());
             deployAnswer.setObjectType(body.getObjectType());
-            deployAnswer.setRecursive(body.getRecursive());
+            deployAnswer.setRecursive(filterJoeObjects.isRecursive());
 
 //            Map<String, DBItemJoeLock> mapOfLocks = null;
 //            if (body.getAccount() != null && !body.getAccount().isEmpty()) {
@@ -364,7 +364,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             
             for (String touchedFolder : touchedFolders) {
                 try {
-                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(touchedFolder, JobSchedulerObjectType.FOLDER.value());
+                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(touchedFolder);
                     SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
                 } catch (Exception e) {
                     //

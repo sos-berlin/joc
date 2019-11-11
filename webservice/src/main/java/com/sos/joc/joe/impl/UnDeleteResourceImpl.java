@@ -80,7 +80,7 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             }
 
             try {
-                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
+                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(folder);
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
             } catch (Exception e) {
                 //

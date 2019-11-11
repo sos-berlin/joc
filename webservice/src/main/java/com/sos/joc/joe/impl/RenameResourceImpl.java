@@ -58,7 +58,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             checkRequiredParameter("oldPath", body.getOldPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
             String folder = null;
-            //String oldFolder = null;
+            String oldFolder = null;
             
             if (isDirectory) { //TODO for later versions
                 throw new JobSchedulerBadRequestException("Renaming of folders are not supported");
@@ -71,7 +71,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
                 }
                 folder = body.getPath();
-                //oldFolder = body.getOldPath();
+                oldFolder = body.getOldPath();
 
             } else {
                 body.setPath(normalizePath(body.getPath()));
@@ -80,7 +80,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
                 }
                 folder = getParent(body.getPath());
-                //oldFolder = getParent(body.getOldPath());
+                oldFolder = getParent(body.getOldPath());
             }
             if (!this.folderPermissions.isPermittedForFolder(folder)) {
                 return accessDeniedResponse();
@@ -205,10 +205,12 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             }
             
             try {
-                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
+                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(folder);
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
-                evt = JOEHelper.getJoeUpdatedEvent(body.getOldPath(), body.getObjectType().value());
-                SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
+                if (!folder.equals(oldFolder)) {
+                    evt = JOEHelper.getJoeUpdatedEvent(oldFolder);
+                    SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
+                }
             } catch (Exception e) {
                 //
             }

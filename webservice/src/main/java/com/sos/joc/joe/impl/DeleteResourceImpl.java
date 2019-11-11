@@ -96,7 +96,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             }
             
             try {
-                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getPath(), body.getObjectType().value());
+                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(folder);
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
             } catch (Exception e) {
                 //

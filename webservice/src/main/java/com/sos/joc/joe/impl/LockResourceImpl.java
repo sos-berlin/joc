@@ -67,7 +67,7 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
                     body.getForceLock(), getAccount());
             if (lock != null) {
                 try {
-                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getFolder(), "FOLDER");
+                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getFolder());
                     SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
                 } catch (Exception e) {
                 }

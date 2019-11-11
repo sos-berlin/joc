@@ -74,7 +74,7 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
             Globals.commit(sosHibernateSession);
 
             try {
-                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getFolder(), body.getObjectType().value());
+                CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getFolder());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
             } catch (Exception e) {
                 //

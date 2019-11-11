@@ -29,7 +29,6 @@ import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.job.Monitor;
 import com.sos.joc.model.joe.job.Script;
 import com.sos.joc.model.joe.jobchain.JobChain;
-import com.sos.joc.model.joe.jobchain.JobChainNode;
 import com.sos.joc.model.joe.nodeparams.Config;
 import com.sos.joc.model.joe.nodeparams.ConfigNode;
 import com.sos.joc.model.joe.nodeparams.ConfigOrder;
@@ -47,6 +46,8 @@ public class ConfigurationMonitor {
     private final Long instanceId;
     private final String jobschedulerId;
     private Set<DBItemJoeObject> nodeParams = new HashSet<DBItemJoeObject>();
+    private DBLayerJoeObjects dbLayerJoe;
+    private FilterJoeObjects joeFilter = new FilterJoeObjects();
 
     public ConfigurationMonitor(SOSHibernateSession sosHibernateSession, JOCHotFolder jocHotFolder, Long instanceId, String jobschedulerId,
             String bodyAccount, String curAccount) {
@@ -59,6 +60,8 @@ public class ConfigurationMonitor {
         } else {
             this.account = bodyAccount;
         }
+        dbLayerJoe = new DBLayerJoeObjects(sosHibernateSession);
+        joeFilter.setSchedulerId(jobschedulerId);
     }
 
     public Set<DBItemJoeObject> addConfigurationMonitor(Set<DBItemJoeObject> curJobs) {
@@ -68,7 +71,7 @@ public class ConfigurationMonitor {
         if (!nodeParams.isEmpty() && instanceId != null && jobschedulerId != null && !jobschedulerId.isEmpty()) {
             Set<String> jobs = new HashSet<String>();
             for (DBItemJoeObject nodeParam : nodeParams) {
-                jobs.addAll(getJobs(instanceId, jobschedulerId, nodeParam.getPath(), nodeParam.getConfiguration()));
+                jobs.addAll(getJobs(nodeParam.getPath(), nodeParam.getConfiguration()));
             }
             // change current jobs from same deploy
             for (DBItemJoeObject curJob : curJobs) {
@@ -94,6 +97,33 @@ public class ConfigurationMonitor {
                 }
                 if (conf != null) {
                     curJob.setConfiguration(conf);
+                }
+            }
+            // change draft jobs
+            for (String draftJob : jobs) {
+                String conf = null;
+                DBItemJoeObject dbItem = null;
+                try {
+                    joeFilter.setObjectType(JobSchedulerObjectType.JOB);
+                    joeFilter.setPath(draftJob);
+                    dbItem = dbLayerJoe.getJoeObject(joeFilter);
+                    if (dbItem != null && dbItem.getConfiguration() != null) {
+                        Job jobPojo = Globals.objectMapper.readValue(dbItem.getConfiguration(), Job.class);
+                        if (jobPojo != null && !jobHasConfigurationMonitor(jobPojo)) {
+                            jobPojo = addConfigurationMonitor(jobPojo);
+                            conf = Globals.objectMapper.writeValueAsString(jobPojo);
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("", e);
+                }
+                if (conf != null && dbItem != null) {
+                    dbItem.setConfiguration(conf);
+                    try {
+                        dbLayerJoe.update(dbItem);
+                    } catch (Exception e) {
+                        LOGGER.warn("", e);
+                    }
                 }
             }
             // load other Jobs from Hot Folder into the deploy if necessary
@@ -130,18 +160,18 @@ public class ConfigurationMonitor {
         this.nodeParams.add(nodeParams);
     }
 
-    private Set<String> getJobs(Long instanceId, String jobschedulerId, String nodeParamsPath, String nodeParamsConfiguration) {
+    private Set<String> getJobs(String nodeParamsPath, String nodeParamsConfiguration) {
         Set<String> states = getStates(nodeParamsConfiguration);
         if (states != null) {
             String jobChain = getJobChainPath(nodeParamsPath);
             Set<String> jobs = getJobsFromDraft(jobschedulerId, jobChain, states);
-            jobs.addAll(getJobsFromInventory(instanceId, jobChain, states));
+            jobs.addAll(getJobsFromInventory(jobChain, states));
             return jobs;
         }
         return new HashSet<String>();
     }
 
-    private Set<String> getJobsFromInventory(Long instanceId, String jobChain, Set<String> states) {
+    private Set<String> getJobsFromInventory(String jobChain, Set<String> states) {
         if (instanceId == null || jobChain == null || jobChain.isEmpty()) {
             return new HashSet<String>();
         }
@@ -169,13 +199,10 @@ public class ConfigurationMonitor {
         if (jobschedulerId == null || jobschedulerId.isEmpty() || jobChain == null || jobChain.isEmpty()) {
             return new HashSet<String>();
         }
-        DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
-        FilterJoeObjects filter = new FilterJoeObjects();
-        filter.setObjectType(JobSchedulerObjectType.JOBCHAIN);
-        filter.setPath(jobChain);
-        filter.setSchedulerId(jobschedulerId);
+        joeFilter.setObjectType(JobSchedulerObjectType.JOBCHAIN);
+        joeFilter.setPath(jobChain);
         try {
-            DBItemJoeObject dbItem = dbLayer.getJoeObject(filter);
+            DBItemJoeObject dbItem = dbLayerJoe.getJoeObject(joeFilter);
             if (dbItem != null && dbItem.getConfiguration() != null) {
                 final Path jobChainFolder = Paths.get(jobChain).getParent();
                 JobChain jobChainPojo = Globals.objectMapper.readValue(dbItem.getConfiguration(), JobChain.class);
