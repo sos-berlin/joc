@@ -47,17 +47,17 @@ public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
         switch (joeObject.getObjectType()) {
         case "JOB":
             this.job = joeObject.getPath();
-            setFolder(path.getParent().toString().replace('\\', '/'));
+            setFolder(joeObject.getFolder());
             setObjectName(path.getFileName().toString());
             break;
         case "JOBCHAIN":
             this.jobChain = joeObject.getPath();
-            setFolder(path.getParent().toString().replace('\\', '/'));
+            setFolder(joeObject.getFolder());
             setObjectName(path.getFileName().toString());
             break;
         case "ORDER":
             this.order = joeObject.getPath();
-            setFolder(path.getParent().toString().replace('\\', '/'));
+            setFolder(joeObject.getFolder());
             setObjectName(path.getFileName().toString());
             break;
         case "FOLDER":
@@ -65,7 +65,7 @@ public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
             setObjectName(null);
             break;
         default:
-            setFolder(path.getParent().toString().replace('\\', '/'));
+            setFolder(joeObject.getFolder());
             setObjectName(path.getFileName().toString());
             break;
         }

@@ -70,7 +70,7 @@ public class DBLayerJoeObjects {
             conditions.add("objectType = :objectType");
         }
 
-        if (filter.getObjectTypes() != null && filter.getObjectTypes().size() > 0) {
+        if (filter.getObjectTypes() != null && !filter.getObjectTypes().isEmpty()) {
             if (filter.getObjectTypes().size() == 1) {
                 conditions.add("objectType = :objectTypes");
             } else {
@@ -105,7 +105,7 @@ public class DBLayerJoeObjects {
         if (filter.getObjectType() != null) {
             query.setParameter("objectType", filter.getObjectType().value());
         }
-        if (filter.getObjectTypes() != null && filter.getObjectTypes().size() > 0) {
+        if (filter.getObjectTypes() != null && !filter.getObjectTypes().isEmpty()) {
             if (filter.getObjectTypes().size() == 1) {
                 query.setParameter("objectTypes", filter.getObjectTypes().get(0));
             } else {
@@ -321,7 +321,9 @@ public class DBLayerJoeObjects {
 
     public void delete(DBItemJoeObject joeObject) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            sosHibernateSession.delete(joeObject);
+            if (joeObject != null && joeObject.getId() != null) {
+                sosHibernateSession.delete(joeObject);
+            }
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

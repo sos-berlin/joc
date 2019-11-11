@@ -44,6 +44,7 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerModifyObjectException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.joe.common.ConfigurationMonitor;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IDeployResource;
 import com.sos.joc.model.calendar.Calendar;
@@ -79,8 +80,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
 
             checkRequiredParameter("folder", body.getFolder());
-            if (body.getObjectType() != null && !body.getObjectType().value().isEmpty() && !JOEHelper.CLASS_MAPPING.containsKey(body.getObjectType()
-                    .value())) {
+            if (body.getObjectType() != null && !body.getObjectType().value().isEmpty() && (!JOEHelper.CLASS_MAPPING.containsKey(body.getObjectType()
+                    .value()) || JobSchedulerObjectType.FOLDER == body.getObjectType())) {
                 throw new JobSchedulerBadRequestException("unsupported object type: " + body.getObjectType().value());
             }
 
@@ -94,13 +95,21 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             DBLayerJoeObjects dbLayerJoeObjects = new DBLayerJoeObjects(sosHibernateSession);
             DBLayerJoeLocks dbLayerJoeLocks = new DBLayerJoeLocks(sosHibernateSession);
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
-            boolean folderDeploy = body.getObjectName() == null || body.getObjectName().isEmpty();
+            boolean folderDeploy = body.getObjectType() == null || body.getObjectType() == JobSchedulerObjectType.FOLDER;
 
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
             filterJoeObjects.setAccount(body.getAccount());
             if (!folderDeploy) {
-                filterJoeObjects.setPath((folder + "/").replaceAll("//+", "/") + body.getObjectName());
-                if (JobSchedulerObjectType.ORDER == body.getObjectType() || JobSchedulerObjectType.JOBCHAIN == body.getObjectType()) {
+                if (body.getObjectName() != null && !body.getObjectName().isEmpty()) {
+                    filterJoeObjects.setPath((folder + "/").replaceAll("//+", "/") + body.getObjectName());
+                } else {
+                    filterJoeObjects.setFolder(folder); 
+                }
+                if (JobSchedulerObjectType.JOBCHAIN == body.getObjectType() && (body.getObjectName() == null || body.getObjectName().isEmpty())) {
+                    //if clicked deploy in job chain action menu
+                    filterJoeObjects.setObjectTypes(body.getObjectType().value(), JobSchedulerObjectType.ORDER.value(),
+                            JobSchedulerObjectType.NODEPARAMS.value());
+                } else if (JobSchedulerObjectType.ORDER == body.getObjectType() || JobSchedulerObjectType.JOBCHAIN == body.getObjectType()) {
                     filterJoeObjects.setObjectTypes(body.getObjectType().value(), JobSchedulerObjectType.NODEPARAMS.value());
                 } else {
                     filterJoeObjects.setObjectType(body.getObjectType());
@@ -133,7 +142,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             filterJoeObjects.setSortMode("desc");
 
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-            
+            ConfigurationMonitor configurationMonitor = new ConfigurationMonitor(sosHibernateSession, jocHotFolder, dbItemInventoryInstance.getId(),
+                    body.getJobschedulerId(), body.getAccount(), getAccount());
+
             DeployAnswer deployAnswer = new DeployAnswer();
             deployAnswer.setMessages(new ArrayList<DeployMessage>());
             deployAnswer.setFolder(folder);
@@ -171,6 +182,16 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
                                 deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
                                 continue;
+                            }
+                            
+                            if (!folderDeploy && "NODEPARAMS".equals(objType) && filterJoeObjects.getObjectTypes() != null) {
+                                boolean isOrderNodeParams = joeObject.getPath().contains(",");
+                                if (!filterJoeObjects.getObjectTypes().contains(JobSchedulerObjectType.ORDER.value()) && isOrderNodeParams) {
+                                    continue;
+                                }
+                                if (!filterJoeObjects.getObjectTypes().contains(JobSchedulerObjectType.JOBCHAIN.value()) && !isOrderNodeParams) {
+                                    continue;
+                                }
                             }
 
 //                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
@@ -264,6 +285,16 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
                                 continue;
                             }
+                            
+                            if (!folderDeploy && "NODEPARAMS".equals(objType) && filterJoeObjects.getObjectTypes() != null) {
+                                boolean isOrderNodeParams = joeObject.getPath().contains(",");
+                                if (!filterJoeObjects.getObjectTypes().contains(JobSchedulerObjectType.ORDER.value()) && isOrderNodeParams) {
+                                    continue;
+                                }
+                                if (!filterJoeObjects.getObjectTypes().contains(JobSchedulerObjectType.JOBCHAIN.value()) && !isOrderNodeParams) {
+                                    continue;
+                                }
+                            }
 
 //                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
 //                                deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(getParent(joeObject.getPath()))));
@@ -283,9 +314,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 } catch (JobSchedulerObjectNotExistException e) {
                                 }
                             } else {
-                                // TODO add configuration monitor in corresponding jobs if objType == NODEPARAMS
                                 if ("NODEPARAMS".equals(objType)) {
-                                    addConfigurationMonitorToJobs(joeObject.getPath(), joeObject.getConfiguration());
+                                    configurationMonitor.addNodeParams(joeObject);
                                 }
                                 jocHotFolder.putFile(joeObject.getPath() + extension, xmlContent);
                                 clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
@@ -296,6 +326,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             touchedFolders.add(joeObject.getFolder());
                             dbLayerJoeObjects.delete(joeObject);
                         }
+                    }
+                    if ("NODEPARAMS".equals(objType)) {
+                        groupedJoeObjects.put("JOB", configurationMonitor.addConfigurationMonitor(groupedJoeObjects.get("JOB")));
                     }
                 }
                 if (groupedJoeObjects.containsKey("FOLDER")) {
@@ -366,11 +399,6 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         } finally {
             Globals.disconnect(sosHibernateSession);
         }
-    }
-
-    private void addConfigurationMonitorToJobs(String path, String configuration) {
-        // TODO Auto-generated method stub
-        
     }
 
     private void deleteWithAllChildren(DBLayerJoeObjects dbLayerJoeObjects, DBItemJoeObject joeObject) throws DBConnectionRefusedException,
