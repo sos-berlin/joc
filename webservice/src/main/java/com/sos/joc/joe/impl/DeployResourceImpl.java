@@ -276,7 +276,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     if (groupedJoeObjects.containsKey(objType)) {
                         for (DBItemJoeObject joeObject : groupedJoeObjects.get(objType)) {
                             
-                            if (joeObject.getConfiguration() == null) {
+                            String jsonContent = joeObject.getConfiguration();
+                            
+                            if (jsonContent == null) {
                                 dbLayerJoeObjects.delete(joeObject);
                                 continue;
                             }
@@ -304,12 +306,22 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 //                                continue;
 //                            }
 
+                            boolean jsonIsEmpty = jsonContent.trim().equals("{}");
+                            
+                            if (jsonIsEmpty) {
+                                if ("ORDER".equals(objType)) {
+                                    jsonContent = "{\"runTime\":{}}";
+                                } else if (!"NODEPARAMS".equals(objType) && !"LOCK".equals(objType)) {
+                                    continue;
+                                }
+                            }
+                            
                             String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
                             ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath()
                                     + extension, false, API_CALL);
-
-                            String xmlContent = XmlSerializer.serializeToStringWithHeader(joeObject.getConfiguration(), objType);
-                            if ("NODEPARAMS".equals(objType) && xmlContent.trim().equals(XmlSerializer.xmlHeader + "<settings/>")) {
+                            
+                            String xmlContent = XmlSerializer.serializeToStringWithHeader(jsonContent, objType);
+                            if ("NODEPARAMS".equals(objType) && jsonIsEmpty) {
                                 // TODO delete configuration monitor in corresponding jobs
                                 try {
                                     jocHotFolder.deleteFile(joeObject.getPath() + extension);

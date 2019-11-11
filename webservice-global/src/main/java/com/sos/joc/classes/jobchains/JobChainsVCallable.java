@@ -169,7 +169,12 @@ public class JobChainsVCallable implements Callable<Map<String, JobChainVolatile
         }
         if (compact != Boolean.TRUE) {
             if (jobChainV.hasJobNodes()) {
-                jobChainV.setDetailedFields(getJobsOfJobChain(jobChainV), orders, maxOrders);
+                try {
+                    jobChainV.setDetailedFields(getJobsOfJobChain(jobChainV), orders, maxOrders);
+                } catch (Exception e) {
+                    LOGGER.warn("", e);
+                    jobChainV.setDetailedFields(null, orders, maxOrders);
+                }
             } else {
                 jobChainV.setDetailedFields(null, orders, maxOrders);
             }

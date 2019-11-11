@@ -229,13 +229,11 @@ public class ConfigurationMonitor {
         return nodeParamsPath;
     }
 
-    /** returns empty list if params are defined for all nodes returns null if no params are defined
+    /** returns empty list if params are defined for all nodes.<br/>returns null if no params are defined.
      * 
      * @param nodeParamsConfiguration
-     * @return
-     * @throws JsonParseException
-     * @throws JsonMappingException
-     * @throws IOException */
+     * @return A set of states
+     **/
     private Set<String> getStates(String nodeParamsConfiguration) {
         try {
             Config nodeParams = Globals.objectMapper.readValue(nodeParamsConfiguration, Config.class);
