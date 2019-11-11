@@ -145,8 +145,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         DeployConfigurationAnswer answer = new DeployConfigurationAnswer();
         answer.setDeployed(deployed);
         answer.setMessage(new AnswerMessage());
-        answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_IS_NEWER);
-        answer.getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_IS_NEWER);
+        answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_NOT_EXIST);
+        answer.getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_NOT_EXIST);
         return answer;
     }
 
@@ -174,8 +174,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         } catch (Throwable e) {
             LOGGER.error(String.format("[%s][%s][%s]%s could't put configuration: %s", in.getJobschedulerId(), in.getObjectType().name(), file,
                     JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, e.toString()), e);
-            throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format("[%s][%s][%s]could't put configuration", in
-                    .getJobschedulerId(), in.getObjectType().name(), file)));
+            throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format(
+                    "[%s]Could't put configuration. Is the JobScheduler \"%s\" running?", file, in.getJobschedulerId())));
         }
     }
 
