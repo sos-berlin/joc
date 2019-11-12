@@ -103,8 +103,13 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 oldItem = new DBItemJoeObject();
                 if (!isDirectory) {
                     String extension = JOEHelper.getFileExtension(body.getObjectType());
-                    JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-                    oldItem.setConfiguration(new String(jocHotFolder.getFile(body.getOldPath() + extension)));
+                    try {
+                        JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                        oldItem.setConfiguration(Globals.objectMapper.writeValueAsString(Globals.xmlMapper.readValue(jocHotFolder.getFile(body
+                                .getOldPath() + extension), JOEHelper.CLASS_MAPPING.get(body.getObjectType().value()))));
+                    } catch (Exception e) {
+                        oldItem.setConfiguration(null);
+                    }
                 } else {
                     oldItem.setConfiguration(null);
                 }
@@ -203,6 +208,61 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     }
                 }
             }
+            
+//            if (body.getObjectType() == JobSchedulerObjectType.JOBCHAIN || body.getObjectType() == JobSchedulerObjectType.ORDER) {
+//                // rename nodeparams too if exists
+//                oldPathFilter.setObjectType(JobSchedulerObjectType.NODEPARAMS);
+//                oldItem = dbJoeLayer.getJoeObject(oldPathFilter);
+//                String liveContent = null;
+//                oldItemExists = oldItem != null;
+//                boolean oldItemExistsLive = false;
+//                
+//                try {
+//                    String extension = JOEHelper.getFileExtension(oldPathFilter.getObjectType());
+//                    JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+//                    oldItemExistsLive = true;
+//                    liveContent = new String(jocHotFolder.getFile(oldPathFilter.getPath() + extension));
+//                } catch (Exception e) {
+//                }
+//                
+//                if (!oldItemExists && oldItemExistsLive) {
+//                    oldItem = new DBItemJoeObject();
+//                    oldItem.setConfiguration(liveContent);
+//                    oldItem.setAccount(getAccount());
+//                    oldItem.setAuditLogId(null);
+//                    oldItem.setFolder(Paths.get(oldPathFilter.getPath()).getParent().toString().replace('\\', '/'));
+//                    oldItem.setPath(oldPathFilter.getPath());
+//                    oldItem.setId(null);
+//                    oldItem.setCreated(Date.from(Instant.now()));
+//                    oldItem.setModified(oldItem.getCreated());
+//                    oldItem.setObjectType(oldPathFilter.getObjectType().value());
+//                    oldItem.setOperation("store");
+//                    oldItem.setSchedulerId(oldPathFilter.getSchedulerId());
+//                }
+//                newPathFilter.setObjectType(JobSchedulerObjectType.NODEPARAMS);
+//                newItem = dbJoeLayer.getJoeObject(newPathFilter);
+//                
+//                if (newItem != null) {
+//                    dbJoeLayer.update(updateDBItemfromOld(newItem, oldItem));
+//                } else {
+//                    dbJoeLayer.save(setNewDBItemfromOld(oldItem, newPathFilter.getPath()));
+//                }
+//                
+//                if (oldItemExistsLive) {
+//                    oldItem.setOperation("delete");
+//                    oldItem.setAccount(getAccount());
+//                    oldItem.setModified(Date.from(Instant.now()));
+//                    if (oldItemExists) {
+//                        dbJoeLayer.update(oldItem);
+//                    } else {
+//                        dbJoeLayer.save(oldItem);
+//                    }
+//                } else {
+//                    if (oldItemExists) {
+//                        dbJoeLayer.delete(oldItem);
+//                    }
+//                }
+//            }
             
             try {
                 CustomEvent evt = JOEHelper.getJoeUpdatedEvent(folder);
