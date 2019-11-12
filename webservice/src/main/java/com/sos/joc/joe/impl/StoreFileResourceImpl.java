@@ -8,10 +8,12 @@ import javax.ws.rs.Path;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
+import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOEHelper;
+import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
@@ -74,19 +76,20 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             filter.setConstraint(body);
             DBItemJoeObject item = dbLayer.getJoeObject(filter);
             if (item != null) {
-                item.setOperation("store");
-                item.setModified(Date.from(Instant.now()));
-                item.setAccount(getAccount());
-                if (!isDirectory) {
-                    if (body.getConfiguration() != null) {
-                        item.setConfiguration(Globals.objectMapper.writeValueAsString(XmlSerializer.serialize(body.getConfiguration(),
-                                JOEHelper.CLASS_MAPPING.get(body.getObjectType().value()))));
+                if (!item.operationIsDelete()) {
+                    item.setOperation("store");
+                    item.setModified(Date.from(Instant.now()));
+                    item.setAccount(getAccount());
+                    if (!isDirectory) {
+                        if (body.getConfiguration() != null) {
+                            item.setConfiguration(Globals.objectMapper.writeValueAsString(XmlSerializer.serialize(body.getConfiguration(),
+                                    JOEHelper.CLASS_MAPPING.get(body.getObjectType().value()))));
+                        }
+                    } else {
+                        item.setConfiguration(null);
                     }
-                } else {
-                    item.setConfiguration(null);
+                    dbLayer.update(item);
                 }
-                dbLayer.update(item);
-
             } else {
                 item = new DBItemJoeObject();
                 item.setId(null);
@@ -112,12 +115,12 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 }
                 dbLayer.save(item);
                 
-//                try {
-//                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(folder);
-//                    SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
-//                } catch (Exception e) {
-//                    //
-//                }
+                try {
+                    CustomEvent evt = JOEHelper.getJoeUpdatedEvent(folder);
+                    SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
+                } catch (Exception e) {
+                    //
+                }
             }
             
             return JOCDefaultResponse.responseStatusJSOk(item.getModified());
