@@ -348,6 +348,9 @@ public class XmlSerializer {
             }
             runtime.getHolidays().setWeekdays(serializeWeekdays(runtime.getHolidays().getWeekdays()));
         }
+        if (runtime.getCalendars() != null && runtime.getCalendars().trim().equals("{}")) {
+            runtime.setCalendars(null); 
+        }
         return (T) runtime;
     }
 
