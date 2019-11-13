@@ -2,8 +2,10 @@ package com.sos.joc.classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -26,12 +28,43 @@ public class ClusterMemberHandler {
     private DBItemInventoryInstance dbItemInventoryInstance;
     private String apiCall;
     private Map<Long, Boolean> successfulConnections = new HashMap<Long, Boolean>();
+    private List<HandlerCall> handlerCalls = new ArrayList<HandlerCall>();
+    
+    private class HandlerCall {
+        private boolean isFolder = false;
+        private String path;
+        private String action;
+        private DBItemSubmittedObject dbItem;
+        
+        public HandlerCall(String action, String path, boolean isFolder, DBItemSubmittedObject dbItem) {
+            this.isFolder = isFolder;
+            this.path = path;
+            this.action = action;
+            this.dbItem = dbItem;
+        }
+        
+        public boolean getIsFolder() {
+            return isFolder;
+        }
+        
+        public String getAction() {
+            return action;
+        }
+        
+        public String getPath() {
+            return path;
+        }
+        
+        public DBItemSubmittedObject getDbItem() {
+            return dbItem;
+        }
+    }
 
     public ClusterMemberHandler(DBItemInventoryInstance dbItemInventoryInstance, String apiCall) {
         this.dbItemInventoryInstance = dbItemInventoryInstance;
         this.apiCall = apiCall;
     }
-
+    
     public void deleteAtOtherClusterMembers(String path, boolean isFolder) throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException,
             DBConnectionRefusedException {
 
@@ -43,7 +76,8 @@ public class ClusterMemberHandler {
             dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
             dbItem.setPath(path);
             dbItem.setToDelete(true);
-            updateOtherClusterMembers("delete", dbItem, path, isFolder);
+            //updateOtherClusterMembers("delete", dbItem, path, isFolder);
+            handlerCalls.add(new HandlerCall("delete", path, isFolder, dbItem));
         }
     }
 
@@ -59,7 +93,14 @@ public class ClusterMemberHandler {
             dbItem.setPath(path);
             dbItem.setToDelete(false);
             dbItem.setContent(content);
-            updateOtherClusterMembers("save", dbItem, path, isFolder);
+            //updateOtherClusterMembers("save", dbItem, path, isFolder);
+            handlerCalls.add(new HandlerCall("save", path, isFolder, dbItem));
+        }
+    }
+    
+    public void executeHandlerCalls() throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException, DBConnectionRefusedException {
+        for (HandlerCall handlerCall : handlerCalls) {
+            updateOtherClusterMembers(handlerCall.getAction(), handlerCall.getDbItem(), handlerCall.getPath(), handlerCall.getIsFolder());
         }
     }
 

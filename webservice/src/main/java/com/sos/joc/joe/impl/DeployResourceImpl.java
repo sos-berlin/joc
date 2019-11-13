@@ -428,6 +428,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     LockResourceImpl.release(dbLayerJoeLocks, body.getJobschedulerId(), touchedFolder, getAccount()); 
                 }
             }
+            
+            clusterMemberHandler.executeHandlerCalls();
 
             return JOCDefaultResponse.responseStatus200(deployAnswer);
 

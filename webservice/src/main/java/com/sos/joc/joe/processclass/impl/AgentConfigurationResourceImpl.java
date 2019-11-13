@@ -132,6 +132,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, API_CALL);
             clusterMemberHandler.deleteAtOtherClusterMembers(processClassPath, false);
+            clusterMemberHandler.executeHandlerCalls();
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
