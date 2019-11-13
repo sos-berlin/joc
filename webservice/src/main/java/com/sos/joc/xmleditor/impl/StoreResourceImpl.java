@@ -82,7 +82,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                 }
 
                 session.commit();
-                response = JOCDefaultResponse.responseStatus200(getSuccess(item.getId(), item.getModified(), setAnswerMessage));
+                response = JOCDefaultResponse.responseStatus200(getSuccess(item.getId(), item.getModified(), item.getDeployed(), setAnswerMessage));
             }
             return response;
         } catch (JocException e) {
@@ -119,14 +119,19 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         return response;
     }
 
-    private StoreConfigurationAnswer getSuccess(Long id, Date date, boolean setMessage) {
+    private StoreConfigurationAnswer getSuccess(Long id, Date modified, Date deployed, boolean setMessage) {
         StoreConfigurationAnswer answer = new StoreConfigurationAnswer();
         answer.setId(id.intValue());
-        answer.setModified(date);
+        answer.setModified(modified);
         if (setMessage) {
             answer.setMessage(new AnswerMessage());
-            answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_IS_NEWER);
-            answer.getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_IS_NEWER);
+            if (deployed == null) {
+                answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
+                answer.getMessage().setMessage(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
+            } else {
+                answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_IS_NEWER);
+                answer.getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_IS_NEWER);
+            }
         }
         return answer;
     }
