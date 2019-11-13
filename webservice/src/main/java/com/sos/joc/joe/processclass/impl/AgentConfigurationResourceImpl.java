@@ -93,8 +93,8 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             storeAuditLogEntry(audit);
 
-            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath, false, API_CALL);
-            clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, API_CALL);
+            clusterMemberHandler.updateAtOtherClusterMembers(processClassPath, false, xmlContent);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -130,8 +130,8 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             storeAuditLogEntry(audit);
 
-            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, processClassPath, false, API_CALL);
-            clusterMemberHandler.deleteAtOtherClusterMembers();
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, API_CALL);
+            clusterMemberHandler.deleteAtOtherClusterMembers(processClassPath, false);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

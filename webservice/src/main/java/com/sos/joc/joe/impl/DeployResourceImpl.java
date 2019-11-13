@@ -91,9 +91,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
-
+            
             DBLayerJoeObjects dbLayerJoeObjects = new DBLayerJoeObjects(sosHibernateSession);
             DBLayerJoeLocks dbLayerJoeLocks = new DBLayerJoeLocks(sosHibernateSession);
+//            InventoryFilesDBLayer dbLayerInventoryFiles = new InventoryFilesDBLayer(sosHibernateSession);
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
             boolean folderDeploy = body.getObjectType() == null || body.getObjectType() == JobSchedulerObjectType.FOLDER;
 
@@ -145,6 +146,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             filterJoeObjects.setSortMode("desc");
 
             JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+            jocHotFolder.setAutoCloseHttpClient(false);
             ConfigurationMonitor configurationMonitor = new ConfigurationMonitor(sosHibernateSession, jocHotFolder, dbItemInventoryInstance.getId(),
                     body.getJobschedulerId(), body.getAccount(), getAccount());
 
@@ -155,6 +157,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             deployAnswer.setObjectName(body.getObjectName());
             deployAnswer.setObjectType(body.getObjectType());
             deployAnswer.setRecursive(filterJoeObjects.isRecursive());
+            
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance,  API_CALL);
 
 //            Map<String, DBItemJoeLock> mapOfLocks = null;
 //            if (body.getAccount() != null && !body.getAccount().isEmpty()) {
@@ -174,6 +178,31 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                 String[] objTypesToDelete = { "ORDER", "JOBCHAIN", "JOB", "SCHEDULE", "MONITOR", "LOCK", "AGENTCLUSTER", "PROCESSCLASS",
                         "NODEPARAMS" };
+                
+//                if (groupedJoeObjects.containsKey("JOBCHAIN")) { //delete orders and nodeparams too
+//                    List<DBItemJoeObject> allOrdersAndNodeParams = new ArrayList<DBItemJoeObject>();
+//                    for (DBItemJoeObject joeObject : groupedJoeObjects.get("JOBCHAIN")) {
+//                        List<DBItemJoeObject> ordersAndNodeParams = dbLayerJoeObjects.getOrdersAndNodeParamsOfJobChain(joeObject.getPath(), body
+//                                .getJobschedulerId());
+//                        if (ordersAndNodeParams != null) {
+//                            allOrdersAndNodeParams.addAll(ordersAndNodeParams);
+//                        }
+//                        //TODO add orders and nodeparams from Inventory to allOrdersAndNodeParams
+//                    }
+//                    Map<String, Set<DBItemJoeObject>> ordersAndNodeParamsMap = allOrdersAndNodeParams.stream().map(i -> {
+//                        i.setOperation("delete");
+//                        return i;
+//                    }).collect(Collectors.groupingBy(DBItemJoeObject::getObjectType, Collectors.toSet()));
+//                    if (ordersAndNodeParamsMap.containsKey("ORDER")) {
+//                        groupedJoeObjects.putIfAbsent("ORDER", new HashSet<DBItemJoeObject>());
+//                        groupedJoeObjects.get("ORDER").addAll(ordersAndNodeParamsMap.get("ORDER"));
+//                    }
+//                    if (ordersAndNodeParamsMap.containsKey("NODEPARAMS")) {
+//                        groupedJoeObjects.putIfAbsent("NODEPARAMS", new HashSet<DBItemJoeObject>());
+//                        groupedJoeObjects.get("NODEPARAMS").addAll(ordersAndNodeParamsMap.get("NODEPARAMS"));
+//                    }
+//                }
+                
 
                 for (String objType : objTypesToDelete) {
                     if (groupedJoeObjects.containsKey(objType)) {
@@ -214,9 +243,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 if ("NODEPARAMS".equals(objType)) {
                                     // TODO delete configuration monitor in corresponding jobs
                                 }
-                                ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath()
-                                        + extension, false, API_CALL);
-                                clusterMemberHandler.deleteAtOtherClusterMembers();
+                                clusterMemberHandler.deleteAtOtherClusterMembers(joeObject.getPath() + extension, false);
                                 deleteCalendarUsedBy(sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
                             }
                             storeAuditLogEntry(deployJoeAudit);
@@ -248,9 +275,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             objExists = false;
                         }
                         if (objExists) {
-                            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath(), true,
-                                    API_CALL);
-                            clusterMemberHandler.deleteAtOtherClusterMembers();
+                            clusterMemberHandler.deleteAtOtherClusterMembers(joeObject.getPath(), true);
                             deleteCalendarUsedBy(sosHibernateSession, body.getJobschedulerId(), "FOLDER", joeObject.getPath());
                         }
 
@@ -317,15 +342,13 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             }
                             
                             String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
-                            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, joeObject.getPath()
-                                    + extension, false, API_CALL);
                             
                             String xmlContent = XmlSerializer.serializeToStringWithHeader(jsonContent, objType);
                             if ("NODEPARAMS".equals(objType) && jsonIsEmpty) {
                                 // TODO delete configuration monitor in corresponding jobs
                                 try {
                                     jocHotFolder.deleteFile(joeObject.getPath() + extension);
-                                    clusterMemberHandler.deleteAtOtherClusterMembers();
+                                    clusterMemberHandler.deleteAtOtherClusterMembers(joeObject.getPath() + extension, false);
                                 } catch (JobSchedulerObjectNotExistException e) {
                                 }
                             } else {
@@ -333,7 +356,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                     configurationMonitor.addNodeParams(joeObject);
                                 }
                                 jocHotFolder.putFile(joeObject.getPath() + extension, xmlContent);
-                                clusterMemberHandler.updateAtOtherClusterMembers(xmlContent);
+                                clusterMemberHandler.updateAtOtherClusterMembers(joeObject.getPath() + extension, false, xmlContent);
                                 updateCalendarUsedBy(xmlContent, sosHibernateSession, body.getJobschedulerId(), objType, joeObject.getPath());
                             }
                             storeAuditLogEntry(deployJoeAudit);
@@ -376,6 +399,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     }
                 }
             }
+            
+            jocHotFolder.closeHttpClient();
             
             for (String touchedFolder : touchedFolders) {
                 try {
