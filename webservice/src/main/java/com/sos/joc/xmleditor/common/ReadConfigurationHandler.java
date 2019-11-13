@@ -104,6 +104,12 @@ public class ReadConfigurationHandler {
         current = live;
         currentModified = liveModified;
 
+        if (deployed) {
+            if (item != null && item.getConfigurationDraft() != null) {
+                deployed = false;
+            }
+        }
+
         answer.setSchema(JocXmlEditor.getSchemaURI(type).toString());
         answer.getState().setDeployed(deployed);
     }
