@@ -44,10 +44,9 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             checkRequiredParameter("objectType", body.getObjectType());
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
-            boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
-            boolean permission2 = JOEHelper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
+            boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

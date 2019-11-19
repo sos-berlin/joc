@@ -67,10 +67,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         try {
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
-            boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDeploy();
-            boolean permission2 = JOEHelper.hasPermission(body.getObjectType(), sosPermissionJocCockpit);
+            boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDeploy();
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1 && permission2);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -210,6 +209,12 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                             DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
                             logAuditMessage(deployJoeAudit);
+
+                            boolean objectPermission = JOEHelper.hasPermission(JobSchedulerObjectType.valueOf(joeObject.getObjectType()), sosPermissionJocCockpit);
+                            if (!objectPermission) {
+                                deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
+                                continue;
+                            }
 
                             if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
                                 deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
