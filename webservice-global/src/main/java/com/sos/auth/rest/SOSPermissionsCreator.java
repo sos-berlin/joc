@@ -331,13 +331,13 @@ public class SOSPermissionsCreator {
                     "sos:products:joc_cockpit:jobscheduler_master:administration:remove_old_instances"));
 
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setDelete(haveRight(masterId,
-                    "sos:products:joc_cockpit:jobscheduler_master:administration:configuration:delete"));
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:delete"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setDeploy(haveRight(masterId,
-                    "sos:products:joc_cockpit:jobscheduler_master:administration:configuration:deploy"));
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setEdit(haveRight(masterId,
-                    "sos:products:joc_cockpit:jobscheduler_master:administration:configuration:edit"));
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:edit"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setView(haveRight(masterId,
-                    "sos:products:joc_cockpit:jobscheduler_master:administration:configuration:view"));
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view"));
 
             
             sosPermissionJocCockpit.getJobschedulerMasterCluster().getView().setStatus(haveRight(masterId,
