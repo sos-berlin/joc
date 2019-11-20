@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.09.26 um 04:06:36 PM CEST 
+// Generiert: 2019.11.20 um 01:01:56 PM CET 
 //
 
 
@@ -79,7 +79,7 @@ import javax.xml.bind.annotation.XmlType;
  *                             &lt;element name="manageCategories" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="editPermissions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="editMainSection" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
- *                             &lt;element name="Configurations">
+ *                             &lt;element name="configurations">
  *                               &lt;complexType>
  *                                 &lt;complexContent>
  *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -4626,7 +4626,7 @@ public class SOSPermissionJocCockpit {
      *                   &lt;element name="manageCategories" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="editPermissions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="editMainSection" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
-     *                   &lt;element name="Configurations">
+     *                   &lt;element name="configurations">
      *                     &lt;complexType>
      *                       &lt;complexContent>
      *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -4755,7 +4755,7 @@ public class SOSPermissionJocCockpit {
          *         &lt;element name="manageCategories" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="editPermissions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="editMainSection" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
-         *         &lt;element name="Configurations">
+         *         &lt;element name="configurations">
          *           &lt;complexType>
          *             &lt;complexContent>
          *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -4792,7 +4792,7 @@ public class SOSPermissionJocCockpit {
             protected boolean editPermissions;
             @XmlElement(required = true)
             protected Object editMainSection;
-            @XmlElement(name = "Configurations", required = true)
+            @XmlElement(required = true)
             protected SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations configurations;
 
             /**
