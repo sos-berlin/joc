@@ -18,7 +18,7 @@ public class JobSchedulerResourcePImplTest {
     public void postjobschedulerPTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobSchedulerId jobSchedulerFilterSchema = new JobSchedulerId();
         jobSchedulerFilterSchema.setJobschedulerId("scheduler_current");
         JobSchedulerResourcePImpl jobschedulerResourcePImpl = new JobSchedulerResourcePImpl();

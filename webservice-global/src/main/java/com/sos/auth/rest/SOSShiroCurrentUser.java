@@ -189,7 +189,7 @@ public class SOSShiroCurrentUser {
         }
         s = s + ipParts[parts];
 
-        b = (currentSubject.isPermitted(permission) || currentSubject.isPermitted(s + ":" + permission) || currentSubject.isPermitted(s + ":" + master
+        b = (currentSubject.isPermitted(permission) || currentSubject.isPermitted("ip=" + s + ":" + permission) || currentSubject.isPermitted("ip=" + s + ":" + master
                 + ":" + permission)) && !excluded;
         return b;
     }

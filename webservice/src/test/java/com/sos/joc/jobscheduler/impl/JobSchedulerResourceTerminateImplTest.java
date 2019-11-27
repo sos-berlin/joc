@@ -16,7 +16,7 @@ public class JobSchedulerResourceTerminateImplTest {
     public void postjobschedulerTerminateTest() throws Exception   {
            
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"", LDAP_USER, LDAP_PASSWORD).getEntity();
         HostPortTimeOutParameter urlTimeoutParamSchema = new HostPortTimeOutParameter();
         urlTimeoutParamSchema.setJobschedulerId("scheduler_current");
         urlTimeoutParamSchema.setTimeout(30);
@@ -28,7 +28,7 @@ public class JobSchedulerResourceTerminateImplTest {
     public void postjobschedulerRestartTest() throws Exception   {
            
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"", LDAP_USER, LDAP_PASSWORD).getEntity();
         HostPortTimeOutParameter urlTimeoutParamSchema = new HostPortTimeOutParameter();
         urlTimeoutParamSchema.setJobschedulerId("scheduler_current");
         urlTimeoutParamSchema.setTimeout(30);

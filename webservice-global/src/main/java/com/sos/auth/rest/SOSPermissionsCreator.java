@@ -33,7 +33,6 @@ import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.security.SecurityConfiguration;
 
 public class SOSPermissionsCreator {
 
@@ -147,16 +146,16 @@ public class SOSPermissionsCreator {
             SOSPermissionRoles sosPermissionRoles = sosPermissionsCreator.getRoles(true);
 
             addSosPermissionJocCockpit("", sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
-         //   if (!currentUser.getCallerIpAddress().isEmpty()) {
-            //       addSosPermissionJocCockpit("ip=" + currentUser.getCallerIpAddress(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
-            //  }
+            if (!currentUser.getCallerIpAddress().isEmpty()) {
+                  addSosPermissionJocCockpit("ip=" + currentUser.getCallerIpAddress(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
+            }
 
             for (DBItemInventoryInstance instance : listOfInstances) {
                 addSosPermissionJocCockpit(instance.getSchedulerId(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
-               // if (!currentUser.getCallerIpAddress().isEmpty()) {
-               //     addSosPermissionJocCockpit("ip=" + currentUser.getCallerIpAddress() + ":" + instance.getSchedulerId(), sosPermissionRoles, unique,
-               //             sosPermissionJocCockpitMasters);
-               // }
+                if (!currentUser.getCallerIpAddress().isEmpty()) {
+                    addSosPermissionJocCockpit("ip=" + currentUser.getCallerIpAddress() + ":" + instance.getSchedulerId(), sosPermissionRoles, unique,
+                            sosPermissionJocCockpitMasters);
+                }
             }
         } finally {
             Globals.disconnect(session);
@@ -169,7 +168,7 @@ public class SOSPermissionsCreator {
         
      // SOSSecurityConfigurationMasters.resetInstance();
      // SOSSecurityConfiguration sosSecurityConfiguration = new SOSSecurityConfiguration();
-     // SecurityConfiguration entity = sosSecurityConfiguration.readConfiguration();
+     //  SecurityConfiguration entity = sosSecurityConfiguration.readConfiguration();
 
         Map<String, String> unique = new HashMap<String, String>();
         SOSHibernateSession session = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");

@@ -291,7 +291,7 @@ public class SOSSecurityConfiguration {
 			writeIni.store();
 
 			IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
-            SecurityManager securityManager = factory.getInstance();
+            //SecurityManager securityManager = factory.getInstance();
 
             SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
 			sosShiroIniShare.copyFileToDb(Globals.getShiroIniFile().toFile());

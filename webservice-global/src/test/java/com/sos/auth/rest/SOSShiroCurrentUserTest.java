@@ -1,5 +1,7 @@
 package com.sos.auth.rest;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 public class SOSShiroCurrentUserTest {
@@ -16,7 +18,9 @@ public class SOSShiroCurrentUserTest {
         masterId = "ip=192.11.0.12";
 
         sosShiroCurrentUser = new SOSShiroCurrentUser("user", "pwd");
-        sosShiroCurrentUser.testGetExcluded(permission, masterId);
+        boolean b = sosShiroCurrentUser.testGetExcluded(permission, masterId);
+        assertEquals("testGetExcluded", b, "true");
+
     }
 
 }
