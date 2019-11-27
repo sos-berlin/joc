@@ -97,11 +97,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-        <dependency>
-            <groupId>com.sos-berlin.jade</groupId>
-            <artifactId>yade-xml-converter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>com.sos-berlin.jade</groupId>
+			<artifactId>yade-xml-converter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- 3RD PARTY DEPENDENCIES -->
 		<dependency>
@@ -195,6 +195,12 @@
 		<dependency>
 			<groupId>com.github.rjeschke</groupId>
 			<artifactId>txtmark</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

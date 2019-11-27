@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
@@ -6,7 +7,7 @@
 	<parent>
 		<groupId>com.sos-berlin</groupId>
 		<artifactId>joc</artifactId>
-		<version>1.13.1-SNAPSHOT</version>
+		<version>1.13.2-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.sos-berlin.joc</groupId>
@@ -172,6 +173,13 @@
 					<artifactId>genson</artifactId>
 					<version>1.3</version>
 				</dependency>
+				<dependency>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+					<version>2.5</version>
+					
+				</dependency>
+
 			</dependencies>
 		</profile>
 		<profile>
@@ -296,7 +304,8 @@
 									<removeOldOutput>false</removeOldOutput>
 									<annotationStyle>jackson2</annotationStyle>
 									<customAnnotator>com.sos.annotator.JacksonXMLJoeConfigurationAnnotator</customAnnotator>
-									<inclusionLevel>NON_EMPTY</inclusionLevel><!-- no empty strings in xml representation -->
+									<inclusionLevel>NON_EMPTY</inclusionLevel><!-- no empty strings 
+										in xml representation -->
 									<propertyWordDelimiters>- </propertyWordDelimiters>
 									<initializeCollections>false</initializeCollections>
 									<includeAdditionalProperties>false</includeAdditionalProperties>
@@ -369,14 +378,14 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-								    <target description="modify initial values">
-										<!-- to provide that at least an empty run_time is created at job  -->
+									<target description="modify initial values">
+										<!-- to provide that at least an empty run_time is created at job -->
 										<replaceregexp flags="ig" byline="true"
 											match="(private RunTime runTime)( = null)?;"
 											replace="\1 = new RunTime();"
 											file="${project.build.directory}/java-gen/com/sos/joc/model/joe/job/Job.java"
 											preserveLastModified="true" />
-										<!-- to provide that at least an empty run_time is created at order  -->
+										<!-- to provide that at least an empty run_time is created at order -->
 										<replaceregexp flags="ig" byline="true"
 											match="(private RunTime runTime)( = null)?;"
 											replace="\1 = new RunTime();"
@@ -494,6 +503,12 @@
 					<groupId>com.owlike</groupId>
 					<artifactId>genson</artifactId>
 					<version>1.3</version>
+				</dependency>
+				<dependency>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+					<version>2.5</version>
+					<scope>provided</scope>
 				</dependency>
 			</dependencies>
 		</profile>
