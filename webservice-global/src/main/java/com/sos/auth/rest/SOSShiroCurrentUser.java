@@ -65,16 +65,16 @@ public class SOSShiroCurrentUser {
         }
 
         if (httpServletRequest != null) {
-            String ip = httpServletRequest.getRemoteAddr();
+            String ip = getCallerIpAddress();
             String ipMasterKey = "ip=" + ip + ":" + masterId;
             String ipKey = "ip=" + ip;
 
             if (listOfSOSPermissionJocCockpit.containsKey(ipMasterKey)) {
-                // return listOfSOSPermissionJocCockpit.get(ipMasterKey);
+                 return listOfSOSPermissionJocCockpit.get(ipMasterKey);
             }
 
             if (listOfSOSPermissionJocCockpit.containsKey(ipKey)) {
-                // return listOfSOSPermissionJocCockpit.get(ipKey);
+                 return listOfSOSPermissionJocCockpit.get(ipKey);
             }
         }
         
