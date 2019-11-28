@@ -146,16 +146,9 @@ public class SOSPermissionsCreator {
             SOSPermissionRoles sosPermissionRoles = sosPermissionsCreator.getRoles(true);
 
             addSosPermissionJocCockpit("", sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
-            if (!currentUser.getCallerIpAddress().isEmpty()) {
-                  addSosPermissionJocCockpit("ip=" + currentUser.getCallerIpAddress(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
-            }
-
+           
             for (DBItemInventoryInstance instance : listOfInstances) {
                 addSosPermissionJocCockpit(instance.getSchedulerId(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
-                if (!currentUser.getCallerIpAddress().isEmpty()) {
-                    addSosPermissionJocCockpit("ip=" + currentUser.getCallerIpAddress() + ":" + instance.getSchedulerId(), sosPermissionRoles, unique,
-                            sosPermissionJocCockpitMasters);
-                }
             }
         } finally {
             Globals.disconnect(session);
@@ -165,11 +158,6 @@ public class SOSPermissionsCreator {
     }
 
     public SOSPermissionCommandsMasters createCommandsPermissionMasterObjectList(String accessToken) throws JocException {
-        
-     // SOSSecurityConfigurationMasters.resetInstance();
-     // SOSSecurityConfiguration sosSecurityConfiguration = new SOSSecurityConfiguration();
-     //  SecurityConfiguration entity = sosSecurityConfiguration.readConfiguration();
-
         Map<String, String> unique = new HashMap<String, String>();
         SOSHibernateSession session = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");
         SOSPermissionCommandsMasters sosPermissionCommandsMasters = new SOSPermissionCommandsMasters();

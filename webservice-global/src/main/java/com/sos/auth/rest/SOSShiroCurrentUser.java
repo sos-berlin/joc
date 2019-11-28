@@ -70,14 +70,14 @@ public class SOSShiroCurrentUser {
             String ipKey = "ip=" + ip;
 
             if (listOfSOSPermissionJocCockpit.containsKey(ipMasterKey)) {
-                 return listOfSOSPermissionJocCockpit.get(ipMasterKey);
+                return listOfSOSPermissionJocCockpit.get(ipMasterKey);
             }
 
             if (listOfSOSPermissionJocCockpit.containsKey(ipKey)) {
-                 return listOfSOSPermissionJocCockpit.get(ipKey);
+                return listOfSOSPermissionJocCockpit.get(ipKey);
             }
         }
-        
+
         if (listOfSOSPermissionJocCockpit.containsKey(masterId)) {
             return listOfSOSPermissionJocCockpit.get(masterId);
         } else {
@@ -160,7 +160,7 @@ public class SOSShiroCurrentUser {
         }
     }
 
-    private boolean getExcluded(String permission, String masterId) {
+    private boolean getExcludedMaster(String permission, String masterId) {
         boolean excluded = false;
         if (currentSubject != null) {
             Path path = Paths.get(permission.replace(':', '/'));
@@ -173,14 +173,36 @@ public class SOSShiroCurrentUser {
                 excluded = currentSubject.isPermitted("-" + s) || currentSubject.isPermitted("-" + masterId + ":" + s);
             }
         }
+        
+      
+        
         return excluded;
+    }
+    
+    private boolean getExcludedIp(String permission, String masterId) {
+        String[] ipParts = this.getCallerIpAddress().split("\\.");
+        boolean excluded = false;
+        String es = "";
+        for (int i = 0; i < ipParts.length; i++) {
+            es = es + ipParts[i];
+            excluded = excluded || getExcludedMaster(permission, "ip=" + es) || getExcludedMaster(permission, "ip=" + es + ":" + masterId);
+            if (excluded) {
+                break;
+            }
+            es = es + ".";
+        }
+        return excluded;
+    }
+    
+    private boolean getExcluded(String permission, String masterId) {
+        return this.getExcludedMaster(permission, masterId) || this.getExcludedIp(permission, masterId);
     }
 
     public boolean testGetExcluded(String permission, String masterId) {
         return getExcluded(permission, masterId);
     }
 
-    private boolean ipPermission(String permission, String master, String[] ipParts, int parts, boolean excluded) {
+    private boolean ipPermission(String permission, String master, String[] ipParts, int parts) {
         boolean b = false;
         String s = "";
 
@@ -189,60 +211,38 @@ public class SOSShiroCurrentUser {
         }
         s = s + ipParts[parts];
 
-        b = (currentSubject.isPermitted(permission) || currentSubject.isPermitted("ip=" + s + ":" + permission) || currentSubject.isPermitted("ip=" + s + ":" + master
-                + ":" + permission)) && !excluded;
+        b = (currentSubject.isPermitted("ip=" + s + ":" + permission)  || currentSubject.isPermitted("ip="
+                + s + ":" + master + ":" + permission));
         return b;
     }
 
     private boolean handleIpPermission(String masterId, String permission) {
 
-        String remoteAddress = "1.1.1.1";
+        String ipAddress = this.getCallerIpAddress();
         InetAddress inetAddress;
         boolean ipv6 = false;
         try {
-            inetAddress = InetAddress.getByName(remoteAddress);
+            inetAddress = InetAddress.getByName(ipAddress);
             ipv6 = inetAddress instanceof Inet6Address;
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        if (masterId.toLowerCase().startsWith("ip=")) {
-            String[] s = masterId.split("=");
-            String[] s2 = s[1].split(":");
-            String ip = s2[0];
-            String master = "";
-            if (s2.length > 1) {
-                master = s2[1];
-            }
+        String[] ipParts = ipAddress.split("\\.");
 
-            String[] ipParts = ip.split("\\.");
-
-            if ((ipParts.length < 4) && !ipv6 || (ipParts.length < 8 && ipv6)) {
-                LOGGER.warn("Wrong ip address found: " + ip);
-                return false;
-            }
-
-            boolean excluded = false;
-            String es = "";
-            for (int i = 0; i < ipParts.length; i++) {
-                es = es + ipParts[i];
-                excluded = excluded || getExcluded(permission, "ip=" + es);
-                if (excluded) {
-                    break;
-                }
-                es = es + ".";
-            }
-
-            return ipPermission(permission, master, ipParts, 0, excluded) || ipPermission(permission, master, ipParts, 1, excluded) || ipPermission(
-                    permission, master, ipParts, 2, excluded) || ipPermission(permission, master, ipParts, 3, excluded);
+        if ((ipParts.length < 4) && !ipv6 || (ipParts.length < 8 && ipv6)) {
+            LOGGER.warn("Wrong ip address found: " + ipAddress);
+            return false;
         }
-        return false;
+
+         return ipPermission(permission, masterId, ipParts, 0) || ipPermission(permission, masterId, ipParts, 1) || ipPermission(
+                permission, masterId, ipParts, 2) || ipPermission(permission, masterId, ipParts, 3);
+
     }
 
-    private boolean getPermissionFromSubject(String masterId, String permission) {
-        return (handleIpPermission(masterId, permission) || currentSubject.isPermitted(permission) || currentSubject.isPermitted(masterId + ":"
-                + permission)) && !getExcluded(permission, masterId);
-
+    private boolean getPermissionFromSubject(String masterId, String permission) {    
+        return (handleIpPermission(masterId, permission) || currentSubject.isPermitted(permission) || currentSubject.isPermitted(masterId
+                + ":" + permission)) && !getExcluded(permission, masterId);
     }
 
     public boolean isPermitted(String masterId, String permission) {
