@@ -19,23 +19,30 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.model.joe.job.Description;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.job.Script;
+import com.sos.joc.model.joe.nodeparams.Config;
 
 public class XmlDeserializer {
 
     public static <T> T deserialize(byte[] xml, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException, DocumentException {
-        if ("Job".equals(clazz.getSimpleName())) {
+        switch (clazz.getSimpleName()) {
+        case "job":
             return clazz.cast(deserializeJob(xml));
-        } else {
+        case "Config": //NODEPARAMS
+            return clazz.cast(deserializeNodeParams(xml));
+        default:
             return Globals.xmlMapper.readValue(xml, clazz);
         }
     }
-    
+
     public static <T> T deserialize(Document doc, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException, DocumentException {
-        if ("Job".equals(clazz.getSimpleName())) {
+        switch (clazz.getSimpleName()) {
+        case "job":
             return clazz.cast(deserializeJob(doc));
-        } else {
+        case "Config": //NODEPARAMS
+            return clazz.cast(deserializeNodeParams(doc));
+        default:
             return Globals.xmlMapper.readValue(doc.asXML(), clazz);
         }
     }
@@ -94,5 +101,21 @@ public class XmlDeserializer {
             job.setScript(scr);
         }
         return job;
+    }
+    
+    private static Config deserializeNodeParams(byte[] xml) throws JsonParseException, JsonMappingException, IOException, DocumentException {
+        SAXReader reader = new SAXReader();
+        reader.setValidation(false);
+        Document doc = reader.read(new ByteArrayInputStream(xml));
+        return deserializeNodeParams(doc);
+    }
+    
+    private static Config deserializeNodeParams(Document doc) throws JsonParseException, JsonMappingException, IOException {
+        @SuppressWarnings("unchecked")
+        List<Node> notes = new ArrayList<Node>(doc.selectNodes("//note"));
+        for (Node note : notes) {
+            note.getParent().remove(note);
+        }
+        return Globals.xmlMapper.readValue(doc.asXML(), Config.class);
     }
 }
