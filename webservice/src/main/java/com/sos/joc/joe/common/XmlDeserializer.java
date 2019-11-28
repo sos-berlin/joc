@@ -27,9 +27,9 @@ public class XmlDeserializer {
             IOException, JobSchedulerBadRequestException, DocumentException {
         switch (clazz.getSimpleName()) {
         case "job":
-            return clazz.cast(deserializeJob(xml));
+            return clazz.cast(deserializeJob(getDocument(xml)));
         case "Config": //NODEPARAMS
-            return clazz.cast(deserializeNodeParams(xml));
+            return clazz.cast(deserializeNodeParams(getDocument(xml)));
         default:
             return Globals.xmlMapper.readValue(xml, clazz);
         }
@@ -47,11 +47,10 @@ public class XmlDeserializer {
         }
     }
 
-    private static Job deserializeJob(byte[] xml) throws DocumentException, JsonParseException, JsonMappingException, IOException {
+    private static Document getDocument(byte[] xml) throws DocumentException {
         SAXReader reader = new SAXReader();
         reader.setValidation(false);
-        Document doc = reader.read(new ByteArrayInputStream(xml));
-        return deserializeJob(doc);
+        return reader.read(new ByteArrayInputStream(xml));
     }
     
     private static Job deserializeJob(Document doc) throws JsonParseException, JsonMappingException, IOException {
@@ -101,13 +100,6 @@ public class XmlDeserializer {
             job.setScript(scr);
         }
         return job;
-    }
-    
-    private static Config deserializeNodeParams(byte[] xml) throws JsonParseException, JsonMappingException, IOException, DocumentException {
-        SAXReader reader = new SAXReader();
-        reader.setValidation(false);
-        Document doc = reader.read(new ByteArrayInputStream(xml));
-        return deserializeNodeParams(doc);
     }
     
     private static Config deserializeNodeParams(Document doc) throws JsonParseException, JsonMappingException, IOException {
