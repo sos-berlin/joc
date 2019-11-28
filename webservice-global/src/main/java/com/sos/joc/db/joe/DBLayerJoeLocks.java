@@ -90,8 +90,8 @@ public class DBLayerJoeLocks {
 
     public <T extends Tree> SortedSet<T> setLockedBy(String schedulerId, SortedSet<T> folders, Comparator<T> byPath)
             throws DBConnectionRefusedException, DBInvalidDataException {
-        if (folders == null) {
-            return null;
+        if (folders == null || folders.isEmpty()) {
+            return folders;
         }
         try {
             StringBuilder sql = new StringBuilder();
