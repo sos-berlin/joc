@@ -5,15 +5,17 @@ import java.io.ByteArrayInputStream;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
+import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 
 import com.sos.joc.Globals;
-import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IMapConfigurationResource;
 
@@ -33,7 +35,8 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
 
             SAXReader reader = new SAXReader();
             reader.setValidation(false);
-            final String rootElementName = reader.read(new ByteArrayInputStream(requestBody)).getRootElement().getName().toLowerCase();
+            Document doc = reader.read(new ByteArrayInputStream(requestBody));
+            final String rootElementName = doc.getRootElement().getName().toLowerCase();
             String objType = rootElementName.replaceAll("_", "").toUpperCase();
             if ("SETTINGS".equals(objType)) {
                 objType = "NODEPARAMS";
@@ -45,9 +48,13 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
             if (!"NODEPARAMS".equals(objType)) {
                 ValidateXML.validateAgainstJobSchedulerSchema(new ByteArrayInputStream(requestBody));
             }
-
-            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(Globals.xmlMapper.readValue(requestBody, JOEHelper.CLASS_MAPPING.get(objType)));
-            return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
+            if ("JOB".equals(objType)) {
+                byte[] bytes = Globals.objectMapper.writeValueAsBytes(XmlDeserializer.deserialize(doc, JOEHelper.CLASS_MAPPING.get(objType)));
+                return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
+            } else {
+                byte[] bytes = Globals.objectMapper.writeValueAsBytes(XmlDeserializer.deserialize(requestBody, JOEHelper.CLASS_MAPPING.get(objType)));
+                return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
+            }
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

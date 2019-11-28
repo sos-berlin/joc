@@ -25,6 +25,7 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocObjectAlreadyExistException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
+import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.resource.IRenameResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
@@ -104,7 +105,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                     String extension = JOEHelper.getFileExtension(body.getObjectType());
                     try {
                         JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-                        oldItem.setConfiguration(Globals.objectMapper.writeValueAsString(Globals.xmlMapper.readValue(jocHotFolder.getFile(body
+                        oldItem.setConfiguration(Globals.objectMapper.writeValueAsString(XmlDeserializer.deserialize(jocHotFolder.getFile(body
                                 .getOldPath() + extension), JOEHelper.CLASS_MAPPING.get(body.getObjectType().value()))));
                     } catch (Exception e) {
                         oldItem.setConfiguration(null);

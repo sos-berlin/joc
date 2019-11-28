@@ -21,6 +21,7 @@ import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.resource.IReadFileResource;
 import com.sos.joc.model.joe.common.EmptyConfiguration;
 import com.sos.joc.model.joe.common.Filter;
@@ -94,7 +95,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             if (dbItemJoeObject == null || dbItemJoeObject.getConfiguration() == null || (body.getForceLive() != null && body.getForceLive())) {
                 fileContent = fileLiveContent;
                 if (fileContent != null) {
-                    jsObjectEdit.setConfiguration((IJSObject) Globals.xmlMapper.readValue(fileContent, JOEHelper.CLASS_MAPPING.get(body.getObjectType()
+                    jsObjectEdit.setConfiguration((IJSObject) XmlDeserializer.deserialize(fileContent, JOEHelper.CLASS_MAPPING.get(body.getObjectType()
                             .value())));
                     lastModifiedDate = jocHotFolder.getLastModifiedDate();
                 }

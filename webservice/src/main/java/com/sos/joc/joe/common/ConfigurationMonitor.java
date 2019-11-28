@@ -130,7 +130,7 @@ public class ConfigurationMonitor {
             for (String liveJob : jobs) {
                 String conf = null;
                 try {
-                    Job jobPojo = Globals.xmlMapper.readValue(jocHotFolder.getFile(liveJob + EXTENSION), Job.class);
+                    Job jobPojo = XmlDeserializer.deserialize(jocHotFolder.getFile(liveJob + EXTENSION), Job.class);
                     if (jobPojo != null && !jobHasConfigurationMonitor(jobPojo)) {
                         jobPojo = addConfigurationMonitor(jobPojo);
                         conf = Globals.objectMapper.writeValueAsString(jobPojo);

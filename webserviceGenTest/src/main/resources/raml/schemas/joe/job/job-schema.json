@@ -91,7 +91,11 @@
       "properties": {
         "includes": {
           "$ref": "../common/includes-schema.json"
-        }
+        },
+    	"content": {
+      		"description": "cdata embedded docu",
+      		"type": "string"
+    	}
       }
     },
     "lockUses": {
