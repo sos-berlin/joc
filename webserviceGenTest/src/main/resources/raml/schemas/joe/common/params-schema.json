@@ -5,11 +5,11 @@
   "javaType": "com.sos.joc.model.joe.common.Params",
   "type": "object",
   "properties": {
-    "paramList": {
-      "xmlElement": "param",
+    "includes": {
+      "xmlElement": "include",
       "type": "array",
       "items": {
-        "$ref": "param-schema.json"
+        "$ref": "../common/paramInclude-schema.json"
       }
     },
     "copyParams": {
@@ -30,10 +30,11 @@
         }
       }
     },
-    "includes": {
+    "paramList": {
+      "xmlElement": "param",
       "type": "array",
       "items": {
-        "$ref": "../common/paramInclude-schema.json"
+        "$ref": "param-schema.json"
       }
     }
   }
