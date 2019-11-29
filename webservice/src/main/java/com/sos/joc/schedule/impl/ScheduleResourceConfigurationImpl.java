@@ -17,6 +17,7 @@ import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.configuration.CalendarUsageConfiguration;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.common.RunTime200;
@@ -107,7 +108,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             runTime.setRunTimeIsTemporary(false);
             runTime.setSurveyDate(entity.getConfiguration().getSurveyDate());
 
-            runTime.setRunTimeJson(Globals.xmlMapper.readValue(entity.getConfiguration().getContent().getXml(),
+            runTime.setRunTimeJson(XmlDeserializer.deserialize(entity.getConfiguration().getContent().getXml(),
                     com.sos.joc.model.joe.schedule.RunTime.class));
             runTimeAnswer.setRunTime(runTime);
             runTimeAnswer.setDeliveryDate(Date.from(Instant.now()));

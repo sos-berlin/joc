@@ -30,6 +30,7 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
+import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.Err419;
@@ -185,7 +186,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                         jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
                     } else {
                         
-                        Job jobPojo = Globals.xmlMapper.readValue(configuration, Job.class);
+                        Job jobPojo = XmlDeserializer.deserialize(configuration, Job.class);
                         if (jobPojo.getRunTime() != null && modifyJob.getCalendars() != null && !modifyJob.getCalendars().isEmpty()) {
                             Calendars calendars = new Calendars();
                             calendars.setCalendars(modifyJob.getCalendars());

@@ -14,6 +14,7 @@ import com.sos.joc.classes.audit.ModifyProcessClassAudit;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.processclass.resource.IAgentConfigurationResource;
 import com.sos.joc.model.joe.processclass.ProcessClass;
@@ -47,7 +48,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             ProcessClassEdit entity = new ProcessClassEdit();
             entity.setPath(agentFilter.getProcessClass());
-            entity.setConfiguration(Globals.xmlMapper.readValue(fileContent, ProcessClass.class));
+            entity.setConfiguration(XmlDeserializer.deserialize(fileContent, ProcessClass.class));
             entity.setConfigurationDate(httpClient.getLastModifiedDate());
             entity.setDeliveryDate(Date.from(Instant.now()));
 

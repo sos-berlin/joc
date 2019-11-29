@@ -18,8 +18,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.model.common.RunTime200;
 
 public class RunTime {
@@ -45,7 +45,7 @@ public class RunTime {
             runTime.setRunTime(getRuntimeXmlString(parent, null));
         }
         if (!asXML) {
-            runTime.setRunTimeJson(Globals.xmlMapper.readValue(runTime.getRunTime(), com.sos.joc.model.joe.schedule.RunTime.class));
+            runTime.setRunTimeJson(XmlDeserializer.deserialize(runTime.getRunTime(), com.sos.joc.model.joe.schedule.RunTime.class));
             runTime.setRunTime(null);
         }
         runTimeAnswer.setRunTime(runTime);

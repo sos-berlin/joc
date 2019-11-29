@@ -28,6 +28,7 @@ import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.joe.schedule.Schedule;
@@ -77,7 +78,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             } else {
 
-                Schedule schedulePojo = Globals.xmlMapper.readValue(modifyRuntime.getRunTime(), Schedule.class);
+                Schedule schedulePojo = XmlDeserializer.deserialize(modifyRuntime.getRunTime(), Schedule.class);
                 if (modifyRuntime.getCalendars() != null && !modifyRuntime.getCalendars().isEmpty()) {
                     Calendars calendars = new Calendars();
                     calendars.setCalendars(modifyRuntime.getCalendars());

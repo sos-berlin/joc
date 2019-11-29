@@ -51,6 +51,7 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
+import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.Err419;
@@ -300,7 +301,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                             jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
                         } else {
 
-                            Order orderPojo = Globals.xmlMapper.readValue(configuration.getRunTime(), Order.class);
+                            Order orderPojo = XmlDeserializer.deserialize(configuration.getRunTime(), Order.class);
                             if (orderPojo.getRunTime() != null && order.getCalendars() != null && !order.getCalendars().isEmpty()) {
                                 Calendars calendars = new Calendars();
                                 calendars.setCalendars(order.getCalendars());
