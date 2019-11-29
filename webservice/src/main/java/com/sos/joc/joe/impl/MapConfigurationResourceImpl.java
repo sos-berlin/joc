@@ -35,6 +35,8 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
 
             SAXReader reader = new SAXReader();
             reader.setValidation(false);
+            reader.setStripWhitespaceText(true);
+            reader.setIgnoreComments(true);
             Document doc = reader.read(new ByteArrayInputStream(requestBody));
             final String rootElementName = doc.getRootElement().getName().toLowerCase();
             String objType = rootElementName.replaceAll("_", "").toUpperCase();
@@ -48,13 +50,8 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
             if (!"NODEPARAMS".equals(objType)) {
                 ValidateXML.validateAgainstJobSchedulerSchema(new ByteArrayInputStream(requestBody));
             }
-            if ("JOB".equals(objType)) {
-                byte[] bytes = Globals.objectMapper.writeValueAsBytes(XmlDeserializer.deserialize(doc, JOEHelper.CLASS_MAPPING.get(objType)));
-                return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
-            } else {
-                byte[] bytes = Globals.objectMapper.writeValueAsBytes(XmlDeserializer.deserialize(requestBody, JOEHelper.CLASS_MAPPING.get(objType)));
-                return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
-            }
+            byte[] bytes = Globals.objectMapper.writeValueAsBytes(XmlDeserializer.deserialize(doc, JOEHelper.CLASS_MAPPING.get(objType)));
+            return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

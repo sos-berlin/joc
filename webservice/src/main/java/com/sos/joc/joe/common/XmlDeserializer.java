@@ -26,31 +26,53 @@ public class XmlDeserializer {
     public static <T> T deserialize(byte[] xml, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException, DocumentException {
         switch (clazz.getSimpleName()) {
-        case "job":
+        case "Job":
             return clazz.cast(deserializeJob(getDocument(xml)));
         case "Config": //NODEPARAMS
             return clazz.cast(deserializeNodeParams(getDocument(xml)));
         default:
-            return Globals.xmlMapper.readValue(xml, clazz);
+            return Globals.xmlMapper.readValue(bytesToString(xml), clazz);
         }
     }
 
     public static <T> T deserialize(Document doc, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException, DocumentException {
         switch (clazz.getSimpleName()) {
-        case "job":
+        case "Job":
             return clazz.cast(deserializeJob(doc));
         case "Config": //NODEPARAMS
             return clazz.cast(deserializeNodeParams(doc));
         default:
-            return Globals.xmlMapper.readValue(doc.asXML(), clazz);
+            return Globals.xmlMapper.readValue(domToString(doc), clazz);
         }
     }
 
     private static Document getDocument(byte[] xml) throws DocumentException {
         SAXReader reader = new SAXReader();
         reader.setValidation(false);
+        reader.setStripWhitespaceText(true);
+        reader.setIgnoreComments(true);
         return reader.read(new ByteArrayInputStream(xml));
+    }
+    
+    private static String domToString(Document doc) {
+        // converts a pair of open and close tag to a closed tag if the content is empty
+        // e.g. <params>   </params> -> <params/>
+        // otherwise Jackson's xmlMapper raises 
+        // com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot construct instance of 
+        // `com.sos.joc.model.joe.XXX` (although at least one Creator exists): no String-argument 
+        // constructor/factory method to deserialize from String value ...
+        return doc.asXML().replaceAll("<([^ \\/>]+)([^>]*)>\\s*</\\1>", "<$1$2/>");
+    }
+    
+    private static String bytesToString(byte[] xml) {
+        // converts a pair of open and close tag to a closed tag if the content is empty
+        // e.g. <params>   </params> -> <params/>
+        // otherwise Jackson's xmlMapper raises 
+        // com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot construct instance of 
+        // `com.sos.joc.model.joe.XXX` (although at least one Creator exists): no String-argument 
+        // constructor/factory method to deserialize from String value ...
+        return new String(xml).replaceAll("<([^ \\/>]+)([^>]*)>\\s*</\\1>", "<$1$2/>");
     }
     
     private static Job deserializeJob(Document doc) throws JsonParseException, JsonMappingException, IOException {
@@ -82,7 +104,7 @@ public class XmlDeserializer {
                 }
             }
         }
-        Job job = Globals.xmlMapper.readValue(doc.asXML(), Job.class);
+        Job job = Globals.xmlMapper.readValue(domToString(doc), Job.class);
         if (!descContent.isEmpty()) {
             Description desc = job.getDocumentation();
             if (desc == null) {
@@ -108,6 +130,6 @@ public class XmlDeserializer {
         for (Node note : notes) {
             note.getParent().remove(note);
         }
-        return Globals.xmlMapper.readValue(doc.asXML(), Config.class);
+        return Globals.xmlMapper.readValue(domToString(doc), Config.class);
     }
 }
