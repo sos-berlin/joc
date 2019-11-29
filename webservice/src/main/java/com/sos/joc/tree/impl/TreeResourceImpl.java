@@ -89,16 +89,14 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
         try {
             List<JobSchedulerObjectType> types = null;
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(treeBody.getJobschedulerId(), accessToken);
-            boolean permission1 = false;
-            boolean permission2 = sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView();
+            boolean permission = sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView();
 
             if (treeBody.getTypes() == null || treeBody.getTypes().isEmpty()) {
                 treeBody.setTypes(Arrays.asList(JobSchedulerObjectType.JOE));
             }
-            types = TreePermanent.getAllowedJoeTypes(treeBody, sosPermission);
+            types = TreePermanent.getJoeTypes(treeBody);
             treeBody.setTypes(types);
-            permission1 = types.size() > 0;
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, treeBody, accessToken, treeBody.getJobschedulerId(), permission1 && permission2);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, treeBody, accessToken, treeBody.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
