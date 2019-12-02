@@ -91,7 +91,7 @@ public class XmlDeserializer {
         // com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot construct instance of 
         // `com.sos.joc.model.joe.XXX` (although at least one Creator exists): no String-argument 
         // constructor/factory method to deserialize from String value ...
-        return xml.replaceAll("<([^ \\/>]+)([^>]*)>\\s*</\\1>", "<$1$2/>");
+        return xml.replaceAll("<([a-zA-Z_]+\\b)([^>]*)>\\s*</\\1>", "<$1$2/>");
     }
     
     private static Job deserializeJob(Document doc) throws JsonParseException, JsonMappingException, IOException {
