@@ -111,7 +111,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
         try {
             //ProcessClassEdit agentFilter = Globals.objectMapper.readValue(bytes, ProcessClassEdit.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "delete", agentFilter, accessToken, agentFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());
+                    getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken).getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isProcessClass());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

@@ -36,7 +36,13 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
         try {
 
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
-            boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDeploy();
+            boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJob() ||
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJobChain() ||
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isLock() ||
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isMonitor() ||
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isOrder() ||
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isProcessClass() ||
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isSchedule();
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {

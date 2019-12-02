@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.11.29 um 05:34:57 PM CET 
+// Generiert: 2019.12.02 um 04:55:18 PM CET 
 //
 
 
@@ -99,6 +99,7 @@ import javax.xml.bind.annotation.XmlType;
  *                                                 &lt;element name="schedule" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                                 &lt;element name="lock" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                                 &lt;element name="monitor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                                 &lt;element name="xmlEditor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                               &lt;/sequence>
  *                                             &lt;/restriction>
  *                                           &lt;/complexContent>
@@ -4522,6 +4523,7 @@ public class SOSPermissionJocCockpit {
      *                                       &lt;element name="schedule" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                                       &lt;element name="lock" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                                       &lt;element name="monitor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                                       &lt;element name="xmlEditor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                                     &lt;/sequence>
      *                                   &lt;/restriction>
      *                                 &lt;/complexContent>
@@ -4667,6 +4669,7 @@ public class SOSPermissionJocCockpit {
          *                             &lt;element name="schedule" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                             &lt;element name="lock" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                             &lt;element name="monitor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                             &lt;element name="xmlEditor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                           &lt;/sequence>
          *                         &lt;/restriction>
          *                       &lt;/complexContent>
@@ -4825,6 +4828,7 @@ public class SOSPermissionJocCockpit {
              *                   &lt;element name="schedule" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *                   &lt;element name="lock" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *                   &lt;element name="monitor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *                   &lt;element name="xmlEditor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *                 &lt;/sequence>
              *               &lt;/restriction>
              *             &lt;/complexContent>
@@ -4943,6 +4947,7 @@ public class SOSPermissionJocCockpit {
                  *         &lt;element name="schedule" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
                  *         &lt;element name="lock" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
                  *         &lt;element name="monitor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+                 *         &lt;element name="xmlEditor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
                  *       &lt;/sequence>
                  *     &lt;/restriction>
                  *   &lt;/complexContent>
@@ -4959,7 +4964,8 @@ public class SOSPermissionJocCockpit {
                     "processClass",
                     "schedule",
                     "lock",
-                    "monitor"
+                    "monitor",
+                    "xmlEditor"
                 })
                 public static class Deploy {
 
@@ -4970,6 +4976,7 @@ public class SOSPermissionJocCockpit {
                     protected boolean schedule;
                     protected boolean lock;
                     protected boolean monitor;
+                    protected boolean xmlEditor;
 
                     /**
                      * Ruft den Wert der job-Eigenschaft ab.
@@ -5081,6 +5088,22 @@ public class SOSPermissionJocCockpit {
                      */
                     public void setMonitor(boolean value) {
                         this.monitor = value;
+                    }
+
+                    /**
+                     * Ruft den Wert der xmlEditor-Eigenschaft ab.
+                     * 
+                     */
+                    public boolean isXmlEditor() {
+                        return xmlEditor;
+                    }
+
+                    /**
+                     * Legt den Wert der xmlEditor-Eigenschaft fest.
+                     * 
+                     */
+                    public void setXmlEditor(boolean value) {
+                        this.xmlEditor = value;
                     }
 
                 }
