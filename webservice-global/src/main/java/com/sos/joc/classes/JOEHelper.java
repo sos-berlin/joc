@@ -47,28 +47,33 @@ public class JOEHelper {
 
     public static boolean hasPermission(JobSchedulerObjectType objectType, SOSPermissionJocCockpit sosPermission) {
         if (objectType == null) {
-            return sosPermission.getJob().getChange().isHotfolder() && sosPermission.getJobChain().getChange().isHotFolder() && sosPermission
-                    .getProcessClass().getChange().isHotFolder() && sosPermission.getOrder().getChange().isHotFolder() && sosPermission.getSchedule()
-                            .getChange().isHotFolder() && sosPermission.getLock().getChange().isHotFolder();
+            return  sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJob() && 
+                    sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJobChain() && 
+                    sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isMonitor() &&
+                    sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isProcessClass() &&
+                    sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isOrder() &&
+                    sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isSchedule() &&
+                    sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isLock();
         }
 
         switch (objectType) {
         case MONITOR:
+            return sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isMonitor();
         case JOB:
-            return sosPermission.getJob().getChange().isHotfolder();
+            return sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJob();
         case NODEPARAMS:
         case JOBCHAIN:
-            return sosPermission.getJobChain().getChange().isHotFolder();
+            return sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJobChain();
         case AGENTCLUSTER:
         case PROCESSCLASS:
-            return sosPermission.getProcessClass().getChange().isHotFolder();
+            return sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isProcessClass();
         case ORDER:
-            return sosPermission.getOrder().getChange().isHotFolder();
+            return sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isOrder();
         case HOLIDAYS:
         case SCHEDULE:
-            return sosPermission.getSchedule().getChange().isHotFolder();
+            return sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isSchedule();
         case LOCK:
-            return sosPermission.getLock().getChange().isHotFolder();
+            return sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isLock();
         case OTHER:
         case FOLDER:
             return true;
