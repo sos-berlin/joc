@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JoeConfigurationException;
 import com.sos.joc.model.joe.common.IJSObject;
 import com.sos.joc.model.joe.common.Params;
 import com.sos.joc.model.joe.job.Commands;
@@ -52,63 +53,91 @@ public class XmlSerializer {
 
     public static String serializeToStringWithHeader(String json, String objType) throws JsonParseException, JsonMappingException,
             JsonProcessingException, IOException, JobSchedulerBadRequestException {
-        return xmlHeader + serializeToString(json, objType);
+        return serializeToStringWithHeader(json, objType, false);
+    }
+
+    public static String serializeToStringWithHeader(String json, String objType, boolean withCheck) throws JsonParseException, JsonMappingException,
+            JsonProcessingException, IOException, JobSchedulerBadRequestException {
+        return xmlHeader + serializeToString(json, objType, withCheck);
     }
 
     public static String serializeToString(String json, String objType) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException {
+        return serializeToString(json, objType, false);
+    }
+
+    public static String serializeToString(String json, String objType, boolean withCheck) throws JsonParseException, JsonMappingException,
+            JsonProcessingException, IOException, JobSchedulerBadRequestException {
         if (!JOEHelper.CLASS_MAPPING.containsKey(objType)) {
             throw new JobSchedulerBadRequestException("unsupported json object: " + objType);
         }
-        return Globals.xmlMapper.writeValueAsString(serialize(json, objType, JOEHelper.CLASS_MAPPING.get(objType)));
+        return Globals.xmlMapper.writeValueAsString(serialize(json, objType, JOEHelper.CLASS_MAPPING.get(objType), withCheck));
     }
 
     public static byte[] serializeToBytes(String json, String objType) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException {
+        return serializeToBytes(json, objType, false);
+    }
+
+    public static byte[] serializeToBytes(String json, String objType, boolean withCheck) throws JsonParseException, JsonMappingException,
+            JsonProcessingException, IOException, JobSchedulerBadRequestException {
         if (!JOEHelper.CLASS_MAPPING.containsKey(objType)) {
             throw new JobSchedulerBadRequestException("unsupported json object: " + objType);
         }
-        return Globals.xmlMapper.writeValueAsBytes(serialize(json, objType, JOEHelper.CLASS_MAPPING.get(objType)));
+        return Globals.xmlMapper.writeValueAsBytes(serialize(json, objType, JOEHelper.CLASS_MAPPING.get(objType), withCheck));
     }
 
     public static byte[] serializeToBytes(byte[] json, String objType) throws JsonParseException, JsonMappingException, JsonProcessingException,
             IOException, JobSchedulerBadRequestException {
+        return serializeToBytes(json, objType, false);
+    }
+
+    public static byte[] serializeToBytes(byte[] json, String objType, boolean withCheck) throws JsonParseException, JsonMappingException,
+            JsonProcessingException, IOException, JobSchedulerBadRequestException {
         if (!JOEHelper.CLASS_MAPPING.containsKey(objType)) {
             throw new JobSchedulerBadRequestException("unsupported json object: " + objType);
         }
-        return Globals.xmlMapper.writeValueAsBytes(serialize(json, objType, JOEHelper.CLASS_MAPPING.get(objType)));
+        return Globals.xmlMapper.writeValueAsBytes(serialize(json, objType, JOEHelper.CLASS_MAPPING.get(objType), withCheck));
     }
 
-    private static <T> T serialize(byte[] json, String objType, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException,
-            JobSchedulerBadRequestException {
+    private static <T> T serialize(byte[] json, String objType, Class<T> clazz, boolean withCheck) throws JsonParseException, JsonMappingException,
+            IOException, JobSchedulerBadRequestException {
         if (objectsWithSpecialSerialization.contains(objType)) {
-            return serialize(Globals.objectMapper.readValue(json, clazz), clazz);
+            return serialize(Globals.objectMapper.readValue(json, clazz), clazz, withCheck);
         } else {
             return Globals.objectMapper.readValue(json, clazz);
         }
     }
 
-    private static <T> T serialize(String json, String objType, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException,
-            JobSchedulerBadRequestException {
+    private static <T> T serialize(String json, String objType, Class<T> clazz, boolean withCheck) throws JsonParseException, JsonMappingException,
+            IOException, JobSchedulerBadRequestException {
         if (objectsWithSpecialSerialization.contains(objType)) {
-            return serialize(Globals.objectMapper.readValue(json, clazz), clazz);
+            return serialize(Globals.objectMapper.readValue(json, clazz), clazz, withCheck);
         } else {
             return Globals.objectMapper.readValue(json, clazz);
         }
     }
 
     public static <T> T serialize(IJSObject obj, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
-        return serialize(clazz.cast(obj), clazz);
+        return serialize(clazz.cast(obj), clazz, false);
+    }
+    
+    public static <T> T serialize(IJSObject obj, Class<T> clazz, boolean withCheck) throws JsonParseException, JsonMappingException, IOException {
+        return serialize(clazz.cast(obj), clazz, withCheck);
+    }
+    
+    public static <T> T serialize(T obj, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
+        return serialize(obj, clazz, false);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T serialize(T obj, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
+    public static <T> T serialize(T obj, Class<T> clazz, boolean withCheck) throws JsonParseException, JsonMappingException, IOException {
         switch (clazz.getSimpleName()) {
         case "Job":
-            return (T) serializeJob((Job) obj);
+            return (T) serializeJob((Job) obj, withCheck);
 
         case "JobChain":
-            return (T) serializeJobChain((JobChain) obj);
+            return (T) serializeJobChain((JobChain) obj, withCheck);
 
         case "Order":
             return (T) serializeOrder((Order) obj);
@@ -121,15 +150,19 @@ public class XmlSerializer {
             return (T) serializeAbstractSchedule((AbstractSchedule) obj);
 
         case "Monitor":
-            return (T) serializeMonitor((Monitor) obj, false);
+            return (T) serializeMonitor((Monitor) obj, false, withCheck);
 
         case "Config":
             return (T) serializeNodeParams((Config) obj);
         }
         return obj;
     }
-
+    
     public static Job serializeJob(Job job) {
+        return serializeJob(job, false);
+    }
+
+    public static Job serializeJob(Job job, boolean withCheck) {
         if (job.getEnabled() != null && trueValues.contains(job.getEnabled())) {
             job.setEnabled(null);
         }
@@ -212,15 +245,19 @@ public class XmlSerializer {
                 }
             }
         }
-        job.setScript(serializeScript(job.getScript()));
+        job.setScript(serializeScript(job.getScript(), withCheck));
         if (job.getMonitors() != null) {
-            job.setMonitors(job.getMonitors().stream().map(i -> serializeMonitor(i, true)).collect(Collectors.toList()));
+            job.setMonitors(job.getMonitors().stream().map(i -> serializeMonitor(i, true, withCheck)).collect(Collectors.toList()));
         }
 
         return job;
     }
-
+    
     public static JobChain serializeJobChain(JobChain jobChain) {
+        return serializeJobChain(jobChain, false);
+    }
+
+    public static JobChain serializeJobChain(JobChain jobChain, boolean withCheck) {
         if (jobChain.getOrdersRecoverable() != null && trueValues.contains(jobChain.getOrdersRecoverable())) {
             jobChain.setOrdersRecoverable(null);
         }
@@ -239,6 +276,9 @@ public class XmlSerializer {
                 item.setOnReturnCodes(serializeOnReturnCodes(item.getOnReturnCodes()));
                 return item;
             }).collect(Collectors.toList());
+        }
+        if (withCheck && (jobChain.getJobChainNodes() == null || jobChain.getJobChainNodes().isEmpty())) {
+            throw new JoeConfigurationException("At least one job chain node is required");
         }
         return jobChain;
     }
@@ -274,12 +314,16 @@ public class XmlSerializer {
         }
         return processClass;
     }
-
+    
     public static Monitor serializeMonitor(Monitor monitor, boolean internal) {
+        return serializeMonitor(monitor, internal, false);
+    }
+
+    public static Monitor serializeMonitor(Monitor monitor, boolean internal, boolean withCheck) {
         if (!internal) {
             monitor.setName(null);
         }
-        monitor.setScript(serializeScript(monitor.getScript()));
+        monitor.setScript(serializeScript(monitor.getScript(), withCheck));
         return monitor;
     }
 
@@ -349,7 +393,7 @@ public class XmlSerializer {
             runtime.getHolidays().setWeekdays(serializeWeekdays(runtime.getHolidays().getWeekdays()));
         }
         if (runtime.getCalendars() != null && runtime.getCalendars().trim().equals("{}")) {
-            runtime.setCalendars(null); 
+            runtime.setCalendars(null);
         }
         return (T) runtime;
     }
@@ -416,7 +460,7 @@ public class XmlSerializer {
         monthdays.setWeekdays(serializeWeekdaysOfMonth(monthdays.getWeekdays()));
         return monthdays;
     }
-    
+
     private static Params serializeParams(Params params) {
         return serializeParams(params, false);
     }
@@ -484,7 +528,7 @@ public class XmlSerializer {
         return variables;
     }
 
-    private static Script serializeScript(Script script) {
+    private static Script serializeScript(Script script, boolean withCheck) {
         if (script != null) {
             if (script.getLanguage() == null) {
                 script.setLanguage("shell");
@@ -508,7 +552,14 @@ public class XmlSerializer {
                 script.setDotnetClass(null);
             }
             if (script.getContent() != null) {
-                script.setContent("\n" + script.getContent().trim() + "\n");
+                if (script.getLanguage().equals("java") || script.getLanguage().equals("dotnet")) {
+                    script.setContent(null);
+                } else {
+                    script.setContent(script.getContent().trim() + "\n");
+                }
+            }
+            if (withCheck && (script.getContent() == null || script.getContent().trim().isEmpty()) && !script.getLanguage().equals("java") && !script.getLanguage().equals("dotnet")) {
+                throw new JoeConfigurationException("A script is required for language " + script.getLanguage());
             }
         }
         return script;

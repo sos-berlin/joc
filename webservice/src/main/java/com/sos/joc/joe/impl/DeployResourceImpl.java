@@ -44,6 +44,7 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerModifyObjectException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JoeConfigurationException;
 import com.sos.joc.joe.common.ConfigurationMonitor;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IDeployResource;
@@ -353,14 +354,21 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 if ("ORDER".equals(objType)) {
                                     jsonContent = "{\"runTime\":{}}";
                                 } else if (!"NODEPARAMS".equals(objType) && !"LOCK".equals(objType)) {
-                                    deployAnswer.getReport().add(getIncompleteMessage(joeObject.getPath(), jsObjType));
+                                    deployAnswer.getReport().add(getIncompleteMessage(joeObject.getPath(), jsObjType, "empty configuration"));
                                     continue;
                                 }
                             }
                             
+                            String xmlContent = null;
+                            try {
+                                xmlContent = XmlSerializer.serializeToStringWithHeader(jsonContent, objType, true);
+                            } catch (JoeConfigurationException e1) {
+                                deployAnswer.getReport().add(getIncompleteMessage(joeObject.getPath(), jsObjType, e1.getMessage()));
+                                continue;
+                            }
+                            
                             String extension = JOEHelper.getFileExtension(jsObjType);
                             
-                            String xmlContent = XmlSerializer.serializeToStringWithHeader(jsonContent, objType);
                             if ("NODEPARAMS".equals(objType) && jsonIsEmpty) {
                                 // TODO delete configuration monitor in corresponding jobs
                                 try {
@@ -380,7 +388,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                             touchedFolders.add(joeObject.getFolder());
                             dbLayerJoeObjects.delete(joeObject);
-                            deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), jsObjType, false));
+                            deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), jsObjType, null));
                         }
                     }
                     if ("NODEPARAMS".equals(objType)) {
@@ -409,7 +417,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         if (!emptyFolder) {
                             dbLayerJoeObjects.delete(joeObject);
                         }
-                        deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), JobSchedulerObjectType.FOLDER, false));
+                        deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), JobSchedulerObjectType.FOLDER, null));
                     }
                 }
             }
@@ -564,26 +572,25 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     }
 
     private DeployMessage getFolderDeniedMessage(String path, JobSchedulerObjectType objectType) {
-        String msg = "Access denied for folder " + path; 
+        String msg = null; //"Access denied for folder " + path; 
         return getDeniedMessage(path, objectType, DeployFailReasonType.MISSING_FOLDER_PERMISSIONS, msg, null);
     }
     
     private DeployMessage getObjectDeniedMessage(String path, JobSchedulerObjectType objectType) {
-        String msg = "Access denied for " + objectType.value().toLowerCase() + " " + path; 
+        String msg = null; //"Access denied for " + objectType.value().toLowerCase() + " " + path; 
         return getDeniedMessage(path, objectType, DeployFailReasonType.MISSING_OBJECT_PERMISSIONS, msg, null);
     }
     
     private DeployMessage getOwnerDeniedMessage(String path, JobSchedulerObjectType objectType, String owner) {
-        String msg = "Access denied. The owner is " + owner; 
+        String msg = null; //"Access denied. The owner is " + owner; 
         return getDeniedMessage(path, objectType, DeployFailReasonType.WRONG_OWNERSHIP, msg, owner);
     }
     
-    private DeployMessage getIncompleteMessage(String path, JobSchedulerObjectType objectType) {
-        String msg = "Incomplete configuration for " + objectType.value().toLowerCase() + " " + path; 
-        return getDeniedMessage(path, objectType, DeployFailReasonType.INCOMPLETE_CONFIGURATION, msg, null);
+    private DeployMessage getIncompleteMessage(String path, JobSchedulerObjectType objectType, String errMsg) {
+        return getDeniedMessage(path, objectType, DeployFailReasonType.INCOMPLETE_CONFIGURATION, errMsg, null);
     }
     
-    private DeployMessage getDeployMessage(String path, JobSchedulerObjectType objectType, boolean deleted) {
+    private DeployMessage getDeployMessage(String path, JobSchedulerObjectType objectType, Boolean deleted) {
         DeployMessage deployMessage = new DeployMessage();
         deployMessage.setDeployed(true);
         deployMessage.setDeleted(deleted);
