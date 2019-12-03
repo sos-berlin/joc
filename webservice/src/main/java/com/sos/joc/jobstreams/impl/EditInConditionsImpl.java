@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
-import com.sos.jobstreams.db.DBLayerInConditions;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.jobstreams.db.DBLayerInConditions;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;

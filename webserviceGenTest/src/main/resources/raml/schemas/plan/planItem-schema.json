@@ -32,6 +32,9 @@
     "job": {
       "$ref": "../common/path-schema.json"
     },
+    "jobStream": {
+       "type": "string"
+    },
     "jobChain": {
       "$ref": "../common/path-schema.json"
     },

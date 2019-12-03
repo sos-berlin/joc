@@ -187,6 +187,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         add = regExMatcher.find();
                     }
                     p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
+                    p.setJobStream(dailyPlanDBItem.getDailyPlanDbItem().getJobStream());
 
                     if (dailyPlanDBItem.getDbItemReportTask() != null) {
                         p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
