@@ -45,7 +45,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                         item = dbLayer.getObject(in.getId().longValue());
                     }
                     name = in.getName();
-                    if (name.startsWith("Edit") && !name.toLowerCase().endsWith(".xml")) {
+                    if (name.toLowerCase().startsWith("edit") && !name.toLowerCase().endsWith(".xml")) {
                         name = name + ".xml";
                     }
 

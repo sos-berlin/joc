@@ -41,6 +41,8 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
+                    checkRequiredParameter("id", in.getId());
+
                     DeleteOtherDraftAnswer answer = handleOtherConfigurations(in);
                     response = JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(answer));
                 } else {
