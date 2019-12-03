@@ -51,6 +51,8 @@ import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.DeployAnswer;
+import com.sos.joc.model.joe.common.DeployFailReason;
+import com.sos.joc.model.joe.common.DeployFailReasonType;
 import com.sos.joc.model.joe.common.DeployMessage;
 import com.sos.joc.model.joe.common.FilterDeploy;
 
@@ -104,7 +106,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             boolean folderDeploy = body.getObjectType() == null || body.getObjectType() == JobSchedulerObjectType.FOLDER;
 
             filterJoeObjects.setSchedulerId(body.getJobschedulerId());
-            filterJoeObjects.setAccount(body.getAccount());
+            //filterJoeObjects.setAccount(body.getAccount());  //for specific account we have check in the loops -> deploy report
             if (!folderDeploy) {
                 filterJoeObjects.setFolder(folder); 
                 if (body.getObjectName() != null && !body.getObjectName().isEmpty()) {
@@ -156,7 +158,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     body.getJobschedulerId(), body.getAccount(), getAccount());
 
             DeployAnswer deployAnswer = new DeployAnswer();
-            deployAnswer.setMessages(new ArrayList<DeployMessage>());
+            deployAnswer.setReport(new ArrayList<DeployMessage>());
             deployAnswer.setFolder(folder);
             deployAnswer.setJobschedulerId(body.getJobschedulerId());
             deployAnswer.setObjectName(body.getObjectName());
@@ -165,10 +167,6 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             
             ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance,  API_CALL);
 
-//            Map<String, DBItemJoeLock> mapOfLocks = null;
-//            if (body.getAccount() != null && !body.getAccount().isEmpty()) {
-//                mapOfLocks = dbLayerJoeLocks.getLocksFromOthers(body.getJobschedulerId(), body.getAccount());
-//            }
             Set<String> touchedFolders = new HashSet<String>();
             Set<String> deletedFolders = new HashSet<String>();
 
@@ -215,15 +213,22 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                             DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
                             logAuditMessage(deployJoeAudit);
-
-                            boolean objectPermission = JOEHelper.hasPermission(JobSchedulerObjectType.valueOf(joeObject.getObjectType()), sosPermissionJocCockpit);
+                            
+                            JobSchedulerObjectType jsObjType = JobSchedulerObjectType.valueOf(joeObject.getObjectType());
+                            boolean objectPermission = JOEHelper.hasPermission(jsObjType, sosPermissionJocCockpit);
+                            
+                            if (body.getAccount() != null && !body.getAccount().isEmpty() && !body.getAccount().equals(joeObject.getAccount())) {
+                                deployAnswer.getReport().add(getOwnerDeniedMessage(joeObject.getPath(), jsObjType, joeObject.getAccount()));
+                                continue;
+                            }
+                            
                             if (!objectPermission) {
-                                deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
+                                deployAnswer.getReport().add(getObjectDeniedMessage(joeObject.getPath(), jsObjType));
                                 continue;
                             }
 
                             if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
-                                deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
+                                deployAnswer.getReport().add(getFolderDeniedMessage(joeObject.getPath(), jsObjType));
                                 continue;
                             }
                             
@@ -237,12 +242,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 }
                             }
 
-//                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
-//                                deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(getParent(joeObject.getPath()))));
-//                                continue;
-//                            }
-
-                            String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
+                            String extension = JOEHelper.getFileExtension(jsObjType);
 
                             boolean objExists = true;
                             try {
@@ -260,6 +260,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             storeAuditLogEntry(deployJoeAudit);
                             touchedFolders.add(joeObject.getFolder());
                             dbLayerJoeObjects.delete(joeObject);
+                            deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), jsObjType, true));
                         }
                     }
                 }
@@ -270,14 +271,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         logAuditMessage(deployJoeAudit);
 
                         if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
-                            deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
+                            deployAnswer.getReport().add(getFolderDeniedMessage(joeObject.getPath(), JobSchedulerObjectType.FOLDER));
                             continue;
                         }
-
-//                        if (mapOfLocks != null && mapOfLocks.containsKey(joeObject.getPath())) {
-//                            deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(joeObject.getPath())));
-//                            continue;
-//                        }
 
                         boolean objExists = true;
                         try {
@@ -296,6 +292,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         // delete all children of deleted folder in the database
                         deleteWithAllChildren(dbLayerJoeObjects, joeObject);
                         dbLayerJoeLocks.delete(body.getJobschedulerId(), joeObject.getPath());
+                        deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), JobSchedulerObjectType.FOLDER, true));
                     }
                 }
             }
@@ -322,8 +319,21 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             DeployJoeAudit deployJoeAudit = new DeployJoeAudit(joeObject, body);
                             logAuditMessage(deployJoeAudit);
 
+                            JobSchedulerObjectType jsObjType = JobSchedulerObjectType.valueOf(joeObject.getObjectType());
+                            boolean objectPermission = JOEHelper.hasPermission(jsObjType, sosPermissionJocCockpit);
+                            
+                            if (body.getAccount() != null && !body.getAccount().isEmpty() && !body.getAccount().equals(joeObject.getAccount())) {
+                                deployAnswer.getReport().add(getOwnerDeniedMessage(joeObject.getPath(), jsObjType, joeObject.getAccount()));
+                                continue;
+                            }
+                            
+                            if (!objectPermission) {
+                                deployAnswer.getReport().add(getObjectDeniedMessage(joeObject.getPath(), jsObjType));
+                                continue;
+                            }
+                            
                             if (!folderPermissions.isPermittedForFolder(getParent(joeObject.getPath()))) {
-                                deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
+                                deployAnswer.getReport().add(getFolderDeniedMessage(joeObject.getPath(), jsObjType));
                                 continue;
                             }
                             
@@ -337,22 +347,18 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 }
                             }
 
-//                            if (mapOfLocks != null && mapOfLocks.containsKey(getParent(joeObject.getPath()))) {
-//                                deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(getParent(joeObject.getPath()))));
-//                                continue;
-//                            }
-
                             boolean jsonIsEmpty = jsonContent.trim().equals("{}");
                             
                             if (jsonIsEmpty) {
                                 if ("ORDER".equals(objType)) {
                                     jsonContent = "{\"runTime\":{}}";
                                 } else if (!"NODEPARAMS".equals(objType) && !"LOCK".equals(objType)) {
+                                    deployAnswer.getReport().add(getIncompleteMessage(joeObject.getPath(), jsObjType));
                                     continue;
                                 }
                             }
                             
-                            String extension = JOEHelper.getFileExtension(JobSchedulerObjectType.fromValue(joeObject.getObjectType()));
+                            String extension = JOEHelper.getFileExtension(jsObjType);
                             
                             String xmlContent = XmlSerializer.serializeToStringWithHeader(jsonContent, objType);
                             if ("NODEPARAMS".equals(objType) && jsonIsEmpty) {
@@ -374,6 +380,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                             touchedFolders.add(joeObject.getFolder());
                             dbLayerJoeObjects.delete(joeObject);
+                            deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), jsObjType, false));
                         }
                     }
                     if ("NODEPARAMS".equals(objType)) {
@@ -387,14 +394,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         logAuditMessage(deployJoeAudit);
 
                         if (!folderPermissions.isPermittedForFolder(joeObject.getPath())) {
-                            deployAnswer.getMessages().add(getAccessDeniedMessage(joeObject.getPath()));
+                            deployAnswer.getReport().add(getFolderDeniedMessage(joeObject.getPath(), JobSchedulerObjectType.FOLDER));
                             continue;
                         }
-
-//                        if (mapOfLocks != null && mapOfLocks.containsKey(joeObject.getPath())) {
-//                            deployAnswer.getMessages().add(getFolderIsLockedMessage(mapOfLocks.get(joeObject.getPath())));
-//                            continue;
-//                        }
 
                         jocHotFolder.putFolder(normalizeFolder(joeObject.getPath()));
 
@@ -407,6 +409,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         if (!emptyFolder) {
                             dbLayerJoeObjects.delete(joeObject);
                         }
+                        deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), JobSchedulerObjectType.FOLDER, false));
                     }
                 }
             }
@@ -560,18 +563,47 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         }
     }
 
-    private DeployMessage getAccessDeniedMessage(String path) {
+    private DeployMessage getFolderDeniedMessage(String path, JobSchedulerObjectType objectType) {
+        String msg = "Access denied for folder " + path; 
+        return getDeniedMessage(path, objectType, DeployFailReasonType.MISSING_FOLDER_PERMISSIONS, msg, null);
+    }
+    
+    private DeployMessage getObjectDeniedMessage(String path, JobSchedulerObjectType objectType) {
+        String msg = "Access denied for " + objectType.value().toLowerCase() + " " + path; 
+        return getDeniedMessage(path, objectType, DeployFailReasonType.MISSING_OBJECT_PERMISSIONS, msg, null);
+    }
+    
+    private DeployMessage getOwnerDeniedMessage(String path, JobSchedulerObjectType objectType, String owner) {
+        String msg = "Access denied. The owner is " + owner; 
+        return getDeniedMessage(path, objectType, DeployFailReasonType.WRONG_OWNERSHIP, msg, owner);
+    }
+    
+    private DeployMessage getIncompleteMessage(String path, JobSchedulerObjectType objectType) {
+        String msg = "Incomplete configuration for " + objectType.value().toLowerCase() + " " + path; 
+        return getDeniedMessage(path, objectType, DeployFailReasonType.INCOMPLETE_CONFIGURATION, msg, null);
+    }
+    
+    private DeployMessage getDeployMessage(String path, JobSchedulerObjectType objectType, boolean deleted) {
         DeployMessage deployMessage = new DeployMessage();
-        deployMessage.setMessage("Access denied");
-        deployMessage.setPermissionDeniedFor(path);
+        deployMessage.setDeployed(true);
+        deployMessage.setDeleted(deleted);
+        deployMessage.setObjectType(objectType);
+        deployMessage.setPath(path);
+        deployMessage.setFailReason(null);
         return deployMessage;
     }
-
-//    private DeployMessage getFolderIsLockedMessage(DBItemJoeLock lockItem) {
-//        DeployMessage deployMessage = new DeployMessage();
-//        deployMessage.setMessage("Folder locked by " + lockItem.getAccount());
-//        deployMessage.setPermissionDeniedFor(lockItem.getFolder());
-//        return deployMessage;
-//    }
+    
+    private DeployMessage getDeniedMessage(String path, JobSchedulerObjectType objectType, DeployFailReasonType failReason, String msg, String owner) {
+        DeployMessage deployMessage = new DeployMessage();
+        deployMessage.setDeployed(false);
+        deployMessage.setObjectType(objectType);
+        deployMessage.setPath(path);
+        DeployFailReason reason = new DeployFailReason();
+        reason.set_key(failReason);
+        reason.setMessage(msg);
+        reason.setOwner(owner);
+        deployMessage.setFailReason(reason);
+        return deployMessage;
+    }
 
 }

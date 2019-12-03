@@ -25,7 +25,7 @@
     "objectType": {
       	"$ref": "../../common/type-schema.json"
     },
-    "messages": {
+    "report": {
         "type": "array",
         "items": {
            "$ref": "deploy-message-schema.json"

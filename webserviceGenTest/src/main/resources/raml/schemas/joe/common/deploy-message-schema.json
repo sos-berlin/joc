@@ -4,15 +4,49 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.joe.common.DeployMessage",
   "type": "object",
+  "required": [
+  	"deployed",
+  	"path",
+  	"objectType"
+  ],
   "properties": {
-    "permissionDeniedFor": {
-      	"$ref": "../../common/path-schema.json"
+  	"deployed": {
+  		"type": "boolean"
+  	},
+  	"deleted": {
+  		"type": "boolean"
+  	},
+  	"path": {
+  		"$ref": "../../common/path-schema.json"
+  	},
+    "objectType": {
+      	"$ref": "../../common/type-schema.json"
     },
-    "wrongObjectType": {
-      "type": "string"
-    },
-    "message": {
-      "type": "string"
+    "failReason": {
+    	"type": "object",
+    	"javaType": "com.sos.joc.model.joe.common.DeployFailReason",
+    	"required": [
+    		"_key"
+    	],
+    	"properties": {
+    		"_key": {
+    			"javaType": "com.sos.joc.model.joe.common.DeployFailReasonType",
+    			"type": "string",
+    			"enum": [
+    				"WRONG_OWNERSHIP",
+    				"MISSING_OBJECT_PERMISSIONS",
+    				"MISSING_FOLDER_PERMISSIONS",
+    				"INCOMPLETE_CONFIGURATION"
+    			]
+    		},
+    		"message": {
+      			"type": "string"
+    		},
+    		"owner": {
+    			"description": "useful to substitute in the WRONG_OWNERSHIP message",
+      			"type": "string"
+    		}
+    	}
     }
   }
 }

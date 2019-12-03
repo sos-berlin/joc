@@ -234,7 +234,10 @@ public class JOCResourceImpl {
     }
 
     public boolean checkRequiredParameter(String paramKey, Integer paramVal) throws JocMissingRequiredParameterException {
-        return checkRequiredParameter(paramKey, String.valueOf(paramVal));
+        if (paramVal == null) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+        }
+        return true;
     }
 
     protected boolean matchesRegex(Pattern p, String path) {
