@@ -601,12 +601,15 @@ public class XmlSerializer {
         if (script != null) {
             String leadingCharInScript = withCheck ? "\n" : "";
 
-            if (script.getLanguage() == null) {
-                script.setLanguage("shell");
+            if (script.getLanguage() == null || script.getLanguage().isEmpty()) {
+                if (withCheck) {
+                    throw new JoeConfigurationException("The script language attribute is required");
+                } else {
+                    script.setLanguage("shell");
+                }
             }
             switch (script.getLanguage()) {
             case "java":
-                script.setComClass(null);
                 script.setDll(null);
                 script.setDotnetClass(null);
                 script.setIncludes(null);
