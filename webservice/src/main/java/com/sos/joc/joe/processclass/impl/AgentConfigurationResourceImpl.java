@@ -88,7 +88,7 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             String processClassPath = configuration.getProcessClass() + FILE_EXTENSION;
             JOCHotFolder httpClient = new JOCHotFolder(this);
-            String xmlContent = XmlSerializer.serializeToStringWithHeader(XmlSerializer.serializeProcessClass(agent));
+            String xmlContent = XmlSerializer.serializeToStringWithHeader(XmlSerializer.serializeProcessClass(agent, false));
 
             httpClient.putFile(processClassPath, xmlContent);
 

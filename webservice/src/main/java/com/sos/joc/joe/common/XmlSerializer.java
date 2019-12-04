@@ -1,8 +1,12 @@
 package com.sos.joc.joe.common;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -20,8 +24,11 @@ import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.job.Monitor;
 import com.sos.joc.model.joe.job.Script;
 import com.sos.joc.model.joe.job.StartJob;
+import com.sos.joc.model.joe.jobchain.FileOrderSink;
 import com.sos.joc.model.joe.jobchain.FileOrderSource;
 import com.sos.joc.model.joe.jobchain.JobChain;
+import com.sos.joc.model.joe.jobchain.JobChainEndNode;
+import com.sos.joc.model.joe.jobchain.JobChainNode;
 import com.sos.joc.model.joe.jobchain.OnReturnCodes;
 import com.sos.joc.model.joe.nodeparams.Config;
 import com.sos.joc.model.joe.nodeparams.ConfigNode;
@@ -121,11 +128,11 @@ public class XmlSerializer {
     public static <T> T serialize(IJSObject obj, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
         return serialize(clazz.cast(obj), clazz, false);
     }
-    
+
     public static <T> T serialize(IJSObject obj, Class<T> clazz, boolean withCheck) throws JsonParseException, JsonMappingException, IOException {
         return serialize(clazz.cast(obj), clazz, withCheck);
     }
-    
+
     public static <T> T serialize(T obj, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
         return serialize(obj, clazz, false);
     }
@@ -143,7 +150,7 @@ public class XmlSerializer {
             return (T) serializeOrder((Order) obj);
 
         case "ProcessClass":
-            return (T) serializeProcessClass((ProcessClass) obj);
+            return (T) serializeProcessClass((ProcessClass) obj, withCheck);
 
         case "Schedule":
         case "RunTime":
@@ -157,7 +164,7 @@ public class XmlSerializer {
         }
         return obj;
     }
-    
+
     public static Job serializeJob(Job job) {
         return serializeJob(job, false);
     }
@@ -252,12 +259,16 @@ public class XmlSerializer {
 
         return job;
     }
-    
+
     public static JobChain serializeJobChain(JobChain jobChain) {
         return serializeJobChain(jobChain, false);
     }
 
     public static JobChain serializeJobChain(JobChain jobChain, boolean withCheck) {
+        List<String> statesOfAllNodesList = new ArrayList<String>();
+        Set<String> nextStatesOfAllNodes = new HashSet<String>();
+        Set<String> errorStatesOfAllNodes = new HashSet<String>();
+
         if (jobChain.getOrdersRecoverable() != null && trueValues.contains(jobChain.getOrdersRecoverable())) {
             jobChain.setOrdersRecoverable(null);
         }
@@ -265,20 +276,75 @@ public class XmlSerializer {
             jobChain.setDistributed(null);
         }
         if (jobChain.getFileOrderSources() != null) {
+            if (withCheck && !jobChain.getFileOrderSources().isEmpty()) {
+                if (jobChain.getFileOrderSources().stream().filter(i -> i.getDirectory() == null || i.getDirectory().isEmpty()).findFirst()
+                        .isPresent()) {
+                    throw new JoeConfigurationException("The directory attribute is required in a file order source");
+                }
+                nextStatesOfAllNodes.addAll(jobChain.getFileOrderSources().stream().filter(i -> i.getNextState() != null && !i.getNextState()
+                        .isEmpty()).map(FileOrderSource::getNextState).collect(Collectors.toSet()));
+            }
             for (FileOrderSource orderSource : jobChain.getFileOrderSources()) {
                 if (orderSource.getAlertWhenDirectoryMissing() != null && trueValues.contains(orderSource.getAlertWhenDirectoryMissing())) {
                     orderSource.setAlertWhenDirectoryMissing(null);
                 }
             }
         }
+        if (jobChain.getFileOrderSinks() != null) {
+            if (withCheck && !jobChain.getFileOrderSinks().isEmpty()) {
+                List<String> fileOrderSinkStates = jobChain.getFileOrderSinks().stream().filter(i -> i.getState() != null && !i.getState().isEmpty())
+                        .map(FileOrderSink::getState).collect(Collectors.toList());
+                if (fileOrderSinkStates.size() != jobChain.getFileOrderSinks().size()) {
+                    throw new JoeConfigurationException("A state is required in a file order sink");
+                }
+                statesOfAllNodesList.addAll(fileOrderSinkStates);
+            }
+        }
+        if (jobChain.getJobChainEndNodes() != null) {
+            if (withCheck && !jobChain.getJobChainEndNodes().isEmpty()) {
+                List<String> endNodeStates = jobChain.getJobChainEndNodes().stream().filter(i -> i.getState() != null && !i.getState().isEmpty()).map(
+                        JobChainEndNode::getState).collect(Collectors.toList());
+                if (endNodeStates.size() != jobChain.getJobChainEndNodes().size()) {
+                    throw new JoeConfigurationException("The state attribute is required in a job chain end node");
+                }
+                statesOfAllNodesList.addAll(endNodeStates);
+            }
+        }
         if (jobChain.getJobChainNodes() != null) {
+            if (withCheck && !jobChain.getJobChainNodes().isEmpty()) {
+                List<String> nodeStates = jobChain.getJobChainNodes().stream().filter(i -> i.getState() != null && !i.getState().isEmpty()).map(
+                        JobChainNode::getState).collect(Collectors.toList());
+                if (nodeStates.size() != jobChain.getJobChainNodes().size()) {
+                    throw new JoeConfigurationException("The state attribute is required in a job chain node");
+                }
+                nextStatesOfAllNodes.addAll(jobChain.getJobChainNodes().stream().filter(i -> i.getNextState() != null && !i.getNextState().isEmpty())
+                        .map(JobChainNode::getNextState).collect(Collectors.toSet()));
+                errorStatesOfAllNodes.addAll(jobChain.getJobChainNodes().stream().filter(i -> i.getErrorState() != null && !i.getErrorState()
+                        .isEmpty()).map(JobChainNode::getErrorState).collect(Collectors.toSet()));
+                statesOfAllNodesList.addAll(nodeStates);
+            }
             jobChain.getJobChainNodes().stream().map(item -> {
                 item.setOnReturnCodes(serializeOnReturnCodes(item.getOnReturnCodes()));
                 return item;
             }).collect(Collectors.toList());
         }
-        if (withCheck && (jobChain.getJobChainNodes() == null || jobChain.getJobChainNodes().isEmpty())) {
-            throw new JoeConfigurationException("At least one job chain node is required");
+        if (withCheck) {
+            if ((jobChain.getJobChainNodes() == null || jobChain.getJobChainNodes().isEmpty()) && (jobChain.getFileOrderSinks() == null || jobChain
+                    .getFileOrderSinks().isEmpty())) {
+                throw new JoeConfigurationException("At least one job chain node is required");
+            }
+            Set<String> statesOfAllNodes = new HashSet<String>(statesOfAllNodesList);
+            if (statesOfAllNodesList.size() != statesOfAllNodes.size()) {
+                throw new JoeConfigurationException("The states of all job chain nodes have to be unique");
+            }
+            Optional<String> nextState = nextStatesOfAllNodes.stream().filter(i -> !statesOfAllNodes.contains(i)).findFirst();
+            if (nextState.isPresent()) {
+                throw new JoeConfigurationException("A job chain node with a state '" + nextState.get() + "' is missing");
+            }
+            Optional<String> errorState = errorStatesOfAllNodes.stream().filter(i -> !statesOfAllNodes.contains(i)).findFirst();
+            if (errorState.isPresent()) {
+                throw new JoeConfigurationException("A job chain node with a state '" + errorState.get() + "' is missing");
+            }
         }
         return jobChain;
     }
@@ -294,7 +360,10 @@ public class XmlSerializer {
         return order;
     }
 
-    public static ProcessClass serializeProcessClass(ProcessClass processClass) {
+    public static ProcessClass serializeProcessClass(ProcessClass processClass, boolean withCheck) {
+        if (withCheck && processClass.getMaxProcesses() == null) {
+            throw new JoeConfigurationException("The max processes attribute is required");
+        }
         RemoteSchedulers agents = processClass.getRemoteSchedulers();
         if (agents != null) {
             if (agents.getRemoteSchedulerList() != null) {
@@ -314,7 +383,7 @@ public class XmlSerializer {
         }
         return processClass;
     }
-    
+
     public static Monitor serializeMonitor(Monitor monitor, boolean internal) {
         return serializeMonitor(monitor, internal, false);
     }
@@ -530,37 +599,75 @@ public class XmlSerializer {
 
     private static Script serializeScript(Script script, boolean withCheck) {
         if (script != null) {
+            String leadingCharInScript = withCheck ? "\n" : "";
+
             if (script.getLanguage() == null) {
                 script.setLanguage("shell");
             }
-            if (script.getLanguage().contains("java")) {
+            switch (script.getLanguage()) {
+            case "java":
                 script.setComClass(null);
                 script.setDll(null);
                 script.setDotnetClass(null);
-                if (!script.getLanguage().equals("java")) {
+                script.setIncludes(null);
+                if (withCheck && (script.getJavaClass() == null || script.getJavaClass().isEmpty())) {
+                    throw new JoeConfigurationException("The class name attribute is required for language java");
+                }
+                if (script.getContent() != null) {
+                    if (script.getContent().trim().isEmpty()) {
+                        script.setContent(null);
+                    } else {
+                        script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
+                    }
+                }
+                break;
+            case "dotnet":
+                script.setJavaClass(null);
+                script.setJavaClassPath(null);
+                script.setIncludes(null);
+                if (withCheck) {
+                    if (script.getDll() == null || script.getDll().isEmpty()) {
+                        throw new JoeConfigurationException("The dll attribute is required for language dotnet");
+                    }
+                    if (script.getDotnetClass() == null || script.getDotnetClass().isEmpty()) {
+                        throw new JoeConfigurationException("The class attribute is required for language dotnet");
+                    }
+                }
+                if (script.getContent() != null) {
+                    if (script.getContent().trim().isEmpty()) {
+                        script.setContent(null);
+                    } else {
+                        script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
+                    }
+                }
+                break;
+            default:
+                script.setDll(null);
+                script.setDotnetClass(null);
+                if (!script.getLanguage().contains("java")) { // not javascript
                     script.setJavaClass(null);
+                    script.setJavaClassPath(null);
                 }
-            } else if (script.getLanguage().equals("dotnet")) {
-                script.setJavaClass(null);
-                script.setJavaClassPath(null);
-                script.setComClass(null);
-            } else {
-                script.setJavaClass(null);
-                script.setJavaClassPath(null);
-                // script.setComClass(null);
-                script.setDll(null);
-                script.setDotnetClass(null);
-            }
-            if (script.getContent() != null) {
-                if (script.getLanguage().equals("java") || script.getLanguage().equals("dotnet")) {
-                    script.setContent(null);
-                } else {
-                    script.setContent(script.getContent().trim() + "\n");
+                if (withCheck && (script.getContent() == null || script.getContent().trim().isEmpty()) && (script.getIncludes() == null || script
+                        .getIncludes().isEmpty())) {
+                    throw new JoeConfigurationException("A script content or includes are required for language " + script.getLanguage());
                 }
+                if (script.getContent() != null) {
+                    if (script.getIncludes() != null && script.getIncludes().isEmpty()) {
+                        if (script.getContent().trim().isEmpty()) {
+                            script.setContent(null);
+                        } else {
+                            script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
+                        }
+                    } else {
+                        script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
+                    }
+                }
+                break;
             }
-            if (withCheck && (script.getContent() == null || script.getContent().trim().isEmpty()) && !script.getLanguage().equals("java") && !script.getLanguage().equals("dotnet")) {
-                throw new JoeConfigurationException("A script is required for language " + script.getLanguage());
-            }
+
+        } else if (withCheck) {
+            throw new JoeConfigurationException("A script is required");
         }
         return script;
     }
