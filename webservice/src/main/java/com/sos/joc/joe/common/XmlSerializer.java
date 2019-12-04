@@ -604,69 +604,69 @@ public class XmlSerializer {
             if (script.getLanguage() == null || script.getLanguage().isEmpty()) {
                 if (withCheck) {
                     throw new JoeConfigurationException("The script language attribute is required");
-                } else {
-                    script.setLanguage("shell");
                 }
-            }
-            switch (script.getLanguage()) {
-            case "java":
-                script.setDll(null);
-                script.setDotnetClass(null);
-                script.setIncludes(null);
-                if (withCheck && (script.getJavaClass() == null || script.getJavaClass().isEmpty())) {
-                    throw new JoeConfigurationException("The class name attribute is required for language java");
-                }
-                if (script.getContent() != null) {
-                    if (script.getContent().trim().isEmpty()) {
-                        script.setContent(null);
-                    } else {
-                        script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
+            } else {
+
+                switch (script.getLanguage()) {
+                case "java":
+                    script.setDll(null);
+                    script.setDotnetClass(null);
+                    script.setIncludes(null);
+                    if (withCheck && (script.getJavaClass() == null || script.getJavaClass().isEmpty())) {
+                        throw new JoeConfigurationException("The class name attribute is required for language java");
                     }
-                }
-                break;
-            case "dotnet":
-                script.setJavaClass(null);
-                script.setJavaClassPath(null);
-                script.setIncludes(null);
-                if (withCheck) {
-                    if (script.getDll() == null || script.getDll().isEmpty()) {
-                        throw new JoeConfigurationException("The dll attribute is required for language dotnet");
-                    }
-                    if (script.getDotnetClass() == null || script.getDotnetClass().isEmpty()) {
-                        throw new JoeConfigurationException("The class attribute is required for language dotnet");
-                    }
-                }
-                if (script.getContent() != null) {
-                    if (script.getContent().trim().isEmpty()) {
-                        script.setContent(null);
-                    } else {
-                        script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
-                    }
-                }
-                break;
-            default:
-                script.setDll(null);
-                script.setDotnetClass(null);
-                if (!script.getLanguage().contains("java")) { // not javascript
-                    script.setJavaClass(null);
-                    script.setJavaClassPath(null);
-                }
-                if (withCheck && (script.getContent() == null || script.getContent().trim().isEmpty()) && (script.getIncludes() == null || script
-                        .getIncludes().isEmpty())) {
-                    throw new JoeConfigurationException("A script content or includes are required for language " + script.getLanguage());
-                }
-                if (script.getContent() != null) {
-                    if (script.getIncludes() != null && script.getIncludes().isEmpty()) {
+                    if (script.getContent() != null) {
                         if (script.getContent().trim().isEmpty()) {
                             script.setContent(null);
                         } else {
                             script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
                         }
-                    } else {
-                        script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
                     }
+                    break;
+                case "dotnet":
+                    script.setJavaClass(null);
+                    script.setJavaClassPath(null);
+                    script.setIncludes(null);
+                    if (withCheck) {
+                        if (script.getDll() == null || script.getDll().isEmpty()) {
+                            throw new JoeConfigurationException("The dll attribute is required for language dotnet");
+                        }
+                        if (script.getDotnetClass() == null || script.getDotnetClass().isEmpty()) {
+                            throw new JoeConfigurationException("The class attribute is required for language dotnet");
+                        }
+                    }
+                    if (script.getContent() != null) {
+                        if (script.getContent().trim().isEmpty()) {
+                            script.setContent(null);
+                        } else {
+                            script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
+                        }
+                    }
+                    break;
+                default:
+                    script.setDll(null);
+                    script.setDotnetClass(null);
+                    if (!script.getLanguage().contains("java")) { // not javascript
+                        script.setJavaClass(null);
+                        script.setJavaClassPath(null);
+                    }
+                    if (withCheck && (script.getContent() == null || script.getContent().trim().isEmpty()) && (script.getIncludes() == null || script
+                            .getIncludes().isEmpty())) {
+                        throw new JoeConfigurationException("A script content or includes are required for language " + script.getLanguage());
+                    }
+                    if (script.getContent() != null) {
+                        if (script.getIncludes() != null && script.getIncludes().isEmpty()) {
+                            if (script.getContent().trim().isEmpty()) {
+                                script.setContent(null);
+                            } else {
+                                script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
+                            }
+                        } else {
+                            script.setContent(leadingCharInScript + script.getContent().trim() + "\n");
+                        }
+                    }
+                    break;
                 }
-                break;
             }
 
         } else if (withCheck) {
