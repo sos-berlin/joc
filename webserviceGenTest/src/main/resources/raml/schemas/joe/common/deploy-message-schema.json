@@ -5,16 +5,19 @@
   "javaType": "com.sos.joc.model.joe.common.DeployMessage",
   "type": "object",
   "required": [
-  	"deployed",
+  	"action",
   	"path",
   	"objectType"
   ],
   "properties": {
-  	"deployed": {
-  		"type": "boolean"
-  	},
-  	"deleted": {
-  		"type": "boolean"
+  	"action": {
+  		"javaType": "com.sos.joc.model.joe.common.DeployActionType",
+  		"type": "string",
+  		"enum": [
+  			"DEPLOYED",
+  			"DELETED",
+  			"SKIPPED"
+  		]
   	},
   	"path": {
   		"$ref": "../../common/path-schema.json"

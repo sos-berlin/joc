@@ -51,6 +51,7 @@ import com.sos.joc.joe.resource.IDeployResource;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.JobSchedulerObjectType;
+import com.sos.joc.model.joe.common.DeployActionType;
 import com.sos.joc.model.joe.common.DeployAnswer;
 import com.sos.joc.model.joe.common.DeployFailReason;
 import com.sos.joc.model.joe.common.DeployFailReasonType;
@@ -354,7 +355,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                                 if ("ORDER".equals(objType)) {
                                     jsonContent = "{\"runTime\":{}}";
                                 } else if (!"NODEPARAMS".equals(objType) && !"LOCK".equals(objType)) {
-                                    deployAnswer.getReport().add(getIncompleteMessage(joeObject.getPath(), jsObjType, "empty configuration"));
+                                    deployAnswer.getReport().add(getIncompleteMessage(joeObject.getPath(), jsObjType, "Empty configuration"));
                                     continue;
                                 }
                             }
@@ -388,7 +389,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                             touchedFolders.add(joeObject.getFolder());
                             dbLayerJoeObjects.delete(joeObject);
-                            deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), jsObjType, null));
+                            deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), jsObjType, false));
                         }
                     }
                     if ("NODEPARAMS".equals(objType)) {
@@ -417,7 +418,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                         if (!emptyFolder) {
                             dbLayerJoeObjects.delete(joeObject);
                         }
-                        deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), JobSchedulerObjectType.FOLDER, null));
+                        deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), JobSchedulerObjectType.FOLDER, false));
                     }
                 }
             }
@@ -590,10 +591,13 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         return getDeniedMessage(path, objectType, DeployFailReasonType.INCOMPLETE_CONFIGURATION, errMsg, null);
     }
     
-    private DeployMessage getDeployMessage(String path, JobSchedulerObjectType objectType, Boolean deleted) {
+    private DeployMessage getDeployMessage(String path, JobSchedulerObjectType objectType, boolean deleted) {
         DeployMessage deployMessage = new DeployMessage();
-        deployMessage.setDeployed(true);
-        deployMessage.setDeleted(deleted);
+        if (deleted) {
+            deployMessage.setAction(DeployActionType.DELETED);
+        } else {
+            deployMessage.setAction(DeployActionType.DEPLOYED);
+        }
         deployMessage.setObjectType(objectType);
         deployMessage.setPath(path);
         deployMessage.setFailReason(null);
@@ -602,7 +606,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     
     private DeployMessage getDeniedMessage(String path, JobSchedulerObjectType objectType, DeployFailReasonType failReason, String msg, String owner) {
         DeployMessage deployMessage = new DeployMessage();
-        deployMessage.setDeployed(false);
+        deployMessage.setAction(DeployActionType.SKIPPED);
         deployMessage.setObjectType(objectType);
         deployMessage.setPath(path);
         DeployFailReason reason = new DeployFailReason();
