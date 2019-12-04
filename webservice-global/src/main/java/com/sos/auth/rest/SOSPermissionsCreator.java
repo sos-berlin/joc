@@ -336,7 +336,7 @@ public class SOSPermissionsCreator {
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:process_class"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().setSchedule(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:schedule"));
-            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().setSchedule(haveRight(masterId,
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().setXmlEditor(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:xml_editor"));
             
             sosPermissionJocCockpit.getJobschedulerMasterCluster().getView().setStatus(haveRight(masterId,
