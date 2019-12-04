@@ -21,6 +21,9 @@
 		"configuration": {
 			"type": "string"
 		},
+		"configurationJson": {
+			"type": "string"
+		},
 		"modified": {
 			"$ref": "../../../common/timestamp-schema.json"
 		}

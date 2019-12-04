@@ -62,6 +62,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                     item.setObjectType(in.getObjectType().name());
                     item.setName(name);
                     item.setConfigurationDraft(in.getConfiguration());
+                    item.setConfigurationDraftJson(in.getConfigurationJson());
                     item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
 
                     item.setAuditLogId(new Long(0));// TODO
@@ -73,6 +74,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                 } else {
                     item.setName(name);
                     item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
+                    item.setConfigurationDraftJson(in.getConfigurationJson());
                     item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
 
                     // item.setAuditLogId(new Long(0));// TODO
@@ -101,6 +103,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         checkRequiredParameter("jobschedulerId", in.getJobschedulerId());
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
         checkRequiredParameter("configuration", in.getConfiguration());
+        checkRequiredParameter("configurationJson", in.getConfigurationJson());
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             checkRequiredParameter("name", in.getName());
             checkRequiredParameter("schema", in.getSchema());

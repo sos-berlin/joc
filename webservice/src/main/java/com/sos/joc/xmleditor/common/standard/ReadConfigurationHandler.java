@@ -1,6 +1,6 @@
-package com.sos.joc.xmleditor.common;
+package com.sos.joc.xmleditor.common.standard;
 
-import java.util.Date;
+import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +23,13 @@ public class ReadConfigurationHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReadConfigurationHandler.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
-    boolean deployed;
-    JOCHotFolder hotFolder;
-    ReadStandardConfigurationAnswer answer;
-    String live;
-    Date liveModified;
-    String draft;
-    Date draftModified;
-    String current;
-    Date currentModified;
+    private boolean deployed;
+    private JOCHotFolder hotFolder;
+    private ReadStandardConfigurationAnswer answer;
+    private ReadConfigurationItem live;
+    private ReadConfigurationItem draft;
+    private ReadConfigurationItem current;
+    private URI schema;
 
     public ReadConfigurationHandler(JOCResourceImpl resource) {
         hotFolder = new JOCHotFolder(resource);
@@ -42,23 +40,23 @@ public class ReadConfigurationHandler {
 
     public void readCurrent(DBItemXmlEditorObject item, String jobschedulerId, ObjectType type, boolean forceLive) throws Exception {
         readLive(item, jobschedulerId, type);
-        current = null;
-        currentModified = null;
+
+        draft = new ReadConfigurationItem(schema);
+        current = new ReadConfigurationItem(schema);
+
         if (item != null) {
-            draft = item.getConfigurationDraft();
-            draftModified = item.getModified();
+            draft.set(item.getConfigurationDraft(), item.getConfigurationDraftJson(), item.getModified());
         }
-        if (forceLive || draft == null) {
-            current = live;
-            currentModified = liveModified;
+        if (forceLive || draft.getConfiguration() == null) {
+            current.set(live);
         }
-        if (current == null) {
-            current = draft;
-            currentModified = draftModified;
+        if (current.getConfiguration() == null) {
+            current.set(draft);
         }
     }
 
     public void readLive(DBItemXmlEditorObject item, String jobschedulerId, ObjectType type) throws Exception {
+        schema = JocXmlEditor.getSchemaURI(type);
         String file = JocXmlEditor.getLivePathXml(type);
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[%s][%s]get file...", jobschedulerId, file));
@@ -87,22 +85,22 @@ public class ReadConfigurationHandler {
             throw e;
         }
 
+        live = new ReadConfigurationItem(schema);
         if (liveFile == null) {
             if (deployed) {
                 if (answer.getWarning() == null) { // not found
                     deployed = false;
                 } else { // connection refused
-                    live = item.getConfigurationDeployed();
-                    liveModified = item.getDeployed();
+                    live.set(item.getConfigurationDeployed(), item.getConfigurationDeployedJson(), item.getDeployed());
                 }
             }
         } else {
             deployed = true;
-            live = new String(liveFile, JocXmlEditor.CHARSET);
-            liveModified = hotFolder.getLastModifiedDate();
+            live.set(new String(liveFile, JocXmlEditor.CHARSET), null, hotFolder.getLastModifiedDate());
         }
-        current = live;
-        currentModified = liveModified;
+
+        current = new ReadConfigurationItem(schema);
+        current.set(live);
 
         if (deployed) {
             if (item != null && item.getConfigurationDraft() != null) {
@@ -110,30 +108,31 @@ public class ReadConfigurationHandler {
             }
         }
 
-        answer.setSchema(JocXmlEditor.getSchemaURI(type).toString());
+        answer.setSchema(schema.toString());
         answer.getState().setDeployed(deployed);
     }
 
     public ReadStandardConfigurationAnswer getAnswer() {
-        answer.setConfiguration(current);
-        answer.setModified(currentModified);
+        answer.setConfiguration(current.getConfiguration());
+        answer.setConfigurationJson(current.getConfigurationJson());
+        answer.setModified(current.getModified());
 
         if (answer.getConfiguration() == null) {
             answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_NO_CONFIGURATION_EXIST);
             answer.getState().getMessage().setCode(JocXmlEditor.CODE_NO_CONFIGURATION_EXIST);
             answer.getState().setVersionState(ObjectVersionState.NO_CONFIGURATION_EXIST);
         } else {
-            if (draft == null) {
+            if (draft.getConfiguration() == null) {
                 answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_NOT_EXIST);
                 answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_NOT_EXIST);
                 answer.getState().setVersionState(ObjectVersionState.DRAFT_NOT_EXIST);
             } else {
-                if (live == null) {
+                if (live.getConfiguration() == null) {
                     answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_NOT_EXIST);
                     answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
                     answer.getState().setVersionState(ObjectVersionState.LIVE_NOT_EXIST);
                 } else {
-                    if (liveModified.after(draftModified)) {
+                    if (live.getModified().after(draft.getModified())) {
                         answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_IS_NEWER);
                         answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_IS_NEWER);
                         answer.getState().setVersionState(ObjectVersionState.LIVE_IS_NEWER);
@@ -155,29 +154,4 @@ public class ReadConfigurationHandler {
     public JOCHotFolder getHotFolder() {
         return hotFolder;
     }
-
-    public String getLive() {
-        return live;
-    }
-
-    public Date getLiveModified() {
-        return liveModified;
-    }
-
-    public String getDraft() {
-        return draft;
-    }
-
-    public Date getDraftModified() {
-        return draftModified;
-    }
-
-    public String getCurrent() {
-        return current;
-    }
-
-    public Date getCurrentModified() {
-        return currentModified;
-    }
-
 }

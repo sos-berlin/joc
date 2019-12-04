@@ -22,7 +22,7 @@ import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.delete.DeleteDraft;
 import com.sos.joc.model.xmleditor.delete.DeleteOtherDraftAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
-import com.sos.joc.xmleditor.common.ReadConfigurationHandler;
+import com.sos.joc.xmleditor.common.standard.ReadConfigurationHandler;
 import com.sos.joc.xmleditor.resource.IDeleteResource;
 
 import sos.util.SOSString;

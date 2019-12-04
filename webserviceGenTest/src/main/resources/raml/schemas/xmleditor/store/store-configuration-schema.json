@@ -20,6 +20,9 @@
 		"configuration": {
 			"type": "string"
 		},
+		"configurationJson": {
+			"type": "string"
+		},
 		"id": {
 			"type": "integer"
 		},

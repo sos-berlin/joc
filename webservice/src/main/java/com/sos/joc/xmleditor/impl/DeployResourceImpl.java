@@ -73,7 +73,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     item.setAuditLogId(auditItem.getId());
                 }
                 item.setConfigurationDeployed(item.getConfigurationDraft());
+                item.setConfigurationDeployedJson(item.getConfigurationDraftJson());
                 item.setConfigurationDraft(null);
+                item.setConfigurationDraftJson(null);
                 item.setAccount(getAccount());
                 item.setDeployed(deployed);
                 item.setModified(new Date());
@@ -100,6 +102,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         checkRequiredParameter("jobschedulerId", in.getJobschedulerId());
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
         checkRequiredParameter("configuration", in.getConfiguration());
+        checkRequiredParameter("configurationJson", in.getConfigurationJson());
     }
 
     private JOCDefaultResponse checkPermissions(final String accessToken, final DeployConfiguration in) throws Exception {
@@ -124,6 +127,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             item.setObjectType(in.getObjectType().name());
             item.setName(JocXmlEditor.getConfigurationName(in.getObjectType()));
             item.setConfigurationDraft(in.getConfiguration());
+            item.setConfigurationDraftJson(in.getConfigurationJson());
             item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType()));
 
             item.setAuditLogId(new Long(0));// TODO
@@ -133,6 +137,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             dbLayer.getSession().save(item);
         } else {
             item.setConfigurationDraft(in.getConfiguration());
+            item.setConfigurationDraftJson(in.getConfigurationJson());
             item.setAccount(getAccount());
             item.setModified(new Date());
             dbLayer.getSession().update(item);
