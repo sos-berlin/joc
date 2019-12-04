@@ -359,7 +359,7 @@ public class SOSShiroCurrentUser {
                 return s;
             }
         } else {
-            return "192.11.0.12";
+            return "0.0.0.0";
         }
     }
 
