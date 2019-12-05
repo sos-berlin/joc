@@ -41,8 +41,8 @@ public class ReadConfigurationHandler {
     public void readCurrent(DBItemXmlEditorObject item, String jobschedulerId, ObjectType type, boolean forceLive) throws Exception {
         readLive(item, jobschedulerId, type);
 
-        draft = new ReadConfigurationItem(schema);
-        current = new ReadConfigurationItem(schema);
+        draft = new ReadConfigurationItem(type, schema);
+        current = new ReadConfigurationItem(type, schema);
 
         if (item != null) {
             draft.set(item.getConfigurationDraft(), item.getConfigurationDraftJson(), item.getModified());
@@ -85,7 +85,7 @@ public class ReadConfigurationHandler {
             throw e;
         }
 
-        live = new ReadConfigurationItem(schema);
+        live = new ReadConfigurationItem(type, schema);
         if (liveFile == null) {
             if (deployed) {
                 if (answer.getWarning() == null) { // not found
@@ -99,7 +99,7 @@ public class ReadConfigurationHandler {
             live.set(new String(liveFile, JocXmlEditor.CHARSET), null, hotFolder.getLastModifiedDate());
         }
 
-        current = new ReadConfigurationItem(schema);
+        current = new ReadConfigurationItem(type, schema);
         current.set(live);
 
         if (deployed) {

@@ -12,9 +12,9 @@ import org.xml.sax.InputSource;
 import com.sos.DataExchange.converter.JadeXml2IniConverter;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.notification.helper.NotificationXmlHelper;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBItemXmlEditorObject;
+import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.jitl.xmleditor.db.DbLayerXmlEditor;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -188,9 +188,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         StringBuilder sb = getXmlFileHeader(objectType, deployedDateTime);
         int indx = -1;
         if (objectType.equals(ObjectType.YADE)) {
-            indx = configuration.indexOf(JadeXml2IniConverter.ELEMENT_NAME_ROOT);
+            indx = configuration.indexOf(JobSchedulerXmlEditor.SCHEMA_ROOT_ELEMENT_NAME_YADE);
         } else {
-            indx = configuration.indexOf(NotificationXmlHelper.ELEMENT_NAME_ROOT);
+            indx = configuration.indexOf(JobSchedulerXmlEditor.SCHEMA_ROOT_ELEMENT_NAME__NOTIFICATION);
         }
         if (indx > -1) {
             configuration = configuration.substring(indx - 1);

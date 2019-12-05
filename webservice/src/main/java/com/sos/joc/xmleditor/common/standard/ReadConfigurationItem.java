@@ -3,16 +3,24 @@ package com.sos.joc.xmleditor.common.standard;
 import java.net.URI;
 import java.util.Date;
 
-import com.sos.joc.xmleditor.common.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sos.joc.model.xmleditor.common.ObjectType;
+import com.sos.joc.xmleditor.common.Xml2JsonConverter;
 
 public class ReadConfigurationItem {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReadConfigurationItem.class);
+
     private final URI schema;
+    private final ObjectType type;
     private String configuration;
     private String configurationJson;
     private Date modified;
 
-    public ReadConfigurationItem(URI schemaLocation) {
+    public ReadConfigurationItem(ObjectType objectType, URI schemaLocation) {
+        type = objectType;
         schema = schemaLocation;
     }
 
@@ -33,7 +41,12 @@ public class ReadConfigurationItem {
 
     private void handleJson() {
         if (configuration != null && configurationJson == null) {
-            configurationJson = Utils.xml2json(configuration, schema);
+            try {
+                Xml2JsonConverter converter = new Xml2JsonConverter();
+                configurationJson = converter.convert(type, schema, configuration);
+            } catch (Exception ex) {
+                LOGGER.error(ex.toString(), ex);
+            }
         }
     }
 

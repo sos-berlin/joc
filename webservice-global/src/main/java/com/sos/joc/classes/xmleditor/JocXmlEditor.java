@@ -25,8 +25,8 @@ public class JocXmlEditor {
 
     public static final String CHARSET = "UTF-8";
 
-    public static final String JOC_SCHEMA_YADE_FILE = "xsd/yade/" + JobSchedulerXmlEditor.SCHEMA_YADE;
-    public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/" + JobSchedulerXmlEditor.SCHEMA_NOTIFICATION;
+    public static final String JOC_SCHEMA_YADE_FILE = "xsd/yade/" + JobSchedulerXmlEditor.SCHEMA_FILENAME_YADE;
+    public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/" + JobSchedulerXmlEditor.SCHEMA_FILENAME_NOTIFICATION;
     public static final String JOC_SCHEMA_OTHER_LOCATION = "xsd/other/";
 
     public static final String MESSAGE_DRAFT_NOT_EXIST = "Using version in live folder. No draft version found in database";
