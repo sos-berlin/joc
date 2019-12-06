@@ -2,11 +2,15 @@ package com.sos.joc.xmleditor.common;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.net.ConnectException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,7 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 
@@ -39,7 +42,6 @@ public class Xml2JsonConverter {
     private static boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private static boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
-    private Writer writer = null;
     private XPath xpathSchema;
     private XPath xpathXml;
     private Node rootSchema;
@@ -47,7 +49,7 @@ public class Xml2JsonConverter {
     private String rootElementName;
     private long uuid;
 
-    public String convert(ObjectType type, URI schema, String xml) throws Exception {
+    public List<Object> convert(ObjectType type, URI schema, String xml) throws Exception {
         if (isDebugEnabled) {
             if (isTraceEnabled) {
                 LOGGER.debug(String.format("[schema=%s]%s", schema.toString(), xml));
@@ -67,28 +69,23 @@ public class Xml2JsonConverter {
         }
 
         try {
-
             uuid = -1;
-            writer = new StringWriter();
-            writer.write("[{");
-            writeElements(null, rootXml, 0, 0);
 
-            writer.write(String.format(",\"lastUuid\": %s,", uuid));
-            writer.write("}]");
-            return writer.toString();
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            builder = buildElements(builder, null, rootXml, 0, 0);
+            builder.add("lastUuid", uuid);
+
+            List<Object> list = new ArrayList<>();
+            list.add(builder.build());
+            return list;
         } catch (Exception ex) {
             throw new Exception(ex.toString(), ex);
-        } finally {
-            if (writer != null) {
-                writer.close();
-                writer = null;
-            }
         }
     }
 
-    private void writeElements(Node parent, Node current, long level, long parentId) throws Exception {
+    private JsonObjectBuilder buildElements(JsonObjectBuilder parentBuilder, Node parent, Node current, long level, long parentId) throws Exception {
         String parentName = parent == null ? "#" : parent.getNodeName();
-        String expanded = level < 3 ? "true" : "false";
+        boolean expanded = level < 3 ? true : false;
 
         uuid++;
         long currentUuid = uuid;
@@ -96,76 +93,69 @@ public class Xml2JsonConverter {
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[%s][level=%s][parentId=%s][uuid=%s]expanded=%s", current.getNodeName(), level, parentId, uuid, expanded));
         }
-        writer.write(String.format("\"ref\": \"%s\",", current.getNodeName()));
-        writer.write(String.format("\"parent\": \"%s\",", parentName));
-        if (parent != null) {
-            // writer.write(String.format("\"import\": \"%s\",", current.getNodeName()));
-        }
+        parentBuilder.add("ref", current.getNodeName());
+        parentBuilder.add("parent", parentName);
+        parentBuilder.add("uuid", currentUuid);
 
-        writer.write(String.format("\"uuid\": %s,", currentUuid));
         if (parent != null) {
-            writer.write(String.format("\"parentId\": %s,", parentId));
+            parentBuilder.add("parentId", parentId);
         }
-        writeDoc(current, null);
-        writer.write(String.format("\"expanded\": %s,", expanded));
+        parentBuilder = writeDoc(parentBuilder, current, null);
+        parentBuilder.add("expanded", expanded);
 
-        writer.write("\"nodes\":[");
+        JsonArrayBuilder nodesBuilder = Json.createArrayBuilder();
         NodeList childs = current.getChildNodes();
         level++;
-        String show = "true";
         String cdata = null;
         for (int i = 0; i < childs.getLength(); i++) {
             Node child = childs.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                writer.write("{");
-                writeElements(current, child, level, currentUuid);
-                writer.write("},");
+                JsonObjectBuilder b = buildElements(Json.createObjectBuilder(), current, child, level, currentUuid);
+                nodesBuilder.add(b);
             } else if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
                 cdata = child.getTextContent();
             }
 
         }
-        writer.write("],");
+        parentBuilder.add("nodes", nodesBuilder);
 
+        boolean show = true;
         NamedNodeMap attributes = current.getAttributes();
         if (attributes != null && attributes.getLength() > 0) {
-            writer.write("\"attributes\":[");
-
+            JsonArrayBuilder attributesBuilder = Json.createArrayBuilder();
             for (int i = 0; i < attributes.getLength(); i++) {
                 Node attribute = attributes.item(i);
-                writer.write("{");
 
-                writer.write(String.format("\"name\": \"%s\",", attribute.getNodeName()));
-                writer.write(String.format("\"data\": %s,", new ObjectMapper().writeValueAsString(attribute.getNodeValue())));
-                writer.write(String.format("\"parent\": \"%s\",", current.getNodeName()));
-
+                JsonObjectBuilder builder = Json.createObjectBuilder();
+                builder.add("name", attribute.getNodeName());
+                builder.add("data", attribute.getNodeValue());
+                builder.add("parent", current.getNodeName());
                 uuid++;
-                writer.write(String.format("\"id\": %s,", uuid));
-
-                writeDoc(current, attribute);
-
-                writer.write("},");
+                builder.add("id", uuid);
+                builder = writeDoc(builder, current, attribute);
+                attributesBuilder.add(builder);
             }
-
-            writer.write("],");
-            show = "false";
+            parentBuilder.add("attributes", attributesBuilder);
+            show = false;
         }
 
         if (cdata != null) {
-            writer.write("\"values\":[{");
-            writer.write(String.format("\"parent\": \"%s\",", current.getNodeName()));
-
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            builder.add("parent", current.getNodeName());
+            builder.add("data", cdata);
             uuid++;
-            writer.write(String.format("\"uuid\": %s,", uuid));
-            writer.write(String.format("\"data\": %s,", new ObjectMapper().writeValueAsString(cdata)));
-            writer.write("}],");
-            show = "false";
-        }
+            builder.add("uuid", uuid);
 
-        writer.write(String.format("\"show\":%s", show));
+            JsonArrayBuilder cdataBuilder = Json.createArrayBuilder();
+            cdataBuilder.add(builder);
+            parentBuilder.add("values", cdataBuilder);
+            show = false;
+        }
+        parentBuilder.add("show", show);
+        return parentBuilder;
     }
 
-    private void writeDoc(Node parent, Node attribute) throws Exception {
+    private JsonObjectBuilder writeDoc(JsonObjectBuilder parentBuilder, Node parent, Node attribute) throws Exception {
         Node node = null;
         String doc = null;
         if (attribute == null) {
@@ -196,14 +186,16 @@ public class Xml2JsonConverter {
             }
         }
 
-        writer.write("\"text\":{");
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("parent", parent.getNodeName());
+
         if (doc == null) {
-            writer.write("\"doc\":[{}],");
+            builder.add("doc", Json.createArrayBuilder());
         } else {
-            writer.write(String.format("\"doc\": %s,", new ObjectMapper().writeValueAsString(doc)));
+            builder.add("doc", doc);
         }
-        writer.write(String.format("\"parent\": \"%s\"", parent.getNodeName()));
-        writer.write("},");
+        parentBuilder.add("text", builder);
+        return parentBuilder;
     }
 
     private static String nodeToString(Node node) {

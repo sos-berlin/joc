@@ -1,6 +1,7 @@
 package com.sos.joc.xmleditor.common.standard;
 
 import java.net.URI;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.common.ObjectVersionState;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswerState;
+import com.sos.joc.xmleditor.common.Utils;
+import com.sos.joc.xmleditor.common.Xml2JsonConverter;
 
 public class ReadConfigurationHandler {
 
@@ -25,24 +28,26 @@ public class ReadConfigurationHandler {
 
     private boolean deployed;
     private JOCHotFolder hotFolder;
+    private ObjectType type;
     private ReadStandardConfigurationAnswer answer;
     private ReadConfigurationItem live;
     private ReadConfigurationItem draft;
     private ReadConfigurationItem current;
     private URI schema;
 
-    public ReadConfigurationHandler(JOCResourceImpl resource) {
+    public ReadConfigurationHandler(JOCResourceImpl resource, ObjectType objectType) {
         hotFolder = new JOCHotFolder(resource);
+        type = objectType;
         answer = new ReadStandardConfigurationAnswer();
         answer.setState(new ReadStandardConfigurationAnswerState());
         answer.getState().setMessage(new AnswerMessage());
     }
 
-    public void readCurrent(DBItemXmlEditorObject item, String jobschedulerId, ObjectType type, boolean forceLive) throws Exception {
-        readLive(item, jobschedulerId, type);
+    public void readCurrent(DBItemXmlEditorObject item, String jobschedulerId, boolean forceLive) throws Exception {
+        readLive(item, jobschedulerId);
 
-        draft = new ReadConfigurationItem(type, schema);
-        current = new ReadConfigurationItem(type, schema);
+        draft = new ReadConfigurationItem();
+        current = new ReadConfigurationItem();
 
         if (item != null) {
             draft.set(item.getConfigurationDraft(), item.getConfigurationDraftJson(), item.getModified());
@@ -55,7 +60,7 @@ public class ReadConfigurationHandler {
         }
     }
 
-    public void readLive(DBItemXmlEditorObject item, String jobschedulerId, ObjectType type) throws Exception {
+    public void readLive(DBItemXmlEditorObject item, String jobschedulerId) throws Exception {
         schema = JocXmlEditor.getSchemaURI(type);
         String file = JocXmlEditor.getLivePathXml(type);
         if (isDebugEnabled) {
@@ -85,7 +90,7 @@ public class ReadConfigurationHandler {
             throw e;
         }
 
-        live = new ReadConfigurationItem(type, schema);
+        live = new ReadConfigurationItem();
         if (liveFile == null) {
             if (deployed) {
                 if (answer.getWarning() == null) { // not found
@@ -99,8 +104,8 @@ public class ReadConfigurationHandler {
             live.set(new String(liveFile, JocXmlEditor.CHARSET), null, hotFolder.getLastModifiedDate());
         }
 
-        draft = new ReadConfigurationItem(type, schema);
-        current = new ReadConfigurationItem(type, schema);
+        draft = new ReadConfigurationItem();
+        current = new ReadConfigurationItem();
         current.set(live);
 
         if (deployed) {
@@ -113,21 +118,26 @@ public class ReadConfigurationHandler {
         answer.getState().setDeployed(deployed);
     }
 
-    public ReadStandardConfigurationAnswer getAnswer() {
+    public ReadStandardConfigurationAnswer getAnswer() throws Exception {
         answer.setConfiguration(current.getConfiguration());
-        answer.setConfigurationJson(current.getConfigurationJson());
-        answer.setRecreateJson(current.recreateJson());
         answer.setModified(current.getModified());
 
         if (answer.getConfiguration() == null) {
             answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_NO_CONFIGURATION_EXIST);
             answer.getState().getMessage().setCode(JocXmlEditor.CODE_NO_CONFIGURATION_EXIST);
             answer.getState().setVersionState(ObjectVersionState.NO_CONFIGURATION_EXIST);
+
+            answer.setConfigurationJson(null);
+            answer.setRecreateJson(false);
         } else {
             if (draft.getConfiguration() == null) {
                 answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_NOT_EXIST);
                 answer.getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_NOT_EXIST);
                 answer.getState().setVersionState(ObjectVersionState.DRAFT_NOT_EXIST);
+
+                // configuration from live - should be recreated
+                answer.setConfigurationJson(convert(type, answer.getConfiguration()));
+                answer.setRecreateJson(true);
             } else {
                 if (live.getConfiguration() == null) {
                     answer.getState().getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_NOT_EXIST);
@@ -144,9 +154,20 @@ public class ReadConfigurationHandler {
                         answer.getState().setVersionState(ObjectVersionState.DRAFT_IS_NEWER);
                     }
                 }
+
+                // configuration from draft - should not be recreated, only converted
+                if (current.getConfigurationJson() != null) {
+                    answer.setConfigurationJson(Utils.string2jsonList(current.getConfigurationJson()));
+                }
+                answer.setRecreateJson(false);
             }
         }
         return answer;
+    }
+
+    private List<Object> convert(ObjectType type, String xmlConfiguration) throws Exception {
+        Xml2JsonConverter converter = new Xml2JsonConverter();
+        return converter.convert(type, schema, xmlConfiguration);
     }
 
     public boolean isDeployed() {

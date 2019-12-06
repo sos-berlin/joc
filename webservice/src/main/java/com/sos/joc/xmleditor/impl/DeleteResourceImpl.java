@@ -80,8 +80,8 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
         DBItemXmlEditorObject item = updateItem(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in
                 .getObjectType()));
 
-        ReadConfigurationHandler handler = new ReadConfigurationHandler(this);
-        handler.readLive(item, in.getJobschedulerId(), in.getObjectType());
+        ReadConfigurationHandler handler = new ReadConfigurationHandler(this, in.getObjectType());
+        handler.readLive(item, in.getJobschedulerId());
         return handler.getAnswer();
     }
 

@@ -28,6 +28,7 @@ import com.sos.joc.model.xmleditor.read.ReadConfiguration;
 import com.sos.joc.model.xmleditor.read.other.AnswerConfiguration;
 import com.sos.joc.model.xmleditor.read.other.ReadOtherConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
+import com.sos.joc.xmleditor.common.Utils;
 import com.sos.joc.xmleditor.common.standard.ReadConfigurationHandler;
 import com.sos.joc.xmleditor.resource.IReadResource;
 
@@ -84,9 +85,8 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         DBItemXmlEditorObject item = getItem(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in
                 .getObjectType()));
 
-        ReadConfigurationHandler handler = new ReadConfigurationHandler(this);
-        handler.readCurrent(item, in.getJobschedulerId(), in.getObjectType(), (in.getForceLive() != null && in.getForceLive()));
-
+        ReadConfigurationHandler handler = new ReadConfigurationHandler(this, in.getObjectType());
+        handler.readCurrent(item, in.getJobschedulerId(), (in.getForceLive() != null && in.getForceLive()));
         return handler.getAnswer();
     }
 
@@ -145,7 +145,9 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 answer.getConfiguration().setName(item.getName());
                 answer.getConfiguration().setSchema(JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.getSchemaLocation()).toString());
                 answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
-                answer.getConfiguration().setConfigurationJson(item.getConfigurationDraftJson());
+                if (item.getConfigurationDraftJson() != null) {
+                    answer.getConfiguration().setConfigurationJson(Utils.string2jsonList(item.getConfigurationDraftJson()));
+                }
                 answer.getConfiguration().setModified(item.getModified());
             }
         }

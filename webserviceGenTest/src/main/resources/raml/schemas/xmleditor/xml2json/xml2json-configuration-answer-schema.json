@@ -7,7 +7,7 @@
 	"description": "",
 	"properties": {
 		"configurationJson": {
-			"type": "string"
+			"type": "array"
 		}
 	}
 }

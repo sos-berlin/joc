@@ -22,7 +22,7 @@
 			"type": "string"
 		},
 		"configurationJson": {
-			"type": "string"
+			"type": "array"
 		},
 		"recreateJson": {
 			"type": "boolean"

@@ -1,6 +1,7 @@
 package com.sos.joc.xmleditor.impl;
 
 import java.net.URI;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
@@ -26,18 +27,14 @@ public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonRe
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
-                String configurationJson = null;
                 URI schema = null;
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
                     schema = new URI(in.getSchema());
                 } else {
                     schema = JocXmlEditor.getSchemaURI(in.getObjectType());
                 }
-
                 Xml2JsonConverter converter = new Xml2JsonConverter();
-                configurationJson = converter.convert(in.getObjectType(), schema, in.getConfiguration());
-
-                response = JOCDefaultResponse.responseStatus200(getSuccess(configurationJson));
+                response = JOCDefaultResponse.responseStatus200(getSuccess(converter.convert(in.getObjectType(), schema, in.getConfiguration())));
             }
             return response;
         } catch (JocException e) {
@@ -69,7 +66,7 @@ public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonRe
         return response;
     }
 
-    private Xml2JsonConfigurationAnswer getSuccess(String json) {
+    private Xml2JsonConfigurationAnswer getSuccess(List<Object> json) {
         Xml2JsonConfigurationAnswer answer = new Xml2JsonConfigurationAnswer();
         answer.setConfigurationJson(json);
         return answer;
