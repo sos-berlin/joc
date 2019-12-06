@@ -2,14 +2,17 @@ package com.sos.joc.joe.impl;
 
 import java.time.Instant;
 import java.util.Date;
+
 import javax.ws.rs.Path;
+
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
-import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOEHelper;
+import com.sos.joc.classes.audit.DeployJoeAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
@@ -18,7 +21,6 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.resource.IDeleteDraftResource;
 import com.sos.joc.model.joe.common.FilterDeploy;
-import com.sos.joc.model.joe.lock.LockInfo;
 
 @Path("joe")
 public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteDraftResource {
@@ -46,6 +48,9 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             LockResourceImpl.unForcelock(new DBLayerJoeLocks(sosHibernateSession), body.getJobschedulerId(), body.getFolder(), getAccount());
+            
+            DeployJoeAudit deployJoeAudit = new DeployJoeAudit(body, true);
+            logAuditMessage(deployJoeAudit);
 
             sosHibernateSession.setAutoCommit(false);
             DBLayerJoeObjects dbLayer = new DBLayerJoeObjects(sosHibernateSession);
@@ -72,7 +77,8 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
             Globals.beginTransaction(sosHibernateSession);
             dbLayer.delete(filter);
             Globals.commit(sosHibernateSession);
-
+            storeAuditLogEntry(deployJoeAudit);
+            
             try {
                 CustomEvent evt = JOEHelper.getJoeUpdatedEvent(body.getFolder());
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);
@@ -82,13 +88,7 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JoeFolderAlreadyLockedException e) {
-            // e.addErrorMetaInfo(getJocError());
-            LockInfo entity = new LockInfo();
-            entity.setIsLocked(true);
-            entity.setLockedSince(e.getLockedSince());
-            entity.setLockedBy(e.getLockedBy());
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus434(entity);
+            return JOEHelper.get434Response(e);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

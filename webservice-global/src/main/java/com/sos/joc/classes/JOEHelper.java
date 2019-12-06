@@ -2,7 +2,9 @@ package com.sos.joc.classes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,11 +12,13 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.helper.EConfigFileExtensions;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.jobscheduler.model.event.CustomEventVariables;
+import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.job.Monitor;
 import com.sos.joc.model.joe.jobchain.JobChain;
 import com.sos.joc.model.joe.lock.Lock;
+import com.sos.joc.model.joe.lock.LockInfo;
 import com.sos.joc.model.joe.nodeparams.Config;
 import com.sos.joc.model.joe.order.Order;
 import com.sos.joc.model.joe.other.Other;
@@ -147,6 +151,15 @@ public class JOEHelper {
         evtVars.setAdditionalProperty("objectType", JobSchedulerObjectType.FOLDER.value());
         evt.setVariables(evtVars);
         return evt;
+    }
+    
+    public static JOCDefaultResponse get434Response(JoeFolderAlreadyLockedException e) {
+        LockInfo entity = new LockInfo();
+        entity.setIsLocked(true);
+        entity.setLockedSince(e.getLockedSince());
+        entity.setLockedBy(e.getLockedBy());
+        entity.setDeliveryDate(Date.from(Instant.now()));
+        return JOCDefaultResponse.responseStatus434(entity);
     }
 
 }

@@ -34,6 +34,28 @@ public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
     @JsonProperty("toDelete")
     private Boolean toDelete;
 
+    public DeployJoeAudit(FilterDeploy filter, boolean operationIsDelete) {
+        setJobschedulerId(filter.getJobschedulerId());
+        setObjectType(filter.getObjectType());
+        setObjectName(filter.getObjectName());
+        setFolder(filter.getFolder());
+        setAuditParams(filter.getAuditLog());
+        setToDelete(operationIsDelete);
+        switch (filter.getObjectType()) {
+        case JOB:
+            this.job = filter.getFolder() + "/" + filter.getObjectName();
+            break;
+        case JOBCHAIN:
+            this.jobChain = filter.getFolder() + "/" + filter.getObjectName();
+            break;
+        case ORDER:
+            this.order = filter.getFolder() + "/" + filter.getObjectName();
+            break;
+        default:
+            break;
+        }
+    }
+    
     public DeployJoeAudit(DBItemJoeObject joeObject, FilterDeploy filter) {
         setJobschedulerId(filter.getJobschedulerId());
         try {
