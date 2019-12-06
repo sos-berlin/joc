@@ -86,7 +86,7 @@ public class Xml2JsonConverter {
 
     private void writeElements(Node parent, Node current, long level, long parentId) throws Exception {
         String parentName = parent == null ? "#" : parent.getNodeName();
-        String expanded = level < 2 ? "true" : "false";
+        String expanded = level < 3 ? "true" : "false";
 
         uuid++;
         long currentUuid = uuid;

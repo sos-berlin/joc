@@ -1,0 +1,27 @@
+{
+	"title": "xmleditor xml2json configuration in",
+	"id": "schemas/xmleditor/xml2json/xml2json-configuration-schema",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.xmleditor.xml2json.Xml2JsonConfiguration",
+	"type": "object",
+	"description": "schema only for OTHER",
+	"required": [
+		"jobschedulerId",
+		"objectType",
+		"configuration"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"type": "string"
+		},
+		"objectType": {
+			"$ref": "../common/object-type-schema.json"
+		},
+		"configuration": {
+			"type": "string"
+		},
+		"schema": {
+			"type": "string"
+		}
+	}
+}
