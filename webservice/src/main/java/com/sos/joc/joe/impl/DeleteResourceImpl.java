@@ -10,9 +10,9 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
-import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
@@ -23,7 +23,6 @@ import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.resource.IDeleteResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
-import com.sos.joc.model.joe.lock.LockInfo;
 
 @Path("joe")
 public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResource {
@@ -103,13 +102,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JoeFolderAlreadyLockedException e) {
-            //e.addErrorMetaInfo(getJocError());
-            LockInfo entity = new LockInfo();
-            entity.setIsLocked(true);
-            entity.setLockedSince(e.getLockedSince());
-            entity.setLockedBy(e.getLockedBy());
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus434(entity);
+            return JOEHelper.get434Response(e);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

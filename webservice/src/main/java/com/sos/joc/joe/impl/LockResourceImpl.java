@@ -9,9 +9,9 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeLock;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
-import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -83,13 +83,7 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JoeFolderAlreadyLockedException e) {
-            LockInfo entity = new LockInfo();
-            entity.setIsLocked(true);
-            entity.setLockedSince(e.getLockedSince());
-            entity.setLockedBy(e.getLockedBy());
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            //e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatus434(entity);
+            return JOEHelper.get434Response(e);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

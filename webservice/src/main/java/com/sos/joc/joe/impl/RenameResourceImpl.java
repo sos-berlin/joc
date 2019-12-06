@@ -29,7 +29,6 @@ import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.resource.IRenameResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
-import com.sos.joc.model.joe.lock.LockInfo;
 
 @Path("joe")
 public class RenameResourceImpl extends JOCResourceImpl implements IRenameResource {
@@ -277,13 +276,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
             
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JoeFolderAlreadyLockedException e) {
-            //e.addErrorMetaInfo(getJocError());
-            LockInfo entity = new LockInfo();
-            entity.setIsLocked(true);
-            entity.setLockedSince(e.getLockedSince());
-            entity.setLockedBy(e.getLockedBy());
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus434(entity);
+            return JOEHelper.get434Response(e);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

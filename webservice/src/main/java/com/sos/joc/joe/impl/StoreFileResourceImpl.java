@@ -24,7 +24,6 @@ import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IStoreFileResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.JSObjectEdit;
-import com.sos.joc.model.joe.lock.LockInfo;
 
 @Path("joe")
 public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFileResource {
@@ -125,13 +124,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             return JOCDefaultResponse.responseStatusJSOk(item.getModified());
 
         } catch (JoeFolderAlreadyLockedException e) {
-            //e.addErrorMetaInfo(getJocError());
-            LockInfo entity = new LockInfo();
-            entity.setIsLocked(true);
-            entity.setLockedSince(e.getLockedSince());
-            entity.setLockedBy(e.getLockedBy());
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus434(entity);
+            return JOEHelper.get434Response(e);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
