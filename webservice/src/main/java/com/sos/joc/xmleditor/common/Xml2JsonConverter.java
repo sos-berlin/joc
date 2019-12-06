@@ -72,6 +72,8 @@ public class Xml2JsonConverter {
             writer = new StringWriter();
             writer.write("[{");
             writeElements(null, rootXml, 0, 0);
+
+            writer.write(String.format(",\"lastUuid\": %s,", uuid));
             writer.write("}]");
             return writer.toString();
         } catch (Exception ex) {
@@ -93,9 +95,6 @@ public class Xml2JsonConverter {
 
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[%s][level=%s][parentId=%s][uuid=%s]expanded=%s", current.getNodeName(), level, parentId, uuid, expanded));
-        }
-        if (parent == null) {
-            writer.write("\"webservice\": true,");
         }
         writer.write(String.format("\"ref\": \"%s\",", current.getNodeName()));
         writer.write(String.format("\"parent\": \"%s\",", parentName));

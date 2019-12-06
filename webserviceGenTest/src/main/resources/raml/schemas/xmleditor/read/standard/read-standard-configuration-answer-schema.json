@@ -17,6 +17,9 @@
 		"configurationJson": {
 			"type": "string"
 		},
+		"recreateJson": {
+			"type": "boolean"
+		},
 		"schema": {
 			"type": "string"
 		},

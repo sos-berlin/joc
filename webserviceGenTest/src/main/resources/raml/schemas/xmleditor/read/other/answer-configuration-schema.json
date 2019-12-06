@@ -24,6 +24,9 @@
 		"configurationJson": {
 			"type": "string"
 		},
+		"recreateJson": {
+			"type": "boolean"
+		},
 		"modified": {
 			"$ref": "../../../common/timestamp-schema.json"
 		}

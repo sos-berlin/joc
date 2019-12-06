@@ -17,6 +17,7 @@ public class ReadConfigurationItem {
     private final ObjectType type;
     private String configuration;
     private String configurationJson;
+    private boolean recreateJson;
     private Date modified;
 
     public ReadConfigurationItem(ObjectType objectType, URI schemaLocation) {
@@ -28,6 +29,7 @@ public class ReadConfigurationItem {
         if (other != null) {
             configuration = other.getConfiguration();
             configurationJson = other.getConfigurationJson();
+            recreateJson = other.recreateJson();
             modified = other.getModified();
         }
     }
@@ -44,6 +46,7 @@ public class ReadConfigurationItem {
             try {
                 Xml2JsonConverter converter = new Xml2JsonConverter();
                 configurationJson = converter.convert(type, schema, configuration);
+                recreateJson = true;
             } catch (Exception ex) {
                 LOGGER.error(ex.toString(), ex);
             }
@@ -56,6 +59,10 @@ public class ReadConfigurationItem {
 
     public String getConfigurationJson() {
         return configurationJson;
+    }
+
+    public boolean recreateJson() {
+        return recreateJson;
     }
 
     public Date getModified() {

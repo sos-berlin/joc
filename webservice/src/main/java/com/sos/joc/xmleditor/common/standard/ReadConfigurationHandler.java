@@ -99,6 +99,7 @@ public class ReadConfigurationHandler {
             live.set(new String(liveFile, JocXmlEditor.CHARSET), null, hotFolder.getLastModifiedDate());
         }
 
+        draft = new ReadConfigurationItem(type, schema);
         current = new ReadConfigurationItem(type, schema);
         current.set(live);
 
@@ -115,6 +116,7 @@ public class ReadConfigurationHandler {
     public ReadStandardConfigurationAnswer getAnswer() {
         answer.setConfiguration(current.getConfiguration());
         answer.setConfigurationJson(current.getConfigurationJson());
+        answer.setRecreateJson(current.recreateJson());
         answer.setModified(current.getModified());
 
         if (answer.getConfiguration() == null) {
