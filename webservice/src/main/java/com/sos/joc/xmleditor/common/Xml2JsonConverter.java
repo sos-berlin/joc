@@ -68,8 +68,9 @@ public class Xml2JsonConverter {
             init(new InputSource(schema.toString()), new InputSource(new StringReader(xml)));
         } catch (ConnectException e) {
             throw new Exception(String.format("[%s][cant't get schema]%s", schema.toString(), e.toString()), e);
+        } catch (Exception e) {
+            throw new Exception(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
         }
-
         try {
             uuid = -1;
 
@@ -109,7 +110,7 @@ public class Xml2JsonConverter {
 
     private JsonObjectBuilder buildElements(JsonObjectBuilder parentBuilder, Node parent, Node current, long level, long parentId) throws Exception {
         String parentName = parent == null ? "#" : parent.getNodeName();
-        boolean expanded = level < 3 ? true : false;
+        boolean expanded = level < 2 ? true : false;
 
         uuid++;
         long currentUuid = uuid;
@@ -131,6 +132,7 @@ public class Xml2JsonConverter {
         NodeList childs = current.getChildNodes();
         level++;
         String cdata = null;
+        String textValue = null;
         for (int i = 0; i < childs.getLength(); i++) {
             Node child = childs.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
@@ -138,9 +140,17 @@ public class Xml2JsonConverter {
                 nodesBuilder.add(b);
             } else if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
                 cdata = child.getTextContent();
-            }
 
+            } else if (child.getNodeType() == Node.TEXT_NODE) {
+                textValue = child.getNodeValue();
+            }
         }
+        if (cdata == null) {
+            if (textValue != null && textValue.trim().length() > 0) {
+                cdata = textValue;
+            }
+        }
+
         parentBuilder.add("nodes", nodesBuilder);
 
         boolean show = true;
@@ -182,6 +192,7 @@ public class Xml2JsonConverter {
     private JsonObjectBuilder writeDoc(JsonObjectBuilder parentBuilder, Node parent, Node attribute) throws Exception {
         Node node = null;
         String doc = null;
+        String attrDefaultValue = null;
         if (attribute == null) {
             String xpath = String.format("./xs:element[@name='%s']/xs:annotation/xs:documentation", parent.getNodeName());
             XPathExpression ex = xpathSchema.compile(xpath);
@@ -189,9 +200,19 @@ public class Xml2JsonConverter {
 
         } else {
             String xpath = String.format("./xs:element[@name='%s']//xs:attribute[@name='%s']/xs:annotation/xs:documentation", parent.getNodeName(),
-                    attribute.getNodeName(), attribute.getNodeName());
+                    attribute.getNodeName());
             XPathExpression ex = xpathSchema.compile(xpath);
             node = (Node) ex.evaluate(rootSchema, XPathConstants.NODE);
+
+            try {
+                Node xsdAttr = node.getParentNode().getParentNode();
+                NamedNodeMap attrs = xsdAttr.getAttributes();
+                if (attrs != null && attrs.getNamedItem("default") != null) {
+                    attrDefaultValue = attrs.getNamedItem("default").getNodeValue();
+                }
+            } catch (Throwable e) {
+
+            }
         }
         if (node != null) {
             if (node.hasChildNodes()) {
@@ -208,6 +229,10 @@ public class Xml2JsonConverter {
                     doc = content;
                 }
             }
+
+            if (attrDefaultValue != null) {
+                doc += "<br />Default: " + attrDefaultValue;
+            }
         }
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
@@ -217,6 +242,7 @@ public class Xml2JsonConverter {
             builder.add("doc", Json.createArrayBuilder());
         } else {
             builder.add("doc", doc);
+            // builder.add("doc", Json.createArrayBuilder());
         }
         parentBuilder.add("text", builder);
         return parentBuilder;
