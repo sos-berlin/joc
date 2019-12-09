@@ -56,10 +56,6 @@ public class Xml2JsonConverter {
             }
         }
 
-        if (type.equals(ObjectType.OTHER)) {
-            throw new Exception("OTHER is currently not supported");
-        }
-
         if (!type.equals(ObjectType.OTHER)) {
             rootElementNameXml = JobSchedulerXmlEditor.getRootElementName(type);
         }
@@ -96,7 +92,9 @@ public class Xml2JsonConverter {
         }
 
         if (rootElementNameXml == null) {
-            // TODO get first element name for OTHERS
+            XPathExpression rootExpression = xpathSchema.compile("./xs:element[1]/@name");
+            Node root = (Node) rootExpression.evaluate(rootSchema, XPathConstants.NODE);
+            rootElementNameXml = root.getNodeValue();
         }
 
         Document xmlDoc = getXmlFileDocument(xmlSource);
