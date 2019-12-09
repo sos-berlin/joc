@@ -1,7 +1,6 @@
 package com.sos.joc.xmleditor.impl;
 
 import java.net.URI;
-import java.util.List;
 
 import javax.ws.rs.Path;
 
@@ -66,7 +65,7 @@ public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonRe
         return response;
     }
 
-    private Xml2JsonConfigurationAnswer getSuccess(List<Object> json) {
+    private Xml2JsonConfigurationAnswer getSuccess(String json) {
         Xml2JsonConfigurationAnswer answer = new Xml2JsonConfigurationAnswer();
         answer.setConfigurationJson(json);
         return answer;

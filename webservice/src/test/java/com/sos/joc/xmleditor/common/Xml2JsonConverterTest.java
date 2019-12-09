@@ -3,7 +3,6 @@ package com.sos.joc.xmleditor.common;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
@@ -51,12 +50,11 @@ public class Xml2JsonConverterTest {
         String xmlFile = "src/test/resources/xmleditor/yade.xml";
         String xml = new String(Files.readAllBytes(Paths.get(xmlFile)));
         URI schema = new URI("http://localhost:4446/joc/xsd/yade/YADE_configuration_v1.12.xsd");
+
         Xml2JsonConverter c = new Xml2JsonConverter();
         try {
-            List<Object> list = c.convert(type, schema, xml);
-            if (list != null) {
-                LOGGER.info(list.get(0).toString());
-            }
+            String s = c.convert(type, schema, xml);
+            LOGGER.info(s);
         } catch (Exception e) {
             LOGGER.error(e.toString(), e);
         }

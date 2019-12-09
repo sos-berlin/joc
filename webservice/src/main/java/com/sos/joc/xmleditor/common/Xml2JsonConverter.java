@@ -4,9 +4,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.ConnectException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -46,10 +44,10 @@ public class Xml2JsonConverter {
     private XPath xpathXml;
     private Node rootSchema;
     private Node rootXml;
-    private String rootElementName;
+    private String rootElementNameXml;
     private long uuid;
 
-    public List<Object> convert(ObjectType type, URI schema, String xml) throws Exception {
+    public String convert(ObjectType type, URI schema, String xml) throws Exception {
         if (isDebugEnabled) {
             if (isTraceEnabled) {
                 LOGGER.debug(String.format("[schema=%s]%s", schema.toString(), xml));
@@ -61,7 +59,11 @@ public class Xml2JsonConverter {
         if (type.equals(ObjectType.OTHER)) {
             throw new Exception("OTHER is currently not supported");
         }
-        rootElementName = JobSchedulerXmlEditor.getRootElementName(type);
+
+        if (!type.equals(ObjectType.OTHER)) {
+            rootElementNameXml = JobSchedulerXmlEditor.getRootElementName(type);
+        }
+
         try {
             init(new InputSource(schema.toString()), new InputSource(new StringReader(xml)));
         } catch (ConnectException e) {
@@ -75,11 +77,33 @@ public class Xml2JsonConverter {
             builder = buildElements(builder, null, rootXml, 0, 0);
             builder.add("lastUuid", uuid);
 
-            List<Object> list = new ArrayList<>();
-            list.add(builder.build());
-            return list;
+            return builder.build().toString();
         } catch (Exception ex) {
             throw new Exception(ex.toString(), ex);
+        }
+    }
+
+    private void init(InputSource schemaSource, InputSource xmlSource) throws Exception {
+        String method = "init";
+        xpathSchema = XPathFactory.newInstance().newXPath();
+        xpathSchema.setNamespaceContext(getSchemaNamespaceContext());
+        Document schemaDoc = getXmlFileDocument(schemaSource);
+        XPathExpression schemaExpression = xpathSchema.compile("/xs:schema");
+        rootSchema = (Node) schemaExpression.evaluate(schemaDoc, XPathConstants.NODE);
+        if (rootSchema == null) {
+            throw new Exception(String.format("[%s]\"xs:schema\" element not found in the schema file", method));
+        }
+
+        if (rootElementNameXml == null) {
+            // TODO get first element name for OTHERS
+        }
+
+        Document xmlDoc = getXmlFileDocument(xmlSource);
+        xpathXml = XPathFactory.newInstance().newXPath();
+        XPathExpression xmlExpression = xpathXml.compile("/" + rootElementNameXml);
+        rootXml = (Node) xmlExpression.evaluate(xmlDoc, XPathConstants.NODE);
+        if (rootXml == null) {
+            throw new Exception(String.format("[%s]root element \"%s\" not found", method, rootElementNameXml));
         }
     }
 
@@ -209,26 +233,6 @@ public class Xml2JsonConverter {
             LOGGER.error(te.toString(), te);
         }
         return sw.toString();
-    }
-
-    private void init(InputSource schemaSource, InputSource xmlSource) throws Exception {
-        String method = "init";
-        xpathSchema = XPathFactory.newInstance().newXPath();
-        xpathSchema.setNamespaceContext(getSchemaNamespaceContext());
-        Document schemaDoc = getXmlFileDocument(schemaSource);
-        XPathExpression schemaExpression = xpathSchema.compile("/xs:schema");
-        rootSchema = (Node) schemaExpression.evaluate(schemaDoc, XPathConstants.NODE);
-        if (rootSchema == null) {
-            throw new Exception(String.format("[%s]\"xs:schema\" element not found in the schema file", method));
-        }
-
-        Document xmlDoc = getXmlFileDocument(xmlSource);
-        xpathXml = XPathFactory.newInstance().newXPath();
-        XPathExpression xmlExpression = xpathXml.compile("/" + rootElementName);
-        rootXml = (Node) xmlExpression.evaluate(xmlDoc, XPathConstants.NODE);
-        if (rootXml == null) {
-            throw new Exception(String.format("[%s]root element \"%s\" not found", method, rootElementName));
-        }
     }
 
     private Document getXmlFileDocument(InputSource xmlSource) throws Exception {

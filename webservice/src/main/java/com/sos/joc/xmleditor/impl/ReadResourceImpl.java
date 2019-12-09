@@ -28,7 +28,6 @@ import com.sos.joc.model.xmleditor.read.ReadConfiguration;
 import com.sos.joc.model.xmleditor.read.other.AnswerConfiguration;
 import com.sos.joc.model.xmleditor.read.other.ReadOtherConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
-import com.sos.joc.xmleditor.common.Utils;
 import com.sos.joc.xmleditor.common.standard.ReadConfigurationHandler;
 import com.sos.joc.xmleditor.resource.IReadResource;
 
@@ -145,9 +144,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 answer.getConfiguration().setName(item.getName());
                 answer.getConfiguration().setSchema(JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.getSchemaLocation()).toString());
                 answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
-                if (item.getConfigurationDraftJson() != null) {
-                    answer.getConfiguration().setConfigurationJson(Utils.string2jsonList(item.getConfigurationDraftJson()));
-                }
+                answer.getConfiguration().setConfigurationJson(item.getConfigurationDraftJson());
                 answer.getConfiguration().setModified(item.getModified());
             }
         }

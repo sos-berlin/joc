@@ -1,7 +1,6 @@
 package com.sos.joc.xmleditor.common.standard;
 
 import java.net.URI;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.common.ObjectVersionState;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswerState;
-import com.sos.joc.xmleditor.common.Utils;
 import com.sos.joc.xmleditor.common.Xml2JsonConverter;
 
 public class ReadConfigurationHandler {
@@ -157,7 +155,7 @@ public class ReadConfigurationHandler {
 
                 // configuration from draft - should not be recreated, only converted
                 if (current.getConfigurationJson() != null) {
-                    answer.setConfigurationJson(Utils.string2jsonList(current.getConfigurationJson()));
+                    answer.setConfigurationJson(current.getConfigurationJson());
                 }
                 answer.setRecreateJson(false);
             }
@@ -165,7 +163,7 @@ public class ReadConfigurationHandler {
         return answer;
     }
 
-    private List<Object> convert(ObjectType type, String xmlConfiguration) throws Exception {
+    private String convert(ObjectType type, String xmlConfiguration) throws Exception {
         Xml2JsonConverter converter = new Xml2JsonConverter();
         return converter.convert(type, schema, xmlConfiguration);
     }
