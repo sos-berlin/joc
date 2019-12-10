@@ -45,7 +45,7 @@ public class XmlEditorAudit implements IAuditLog {
         jobschedulerId = in.getJobschedulerId();
         objectType = in.getObjectType();
         name = JocXmlEditor.getConfigurationName(objectType);
-        schemaLocation = JocXmlEditor.getSchemaLocation(objectType);
+        schemaLocation = JocXmlEditor.getRelativeSchemaLocation(objectType);
         folder = JobSchedulerXmlEditor.getNormalizedLiveFolder(objectType);
         setAuditParams(in.getAuditLog());
     }

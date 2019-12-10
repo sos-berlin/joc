@@ -60,7 +60,7 @@ public class ReadConfigurationHandler {
 
     public void readLive(DBItemXmlEditorObject item, String jobschedulerId) throws Exception {
         schema = JocXmlEditor.getSchemaURI(type);
-        String file = JocXmlEditor.getLivePathXml(type);
+        String file = JocXmlEditor.getJobSchedulerLivePathXml(type);
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[%s][%s]get file...", jobschedulerId, file));
         }

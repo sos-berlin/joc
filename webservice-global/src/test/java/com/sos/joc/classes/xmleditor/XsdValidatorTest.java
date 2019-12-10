@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.sos.joc.model.xmleditor.common.ObjectType;
+
 public class XsdValidatorTest {
 
     @Ignore
@@ -17,7 +19,7 @@ public class XsdValidatorTest {
         String xml = new String(Files.readAllBytes(Paths.get(xmlFile)));
 
         XsdValidator validator = null;
-        validator = new XsdValidator(new URI(uri));
+        validator = new XsdValidator(ObjectType.YADE, new URI(uri));
         validator.validate(xml);
 
     }

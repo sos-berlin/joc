@@ -116,7 +116,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 answer.setConfigurations(configurations);
             }
 
-            List<java.nio.file.Path> files = JocXmlEditor.getXsdFilesOther();
+            List<java.nio.file.Path> files = JocXmlEditor.getAbsoluteSchemaLocationsOther();
             if (files != null && files.size() > 0) {
                 for (int i = 0; i < files.size(); i++) {
                     java.nio.file.Path path = files.get(i);

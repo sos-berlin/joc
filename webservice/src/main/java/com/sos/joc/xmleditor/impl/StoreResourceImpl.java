@@ -63,7 +63,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                     item.setName(name);
                     item.setConfigurationDraft(in.getConfiguration());
                     item.setConfigurationDraftJson(in.getConfigurationJson());
-                    item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
+                    item.setSchemaLocation(JocXmlEditor.getRelativeSchemaLocation(in.getObjectType(), in.getSchema()));
 
                     item.setAuditLogId(new Long(0));// TODO
                     item.setAccount(getAccount());
@@ -75,7 +75,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                     item.setName(name);
                     item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
                     item.setConfigurationDraftJson(in.getConfigurationJson());
-                    item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType(), in.getSchema()));
+                    item.setSchemaLocation(JocXmlEditor.getRelativeSchemaLocation(in.getObjectType(), in.getSchema()));
 
                     // item.setAuditLogId(new Long(0));// TODO
                     item.setAccount(getAccount());

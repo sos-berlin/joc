@@ -128,7 +128,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             item.setName(JocXmlEditor.getConfigurationName(in.getObjectType()));
             item.setConfigurationDraft(in.getConfiguration());
             item.setConfigurationDraftJson(in.getConfigurationJson());
-            item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType()));
+            item.setSchemaLocation(JocXmlEditor.getRelativeSchemaLocation(in.getObjectType()));
 
             item.setAuditLogId(new Long(0));// TODO
             item.setAccount(getAccount());
@@ -166,11 +166,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             } catch (Exception e) {
             }
 
-            file = JocXmlEditor.getLivePathXml(in.getObjectType());
+            file = JocXmlEditor.getJobSchedulerLivePathXml(in.getObjectType());
             if (in.getObjectType().equals(ObjectType.YADE)) {
                 hotFolder.putFile(file, getXmlFileContent(in.getObjectType(), configuration, deployedDateTime));
 
-                file = JocXmlEditor.getLivePathYadeIni();
+                file = JocXmlEditor.getJobSchedulerLivePathYadeIni();
                 hotFolder.putFile(file, convertXml2Ini(configuration, deployedDateTime));
             } else {
                 hotFolder.putFile(file, getXmlFileContent(in.getObjectType(), configuration, deployedDateTime));

@@ -55,11 +55,23 @@ public class JocXmlEditor {
         return String.format("./%s/%s", APPLICATION_PATH, path);
     }
 
-    public static String getSchemaLocation(final ObjectType type) {
-        return getSchemaLocation(type, null);
+    public static Path getAbsoluteSchemaLocation(ObjectType type) {
+        Path path = Globals.servletContextRealPath;
+        if (path != null) {
+            if (type.equals(ObjectType.YADE)) {
+                path = path.resolve(Paths.get(JocXmlEditor.JOC_SCHEMA_YADE_FILE));
+            } else {
+                path = path.resolve(Paths.get(JocXmlEditor.JOC_SCHEMA_NOTIFICATION_FILE));
+            }
+        }
+        return path;
     }
 
-    public static String getSchemaLocation(final ObjectType type, final String otherSchema) {
+    public static String getRelativeSchemaLocation(final ObjectType type) {
+        return getRelativeSchemaLocation(type, null);
+    }
+
+    public static String getRelativeSchemaLocation(final ObjectType type, final String otherSchema) {
         if (type == null || SOSString.isEmpty(type.name())) {
             return null;
         }
@@ -76,7 +88,7 @@ public class JocXmlEditor {
     }
 
     public static URI getSchemaURI(final ObjectType type, final String otherSchema) throws Exception {
-        String schemaLocation = getSchemaLocation(type, otherSchema);
+        String schemaLocation = getRelativeSchemaLocation(type, otherSchema);
         if (schemaLocation == null) {
             return null;
         }
@@ -114,12 +126,17 @@ public class JocXmlEditor {
     public static XsdValidator validate(final ObjectType type, final String configuration, final String otherSchema) throws Exception {
         XsdValidator validator = null;
         try {
-            validator = new XsdValidator(getSchemaURI(type, otherSchema));
+            validator = new XsdValidator(type, getSchemaURI(type, otherSchema));
             validator.validate(configuration);
         } catch (Throwable e) {
             String schema = "";
             if (validator != null) {
-                schema = validator.getSchema().toString();
+                if (validator.getSchemaLocalFile() == null) {
+                    schema = validator.getSchema().toString();
+                } else {
+                    schema = validator.getSchemaLocalFile().toString();
+                }
+
             }
             throw new JocException(new JocError(ERROR_CODE_VALIDATION_ERROR, String.format("[%s][%s]%s", type.name(), schema, e.toString())), e);
         }
@@ -138,7 +155,7 @@ public class JocXmlEditor {
         return null;
     }
 
-    public static String getLivePathXml(ObjectType type) {
+    public static String getJobSchedulerLivePathXml(ObjectType type) {
         if (type == null) {
             return null;
         }
@@ -150,11 +167,11 @@ public class JocXmlEditor {
         return null;
     }
 
-    public static String getLivePathYadeIni() {
+    public static String getJobSchedulerLivePathYadeIni() {
         return "/" + JobSchedulerXmlEditor.getLivePathYadeIni();
     }
 
-    public static List<Path> getXsdFilesOther() throws Exception {
+    public static List<Path> getAbsoluteSchemaLocationsOther() throws Exception {
         Path path = Globals.servletContextRealPath == null ? Paths.get(System.getProperty("user.dir")) : Globals.servletContextRealPath;
         return getFiles(path.resolve(JOC_SCHEMA_OTHER_LOCATION), "xsd");
     }
