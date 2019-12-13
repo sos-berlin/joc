@@ -1,7 +1,5 @@
 package com.sos.joc.xmleditor.impl;
 
-import java.net.URI;
-
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
@@ -26,14 +24,9 @@ public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonRe
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
-                URI schema = null;
-                if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    schema = new URI(in.getSchema());
-                } else {
-                    schema = JocXmlEditor.getSchemaURI(in.getObjectType());
-                }
                 Xml2JsonConverter converter = new Xml2JsonConverter();
-                response = JOCDefaultResponse.responseStatus200(getSuccess(converter.convert(in.getObjectType(), schema, in.getConfiguration())));
+                response = JOCDefaultResponse.responseStatus200(getSuccess(converter.convert(in.getObjectType(), JocXmlEditor
+                        .getAbsoluteSchemaLocation(in.getObjectType()), in.getConfiguration())));
             }
             return response;
         } catch (JocException e) {

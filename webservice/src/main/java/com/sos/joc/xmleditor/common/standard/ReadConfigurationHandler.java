@@ -1,7 +1,5 @@
 package com.sos.joc.xmleditor.common.standard;
 
-import java.net.URI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +29,6 @@ public class ReadConfigurationHandler {
     private ReadConfigurationItem live;
     private ReadConfigurationItem draft;
     private ReadConfigurationItem current;
-    private URI schema;
 
     public ReadConfigurationHandler(JOCResourceImpl resource, ObjectType objectType) {
         hotFolder = new JOCHotFolder(resource);
@@ -59,7 +56,6 @@ public class ReadConfigurationHandler {
     }
 
     public void readLive(DBItemXmlEditorObject item, String jobschedulerId) throws Exception {
-        schema = JocXmlEditor.getSchemaURI(type);
         String file = JocXmlEditor.getJobSchedulerLivePathXml(type);
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[%s][%s]get file...", jobschedulerId, file));
@@ -73,7 +69,7 @@ public class ReadConfigurationHandler {
         try {
             liveFile = hotFolder.getFile(file);
             if (isDebugEnabled) {
-                LOGGER.debug(String.format("[%s][%s]%s bytes", jobschedulerId, liveFile == null ? "null" : liveFile.length));
+                LOGGER.debug(String.format("[%s]%s bytes", jobschedulerId, liveFile == null ? "null" : liveFile.length));
             }
         } catch (JobSchedulerConnectionRefusedException e) {
             LOGGER.warn(String.format("[%s]JobScheduler could't be connected", jobschedulerId), e);
@@ -112,7 +108,7 @@ public class ReadConfigurationHandler {
             }
         }
 
-        answer.setSchema(schema.toString());
+        answer.setSchema(JocXmlEditor.getRelativeSchemaLocation(type));
         answer.getState().setDeployed(deployed);
     }
 
@@ -168,7 +164,7 @@ public class ReadConfigurationHandler {
 
     private String convert(ObjectType type, String xmlConfiguration) throws Exception {
         Xml2JsonConverter converter = new Xml2JsonConverter();
-        return converter.convert(type, schema, xmlConfiguration);
+        return converter.convert(type, JocXmlEditor.getAbsoluteSchemaLocation(type), xmlConfiguration);
     }
 
     public boolean isDeployed() {

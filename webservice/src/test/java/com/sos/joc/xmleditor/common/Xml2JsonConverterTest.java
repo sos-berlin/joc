@@ -1,7 +1,7 @@
 package com.sos.joc.xmleditor.common;
 
-import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.json.Json;
@@ -49,8 +49,7 @@ public class Xml2JsonConverterTest {
         ObjectType type = ObjectType.YADE;
         String xmlFile = "src/test/resources/xmleditor/yade.xml";
         String xml = new String(Files.readAllBytes(Paths.get(xmlFile)));
-        URI schema = new URI("http://localhost:4446/joc/xsd/yade/YADE_configuration_v1.12.xsd");
-
+        Path schema = Paths.get("src/test/resources/xmleditor/YADE_configuration_v1.12.xsd");
         Xml2JsonConverter c = new Xml2JsonConverter();
         try {
             String s = c.convert(type, schema, xml);
@@ -67,7 +66,7 @@ public class Xml2JsonConverterTest {
         ObjectType type = ObjectType.OTHER;
         String xmlFile = "src/test/resources/xmleditor/other.xml";
         String xml = new String(Files.readAllBytes(Paths.get(xmlFile)));
-        URI schema = new URI("http://localhost:4446/joc/xsd/other/JSSuiteInventory.xsd");
+        Path schema = Paths.get("http://localhost:4446/joc/xsd/other/JSSuiteInventory.xsd");
 
         Xml2JsonConverter c = new Xml2JsonConverter();
         try {

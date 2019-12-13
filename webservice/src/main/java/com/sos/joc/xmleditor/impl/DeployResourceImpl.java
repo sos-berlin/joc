@@ -1,6 +1,7 @@
 package com.sos.joc.xmleditor.impl;
 
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -200,7 +201,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
     private byte[] convertXml2Ini(String configuration, String deployedDateTime) throws Exception {
         JadeXml2IniConverter converter = new JadeXml2IniConverter();
-        InputSource schemaInputSource = new InputSource(JocXmlEditor.getSchemaURI(ObjectType.YADE).toString());
+        InputSource schemaInputSource = new InputSource(Files.newInputStream(JocXmlEditor.getAbsoluteSchemaLocation(ObjectType.YADE)));
         InputSource configurationInputSource = new InputSource();
         configurationInputSource.setCharacterStream(new StringReader(configuration));
         return converter.process(schemaInputSource, configurationInputSource, getIniFileHeader(deployedDateTime));
