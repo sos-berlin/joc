@@ -73,7 +73,7 @@ public class ReadConfigurationHandler {
         try {
             liveFile = hotFolder.getFile(file);
             if (isDebugEnabled) {
-                LOGGER.debug(String.format("[%s][%s]%s bytes", jobschedulerId, liveFile == null ? "null" : liveFile.length));
+                LOGGER.debug(String.format("[%s]%s bytes", jobschedulerId, liveFile == null ? "null" : liveFile.length));
             }
         } catch (JobSchedulerConnectionRefusedException e) {
             LOGGER.warn(String.format("[%s]JobScheduler could't be connected", jobschedulerId), e);

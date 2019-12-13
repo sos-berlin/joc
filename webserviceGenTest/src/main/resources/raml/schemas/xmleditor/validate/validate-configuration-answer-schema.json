@@ -8,6 +8,9 @@
 	"properties": {
 		"validated": {
 			"$ref": "../../common/timestamp-schema.json"
+		},
+		"validationError": {
+			"$ref": "error-message-schema.json"
 		}
 	}
 }

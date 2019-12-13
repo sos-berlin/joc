@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
 
 import com.sos.DataExchange.converter.JadeXml2IniConverter;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
@@ -22,6 +23,7 @@ import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.XmlEditorAudit;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.XsdValidator;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -62,28 +64,40 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
 
+                // step 1 - store draft in the database
                 DBItemXmlEditorObject item = getItem(dbLayer, in);
 
-                JocXmlEditor.validate(in.getObjectType(), item.getConfigurationDraft());
-                Date deployed = putFile(in, item.getConfigurationDraft());
-
-                audit.setStartTime(deployed);
-                DBItemAuditLog auditItem = storeAuditLogEntry(audit);
-                if (auditItem != null) {
-                    item.setAuditLogId(auditItem.getId());
+                // step 2 - validate
+                XsdValidator validator = new XsdValidator(in.getObjectType(), JocXmlEditor.getSchemaURI(in.getObjectType()));
+                try {
+                    validator.validate(item.getConfigurationDraft());
+                } catch (SAXParseException e) {
+                    LOGGER.error(String.format("[%s]%s", validator.getUsedSchema(), e.toString()), e);
+                    response = JOCDefaultResponse.responseStatus200(ValidateResourceImpl.getError(validator, e));
                 }
-                item.setConfigurationDeployed(item.getConfigurationDraft());
-                item.setConfigurationDeployedJson(item.getConfigurationDraftJson());
-                item.setConfigurationDraft(null);
-                item.setConfigurationDraftJson(null);
-                item.setAccount(getAccount());
-                item.setDeployed(deployed);
-                item.setModified(new Date());
 
-                session.beginTransaction();
-                session.update(item);
-                session.commit();
-                response = JOCDefaultResponse.responseStatus200(getSuccess(deployed));
+                // step 3 - deploy
+                if (response == null) {
+                    Date deployed = putFile(in, item.getConfigurationDraft());
+
+                    audit.setStartTime(deployed);
+                    DBItemAuditLog auditItem = storeAuditLogEntry(audit);
+                    if (auditItem != null) {
+                        item.setAuditLogId(auditItem.getId());
+                    }
+                    item.setConfigurationDeployed(item.getConfigurationDraft());
+                    item.setConfigurationDeployedJson(item.getConfigurationDraftJson());
+                    item.setConfigurationDraft(null);
+                    item.setConfigurationDraftJson(null);
+                    item.setAccount(getAccount());
+                    item.setDeployed(deployed);
+                    item.setModified(new Date());
+
+                    session.beginTransaction();
+                    session.update(item);
+                    session.commit();
+                    response = JOCDefaultResponse.responseStatus200(getSuccess(deployed));
+                }
             }
             return response;
         } catch (JocException e) {

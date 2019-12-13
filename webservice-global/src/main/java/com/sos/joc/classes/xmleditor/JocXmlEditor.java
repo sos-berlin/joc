@@ -119,11 +119,11 @@ public class JocXmlEditor {
         return true;
     }
 
-    public static XsdValidator validate(final ObjectType type, final String configuration) throws Exception {
-        return validate(type, configuration, null);
+    public static XsdValidator validateX(final ObjectType type, final String configuration) throws Exception {
+        return validateX(type, configuration, null);
     }
 
-    public static XsdValidator validate(final ObjectType type, final String configuration, final String otherSchema) throws Exception {
+    public static XsdValidator validateX(final ObjectType type, final String configuration, final String otherSchema) throws Exception {
         XsdValidator validator = null;
         try {
             validator = new XsdValidator(type, getSchemaURI(type, otherSchema));
