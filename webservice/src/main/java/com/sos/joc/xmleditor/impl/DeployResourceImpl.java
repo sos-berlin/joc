@@ -1,6 +1,7 @@
 package com.sos.joc.xmleditor.impl;
 
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -8,7 +9,6 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
 
 import com.sos.DataExchange.converter.JadeXml2IniConverter;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
@@ -23,7 +23,8 @@ import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.XmlEditorAudit;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
-import com.sos.joc.classes.xmleditor.XsdValidator;
+import com.sos.joc.classes.xmleditor.exceptions.XsdValidatorException;
+import com.sos.joc.classes.xmleditor.validator.XsdValidator;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -68,12 +69,12 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 DBItemXmlEditorObject item = getItem(dbLayer, in);
 
                 // step 2 - validate
-                XsdValidator validator = new XsdValidator(in.getObjectType(), JocXmlEditor.getSchemaURI(in.getObjectType()));
+                XsdValidator validator = new XsdValidator(JocXmlEditor.getAbsoluteSchemaLocation(in.getObjectType()));
                 try {
                     validator.validate(item.getConfigurationDraft());
-                } catch (SAXParseException e) {
-                    LOGGER.error(String.format("[%s]%s", validator.getUsedSchema(), e.toString()), e);
-                    response = JOCDefaultResponse.responseStatus200(ValidateResourceImpl.getError(validator, e));
+                } catch (XsdValidatorException e) {
+                    LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
+                    response = JOCDefaultResponse.responseStatus200(ValidateResourceImpl.getError(e));
                 }
 
                 // step 3 - deploy
@@ -214,7 +215,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
     private byte[] convertXml2Ini(String configuration, String deployedDateTime) throws Exception {
         JadeXml2IniConverter converter = new JadeXml2IniConverter();
-        InputSource schemaInputSource = new InputSource(JocXmlEditor.getSchemaURI(ObjectType.YADE).toString());
+        InputSource schemaInputSource = new InputSource(Files.newInputStream(JocXmlEditor.getAbsoluteSchemaLocation(ObjectType.YADE)));
         InputSource configurationInputSource = new InputSource();
         configurationInputSource.setCharacterStream(new StringReader(configuration));
         return converter.process(schemaInputSource, configurationInputSource, getIniFileHeader(deployedDateTime));

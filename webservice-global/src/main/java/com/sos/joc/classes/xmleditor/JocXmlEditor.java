@@ -1,6 +1,5 @@
 package com.sos.joc.classes.xmleditor;
 
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,8 +8,6 @@ import java.util.stream.Collectors;
 
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.Globals;
-import com.sos.joc.exceptions.JocError;
-import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 
@@ -83,24 +80,6 @@ public class JocXmlEditor {
         return otherSchema;
     }
 
-    public static URI getSchemaURI(final ObjectType type) throws Exception {
-        return getSchemaURI(type, null);
-    }
-
-    public static URI getSchemaURI(final ObjectType type, final String otherSchema) throws Exception {
-        String schemaLocation = getRelativeSchemaLocation(type, otherSchema);
-        if (schemaLocation == null) {
-            return null;
-        }
-        if (type.equals(ObjectType.OTHER)) {
-            URI uri = new URI(schemaLocation);
-            if (uri.isAbsolute()) {
-                return uri;
-            }
-        }
-        return Globals.servletBaseUri.resolve(schemaLocation);
-    }
-
     public static String getConfigurationName(final ObjectType type) {
         return getConfigurationName(type, null);
     }
@@ -117,30 +96,6 @@ public class JocXmlEditor {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
         }
         return true;
-    }
-
-    public static XsdValidator validateX(final ObjectType type, final String configuration) throws Exception {
-        return validateX(type, configuration, null);
-    }
-
-    public static XsdValidator validateX(final ObjectType type, final String configuration, final String otherSchema) throws Exception {
-        XsdValidator validator = null;
-        try {
-            validator = new XsdValidator(type, getSchemaURI(type, otherSchema));
-            validator.validate(configuration);
-        } catch (Throwable e) {
-            String schema = "";
-            if (validator != null) {
-                if (validator.getSchemaLocalFile() == null) {
-                    schema = validator.getSchema().toString();
-                } else {
-                    schema = validator.getSchemaLocalFile().toString();
-                }
-
-            }
-            throw new JocException(new JocError(ERROR_CODE_VALIDATION_ERROR, String.format("[%s][%s]%s", type.name(), schema, e.toString())), e);
-        }
-        return validator;
     }
 
     public static String getBaseName(ObjectType type) {

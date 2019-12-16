@@ -17,7 +17,7 @@
 					</Password>
 				</BasicAuthentication>
 				<CredentialStoreFragmentRef
-					ref="yade_credential_store" />
+					ref="yade_credential_storex" />
 				<PassiveMode>true</PassiveMode>
 			</FTPFragment>
 		</ProtocolFragments>

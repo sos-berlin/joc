@@ -3,7 +3,8 @@ package com.sos.joc.xmleditor.common;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.ConnectException;
-import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 
 import javax.json.Json;
@@ -38,8 +39,7 @@ public class Xml2JsonConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Xml2JsonConverter.class);
     private static boolean isDebugEnabled = LOGGER.isDebugEnabled();
-    private static boolean isTraceEnabled = LOGGER.isTraceEnabled();
-
+   
     private XPath xpathSchema;
     private XPath xpathXml;
     private Node rootSchema;
@@ -47,13 +47,13 @@ public class Xml2JsonConverter {
     private String rootElementNameXml;
     private long uuid;
 
-    public String convert(ObjectType type, URI schema, String xml) throws Exception {
-        if (isDebugEnabled) {
-            if (isTraceEnabled) {
-                LOGGER.debug(String.format("[schema=%s]%s", schema.toString(), xml));
-            } else {
-                LOGGER.debug(String.format("schema=%s", schema.toString()));
+    public String convert(ObjectType type, Path schema, String xml) throws Exception {
+        if (Files.exists(schema) && Files.isReadable(schema)) {
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[schema][use local file]%s", schema));
             }
+        } else {
+            throw new Exception(String.format("[%s]schema not found", schema.toString()));
         }
 
         if (!type.equals(ObjectType.OTHER)) {
@@ -61,7 +61,7 @@ public class Xml2JsonConverter {
         }
 
         try {
-            init(new InputSource(schema.toString()), new InputSource(new StringReader(xml)));
+            init(new InputSource(Files.newInputStream(schema)), new InputSource(new StringReader(xml)));
         } catch (ConnectException e) {
             throw new Exception(String.format("[%s][cant't get schema]%s", schema.toString(), e.toString()), e);
         } catch (Exception e) {
