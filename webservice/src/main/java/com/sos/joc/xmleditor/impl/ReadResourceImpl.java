@@ -46,6 +46,8 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
+                JocXmlEditor.tempCreateDirs();
+
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
                     ReadOtherConfigurationAnswer answer = handleOtherConfigurations(in);
                     response = JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(answer));
@@ -95,6 +97,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
         if (in.getId() == null || in.getId() <= 0) {
             ArrayList<String> schemas = new ArrayList<String>();
+            // https locations
             schemas.add(JobSchedulerXmlEditor.SCHEMA_URI_NOTIFICATION);
             schemas.add(JobSchedulerXmlEditor.SCHEMA_URI_YADE);
 
@@ -108,23 +111,23 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                     configuration.setName(item.get("1").toString());
                     configurations.add(configuration);
 
-                    // String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.get("2").toString()).toString();
-                    // if (!schemas.contains(uri)) {
-                    // schemas.add(uri);
-                    // }
+                    // fileName or http(s) location
+                    String schema = JocXmlEditor.getOthersSchemaIdentifier(item.get("2").toString());
+                    if (!schemas.contains(schema)) {
+                        schemas.add(schema);
+                    }
                 }
                 answer.setConfigurations(configurations);
             }
 
-            List<java.nio.file.Path> files = JocXmlEditor.getAbsoluteSchemaLocationsOther();
+            List<java.nio.file.Path> files = JocXmlEditor.getOthersAbsoluteSchemaLocations();
             if (files != null && files.size() > 0) {
                 for (int i = 0; i < files.size(); i++) {
-                    // java.nio.file.Path path = files.get(i);
-                    // String schema = JocXmlEditor.JOC_SCHEMA_OTHER_LOCATION + path.getFileName();
-                    // String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, schema).toString();
-                    // if (!schemas.contains(uri)) {
-                    // schemas.add(uri);
-                    // }
+                    // fileName
+                    String schema = JocXmlEditor.getOthersSchemaIdentifier(files.get(i));
+                    if (!schemas.contains(schema)) {
+                        schemas.add(schema);
+                    }
                 }
             }
 
@@ -142,7 +145,8 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             } else {
                 answer.getConfiguration().setId(item.getId().intValue());
                 answer.getConfiguration().setName(item.getName());
-                // answer.getConfiguration().setSchema(JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.getSchemaLocation()).toString());
+                answer.getConfiguration().setSchema(JocXmlEditor.readOthersSchemaFile(item.getSchemaLocation()));
+                answer.getConfiguration().setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(item.getSchemaLocation()));
                 answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
                 answer.getConfiguration().setConfigurationJson(item.getConfigurationDraftJson());
                 answer.getConfiguration().setModified(item.getModified());

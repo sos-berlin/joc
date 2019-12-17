@@ -1,10 +1,19 @@
 package com.sos.joc.classes.xmleditor;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.Globals;
@@ -15,6 +24,8 @@ import sos.util.SOSString;
 
 public class JocXmlEditor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JocXmlEditor.class);
+
     public static final String APPLICATION_PATH = "xmleditor";
     public static final String AVAILABILITY_STARTING_WITH = "1.13.1";
     public static final String MESSAGE_UNSUPPORTED_WEB_SERVICE = String.format("Unsupported web service: JobScheduler needs at least version %s",
@@ -22,9 +33,7 @@ public class JocXmlEditor {
 
     public static final String CHARSET = "UTF-8";
 
-    public static final String JOC_SCHEMA_YADE_FILE = "xsd/yade/" + JobSchedulerXmlEditor.SCHEMA_FILENAME_YADE;
-    public static final String JOC_SCHEMA_NOTIFICATION_FILE = "xsd/notification/" + JobSchedulerXmlEditor.SCHEMA_FILENAME_NOTIFICATION;
-    public static final String JOC_SCHEMA_OTHER_LOCATION = "xsd/other/";
+    public static final String JOC_SCHEMA_LOCATION = "xsd";
 
     public static final String MESSAGE_DRAFT_NOT_EXIST = "Using version in live folder. No draft version found in database";
     public static final String MESSAGE_LIVE_NOT_EXIST = "Using draft version, no live version found";
@@ -48,36 +57,102 @@ public class JocXmlEditor {
 
     public static final String NEW_LINE = "\r\n";
 
+    private static Path realPath = null;
+
     public static String getResourceImplPath(final String path) {
         return String.format("./%s/%s", APPLICATION_PATH, path);
     }
 
-    public static Path getAbsoluteSchemaLocation(ObjectType type) {
-        Path path = Globals.servletContextRealPath;
+    public static Path getStandardAbsoluteSchemaLocation(ObjectType type) throws Exception {
+        if (realPath == null) {
+            tempCreateDirs();
+        }
+        Path path = realPath;
         if (path != null) {
-            if (type.equals(ObjectType.YADE)) {
-                path = path.resolve(Paths.get(JocXmlEditor.JOC_SCHEMA_YADE_FILE));
-            } else {
-                path = path.resolve(Paths.get(JocXmlEditor.JOC_SCHEMA_NOTIFICATION_FILE));
-            }
+            path = path.resolve(getStandardRelativeSchemaLocation(type));
         }
         return path;
     }
 
-    public static String getRelativeSchemaLocation(final ObjectType type) {
-        return getRelativeSchemaLocation(type, null);
+    public static List<Path> getOthersAbsoluteSchemaLocations() throws Exception {
+        if (realPath == null) {
+            tempCreateDirs();
+        }
+        Path path = realPath == null ? Paths.get(System.getProperty("user.dir")) : realPath;
+        return getFiles(path.resolve(getOthersRelativeSchemaLocation().toString()), "xsd");
     }
 
-    public static String getRelativeSchemaLocation(final ObjectType type, final String otherSchema) {
+    public static Path getOthersAbsoluteSchemaLocation(String name) throws Exception {
+        if (realPath == null) {
+            tempCreateDirs();
+        }
+        Path path = realPath;
+        if (path != null) {
+            path = path.resolve(getOthersRelativeSchemaLocation(name));
+        }
+        return path;
+    }
+
+    public static Path getOthersAbsoluteHttpSchemaLocation(String name) throws Exception {
+        if (realPath == null) {
+            tempCreateDirs();
+        }
+        Path path = realPath;
+        if (path != null) {
+            path = path.resolve(getOthersRelativeHttpSchemaLocation(name));
+        }
+        return path;
+    }
+
+    public static String getOthersSchemaIdentifier(String path) {
+        if (isHttp(path)) {
+            return path;
+        }
+        return getFileName(Paths.get(path));
+    }
+
+    public static String getOthersSchemaIdentifier(Path path) {
+        return getFileName(path);
+    }
+
+    private static String getFileName(Path path) {
+        return path.getFileName().toString();
+    }
+
+    public static String getStandardRelativeSchemaLocation(final ObjectType type) {
         if (type == null || SOSString.isEmpty(type.name())) {
             return null;
         }
         if (type.equals(ObjectType.YADE)) {
-            return JOC_SCHEMA_YADE_FILE;
+            return getYadeRelativeSchemaLocation().append("/").append(JobSchedulerXmlEditor.SCHEMA_FILENAME_YADE).toString();
         } else if (type.equals(ObjectType.NOTIFICATION)) {
-            return JOC_SCHEMA_NOTIFICATION_FILE;
+            return getNotificationRelativeSchemaLocation().append("/").append(JobSchedulerXmlEditor.SCHEMA_FILENAME_NOTIFICATION).toString();
         }
-        return otherSchema;
+        return null;
+    }
+
+    public static StringBuilder getYadeRelativeSchemaLocation() {
+        return new StringBuilder(JOC_SCHEMA_LOCATION).append("/yade");
+    }
+
+    public static StringBuilder getNotificationRelativeSchemaLocation() {
+        return new StringBuilder(JOC_SCHEMA_LOCATION).append("/notification");
+    }
+
+    public static StringBuilder getOthersRelativeSchemaLocation() {
+        return new StringBuilder(JOC_SCHEMA_LOCATION).append("/others");
+    }
+
+    public static StringBuilder getOthersRelativeHttpSchemaLocation() {
+        return getOthersRelativeSchemaLocation().append("/http");
+    }
+
+    public static String getOthersRelativeSchemaLocation(final String name) {
+        return getOthersRelativeSchemaLocation().append("/").append(name).toString();
+    }
+
+    public static String getOthersRelativeHttpSchemaLocation(final String name) {
+        return getOthersRelativeHttpSchemaLocation().append("/").append(name).toString();
     }
 
     public static String getConfigurationName(final ObjectType type) {
@@ -88,7 +163,7 @@ public class JocXmlEditor {
         if (type.equals(ObjectType.OTHER)) {
             return name;
         }
-        return getBaseName(type) + ".xml";
+        return getStandardBaseName(type) + ".xml";
     }
 
     public static boolean checkRequiredParameter(final String paramKey, final ObjectType paramVal) throws JocMissingRequiredParameterException {
@@ -98,7 +173,7 @@ public class JocXmlEditor {
         return true;
     }
 
-    public static String getBaseName(ObjectType type) {
+    public static String getStandardBaseName(ObjectType type) {
         if (type == null) {
             return null;
         }
@@ -126,14 +201,110 @@ public class JocXmlEditor {
         return "/" + JobSchedulerXmlEditor.getLivePathYadeIni();
     }
 
-    public static List<Path> getAbsoluteSchemaLocationsOther() throws Exception {
-        Path path = Globals.servletContextRealPath == null ? Paths.get(System.getProperty("user.dir")) : Globals.servletContextRealPath;
-        return getFiles(path.resolve(JOC_SCHEMA_OTHER_LOCATION), "xsd");
-    }
-
     public static List<Path> getFiles(Path dir, String extension) throws Exception {
         return Files.walk(dir).filter(s -> s.toString().toLowerCase().endsWith("." + extension.toLowerCase())).map(Path::getFileName).sorted()
                 .collect(Collectors.toList());
+    }
+
+    public static String bytes2string(byte[] bytes) {
+        try {
+            return new String(bytes, CHARSET);
+        } catch (UnsupportedEncodingException e) {
+            return new String(bytes);
+        }
+    }
+
+    public static String getFileContent(Path path) throws IOException {
+        return bytes2string(Files.readAllBytes(path));
+    }
+
+    public static Path downloadOthersSchema(String path) throws Exception {
+        URI uri = URI.create(path);
+        String name = Paths.get(uri.getPath()).getFileName().toString();
+        Path target = getOthersAbsoluteHttpSchemaLocation(name);
+        try (InputStream inputStream = uri.toURL().openStream()) {
+            Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (Throwable ex) {
+            LOGGER.error(ex.toString(), ex);
+            throw ex;
+        }
+        return target;
+    }
+
+    public static Path copyOthersSchema(String path) throws Exception {
+        Path source = Paths.get(path);
+        Path target = JocXmlEditor.getOthersAbsoluteSchemaLocation(source.getFileName().toString());
+        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+        return target;
+    }
+
+    public static Path createOthersSchema(String fileName, String fileContent) throws Exception {
+        Path target = JocXmlEditor.getOthersAbsoluteSchemaLocation(fileName);
+        Files.write(target, fileContent.getBytes(JocXmlEditor.CHARSET), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        return target;
+    }
+
+    // TODO
+    public static boolean isHttp(String path) {
+        return path.toLowerCase().startsWith("https://") || path.toLowerCase().startsWith("http://");
+    }
+
+    public static Path getOthersSchemaFile(String path, boolean downloadIfHttp) throws Exception {
+        Path file = null;
+        String fileName = getFileName(Paths.get(path));
+        if (isHttp(path)) {
+            if (downloadIfHttp) {
+                try {
+                    file = downloadOthersSchema(path);
+                } catch (Throwable e) {
+                    LOGGER.error(String.format("[%s]can't download file, try to find in the %s location ..", path,
+                            getOthersRelativeHttpSchemaLocation()));
+                }
+            }
+            if (file == null) {
+                file = JocXmlEditor.getOthersAbsoluteHttpSchemaLocation(fileName);
+            }
+
+        } else {
+            file = JocXmlEditor.getOthersAbsoluteSchemaLocation(fileName);
+        }
+        return file;
+    }
+
+    public static String readOthersSchemaFile(String path) throws Exception {
+        Path file = getOthersSchemaFile(path, true);
+        if (Files.exists(file)) {
+            return getFileContent(file);
+        } else {
+            throw new Exception(String.format("[%s]file not found", path));
+        }
+    }
+
+    public static void tempCreateDirs() throws Exception {
+        if (Globals.sosShiroProperties != null && Globals.servletContextRealPath != null) {
+            java.nio.file.Path xsd = Globals.sosShiroProperties.resolvePath(JOC_SCHEMA_LOCATION);
+            if (!Files.exists(xsd)) {
+                CopyDirectory yade = new CopyDirectory(Globals.servletContextRealPath.resolve("xsd/yade"), xsd.resolve("yade"));
+                yade.copy();
+
+                CopyDirectory notification = new CopyDirectory(Globals.servletContextRealPath.resolve("xsd/notification"), xsd.resolve(
+                        "notification"));
+                notification.copy();
+
+                CopyDirectory others = new CopyDirectory(Globals.servletContextRealPath.resolve("xsd/other"), xsd.resolve("others"));
+                others.copy();
+
+                Files.createDirectories(xsd.resolve("others/http"));
+            }
+            realPath = Globals.sosShiroProperties.resolvePath(".");
+        } else {
+            LOGGER.info(String.format(
+                    "[skip][one or more of the properties is null][Globals.sosShiroProperties=%s][Globals.servletContextRealPath=%s]",
+                    Globals.sosShiroProperties, Globals.servletContextRealPath));
+        }
+        if (realPath == null) {
+            realPath = Globals.servletContextRealPath;
+        }
     }
 
 }

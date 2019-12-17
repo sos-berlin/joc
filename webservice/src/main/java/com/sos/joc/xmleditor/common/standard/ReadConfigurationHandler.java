@@ -1,7 +1,5 @@
 package com.sos.joc.xmleditor.common.standard;
 
-import java.nio.file.Files;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +95,7 @@ public class ReadConfigurationHandler {
             }
         } else {
             deployed = true;
-            live.set(new String(liveFile, JocXmlEditor.CHARSET), null, hotFolder.getLastModifiedDate());
+            live.set(JocXmlEditor.bytes2string(liveFile), null, hotFolder.getLastModifiedDate());
         }
 
         draft = new ReadConfigurationItem();
@@ -110,8 +108,7 @@ public class ReadConfigurationHandler {
             }
         }
 
-        // answer.setSchema(JocXmlEditor.getRelativeSchemaLocation(type));
-        answer.setSchema(new String(Files.readAllBytes(JocXmlEditor.getAbsoluteSchemaLocation(type)), JocXmlEditor.CHARSET));
+        answer.setSchema(JocXmlEditor.getFileContent(JocXmlEditor.getStandardAbsoluteSchemaLocation(type)));
         answer.getState().setDeployed(deployed);
     }
 
@@ -167,7 +164,7 @@ public class ReadConfigurationHandler {
 
     private String convert(ObjectType type, String xmlConfiguration) throws Exception {
         Xml2JsonConverter converter = new Xml2JsonConverter();
-        return converter.convert(type, JocXmlEditor.getAbsoluteSchemaLocation(type), xmlConfiguration);
+        return converter.convert(type, JocXmlEditor.getStandardAbsoluteSchemaLocation(type), xmlConfiguration);
     }
 
     public boolean isDeployed() {

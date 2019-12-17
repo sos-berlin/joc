@@ -49,13 +49,12 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     public JOCDefaultResponse deploy(final String accessToken, final DeployConfiguration in) {
         SOSHibernateSession session = null;
         try {
-            // TODO check folder permissions
-            checkRequiredParameters(in);
-
-            if (in.getObjectType().equals(ObjectType.OTHER)) {
+            if (in.getObjectType() != null && in.getObjectType().equals(ObjectType.OTHER)) {
                 throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR_UNSUPPORTED_OBJECT_TYPE, String.format(
                         "[%s][%s]unsupported object type for deployment", in.getJobschedulerId(), in.getObjectType().name())));
             }
+            // TODO check folder permissions
+            checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
@@ -69,7 +68,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 DBItemXmlEditorObject item = getItem(dbLayer, in);
 
                 // step 2 - validate
-                XsdValidator validator = new XsdValidator(JocXmlEditor.getAbsoluteSchemaLocation(in.getObjectType()));
+                XsdValidator validator = new XsdValidator(JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType()));
                 try {
                     validator.validate(item.getConfigurationDraft());
                 } catch (XsdValidatorException e) {
@@ -143,7 +142,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             item.setName(JocXmlEditor.getConfigurationName(in.getObjectType()));
             item.setConfigurationDraft(in.getConfiguration());
             item.setConfigurationDraftJson(in.getConfigurationJson());
-            item.setSchemaLocation(JocXmlEditor.getRelativeSchemaLocation(in.getObjectType()));
+            item.setSchemaLocation(JocXmlEditor.getStandardRelativeSchemaLocation(in.getObjectType()));
 
             item.setAuditLogId(new Long(0));// TODO
             item.setAccount(getAccount());
@@ -215,7 +214,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
     private byte[] convertXml2Ini(String configuration, String deployedDateTime) throws Exception {
         JadeXml2IniConverter converter = new JadeXml2IniConverter();
-        InputSource schemaInputSource = new InputSource(Files.newInputStream(JocXmlEditor.getAbsoluteSchemaLocation(ObjectType.YADE)));
+        InputSource schemaInputSource = new InputSource(Files.newInputStream(JocXmlEditor.getStandardAbsoluteSchemaLocation(ObjectType.YADE)));
         InputSource configurationInputSource = new InputSource();
         configurationInputSource.setCharacterStream(new StringReader(configuration));
         return converter.process(schemaInputSource, configurationInputSource, getIniFileHeader(deployedDateTime));

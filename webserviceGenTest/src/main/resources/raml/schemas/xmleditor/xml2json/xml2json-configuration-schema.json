@@ -4,7 +4,7 @@
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"javaType": "com.sos.joc.model.xmleditor.xml2json.Xml2JsonConfiguration",
 	"type": "object",
-	"description": "schema only for OTHER",
+	"description": "schemaIdentifier only for OTHER",
 	"required": [
 		"jobschedulerId",
 		"objectType",
@@ -20,7 +20,7 @@
 		"configuration": {
 			"type": "string"
 		},
-		"schema": {
+		"schemaIdentifier": {
 			"type": "string"
 		}
 	}

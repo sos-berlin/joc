@@ -11,13 +11,13 @@ import com.sos.jitl.xmleditor.db.DbLayerXmlEditor;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.store.StoreConfiguration;
 import com.sos.joc.model.xmleditor.store.StoreConfigurationAnswer;
-import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.xmleditor.resource.IStoreResource;
 
 import sos.util.SOSString;
@@ -38,53 +38,24 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
 
                 DBItemXmlEditorObject item = null;
-                boolean setAnswerMessage = false;
                 String name = null;
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    if (in.getId() != null && in.getId() > 0) {
-                        item = dbLayer.getObject(in.getId().longValue());
-                    }
                     name = in.getName();
-                    if (name.toLowerCase().startsWith("edit") && !name.toLowerCase().endsWith(".xml")) {
-                        name = name + ".xml";
-                    }
-
+                    item = getOthersObject(dbLayer, in, name);
                 } else {
-                    setAnswerMessage = true;
-                    item = dbLayer.getObject(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in.getObjectType(),
-                            in.getName()));
                     name = JocXmlEditor.getConfigurationName(in.getObjectType());
+                    item = getStandardObject(dbLayer, in);
                 }
 
                 if (item == null) {
-                    item = new DBItemXmlEditorObject();
-                    item.setSchedulerId(in.getJobschedulerId());
-                    item.setObjectType(in.getObjectType().name());
-                    item.setName(name);
-                    item.setConfigurationDraft(in.getConfiguration());
-                    item.setConfigurationDraftJson(in.getConfigurationJson());
-                    item.setSchemaLocation(JocXmlEditor.getRelativeSchemaLocation(in.getObjectType(), in.getSchema()));
-
-                    item.setAuditLogId(new Long(0));// TODO
-                    item.setAccount(getAccount());
-                    item.setCreated(new Date());
-                    item.setModified(item.getCreated());
-                    session.save(item);
+                    item = create(session, in, name);
 
                 } else {
-                    item.setName(name);
-                    item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
-                    item.setConfigurationDraftJson(in.getConfigurationJson());
-                    item.setSchemaLocation(JocXmlEditor.getRelativeSchemaLocation(in.getObjectType(), in.getSchema()));
-
-                    // item.setAuditLogId(new Long(0));// TODO
-                    item.setAccount(getAccount());
-                    item.setModified(new Date());
-                    session.update(item);
+                    item = update(session, in, item, name);
                 }
 
                 session.commit();
-                response = JOCDefaultResponse.responseStatus200(getSuccess(item.getId(), item.getModified(), item.getDeployed(), setAnswerMessage));
+                response = JOCDefaultResponse.responseStatus200(getSuccess(in.getObjectType(), item.getId(), item.getModified(), item.getDeployed()));
             }
             return response;
         } catch (JocException e) {
@@ -99,6 +70,59 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         }
     }
 
+    private DBItemXmlEditorObject getOthersObject(DbLayerXmlEditor dbLayer, StoreConfiguration in, String name) throws Exception {
+        DBItemXmlEditorObject item = null;
+        if (in.getId() != null && in.getId() > 0) {
+            item = dbLayer.getObject(in.getId().longValue());
+            if (item != null && !item.getObjectType().equals(ObjectType.OTHER.name())) {
+                item = dbLayer.getObject(in.getJobschedulerId(), ObjectType.OTHER.name(), name);
+            }
+        }
+        return item;
+    }
+
+    private DBItemXmlEditorObject getStandardObject(DbLayerXmlEditor dbLayer, StoreConfiguration in) throws Exception {
+        return dbLayer.getObject(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in.getObjectType(), in
+                .getName()));
+    }
+
+    private DBItemXmlEditorObject create(SOSHibernateSession session, StoreConfiguration in, String name) throws Exception {
+        DBItemXmlEditorObject item = new DBItemXmlEditorObject();
+        item.setSchedulerId(in.getJobschedulerId());
+        item.setObjectType(in.getObjectType().name());
+        item.setName(name);
+        item.setConfigurationDraft(in.getConfiguration());
+        item.setConfigurationDraftJson(in.getConfigurationJson());
+        if (in.getObjectType().equals(ObjectType.OTHER)) {
+            item.setSchemaLocation(in.getSchemaIdentifier());
+        } else {
+            item.setSchemaLocation(JocXmlEditor.getStandardRelativeSchemaLocation(in.getObjectType()));
+        }
+        item.setAuditLogId(new Long(0));// TODO
+        item.setAccount(getAccount());
+        item.setCreated(new Date());
+        item.setModified(item.getCreated());
+        session.save(item);
+        return item;
+    }
+
+    private DBItemXmlEditorObject update(SOSHibernateSession session, StoreConfiguration in, DBItemXmlEditorObject item, String name)
+            throws Exception {
+        item.setName(name);
+        item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
+        item.setConfigurationDraftJson(in.getConfigurationJson());
+        if (in.getObjectType().equals(ObjectType.OTHER)) {
+            item.setSchemaLocation(in.getSchemaIdentifier());
+        } else {
+            item.setSchemaLocation(JocXmlEditor.getStandardRelativeSchemaLocation(in.getObjectType()));
+        }
+        // item.setAuditLogId(new Long(0));// TODO
+        item.setAccount(getAccount());
+        item.setModified(new Date());
+        session.update(item);
+        return item;
+    }
+
     private void checkRequiredParameters(final StoreConfiguration in) throws Exception {
         checkRequiredParameter("jobschedulerId", in.getJobschedulerId());
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
@@ -106,7 +130,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         checkRequiredParameter("configurationJson", in.getConfigurationJson());
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             checkRequiredParameter("name", in.getName());
-            checkRequiredParameter("schema", in.getSchema());
+            checkRequiredParameter("schemaIdentifier", in.getSchemaIdentifier());
         }
     }
 
@@ -122,15 +146,15 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         return response;
     }
 
-    private StoreConfigurationAnswer getSuccess(Long id, Date modified, Date deployed, boolean setMessage) {
+    private StoreConfigurationAnswer getSuccess(ObjectType type, Long id, Date modified, Date deployed) {
         StoreConfigurationAnswer answer = new StoreConfigurationAnswer();
         answer.setId(id.intValue());
         answer.setModified(modified);
-        if (setMessage) {
+        if (!type.equals(ObjectType.OTHER)) {
             answer.setMessage(new AnswerMessage());
             if (deployed == null) {
                 answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
-                answer.getMessage().setMessage(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
+                answer.getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_NOT_EXIST);
             } else {
                 answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_IS_NEWER);
                 answer.getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_IS_NEWER);

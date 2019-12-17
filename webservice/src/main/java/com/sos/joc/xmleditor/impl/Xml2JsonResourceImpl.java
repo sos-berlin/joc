@@ -24,9 +24,15 @@ public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonRe
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
+                java.nio.file.Path schema = null;
+                if (in.getObjectType().equals(ObjectType.OTHER)) {
+                    schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
+                } else {
+                    schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
+                }
+
                 Xml2JsonConverter converter = new Xml2JsonConverter();
-                response = JOCDefaultResponse.responseStatus200(getSuccess(converter.convert(in.getObjectType(), JocXmlEditor
-                        .getAbsoluteSchemaLocation(in.getObjectType()), in.getConfiguration())));
+                response = JOCDefaultResponse.responseStatus200(getSuccess(converter.convert(in.getObjectType(), schema, in.getConfiguration())));
             }
             return response;
         } catch (JocException e) {
@@ -42,7 +48,7 @@ public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonRe
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
         checkRequiredParameter("configuration", in.getConfiguration());
         if (in.getObjectType().equals(ObjectType.OTHER)) {
-            checkRequiredParameter("schema", in.getSchema());
+            checkRequiredParameter("schemaIdentifier", in.getSchemaIdentifier());
         }
     }
 
