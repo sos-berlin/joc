@@ -137,16 +137,16 @@ public class JocConfigurationDbLayer extends DBLayer {
         return this.getSession().getResultList(query);
 
     }
-
+ 
     public List<Profile> getJocConfigurationProfiles() throws SOSHibernateException {
-        StringBuilder sql = new StringBuilder();
-        sql.append("select new ").append(CONFIGURATION_PROFILE);
-        sql.append("(lower(al.account), al.account, max(al.created)) from ").append(JOC_CONFIGURATION_DB_ITEM).append(" jc, ").append(
-                DBITEM_AUDIT_LOG).append(" al ");
-        sql.append("where lower(jc.account)=lower(al.account) and jc.configurationType='PROFILE' and al.request='./login'").append(
-                " group by lower(al.account), al.account order by max(al.created) desc");
-        Query<ConfigurationProfile> query = this.getSession().createQuery(sql.toString());
+        this.resetFilter();
+        this.filter.setConfigurationType("PROFILE");
+ 
+        String sql = "select new "  + CONFIGURATION_PROFILE + "(c.account, c.modified) from " + JOC_CONFIGURATION_DB_ITEM + " c " + getWhere() + filter.getOrderCriteria() + filter.getSortMode();
+        Query<ConfigurationProfile> query = this.getSession().createQuery(sql);
+        query.setParameter("configurationType", filter.getConfigurationType());
         List<ConfigurationProfile> profiles = this.getSession().getResultList(query);
+         
         if (profiles == null) {
             return null;
         }
@@ -156,19 +156,7 @@ public class JocConfigurationDbLayer extends DBLayer {
     public JocConfigurationDbItem getJocConfiguration(Long id) throws SOSHibernateException {
         return this.getSession().get(JocConfigurationDbItem.class, id);
     }
-
-    public List<JocConfigurationDbItem> getJocConfigurations(final int limit) throws SOSHibernateException {
-        StringBuilder sql = new StringBuilder();
-        sql.append("from ").append(JOC_CONFIGURATION_DB_ITEM).append(" ").append(getWhere()).append(filter.getOrderCriteria()).append(filter
-                .getSortMode());
-        Query<JocConfigurationDbItem> query = this.getSession().createQuery(sql.toString());
-        bindParameters(query);
-        if (limit > 0) {
-            query.setMaxResults(limit);
-        }
-        return this.getSession().getResultList(query);
-    }
-
+ 
     public Long saveOrUpdateConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws SOSHibernateException {
         jocConfigurationDbItem.setModified(new Date());
         if (jocConfigurationDbItem.getId() == null) {

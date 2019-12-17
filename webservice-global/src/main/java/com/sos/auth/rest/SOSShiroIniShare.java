@@ -75,7 +75,7 @@ public class SOSShiroIniShare {
 		JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
 		jocConfigurationDBLayer.getFilter().setAccount(".");
 		jocConfigurationDBLayer.getFilter().setConfigurationType("SHIRO");
-		List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurations(0);
+		List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
 		if (listOfConfigurtions.size() > 0) {
 			jocConfigurationDbItem = listOfConfigurtions.get(0);
 		} else {
@@ -113,7 +113,7 @@ public class SOSShiroIniShare {
 		JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
 		jocConfigurationDBLayer.getFilter().setAccount(".");
 		jocConfigurationDBLayer.getFilter().setConfigurationType("SHIRO");
-		List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurations(0);
+		List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
 		Globals.commit(sosHibernateSession);
 
 		if (listOfConfigurtions.size() > 0) {

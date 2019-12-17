@@ -11,10 +11,10 @@ public class ConfigurationProfile extends Profile {
     
     private String lowerAccount;
 
-    public ConfigurationProfile(String lowerAccount, String account, Date lastLogin) {
+    public ConfigurationProfile(String account, Date modified) {
         setAccount(account);
-        setLastLogin(lastLogin);
-        this.lowerAccount = lowerAccount;
+        setModified(modified);
+        this.lowerAccount = account.toLowerCase();
     }
     
     @Override
