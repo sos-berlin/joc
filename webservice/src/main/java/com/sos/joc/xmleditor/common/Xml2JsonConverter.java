@@ -3,7 +3,8 @@ package com.sos.joc.xmleditor.common;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.ConnectException;
-import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 
 import javax.json.Json;
@@ -38,8 +39,7 @@ public class Xml2JsonConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Xml2JsonConverter.class);
     private static boolean isDebugEnabled = LOGGER.isDebugEnabled();
-    private static boolean isTraceEnabled = LOGGER.isTraceEnabled();
-
+   
     private XPath xpathSchema;
     private XPath xpathXml;
     private Node rootSchema;
@@ -47,17 +47,13 @@ public class Xml2JsonConverter {
     private String rootElementNameXml;
     private long uuid;
 
-    public String convert(ObjectType type, URI schema, String xml) throws Exception {
-        if (isDebugEnabled) {
-            if (isTraceEnabled) {
-                LOGGER.debug(String.format("[schema=%s]%s", schema.toString(), xml));
-            } else {
-                LOGGER.debug(String.format("schema=%s", schema.toString()));
+    public String convert(ObjectType type, Path schema, String xml) throws Exception {
+        if (Files.exists(schema) && Files.isReadable(schema)) {
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[schema][use local file]%s", schema));
             }
-        }
-
-        if (type.equals(ObjectType.OTHER)) {
-            throw new Exception("OTHER is currently not supported");
+        } else {
+            throw new Exception(String.format("[%s]schema not found", schema.toString()));
         }
 
         if (!type.equals(ObjectType.OTHER)) {
@@ -65,11 +61,12 @@ public class Xml2JsonConverter {
         }
 
         try {
-            init(new InputSource(schema.toString()), new InputSource(new StringReader(xml)));
+            init(new InputSource(Files.newInputStream(schema)), new InputSource(new StringReader(xml)));
         } catch (ConnectException e) {
             throw new Exception(String.format("[%s][cant't get schema]%s", schema.toString(), e.toString()), e);
+        } catch (Exception e) {
+            throw new Exception(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
         }
-
         try {
             uuid = -1;
 
@@ -95,7 +92,9 @@ public class Xml2JsonConverter {
         }
 
         if (rootElementNameXml == null) {
-            // TODO get first element name for OTHERS
+            XPathExpression rootExpression = xpathSchema.compile("./xs:element[1]/@name");
+            Node root = (Node) rootExpression.evaluate(rootSchema, XPathConstants.NODE);
+            rootElementNameXml = root.getNodeValue();
         }
 
         Document xmlDoc = getXmlFileDocument(xmlSource);
@@ -109,7 +108,7 @@ public class Xml2JsonConverter {
 
     private JsonObjectBuilder buildElements(JsonObjectBuilder parentBuilder, Node parent, Node current, long level, long parentId) throws Exception {
         String parentName = parent == null ? "#" : parent.getNodeName();
-        boolean expanded = level < 3 ? true : false;
+        boolean expanded = level < 2 ? true : false;
 
         uuid++;
         long currentUuid = uuid;
@@ -131,6 +130,7 @@ public class Xml2JsonConverter {
         NodeList childs = current.getChildNodes();
         level++;
         String cdata = null;
+        String textValue = null;
         for (int i = 0; i < childs.getLength(); i++) {
             Node child = childs.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
@@ -138,9 +138,17 @@ public class Xml2JsonConverter {
                 nodesBuilder.add(b);
             } else if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
                 cdata = child.getTextContent();
-            }
 
+            } else if (child.getNodeType() == Node.TEXT_NODE) {
+                textValue = child.getNodeValue();
+            }
         }
+        if (cdata == null) {
+            if (textValue != null && textValue.trim().length() > 0) {
+                cdata = textValue;
+            }
+        }
+
         parentBuilder.add("nodes", nodesBuilder);
 
         boolean show = true;
@@ -182,6 +190,7 @@ public class Xml2JsonConverter {
     private JsonObjectBuilder writeDoc(JsonObjectBuilder parentBuilder, Node parent, Node attribute) throws Exception {
         Node node = null;
         String doc = null;
+        String attrDefaultValue = null;
         if (attribute == null) {
             String xpath = String.format("./xs:element[@name='%s']/xs:annotation/xs:documentation", parent.getNodeName());
             XPathExpression ex = xpathSchema.compile(xpath);
@@ -189,9 +198,19 @@ public class Xml2JsonConverter {
 
         } else {
             String xpath = String.format("./xs:element[@name='%s']//xs:attribute[@name='%s']/xs:annotation/xs:documentation", parent.getNodeName(),
-                    attribute.getNodeName(), attribute.getNodeName());
+                    attribute.getNodeName());
             XPathExpression ex = xpathSchema.compile(xpath);
             node = (Node) ex.evaluate(rootSchema, XPathConstants.NODE);
+
+            try {
+                Node xsdAttr = node.getParentNode().getParentNode();
+                NamedNodeMap attrs = xsdAttr.getAttributes();
+                if (attrs != null && attrs.getNamedItem("default") != null) {
+                    attrDefaultValue = attrs.getNamedItem("default").getNodeValue();
+                }
+            } catch (Throwable e) {
+
+            }
         }
         if (node != null) {
             if (node.hasChildNodes()) {
@@ -208,6 +227,10 @@ public class Xml2JsonConverter {
                     doc = content;
                 }
             }
+
+            if (attrDefaultValue != null) {
+                doc += "<br />Default: " + attrDefaultValue;
+            }
         }
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
@@ -217,6 +240,7 @@ public class Xml2JsonConverter {
             builder.add("doc", Json.createArrayBuilder());
         } else {
             builder.add("doc", doc);
+            // builder.add("doc", Json.createArrayBuilder());
         }
         parentBuilder.add("text", builder);
         return parentBuilder;

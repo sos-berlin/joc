@@ -1,6 +1,5 @@
 package com.sos.joc.classes.xmleditor;
 
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,8 +8,6 @@ import java.util.stream.Collectors;
 
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.Globals;
-import com.sos.joc.exceptions.JocError;
-import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 
@@ -55,11 +52,23 @@ public class JocXmlEditor {
         return String.format("./%s/%s", APPLICATION_PATH, path);
     }
 
-    public static String getSchemaLocation(final ObjectType type) {
-        return getSchemaLocation(type, null);
+    public static Path getAbsoluteSchemaLocation(ObjectType type) {
+        Path path = Globals.servletContextRealPath;
+        if (path != null) {
+            if (type.equals(ObjectType.YADE)) {
+                path = path.resolve(Paths.get(JocXmlEditor.JOC_SCHEMA_YADE_FILE));
+            } else {
+                path = path.resolve(Paths.get(JocXmlEditor.JOC_SCHEMA_NOTIFICATION_FILE));
+            }
+        }
+        return path;
     }
 
-    public static String getSchemaLocation(final ObjectType type, final String otherSchema) {
+    public static String getRelativeSchemaLocation(final ObjectType type) {
+        return getRelativeSchemaLocation(type, null);
+    }
+
+    public static String getRelativeSchemaLocation(final ObjectType type, final String otherSchema) {
         if (type == null || SOSString.isEmpty(type.name())) {
             return null;
         }
@@ -69,24 +78,6 @@ public class JocXmlEditor {
             return JOC_SCHEMA_NOTIFICATION_FILE;
         }
         return otherSchema;
-    }
-
-    public static URI getSchemaURI(final ObjectType type) throws Exception {
-        return getSchemaURI(type, null);
-    }
-
-    public static URI getSchemaURI(final ObjectType type, final String otherSchema) throws Exception {
-        String schemaLocation = getSchemaLocation(type, otherSchema);
-        if (schemaLocation == null) {
-            return null;
-        }
-        if (type.equals(ObjectType.OTHER)) {
-            URI uri = new URI(schemaLocation);
-            if (uri.isAbsolute()) {
-                return uri;
-            }
-        }
-        return Globals.servletBaseUri.resolve(schemaLocation);
     }
 
     public static String getConfigurationName(final ObjectType type) {
@@ -107,25 +98,6 @@ public class JocXmlEditor {
         return true;
     }
 
-    public static XsdValidator validate(final ObjectType type, final String configuration) throws Exception {
-        return validate(type, configuration, null);
-    }
-
-    public static XsdValidator validate(final ObjectType type, final String configuration, final String otherSchema) throws Exception {
-        XsdValidator validator = null;
-        try {
-            validator = new XsdValidator(getSchemaURI(type, otherSchema));
-            validator.validate(configuration);
-        } catch (Throwable e) {
-            String schema = "";
-            if (validator != null) {
-                schema = validator.getSchema().toString();
-            }
-            throw new JocException(new JocError(ERROR_CODE_VALIDATION_ERROR, String.format("[%s][%s]%s", type.name(), schema, e.toString())), e);
-        }
-        return validator;
-    }
-
     public static String getBaseName(ObjectType type) {
         if (type == null) {
             return null;
@@ -138,7 +110,7 @@ public class JocXmlEditor {
         return null;
     }
 
-    public static String getLivePathXml(ObjectType type) {
+    public static String getJobSchedulerLivePathXml(ObjectType type) {
         if (type == null) {
             return null;
         }
@@ -150,11 +122,11 @@ public class JocXmlEditor {
         return null;
     }
 
-    public static String getLivePathYadeIni() {
+    public static String getJobSchedulerLivePathYadeIni() {
         return "/" + JobSchedulerXmlEditor.getLivePathYadeIni();
     }
 
-    public static List<Path> getXsdFilesOther() throws Exception {
+    public static List<Path> getAbsoluteSchemaLocationsOther() throws Exception {
         Path path = Globals.servletContextRealPath == null ? Paths.get(System.getProperty("user.dir")) : Globals.servletContextRealPath;
         return getFiles(path.resolve(JOC_SCHEMA_OTHER_LOCATION), "xsd");
     }

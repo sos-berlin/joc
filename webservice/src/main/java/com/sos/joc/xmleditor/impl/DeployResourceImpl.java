@@ -1,6 +1,7 @@
 package com.sos.joc.xmleditor.impl;
 
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -22,6 +23,8 @@ import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.XmlEditorAudit;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.exceptions.XsdValidatorException;
+import com.sos.joc.classes.xmleditor.validator.XsdValidator;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -62,28 +65,40 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
 
+                // step 1 - store draft in the database
                 DBItemXmlEditorObject item = getItem(dbLayer, in);
 
-                JocXmlEditor.validate(in.getObjectType(), item.getConfigurationDraft());
-                Date deployed = putFile(in, item.getConfigurationDraft());
-
-                audit.setStartTime(deployed);
-                DBItemAuditLog auditItem = storeAuditLogEntry(audit);
-                if (auditItem != null) {
-                    item.setAuditLogId(auditItem.getId());
+                // step 2 - validate
+                XsdValidator validator = new XsdValidator(JocXmlEditor.getAbsoluteSchemaLocation(in.getObjectType()));
+                try {
+                    validator.validate(item.getConfigurationDraft());
+                } catch (XsdValidatorException e) {
+                    LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
+                    response = JOCDefaultResponse.responseStatus200(ValidateResourceImpl.getError(e));
                 }
-                item.setConfigurationDeployed(item.getConfigurationDraft());
-                item.setConfigurationDeployedJson(item.getConfigurationDraftJson());
-                item.setConfigurationDraft(null);
-                item.setConfigurationDraftJson(null);
-                item.setAccount(getAccount());
-                item.setDeployed(deployed);
-                item.setModified(new Date());
 
-                session.beginTransaction();
-                session.update(item);
-                session.commit();
-                response = JOCDefaultResponse.responseStatus200(getSuccess(deployed));
+                // step 3 - deploy
+                if (response == null) {
+                    Date deployed = putFile(in, item.getConfigurationDraft());
+
+                    audit.setStartTime(deployed);
+                    DBItemAuditLog auditItem = storeAuditLogEntry(audit);
+                    if (auditItem != null) {
+                        item.setAuditLogId(auditItem.getId());
+                    }
+                    item.setConfigurationDeployed(item.getConfigurationDraft());
+                    item.setConfigurationDeployedJson(item.getConfigurationDraftJson());
+                    item.setConfigurationDraft(null);
+                    item.setConfigurationDraftJson(null);
+                    item.setAccount(getAccount());
+                    item.setDeployed(deployed);
+                    item.setModified(new Date());
+
+                    session.beginTransaction();
+                    session.update(item);
+                    session.commit();
+                    response = JOCDefaultResponse.responseStatus200(getSuccess(deployed));
+                }
             }
             return response;
         } catch (JocException e) {
@@ -128,7 +143,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             item.setName(JocXmlEditor.getConfigurationName(in.getObjectType()));
             item.setConfigurationDraft(in.getConfiguration());
             item.setConfigurationDraftJson(in.getConfigurationJson());
-            item.setSchemaLocation(JocXmlEditor.getSchemaLocation(in.getObjectType()));
+            item.setSchemaLocation(JocXmlEditor.getRelativeSchemaLocation(in.getObjectType()));
 
             item.setAuditLogId(new Long(0));// TODO
             item.setAccount(getAccount());
@@ -166,11 +181,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             } catch (Exception e) {
             }
 
-            file = JocXmlEditor.getLivePathXml(in.getObjectType());
+            file = JocXmlEditor.getJobSchedulerLivePathXml(in.getObjectType());
             if (in.getObjectType().equals(ObjectType.YADE)) {
                 hotFolder.putFile(file, getXmlFileContent(in.getObjectType(), configuration, deployedDateTime));
 
-                file = JocXmlEditor.getLivePathYadeIni();
+                file = JocXmlEditor.getJobSchedulerLivePathYadeIni();
                 hotFolder.putFile(file, convertXml2Ini(configuration, deployedDateTime));
             } else {
                 hotFolder.putFile(file, getXmlFileContent(in.getObjectType(), configuration, deployedDateTime));
@@ -200,7 +215,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
     private byte[] convertXml2Ini(String configuration, String deployedDateTime) throws Exception {
         JadeXml2IniConverter converter = new JadeXml2IniConverter();
-        InputSource schemaInputSource = new InputSource(JocXmlEditor.getSchemaURI(ObjectType.YADE).toString());
+        InputSource schemaInputSource = new InputSource(Files.newInputStream(JocXmlEditor.getAbsoluteSchemaLocation(ObjectType.YADE)));
         InputSource configurationInputSource = new InputSource();
         configurationInputSource.setCharacterStream(new StringReader(configuration));
         return converter.process(schemaInputSource, configurationInputSource, getIniFileHeader(deployedDateTime));

@@ -1,6 +1,6 @@
 package com.sos.joc.xmleditor.common.standard;
 
-import java.net.URI;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,6 @@ public class ReadConfigurationHandler {
     private ReadConfigurationItem live;
     private ReadConfigurationItem draft;
     private ReadConfigurationItem current;
-    private URI schema;
 
     public ReadConfigurationHandler(JOCResourceImpl resource, ObjectType objectType) {
         hotFolder = new JOCHotFolder(resource);
@@ -59,8 +58,7 @@ public class ReadConfigurationHandler {
     }
 
     public void readLive(DBItemXmlEditorObject item, String jobschedulerId) throws Exception {
-        schema = JocXmlEditor.getSchemaURI(type);
-        String file = JocXmlEditor.getLivePathXml(type);
+        String file = JocXmlEditor.getJobSchedulerLivePathXml(type);
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[%s][%s]get file...", jobschedulerId, file));
         }
@@ -73,7 +71,7 @@ public class ReadConfigurationHandler {
         try {
             liveFile = hotFolder.getFile(file);
             if (isDebugEnabled) {
-                LOGGER.debug(String.format("[%s][%s]%s bytes", jobschedulerId, liveFile == null ? "null" : liveFile.length));
+                LOGGER.debug(String.format("[%s]%s bytes", jobschedulerId, liveFile == null ? "null" : liveFile.length));
             }
         } catch (JobSchedulerConnectionRefusedException e) {
             LOGGER.warn(String.format("[%s]JobScheduler could't be connected", jobschedulerId), e);
@@ -112,7 +110,8 @@ public class ReadConfigurationHandler {
             }
         }
 
-        answer.setSchema(schema.toString());
+        // answer.setSchema(JocXmlEditor.getRelativeSchemaLocation(type));
+        answer.setSchema(new String(Files.readAllBytes(JocXmlEditor.getAbsoluteSchemaLocation(type)), JocXmlEditor.CHARSET));
         answer.getState().setDeployed(deployed);
     }
 
@@ -153,11 +152,14 @@ public class ReadConfigurationHandler {
                     }
                 }
 
-                // configuration from draft - should not be recreated, only converted
-                if (current.getConfigurationJson() != null) {
+                if (current.getConfigurationJson() == null) {
+                    // configuration from draft - should be recreated
+                    answer.setConfigurationJson(convert(type, draft.getConfiguration()));
+                    answer.setRecreateJson(true);
+                } else {// configuration from draft - should not be recreated, only converted
                     answer.setConfigurationJson(current.getConfigurationJson());
+                    answer.setRecreateJson(false);
                 }
-                answer.setRecreateJson(false);
             }
         }
         return answer;
@@ -165,7 +167,7 @@ public class ReadConfigurationHandler {
 
     private String convert(ObjectType type, String xmlConfiguration) throws Exception {
         Xml2JsonConverter converter = new Xml2JsonConverter();
-        return converter.convert(type, schema, xmlConfiguration);
+        return converter.convert(type, JocXmlEditor.getAbsoluteSchemaLocation(type), xmlConfiguration);
     }
 
     public boolean isDeployed() {

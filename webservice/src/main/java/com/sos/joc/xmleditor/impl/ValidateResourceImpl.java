@@ -10,13 +10,15 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.xmleditor.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.exceptions.XsdValidatorException;
+import com.sos.joc.classes.xmleditor.validator.XsdValidator;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
+import com.sos.joc.model.xmleditor.validate.ErrorMessage;
 import com.sos.joc.model.xmleditor.validate.ValidateConfiguration;
 import com.sos.joc.model.xmleditor.validate.ValidateConfigurationAnswer;
-import com.sos.joc.classes.xmleditor.JocXmlEditor;
-import com.sos.joc.classes.xmleditor.XsdValidator;
 import com.sos.joc.xmleditor.resource.IValidateResource;
 
 @Path(JocXmlEditor.APPLICATION_PATH)
@@ -33,12 +35,22 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
             JOCDefaultResponse response = checkPermissions(accessToken, in);
 
             if (response == null) {
-
-                XsdValidator validator = JocXmlEditor.validate(in.getObjectType(), in.getConfiguration(), in.getSchema());
-                if (isDebugEnabled) {
-                    LOGGER.debug(String.format("[%s][%s][%s]validated", in.getJobschedulerId(), in.getObjectType().name(), validator.getSchema()));
+                // TODO Others
+                XsdValidator validator = new XsdValidator(JocXmlEditor.getAbsoluteSchemaLocation(in.getObjectType()));
+                try {
+                    validator.validate(in.getConfiguration());
+                } catch (XsdValidatorException e) {
+                    LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
+                    response = JOCDefaultResponse.responseStatus200(getError(e));
                 }
-                response = JOCDefaultResponse.responseStatus200(getSuccess());
+
+                if (response == null) {
+                    if (isDebugEnabled) {
+                        LOGGER.debug(String.format("[%s][%s][%s]validated", in.getJobschedulerId(), in.getObjectType().name(), validator
+                                .getSchema()));
+                    }
+                    response = JOCDefaultResponse.responseStatus200(getSuccess());
+                }
             }
             return response;
         } catch (JocException e) {
@@ -68,6 +80,24 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
             }
         }
         return response;
+    }
+
+    public static ValidateConfigurationAnswer getError(XsdValidatorException e) {
+        ValidateConfigurationAnswer answer = new ValidateConfigurationAnswer();
+        answer.setValidated(null);
+        answer.setValidationError(getErrorMessage(e));
+        return answer;
+    }
+
+    private static ErrorMessage getErrorMessage(XsdValidatorException e) {
+        ErrorMessage m = new ErrorMessage();
+        m.setCode(JocXmlEditor.ERROR_CODE_VALIDATION_ERROR);
+        m.setMessage(e.toString());
+        m.setLine(e.getLineNumber());
+        m.setColumn(e.getColumnNumber());
+        m.setElementName(e.getElementName());
+        m.setElementPosition(e.getElementPosition());
+        return m;
     }
 
     private ValidateConfigurationAnswer getSuccess() {

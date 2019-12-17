@@ -108,23 +108,23 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                     configuration.setName(item.get("1").toString());
                     configurations.add(configuration);
 
-                    String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.get("2").toString()).toString();
-                    if (!schemas.contains(uri)) {
-                        schemas.add(uri);
-                    }
+                    // String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.get("2").toString()).toString();
+                    // if (!schemas.contains(uri)) {
+                    // schemas.add(uri);
+                    // }
                 }
                 answer.setConfigurations(configurations);
             }
 
-            List<java.nio.file.Path> files = JocXmlEditor.getXsdFilesOther();
+            List<java.nio.file.Path> files = JocXmlEditor.getAbsoluteSchemaLocationsOther();
             if (files != null && files.size() > 0) {
                 for (int i = 0; i < files.size(); i++) {
-                    java.nio.file.Path path = files.get(i);
-                    String schema = JocXmlEditor.JOC_SCHEMA_OTHER_LOCATION + path.getFileName();
-                    String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, schema).toString();
-                    if (!schemas.contains(uri)) {
-                        schemas.add(uri);
-                    }
+                    // java.nio.file.Path path = files.get(i);
+                    // String schema = JocXmlEditor.JOC_SCHEMA_OTHER_LOCATION + path.getFileName();
+                    // String uri = JocXmlEditor.getSchemaURI(ObjectType.OTHER, schema).toString();
+                    // if (!schemas.contains(uri)) {
+                    // schemas.add(uri);
+                    // }
                 }
             }
 
@@ -142,7 +142,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             } else {
                 answer.getConfiguration().setId(item.getId().intValue());
                 answer.getConfiguration().setName(item.getName());
-                answer.getConfiguration().setSchema(JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.getSchemaLocation()).toString());
+                // answer.getConfiguration().setSchema(JocXmlEditor.getSchemaURI(ObjectType.OTHER, item.getSchemaLocation()).toString());
                 answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
                 answer.getConfiguration().setConfigurationJson(item.getConfigurationDraftJson());
                 answer.getConfiguration().setModified(item.getModified());

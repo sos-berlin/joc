@@ -113,7 +113,11 @@
           </CopySource>
           <CopyTarget>
             <CopyTargetFragmentRef>
-              <SFTPFragmentRef ref="my_server" />
+              <SFTPFragmentRef ref="my_server">
+                <SFTPPreProcessing>
+                  <CommandBeforeFile enable_for_skipped_transfer="false"><![CDATA[xxx]]></CommandBeforeFile>
+                </SFTPPreProcessing>
+              </SFTPFragmentRef>
             </CopyTargetFragmentRef>
             <Directory><![CDATA[/home/test/data/from_product_demo]]></Directory>
           </CopyTarget>

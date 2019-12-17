@@ -1,7 +1,7 @@
 package com.sos.joc.xmleditor.common;
 
-import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.json.Json;
@@ -45,11 +45,31 @@ public class Xml2JsonConverterTest {
 
     @Ignore
     @Test
-    public void convertXml2json() throws Exception {
+    public void convertStandardXml2json() throws Exception {
         ObjectType type = ObjectType.YADE;
         String xmlFile = "src/test/resources/xmleditor/yade.xml";
         String xml = new String(Files.readAllBytes(Paths.get(xmlFile)));
-        URI schema = new URI("http://localhost:4446/joc/xsd/yade/YADE_configuration_v1.12.xsd");
+        Path schema = Paths.get("../../jade/jade-engine/src/main/resources/YADE_configuration_v1.12.xsd");
+        LOGGER.info(schema.toFile().getCanonicalPath());
+
+        Xml2JsonConverter c = new Xml2JsonConverter();
+        try {
+            String s = c.convert(type, schema, xml);
+            LOGGER.info(s);
+        } catch (Exception e) {
+            LOGGER.error(e.toString(), e);
+        }
+
+    }
+
+    @Ignore
+    @Test
+    public void convertOtherXml2json() throws Exception {
+        ObjectType type = ObjectType.OTHER;
+        String xmlFile = "src/test/resources/xmleditor/other.xml";
+        String xml = new String(Files.readAllBytes(Paths.get(xmlFile)));
+        Path schema = Paths.get("../../jade/jade-engine/src/main/resources/YADE_configuration_v1.12.xsd");
+        LOGGER.info(schema.toFile().getCanonicalPath());
 
         Xml2JsonConverter c = new Xml2JsonConverter();
         try {
