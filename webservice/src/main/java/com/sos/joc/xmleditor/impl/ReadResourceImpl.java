@@ -109,12 +109,11 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                     AnswerConfiguration configuration = new AnswerConfiguration();
                     configuration.setId(Integer.parseInt(item.get("0").toString()));
                     configuration.setName(item.get("1").toString());
+                    configuration.setSchemaIdentifier(item.get("2").toString());// fileName or http(s) location
                     configurations.add(configuration);
 
-                    // fileName or http(s) location
-                    String schema = JocXmlEditor.getOthersSchemaIdentifier(item.get("2").toString());
-                    if (!schemas.contains(schema)) {
-                        schemas.add(schema);
+                    if (!schemas.contains(configuration.getSchemaIdentifier())) {
+                        schemas.add(configuration.getSchemaIdentifier());
                     }
                 }
                 answer.setConfigurations(configurations);
