@@ -18,6 +18,9 @@
 		"schema": {
 			"type": "string"
 		},
+		"schemaIdentifier": {
+			"type": "string"
+		},
 		"configuration": {
 			"type": "string"
 		},

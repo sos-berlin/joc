@@ -35,8 +35,13 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
             JOCDefaultResponse response = checkPermissions(accessToken, in);
 
             if (response == null) {
-                // TODO Others
-                XsdValidator validator = new XsdValidator(JocXmlEditor.getAbsoluteSchemaLocation(in.getObjectType()));
+                java.nio.file.Path schema = null;
+                if (in.getObjectType().equals(ObjectType.OTHER)) {
+                    schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
+                } else {
+                    schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
+                }
+                XsdValidator validator = new XsdValidator(schema);
                 try {
                     validator.validate(in.getConfiguration());
                 } catch (XsdValidatorException e) {
@@ -66,7 +71,7 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
         checkRequiredParameter("configuration", in.getConfiguration());
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
         if (in.getObjectType().equals(ObjectType.OTHER)) {
-            checkRequiredParameter("schema", in.getSchema());
+            checkRequiredParameter("schemaIdentifier", in.getSchemaIdentifier());
         }
     }
 

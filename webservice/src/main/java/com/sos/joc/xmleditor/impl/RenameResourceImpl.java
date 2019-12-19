@@ -13,22 +13,24 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
-import com.sos.joc.model.xmleditor.store.StoreConfiguration;
-import com.sos.joc.model.xmleditor.store.StoreConfigurationAnswer;
-import com.sos.joc.xmleditor.resource.IStoreResource;
-
-import sos.util.SOSString;
+import com.sos.joc.model.xmleditor.rename.RenameConfiguration;
+import com.sos.joc.model.xmleditor.rename.RenameConfigurationAnswer;
+import com.sos.joc.xmleditor.resource.IRenameResource;
 
 @Path(JocXmlEditor.APPLICATION_PATH)
-public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource {
+public class RenameResourceImpl extends JOCResourceImpl implements IRenameResource {
 
     @Override
-    public JOCDefaultResponse store(final String accessToken, final StoreConfiguration in) {
+    public JOCDefaultResponse rename(final String accessToken, final RenameConfiguration in) {
         SOSHibernateSession session = null;
         try {
+            if (in.getObjectType() != null && !in.getObjectType().equals(ObjectType.OTHER)) {
+                throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR_UNSUPPORTED_OBJECT_TYPE, String.format(
+                        "[%s][%s]unsupported object type for rename", in.getJobschedulerId(), in.getObjectType().name())));
+            }
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
@@ -37,15 +39,8 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                 session.beginTransaction();
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
 
-                DBItemXmlEditorObject item = null;
-                String name = null;
-                if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    name = in.getName();
-                    item = getOthersObject(dbLayer, in, name);
-                } else {
-                    name = JocXmlEditor.getConfigurationName(in.getObjectType());
-                    item = getStandardObject(dbLayer, in);
-                }
+                String name = in.getName();
+                DBItemXmlEditorObject item = getOthersObject(dbLayer, in, name);
 
                 if (item == null) {
                     item = create(session, in, name);
@@ -55,7 +50,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
                 }
 
                 session.commit();
-                response = JOCDefaultResponse.responseStatus200(getSuccess(in.getObjectType(), item.getId(), item.getModified(), item.getDeployed()));
+                response = JOCDefaultResponse.responseStatus200(getSuccess(item.getId(), item.getModified()));
             }
             return response;
         } catch (JocException e) {
@@ -70,34 +65,25 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         }
     }
 
-    private DBItemXmlEditorObject getOthersObject(DbLayerXmlEditor dbLayer, StoreConfiguration in, String name) throws Exception {
+    private DBItemXmlEditorObject getOthersObject(DbLayerXmlEditor dbLayer, RenameConfiguration in, String name) throws Exception {
         DBItemXmlEditorObject item = null;
         if (in.getId() != null && in.getId() > 0) {
             item = dbLayer.getObject(in.getId().longValue());
             if (item != null && !item.getObjectType().equals(ObjectType.OTHER.name())) {
-                item = null;// dbLayer.getObject(in.getJobschedulerId(), ObjectType.OTHER.name(), name);
+                item = null; // dbLayer.getObject(in.getJobschedulerId(), ObjectType.OTHER.name(), name);
             }
         }
         return item;
     }
 
-    private DBItemXmlEditorObject getStandardObject(DbLayerXmlEditor dbLayer, StoreConfiguration in) throws Exception {
-        return dbLayer.getObject(in.getJobschedulerId(), in.getObjectType().name(), JocXmlEditor.getConfigurationName(in.getObjectType(), in
-                .getName()));
-    }
-
-    private DBItemXmlEditorObject create(SOSHibernateSession session, StoreConfiguration in, String name) throws Exception {
+    private DBItemXmlEditorObject create(SOSHibernateSession session, RenameConfiguration in, String name) throws Exception {
         DBItemXmlEditorObject item = new DBItemXmlEditorObject();
         item.setSchedulerId(in.getJobschedulerId());
         item.setObjectType(in.getObjectType().name());
         item.setName(name);
-        item.setConfigurationDraft(in.getConfiguration());
-        item.setConfigurationDraftJson(in.getConfigurationJson());
-        if (in.getObjectType().equals(ObjectType.OTHER)) {
-            item.setSchemaLocation(in.getSchemaIdentifier());
-        } else {
-            item.setSchemaLocation(JocXmlEditor.getStandardRelativeSchemaLocation(in.getObjectType()));
-        }
+        item.setConfigurationDraft(null);
+        item.setConfigurationDraftJson(null);
+        item.setSchemaLocation(in.getSchemaIdentifier());
         item.setAuditLogId(new Long(0));// TODO
         item.setAccount(getAccount());
         item.setCreated(new Date());
@@ -106,16 +92,10 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         return item;
     }
 
-    private DBItemXmlEditorObject update(SOSHibernateSession session, StoreConfiguration in, DBItemXmlEditorObject item, String name)
+    private DBItemXmlEditorObject update(SOSHibernateSession session, RenameConfiguration in, DBItemXmlEditorObject item, String name)
             throws Exception {
         item.setName(name);
-        item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
-        item.setConfigurationDraftJson(in.getConfigurationJson());
-        if (in.getObjectType().equals(ObjectType.OTHER)) {
-            item.setSchemaLocation(in.getSchemaIdentifier());
-        } else {
-            item.setSchemaLocation(JocXmlEditor.getStandardRelativeSchemaLocation(in.getObjectType()));
-        }
+        item.setSchemaLocation(in.getSchemaIdentifier());
         // item.setAuditLogId(new Long(0));// TODO
         item.setAccount(getAccount());
         item.setModified(new Date());
@@ -123,11 +103,9 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         return item;
     }
 
-    private void checkRequiredParameters(final StoreConfiguration in) throws Exception {
+    private void checkRequiredParameters(final RenameConfiguration in) throws Exception {
         checkRequiredParameter("jobschedulerId", in.getJobschedulerId());
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
-        checkRequiredParameter("configuration", in.getConfiguration());
-        checkRequiredParameter("configurationJson", in.getConfigurationJson());
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             checkRequiredParameter("id", in.getId());
             checkRequiredParameter("name", in.getName());
@@ -135,7 +113,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         }
     }
 
-    private JOCDefaultResponse checkPermissions(final String accessToken, final StoreConfiguration in) throws Exception {
+    private JOCDefaultResponse checkPermissions(final String accessToken, final RenameConfiguration in) throws Exception {
         SOSPermissionJocCockpit permissions = getPermissonsJocCockpit(in.getJobschedulerId(), accessToken);
         boolean permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
         JOCDefaultResponse response = init(IMPL_PATH, in, accessToken, in.getJobschedulerId(), permission);
@@ -147,20 +125,10 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         return response;
     }
 
-    private StoreConfigurationAnswer getSuccess(ObjectType type, Long id, Date modified, Date deployed) {
-        StoreConfigurationAnswer answer = new StoreConfigurationAnswer();
+    private RenameConfigurationAnswer getSuccess(Long id, Date modified) {
+        RenameConfigurationAnswer answer = new RenameConfigurationAnswer();
         answer.setId(id.intValue());
         answer.setModified(modified);
-        if (!type.equals(ObjectType.OTHER)) {
-            answer.setMessage(new AnswerMessage());
-            if (deployed == null) {
-                answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
-                answer.getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_NOT_EXIST);
-            } else {
-                answer.getMessage().setCode(JocXmlEditor.MESSAGE_CODE_DRAFT_IS_NEWER);
-                answer.getMessage().setMessage(JocXmlEditor.MESSAGE_DRAFT_IS_NEWER);
-            }
-        }
         return answer;
     }
 

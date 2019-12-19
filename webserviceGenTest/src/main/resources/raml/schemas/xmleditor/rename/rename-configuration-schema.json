@@ -1,14 +1,13 @@
 {
-	"title": "xmleditor xml2json configuration in",
-	"id": "schemas/xmleditor/xml2json/xml2json-configuration-schema",
+	"title": "xmleditor rename configuration in",
+	"id": "schemas/xmleditor/rename/rename-configuration-schema",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"javaType": "com.sos.joc.model.xmleditor.xml2json.Xml2JsonConfiguration",
+	"javaType": "com.sos.joc.model.xmleditor.rename.RenameConfiguration",
 	"type": "object",
-	"description": "schemaIdentifier only for OTHER",
+	"description": "id, name, schemaIdentifier only for OTHER",
 	"required": [
 		"jobschedulerId",
-		"objectType",
-		"configuration"
+		"objectType"
 	],
 	"properties": {
 		"jobschedulerId": {
@@ -17,7 +16,10 @@
 		"objectType": {
 			"$ref": "../common/object-type-schema.json"
 		},
-		"configuration": {
+		"id": {
+			"type": "integer"
+		},
+		"name": {
 			"type": "string"
 		},
 		"schemaIdentifier": {
