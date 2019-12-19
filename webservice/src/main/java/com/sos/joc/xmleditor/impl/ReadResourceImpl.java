@@ -110,11 +110,12 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                     configuration.setId(Integer.parseInt(item.get("0").toString()));
                     configuration.setName(item.get("1").toString());
                     configuration.setSchemaIdentifier(item.get("2").toString());// fileName or http(s) location
-                    configurations.add(configuration);
-
+                    
                     if (!schemas.contains(configuration.getSchemaIdentifier())) {
                         schemas.add(configuration.getSchemaIdentifier());
                     }
+                    
+                    configurations.add(configuration);
                 }
                 answer.setConfigurations(configurations);
             }

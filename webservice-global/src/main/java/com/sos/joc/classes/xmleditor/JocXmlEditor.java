@@ -79,7 +79,7 @@ public class JocXmlEditor {
             tempCreateDirs();
         }
         Path path = realPath == null ? Paths.get(System.getProperty("user.dir")) : realPath;
-        return getFiles(path.resolve(getOthersRelativeSchemaLocation().toString()), "xsd");
+        return getFiles(path.resolve(getOthersRelativeSchemaLocation().toString()), false, "xsd");
     }
 
     public static Path getOthersAbsoluteSchemaLocation(String name) throws Exception {
@@ -117,6 +117,11 @@ public class JocXmlEditor {
 
     private static String getFileName(Path path) {
         return path.getFileName().toString();
+    }
+
+    public static String getFileName(URI uri) {
+        String path = uri.toString();
+        return path.substring(path.lastIndexOf('/') + 1, path.length());
     }
 
     public static String getStandardRelativeSchemaLocation(final ObjectType type) {
@@ -201,9 +206,14 @@ public class JocXmlEditor {
         return "/" + JobSchedulerXmlEditor.getLivePathYadeIni();
     }
 
-    public static List<Path> getFiles(Path dir, String extension) throws Exception {
-        return Files.walk(dir).filter(s -> s.toString().toLowerCase().endsWith("." + extension.toLowerCase())).map(Path::getFileName).sorted()
-                .collect(Collectors.toList());
+    public static List<Path> getFiles(Path dir, boolean recursiv, String extension) throws Exception {
+        if (recursiv) {
+            return Files.walk(dir).filter(s -> s.toString().toLowerCase().endsWith("." + extension.toLowerCase())).map(Path::getFileName).sorted()
+                    .collect(Collectors.toList());
+        } else {
+            return Files.walk(dir, 1).filter(s -> s.toString().toLowerCase().endsWith("." + extension.toLowerCase())).map(Path::getFileName).sorted()
+                    .collect(Collectors.toList());
+        }
     }
 
     public static String bytes2string(byte[] bytes) {
@@ -218,9 +228,8 @@ public class JocXmlEditor {
         return bytes2string(Files.readAllBytes(path));
     }
 
-    public static Path downloadOthersSchema(String path) throws Exception {
-        URI uri = URI.create(path);
-        String name = Paths.get(uri.getPath()).getFileName().toString();
+    public static Path downloadOthersSchema(URI uri) throws Exception {
+        String name = getFileName(uri);
         Path target = getOthersAbsoluteHttpSchemaLocation(name);
         try (InputStream inputStream = uri.toURL().openStream()) {
             Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
@@ -231,8 +240,7 @@ public class JocXmlEditor {
         return target;
     }
 
-    public static Path copyOthersSchema(String path) throws Exception {
-        Path source = Paths.get(path);
+    public static Path copyOthersSchema(Path source) throws Exception {
         Path target = JocXmlEditor.getOthersAbsoluteSchemaLocation(source.getFileName().toString());
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
         return target;
@@ -246,27 +254,28 @@ public class JocXmlEditor {
 
     // TODO
     public static boolean isHttp(String path) {
-        return path.toLowerCase().startsWith("https://") || path.toLowerCase().startsWith("http://");
+        path = path.toLowerCase();
+        return path.startsWith("https://") || path.startsWith("http://");
     }
 
     public static Path getOthersSchemaFile(String path, boolean downloadIfHttp) throws Exception {
         Path file = null;
-        String fileName = getFileName(Paths.get(path));
         if (isHttp(path)) {
+            URI uri = new URI(path);
             if (downloadIfHttp) {
                 try {
-                    file = downloadOthersSchema(path);
+                    file = downloadOthersSchema(uri);
                 } catch (Throwable e) {
                     LOGGER.error(String.format("[%s]can't download file, try to find in the %s location ..", path,
                             getOthersRelativeHttpSchemaLocation()));
                 }
             }
             if (file == null) {
-                file = JocXmlEditor.getOthersAbsoluteHttpSchemaLocation(fileName);
+                file = JocXmlEditor.getOthersAbsoluteHttpSchemaLocation(getFileName(uri));
             }
 
         } else {
-            file = JocXmlEditor.getOthersAbsoluteSchemaLocation(fileName);
+            file = JocXmlEditor.getOthersAbsoluteSchemaLocation(getFileName(Paths.get(path)));
         }
         return file;
     }

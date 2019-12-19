@@ -1,6 +1,8 @@
 package com.sos.joc.xmleditor.impl;
 
+import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.ws.rs.Path;
 
@@ -23,7 +25,7 @@ import com.sos.joc.xmleditor.resource.IAssignSchemaResource;
 public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssignSchemaResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssignSchemaResourceImpl.class);
-    private static final boolean isDebugEnabled = true;//LOGGER.isDebugEnabled();
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
     @Override
     public JOCDefaultResponse assign(final String accessToken, final AssignSchemaConfiguration in) {
@@ -70,29 +72,36 @@ public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssign
             String source = null;
             java.nio.file.Path target = null;
             if (in.getUri() == null) {
+                // fileName & fileContent
                 source = in.getFileName();
                 if (isDebugEnabled) {
-                    LOGGER.info(String.format("[%s]create from local file", source));
+                    LOGGER.debug(String.format("[%s]create from local file", source));
                 }
                 target = JocXmlEditor.createOthersSchema(source, in.getFileContent());
             } else {
                 source = in.getUri();
+                URI uri = new URI(in.getUri());
                 if (JocXmlEditor.isHttp(in.getUri())) {
+                    // http(s)://
                     if (isDebugEnabled) {
-                        LOGGER.info(String.format("[%s]copy from http(s)", source));
+                        LOGGER.debug(String.format("[%s]copy from http(s)", source));
                     }
-                    target = JocXmlEditor.downloadOthersSchema(in.getUri());
+                    target = JocXmlEditor.downloadOthersSchema(uri);
                 } else {
                     if (isDebugEnabled) {
-                        LOGGER.info(String.format("[%s]copy from local file", source));
+                        LOGGER.debug(String.format("[%s]copy from local file", source));
                     }
-                    target = JocXmlEditor.copyOthersSchema(in.getUri());
+                    if (uri.isAbsolute()) {// C://Temp/xyz.xsd
+                        target = JocXmlEditor.copyOthersSchema(Paths.get(in.getUri()));
+                    } else {// xyz.xsd
+                        target = JocXmlEditor.getOthersAbsoluteSchemaLocation(in.getUri());
+                    }
                 }
             }
             if (Files.exists(target)) {
                 AssignSchemaConfigurationAnswer answer = new AssignSchemaConfigurationAnswer();
                 answer.setSchema(JocXmlEditor.getFileContent(target));
-                answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(target));
+                answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(source));
                 return answer;
             } else {
                 throw new Exception(String.format("[%s][target=%s]target file not found", source, target));
