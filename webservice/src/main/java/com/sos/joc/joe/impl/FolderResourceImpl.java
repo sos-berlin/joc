@@ -52,6 +52,7 @@ import com.sos.joc.model.joe.other.FolderItem;
 @Path("joe")
 public class FolderResourceImpl extends JOCResourceImpl implements IFolderResource {
 
+    private static final String ROOT_FOLDER = "/";
     private static final String API_CALL = "./joe/read/folder";
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderResourceImpl.class);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -70,10 +71,19 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
 
             checkRequiredParameter("path", body.getPath());
             body.setPath(normalizeFolder(body.getPath()));
-            //String path = (body.getPath() + "/").replaceAll("//+", "/");
 
-            if (!folderPermissions.isPermittedForFolder(body.getPath())) {
-                return accessDeniedResponse();
+            if (ROOT_FOLDER.equals(body.getPath())) {
+                if (!folderPermissions.isPermittedForFolder(body.getPath())) {
+                    Folder entity = new Folder();
+                    entity.setDeliveryDate(Date.from(Instant.now()));
+                    entity.setPath(body.getPath());
+                    return JOCDefaultResponse.responseStatus200(entity);
+                }
+
+            } else {
+                if (!folderPermissions.isPermittedForFolder(body.getPath())) {
+                    return accessDeniedResponse();
+                }
             }
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -111,7 +121,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             if (inventoryFiles != null) {
                 for (DBItemInventoryFile inventoryFile : inventoryFiles) {
                     String objectType = inventoryFile.getFileType().replaceAll("_", "").toUpperCase();
-                    if ("/".equals(body.getPath()) && "PROCESSCLASS".equals(objectType) && "(default)".equals(inventoryFile.getFileBaseName())) {
+                    if (ROOT_FOLDER.equals(body.getPath()) && "PROCESSCLASS".equals(objectType) && "(default)".equals(inventoryFile.getFileBaseName())) {
                         continue;
                     }
                     if (!JOEHelper.CLASS_MAPPING.containsKey(objectType)) {
