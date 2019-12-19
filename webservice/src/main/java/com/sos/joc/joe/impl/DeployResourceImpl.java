@@ -63,6 +63,7 @@ import sos.xml.SOSXMLXPath;
 @Path("joe")
 public class DeployResourceImpl extends JOCResourceImpl implements IDeployResource {
 
+    private static final String ROOT_FOLDER = "/";
     private static final String API_CALL = "./joe/deploy";
 
     @Override
@@ -95,7 +96,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             }
 
             String folder = normalizeFolder(body.getFolder());
-            if (!folderPermissions.isPermittedForFolder(folder)) {
+            if (!ROOT_FOLDER.equals(folder)  && !folderPermissions.isPermittedForFolder(folder)) {
                 return accessDeniedResponse();
             }
 
@@ -112,7 +113,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             if (!folderDeploy) {
                 filterJoeObjects.setFolder(folder); 
                 if (body.getObjectName() != null && !body.getObjectName().isEmpty()) {
-                    filterJoeObjects.setPath((folder + "/").replaceAll("//+", "/") + body.getObjectName());
+                    filterJoeObjects.setPath((folder + ROOT_FOLDER).replaceAll("//+", ROOT_FOLDER) + body.getObjectName());
                 }
                 if (JobSchedulerObjectType.JOBCHAIN == body.getObjectType() && (body.getObjectName() == null || body.getObjectName().isEmpty())) {
                     //if clicked deploy in job chain action menu
@@ -135,7 +136,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
             if (folderDeploy) {
                 // It's not allowed to delete the root folder
-                if ("/".equals(body.getFolder())) {
+                if (ROOT_FOLDER.equals(body.getFolder())) {
                     filterJoeObjects.setObjectType(JobSchedulerObjectType.FOLDER);
                     DBItemJoeObject folderDbItem = dbLayerJoeObjects.getJoeObject(filterJoeObjects);
                     if (folderDbItem != null && folderDbItem.operationIsDelete()) {
