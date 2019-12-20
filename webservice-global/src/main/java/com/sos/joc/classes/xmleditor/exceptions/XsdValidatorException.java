@@ -8,16 +8,18 @@ public class XsdValidatorException extends RuntimeException {
     private final String elementName;
     private final String elementPosition;
     private final int elementDepth;
-    private final int lineNumber;
-    private final int columnNumber;
+    private int lineNumber = 1;
+    private int columnNumber = 1;
 
     public XsdValidatorException(SAXParseException cause, String name, String position, int depth) {
         super(cause);
         elementName = name;
         elementPosition = position;
         elementDepth = depth;
-        lineNumber = cause.getLineNumber();
-        columnNumber = cause.getColumnNumber();
+        if (cause != null) {
+            lineNumber = cause.getLineNumber();
+            columnNumber = cause.getColumnNumber();
+        }
 
     }
 

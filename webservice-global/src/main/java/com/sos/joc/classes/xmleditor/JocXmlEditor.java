@@ -121,7 +121,7 @@ public class JocXmlEditor {
 
     public static String getFileName(URI uri) {
         String path = uri.toString();
-        return path.substring(path.lastIndexOf('/') + 1, path.length());
+        return path.substring(path.lastIndexOf('/') + 1);
     }
 
     public static String getStandardRelativeSchemaLocation(final ObjectType type) {

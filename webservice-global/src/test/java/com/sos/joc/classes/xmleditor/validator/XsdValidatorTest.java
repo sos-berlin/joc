@@ -21,7 +21,7 @@ public class XsdValidatorTest {
         String xmlFile = "src/test/resources/xmleditor/yade.xml";
         String xml = new String(Files.readAllBytes(Paths.get(xmlFile)));
         Path schema = Paths.get("../../jade/jade-engine/src/main/resources/YADE_configuration_v1.12.xsd");
-        LOGGER.info(schema.toFile().getCanonicalPath());
+        LOGGER.info(schema.toRealPath().toString());
 
         XsdValidator validator = new XsdValidator(schema);
 
@@ -30,7 +30,8 @@ public class XsdValidatorTest {
         } catch (XsdValidatorException e) {
             LOGGER.error(String.format("[errorElement=%s][errorDepth=%s]errorElementPosition=%s", e.getElementName(), e.getElementDepth(), e
                     .getElementPosition()));
-            LOGGER.error(String.format("[line=%s][column=%s]%s", e.getLineNumber(), e.getColumnNumber(), e), e);
+            //LOGGER.error(String.format("[line=%s][column=%s]%s", e.getLineNumber(), e.getColumnNumber(), e.toString()), e);
+            LOGGER.error(String.format("[line=%s][column=%s]%s", e.getLineNumber(), e.getColumnNumber(), e.getCause().getMessage()));
         }
     }
 
@@ -39,11 +40,10 @@ public class XsdValidatorTest {
     public void validateNotification() throws Exception {
         String xmlFile = "src/test/resources/xmleditor/notification.xml";
         String xml = new String(Files.readAllBytes(Paths.get(xmlFile)));
-        Path schema = Paths.get("D:\\_Workspace\\schema.generator\\Monitor\\SystemMonitorNotification_v1.0.xsd");
+        Path schema = Paths.get("../SystemMonitorNotification_v1.0.xsd");
         LOGGER.info(schema.toFile().getCanonicalPath());
 
         XsdValidator validator = new XsdValidator(schema);
-
         try {
             validator.validate(xml);
         } catch (XsdValidatorException e) {

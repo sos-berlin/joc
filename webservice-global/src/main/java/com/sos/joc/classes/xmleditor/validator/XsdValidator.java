@@ -47,7 +47,8 @@ public class XsdValidator {
         factory.setNamespaceAware(false);
         factory.setSchema(validationSchema);
         SAXParser parser = factory.newSAXParser();
-        parser.parse(new InputSource(new StringReader(content.replaceAll(">\\s+<", "><").trim())), handler);
+        // parser.parse(new InputSource(new StringReader(content.replaceAll(">\\s+<", "><").trim())), handler);
+        parser.parse(new InputSource(new StringReader(content)), handler);
     }
 
     public Path getSchema() {

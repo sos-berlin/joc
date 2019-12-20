@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -25,7 +27,8 @@ public class XsdValidatorHandler extends DefaultHandler {
     private int currentDepth;
     private int lastDepth;
     private String rootElement;
-    private String currentElement;
+    private Stack<String> currentElement = new Stack<String>();
+    private String currentElementValue;
     private SAXParseException error;
     // key - depth, value - count elements
     private Map<Integer, Integer> currentDepths = new LinkedHashMap<Integer, Integer>();
@@ -33,18 +36,19 @@ public class XsdValidatorHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qname, Attributes attr) {
-        currentElement = qname;
+        currentElement.push(qname);
+        currentElementValue = null;
         currentDepth++;
 
         if (currentDepth < lastDepth) {
             List<Integer> toReset = currentDepths.keySet().stream().filter(x -> x > currentDepth).collect(Collectors.toList());
             for (Integer depthKey : toReset) {
-                // depths.put(depthKey, 0);
+                // currentDepths.put(depthKey, 0);
                 currentDepths.remove(depthKey);
             }
         } else {
             if (currentDepth == 1) {
-                rootElement = currentElement;
+                rootElement = qname;
             }
         }
 
@@ -56,14 +60,14 @@ public class XsdValidatorHandler extends DefaultHandler {
         lastDepth = currentDepth;
 
         if (isDebugEnabled) {
-            LOGGER.debug(String.format("[depth=%s][%s][localName=%s][uri=%s]", currentDepth, currentElement, localName, uri));
+            LOGGER.debug(String.format("[startElement][depth=%s][%s][localName=%s][uri=%s]", currentDepth, currentElement, localName, uri));
         }
 
-        if (currentElement.endsWith("Ref")) {
+        if (qname.endsWith("Ref")) {
             if (attr != null) {
                 String ref = attr.getValue("ref");
                 if (ref != null) {
-                    refElements.put(ref, new StringBuilder(currentElement).append(REF_DELIMITER).append(getCurrentElementPosition()).toString());
+                    refElements.put(ref, new StringBuilder(qname).append(REF_DELIMITER).append(getCurrentElementPosition()).toString());
                 }
             }
         }
@@ -72,8 +76,29 @@ public class XsdValidatorHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qname) {
-        currentDepth--;
         handleError();
+
+        currentElement.pop();
+        currentDepth--;
+        
+        //if (isDebugEnabled) {
+        //    LOGGER.debug(String.format("[endElement][depth=%s][%s][localName=%s][uri=%s]", currentDepth, currentElement, localName, uri));
+        //}
+    }
+
+    @Override
+    public void endDocument() throws SAXException {
+        handleError();
+    }
+
+    @Override
+    public void characters(char ch[], int start, int length) throws SAXException {
+        if (currentElementValue == null) {
+            String val = new String(ch, start, length).trim();
+            if (val.length() > 0) {
+                currentElementValue = val;
+            }
+        }
     }
 
     @Override
@@ -83,7 +108,9 @@ public class XsdValidatorHandler extends DefaultHandler {
 
     @Override
     public void error(SAXParseException e) throws SAXParseException {
-        error = e;
+        if (error == null) {// use the first error, in some cases (e.g. cvc-enumeration-valid - provides 2 errors)
+            error = e;
+        }
     }
 
     @Override
@@ -94,24 +121,48 @@ public class XsdValidatorHandler extends DefaultHandler {
 
     private void handleError() throws XsdValidatorException {
         if (error != null) {
+
+            String current = currentElement.peek();
             String msg = error.getMessage();
-            if (msg != null && msg.trim().startsWith("cvc-identity-constraint")) {
-                List<String> l = Arrays.asList(msg.split(" ")).stream().filter(x -> x.startsWith("'")).collect(Collectors.toList());
-                if (l.size() == 3) {
-                    String key = l.get(1).replaceAll("'", "");
-                    if (refElements.containsKey(key)) {
-                        String[] arr = refElements.get(key).split(REF_DELIMITER);
-                        String position = arr[1];
-                        throw new XsdValidatorException(error, arr[0], position, position.split(PATH_DELIMITER).length);
+            if (msg != null) {
+                msg = msg.trim();
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[handleError]%s", msg));
+                }
+                if (msg.startsWith("cvc-identity-constraint")) {
+                    List<String> l = Arrays.asList(msg.split(" ")).stream().filter(x -> x.startsWith("'")).collect(Collectors.toList());
+                    if (l.size() == 3) {
+                        String key = l.get(1).replaceAll("'", "");
+                        if (refElements.containsKey(key)) {
+                            String[] arr = refElements.get(key).split(REF_DELIMITER);
+                            String position = arr[1];
+                            throw new XsdValidatorException(error, arr[0], position, position.split(PATH_DELIMITER).length);
+                        }
+                    }
+                    throw new XsdValidatorException(error, rootElement, "1", 1);
+                } else if (msg.startsWith("cvc-enumeration-valid") && currentElementValue != null) {
+                    try {
+                        int pos1 = msg.indexOf("'[");
+                        int pos2 = msg.indexOf("]'");
+                        List<String> enumeration = Arrays.asList(msg.substring(pos1 + 2, pos2).split(",")).stream().map(x -> x.trim()).collect(
+                                Collectors.toList());
+                        if (enumeration.contains(currentElementValue)) {
+                            error = null;
+                            return;
+                        }
+                    } catch (Throwable ex) {
+                        LOGGER.warn(String.format("[exception on enum handling][%s]%s", msg, ex.toString()), ex);
                     }
                 }
-                throw new XsdValidatorException(error, rootElement, "1", 1);
             }
-            throw new XsdValidatorException(error, currentElement, getCurrentElementPosition(), currentDepths.size());
+            throw new XsdValidatorException(error, current, getCurrentElementPosition(), currentDepth);
         }
+
     }
 
     private String getCurrentElementPosition() {
-        return currentDepths.values().stream().map(val -> val.toString()).collect(Collectors.joining(PATH_DELIMITER));
+        // return currentDepths.values().stream().map(val -> val.toString()).collect(Collectors.joining(PATH_DELIMITER));
+        return currentDepths.entrySet().stream().filter(x -> x.getKey() <= currentDepth).map(x -> x.getValue().toString()).collect(Collectors.joining(
+                PATH_DELIMITER));
     }
 }

@@ -97,7 +97,12 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
     private static ErrorMessage getErrorMessage(XsdValidatorException e) {
         ErrorMessage m = new ErrorMessage();
         m.setCode(JocXmlEditor.ERROR_CODE_VALIDATION_ERROR);
-        m.setMessage(e.toString());
+        try {
+            m.setMessage(String.format("'%s', line=%s, column=%s, %s", e.getElementName(), e.getLineNumber(), e.getColumnNumber(), e.getCause()
+                    .getMessage()));
+        } catch (Throwable ex) {
+            m.setMessage(ex.toString());
+        }
         m.setLine(e.getLineNumber());
         m.setColumn(e.getColumnNumber());
         m.setElementName(e.getElementName());
