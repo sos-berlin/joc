@@ -21,14 +21,12 @@ public class XsdValidator {
     private static boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
     private Path schema = null;
-    private XsdValidatorHandler handler = null;
 
     public XsdValidator(Path sourceSchema) {
         schema = sourceSchema;
     }
 
     public void validate(String content) throws Exception {
-        handler = new XsdValidatorHandler();
         Schema validationSchema = null;
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
@@ -47,8 +45,8 @@ public class XsdValidator {
         factory.setNamespaceAware(false);
         factory.setSchema(validationSchema);
         SAXParser parser = factory.newSAXParser();
-        // parser.parse(new InputSource(new StringReader(content.replaceAll(">\\s+<", "><").trim())), handler);
-        parser.parse(new InputSource(new StringReader(content)), handler);
+        // parser.parse(new InputSource(new StringReader(content.replaceAll(">\\s+<", "><").trim())), new XsdValidatorHandler());
+        parser.parse(new InputSource(new StringReader(content)), new XsdValidatorHandler());
     }
 
     public Path getSchema() {

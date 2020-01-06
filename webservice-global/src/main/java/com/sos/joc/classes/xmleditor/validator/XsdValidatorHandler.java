@@ -21,6 +21,7 @@ public class XsdValidatorHandler extends DefaultHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XsdValidatorHandler.class);
     private final boolean isDebugEnabled = LOGGER.isDebugEnabled();
+    private final boolean isTraceEnabled = LOGGER.isTraceEnabled();
     private final String PATH_DELIMITER = "-";
     private final String REF_DELIMITER = ";";
 
@@ -78,12 +79,12 @@ public class XsdValidatorHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String qname) {
         handleError();
 
+        if (isTraceEnabled) {
+            LOGGER.trace(String.format("[endElement][depth=%s][%s][localName=%s][uri=%s]", currentDepth, currentElement, localName, uri));
+        }
+
         currentElement.pop();
         currentDepth--;
-        
-        //if (isDebugEnabled) {
-        //    LOGGER.debug(String.format("[endElement][depth=%s][%s][localName=%s][uri=%s]", currentDepth, currentElement, localName, uri));
-        //}
     }
 
     @Override
@@ -121,15 +122,17 @@ public class XsdValidatorHandler extends DefaultHandler {
 
     private void handleError() throws XsdValidatorException {
         if (error != null) {
-
-            String current = currentElement.peek();
-            String msg = error.getMessage();
-            if (msg != null) {
-                msg = msg.trim();
+            if (error.getMessage() != null) {
+                String msg = error.getMessage().trim();
                 if (isDebugEnabled) {
                     LOGGER.debug(String.format("[handleError]%s", msg));
                 }
                 if (msg.startsWith("cvc-identity-constraint")) {
+                    // xs:key -> xs:keyref issue, try to find the KeyRef element position
+
+                    // Message, e.g.:
+                    // cvc-identity-constraint.4.3: Key 'CredentialStoreFragmentKeyRef' with value 'yade_credential_storex' not found for identity constraint of
+                    // element 'Configurations'.
                     List<String> l = Arrays.asList(msg.split(" ")).stream().filter(x -> x.startsWith("'")).collect(Collectors.toList());
                     if (l.size() == 3) {
                         String key = l.get(1).replaceAll("'", "");
@@ -141,12 +144,20 @@ public class XsdValidatorHandler extends DefaultHandler {
                     }
                     throw new XsdValidatorException(error, rootElement, "1", 1);
                 } else if (msg.startsWith("cvc-enumeration-valid") && currentElementValue != null) {
+                    // ignore white spaces issue
                     try {
+                        // Message, e.g:
+                        // cvc-enumeration-valid: Value '
+                        // false
+                        // ' is not facet-valid with respect to enumeration '[true, false, strict, relaxed]'. It must be a value from the enumeration.
                         int pos1 = msg.indexOf("'[");
                         int pos2 = msg.indexOf("]'");
                         List<String> enumeration = Arrays.asList(msg.substring(pos1 + 2, pos2).split(",")).stream().map(x -> x.trim()).collect(
                                 Collectors.toList());
                         if (enumeration.contains(currentElementValue)) {
+                            if (isDebugEnabled) {
+                                LOGGER.debug(String.format("[handleError][value=%s]error ignored", currentElementValue));
+                            }
                             error = null;
                             return;
                         }
@@ -155,13 +166,11 @@ public class XsdValidatorHandler extends DefaultHandler {
                     }
                 }
             }
-            throw new XsdValidatorException(error, current, getCurrentElementPosition(), currentDepth);
+            throw new XsdValidatorException(error, currentElement.peek(), getCurrentElementPosition(), currentDepth);
         }
-
     }
 
     private String getCurrentElementPosition() {
-        // return currentDepths.values().stream().map(val -> val.toString()).collect(Collectors.joining(PATH_DELIMITER));
         return currentDepths.entrySet().stream().filter(x -> x.getKey() <= currentDepth).map(x -> x.getValue().toString()).collect(Collectors.joining(
                 PATH_DELIMITER));
     }
