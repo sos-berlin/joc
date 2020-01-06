@@ -43,7 +43,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             String jobChainPath = normalizePath(orderFilter.getJobChain());
             String orderCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, orderFilter.getOrderId(), "run_time");
-            runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken, true);
+            runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken, false);
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);

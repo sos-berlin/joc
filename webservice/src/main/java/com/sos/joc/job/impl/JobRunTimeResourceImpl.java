@@ -40,7 +40,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 			String jobPath = normalizePath(jobFilter.getJob());
 			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 			String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
-			runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, true);
+			runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, false);
 
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);

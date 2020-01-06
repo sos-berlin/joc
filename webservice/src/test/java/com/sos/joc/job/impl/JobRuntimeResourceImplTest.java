@@ -33,8 +33,8 @@ public class JobRuntimeResourceImplTest {
         JobRunTimeResourceImpl jobRunTimeImpl = new JobRunTimeResourceImpl();
         JOCDefaultResponse jobResponse = jobRunTimeImpl.postJobRunTime(accessToken, jobFilterSchema);
         RunTime200 jobRunTimeSchema = (RunTime200) jobResponse.getEntity();
-        LOGGER.info(jobRunTimeSchema.getRunTime().getRunTime());
-        assertTrue("", jobRunTimeSchema.getRunTime().getRunTime().startsWith("<run_time"));
+        LOGGER.info(jobRunTimeSchema.getRunTime().getRunTimeXml());
+        assertTrue("", jobRunTimeSchema.getRunTime().getRunTimeXml().startsWith("<run_time"));
      }
 
 }

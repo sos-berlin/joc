@@ -108,7 +108,8 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             runTime.setRunTimeIsTemporary(false);
             runTime.setSurveyDate(entity.getConfiguration().getSurveyDate());
 
-            runTime.setRunTimeJson(XmlDeserializer.deserialize(entity.getConfiguration().getContent().getXml(),
+            runTime.setRunTimeXml(entity.getConfiguration().getContent().getXml());
+            runTime.setRunTime(XmlDeserializer.deserialize(entity.getConfiguration().getContent().getXml(),
                     com.sos.joc.model.joe.schedule.RunTime.class));
             runTimeAnswer.setRunTime(runTime);
             runTimeAnswer.setDeliveryDate(Date.from(Instant.now()));
