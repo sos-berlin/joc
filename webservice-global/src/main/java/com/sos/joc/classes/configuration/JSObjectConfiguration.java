@@ -65,7 +65,7 @@ public class JSObjectConfiguration {
             ModifyOrder o = new ModifyOrder();
             o.setJobChain(nestedChain);
             o.setOrderId(orderId);
-            o.setRunTime(jocXmlCommand.getXmlString(orderNode));
+            o.setRunTimeXml(jocXmlCommand.getXmlString(orderNode));
             return o;
         } catch (JocException e) {
             throw e;

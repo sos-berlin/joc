@@ -37,6 +37,7 @@ import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
 import com.sos.joc.model.joe.job.Job;
+import com.sos.joc.model.joe.schedule.RunTime;
 
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {
@@ -163,8 +164,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             logAuditMessage(jobAudit);
 
             checkRequiredParameter("job", modifyJob.getJob());
-            if (SET_RUN_TIME.equals(command)) {
-                checkRequiredParameter("runTime", modifyJob.getRunTime());
+            if (SET_RUN_TIME.equals(command) && modifyJob.getRunTime() == null) {
+                throw new JocMissingRequiredParameterException("undefined 'runTime'");
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
@@ -172,9 +173,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             switch (command) {
             case SET_RUN_TIME:
                 try {
-
+                    RunTime runTime = XmlSerializer.serializeAbstractSchedule(modifyJob.getRunTime());
+                    modifyJob.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
                     JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
-                    String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTime(), this, jobPath);
+                    String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTimeXml(), this, jobPath);
                     ValidateXML.validateAgainstJobSchedulerSchema(configuration);
                     
                     if (versionIsOlderThan("1.13.1")) {
@@ -197,7 +199,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     }
 
                     CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(connection, dbItemInventoryInstance.getSchedulerId(),
-                            CalendarObjectType.JOB, jobPath, modifyJob.getRunTime(), modifyJob.getCalendars());
+                            CalendarObjectType.JOB, jobPath, modifyJob.getRunTimeXml(), modifyJob.getCalendars());
                     calendarUsedByWriter.updateUsedBy();
                     CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
                     if (calEvt != null) {

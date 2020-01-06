@@ -28,6 +28,7 @@ import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.calendar.Calendars;
@@ -61,7 +62,13 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 			ModifyScheduleAudit scheduleAudit = new ModifyScheduleAudit(modifyRuntime);
 			logAuditMessage(scheduleAudit);
 			checkRequiredParameter("schedule", modifyRuntime.getSchedule());
-			ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTime());
+			if (modifyRuntime.getRunTime() == null) {
+                throw new JocMissingRequiredParameterException("undefined 'runTime'");
+            }
+			
+			Schedule runTime = XmlSerializer.serializeAbstractSchedule(modifyRuntime.getRunTime());
+			modifyRuntime.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
+			ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTimeXml());
 
 			String schedulePath = normalizePath(modifyRuntime.getSchedule());
 			
@@ -69,7 +76,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
                 XMLBuilder command = new XMLBuilder("modify_hot_folder");
 
-                Element scheduleElement = XMLBuilder.parse(modifyRuntime.getRunTime());
+                Element scheduleElement = XMLBuilder.parse(modifyRuntime.getRunTimeXml());
                 scheduleElement.addAttribute("name", Paths.get(schedulePath).getFileName().toString());
                 command.addAttribute("folder", getParent(schedulePath)).add(scheduleElement);
 
@@ -78,7 +85,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             } else {
 
-                Schedule schedulePojo = XmlDeserializer.deserialize(modifyRuntime.getRunTime(), Schedule.class);
+                Schedule schedulePojo = XmlDeserializer.deserialize(modifyRuntime.getRunTimeXml(), Schedule.class);
                 if (modifyRuntime.getCalendars() != null && !modifyRuntime.getCalendars().isEmpty()) {
                     Calendars calendars = new Calendars();
                     calendars.setCalendars(modifyRuntime.getCalendars());
@@ -92,7 +99,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 			session = Globals.createSosHibernateStatelessConnection(API_CALL);
 			CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session,
 					dbItemInventoryInstance.getSchedulerId(), CalendarObjectType.SCHEDULE, schedulePath,
-					modifyRuntime.getRunTime(), modifyRuntime.getCalendars());
+					modifyRuntime.getRunTimeXml(), modifyRuntime.getCalendars());
 			calendarUsedByWriter.updateUsedBy();
 			
 			CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();

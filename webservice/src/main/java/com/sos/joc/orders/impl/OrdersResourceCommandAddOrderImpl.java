@@ -39,8 +39,10 @@ import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
+import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
+import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.order.AddedOrders;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
@@ -149,14 +151,16 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 xml.addAttribute("priority", order.getPriority().toString());
             }
             xml.add(getParams(order.getParams()));
-            if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
+            if (order.getRunTime() != null) {
                 try {
-                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
-                    xml.add(XMLBuilder.parse(order.getRunTime()));
+                    RunTime runTime = XmlSerializer.serializeAbstractSchedule(order.getRunTime());
+                    order.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
+                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTimeXml());
+                    xml.add(XMLBuilder.parse(order.getRunTimeXml()));
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
+                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime().toString());
                 }
             }
             
