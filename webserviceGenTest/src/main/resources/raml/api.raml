@@ -1,6 +1,6 @@
 #%RAML 0.8
 title: JOC API
-version: 1.13.2
+version: 1.13.3
 protocols: [ HTTP, HTTPS ]
 #baseUri: http://test.sos-berlin.com:3001/joc/api
 #mediaType: application/json
@@ -884,7 +884,7 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: Returns the run time as XML string in the JSON content field
+        description200: Returns the run time
         schema: !include schemas/order/orderFilter-schema.json
         schema200: !include schemas/common/runtime200-schema.json
         example: !include examples/order/filteredOrder-example.json
@@ -1170,7 +1170,7 @@ traits:
   /run_time:
     type:
       postJSON:
-        description: run time as XML string embedded in JSON
+        description: run time
         description1: !include documentation/job/jobRequired.md
         description2: " "
         description3: " "
@@ -1181,7 +1181,7 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: Returns the run time as XML string in the JSON content field
+        description200: Returns the run time
         schema: !include schemas/job/jobFilter-schema.json
         schema200: !include schemas/common/runtime200-schema.json
         example: TODO
@@ -1732,24 +1732,24 @@ traits:
         schema200: !include schemas/schedule/schedule200_p-schema.json
         example: !include examples/schedule/filteredScheduleWithCompact-example.json
         example200: !include examples/schedule/schedule_p-example.json
-  #/run_time:
-  #  type:
-  #    postJSON:
-  #      description: run time as XML string embedded in JSON
-  #      description1: !include documentation/schedule/scheduleRequired.md
-  #      description2: " "
-  #      description3: " "
-  #      description4: " "
-  #      description5: " "
-  #      description6: " "
-  #      description7: " "
-  #      description8: " "
-  #      description9: " "
-  #      description200: returns the run time as XML string in the JSON content field
-  #      schema: !include schemas/schedule/scheduleFilter-schema.json
-  #      schema200: !include schemas/common/runtime200-schema.json
-  #      example: TODO
-  #      example200: !include examples/common/runtime-example.json
+  /run_time:
+    type:
+      postJSON:
+        description: run time
+        description1: !include documentation/schedule/scheduleRequired.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description200: returns the run time
+        schema: !include schemas/schedule/scheduleFilter-schema.json
+        schema200: !include schemas/schedule/runtime200-schema.json
+        example: TODO
+        example200: !include examples/common/runtime-example.json
   /configuration:
     type:
       postJSON:
@@ -3049,4 +3049,42 @@ traits:
         200:
           body:
             application/json:
+  /wizzard/jobs:
+    type:
+      postJSON:
+        description: Collection of all JITL Job Specifications
+        description1: !include documentation/job/orderJob.md
+        description2: !include documentation/joe/pathRequired.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/joe/jitlJobs.md
+        schema: !include schemas/joe/wizzard/jobsFilter-schema.json
+        schema200: !include schemas/joe/wizzard/jobs-schema.json
+        example: " "
+        example200: " "
+  /wizzard/job:
+    type:
+      postJSON:
+        description: sends JITL Jobs Specification
+        description1: !include documentation/common/pathRequired.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200:  !include documentation/joe/jitlJob.md
+        schema: !include schemas/joe/wizzard/jobFilter-schema.json
+        schema200: !include schemas/joe/wizzard/job-schema.json
+        example: " "
+        example200: " "
         
