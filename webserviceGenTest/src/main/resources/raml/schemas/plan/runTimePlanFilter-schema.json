@@ -14,7 +14,7 @@
       "type": "string"
     },
     "runTime": {
-      "type": "string"
+      "$ref": "../joe/schedule/runTime-schema.json"
     },
     "dateFrom": {
       "type": "string",

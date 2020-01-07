@@ -1,7 +1,22 @@
 {
-  "deliveryDate": "2016-05-05T20:34:51Z",
+  "deliveryDate": "2020-01-06T20:34:51Z",
   "runTime": {
-    "surveyDate": "2016-05-05T20:34:51Z",
-    "content": "&lt;run_time&gt;&lt;monthdays&gt;&lt;day day=\"20\"&gt;&lt;period single_start=\"10:00\"/&gt;&lt;/day&gt;&lt;/monthdays&gt;&lt;/run_time&gt;"
+    "letRun": "false",
+    "runOnce": "false",
+    "monthdays": {
+        "days": [
+            {
+                "day": "20",
+                "periods": [
+                    {
+                        "singleStart": "10:00",
+                        "letRun": "false",
+                        "runOnce": "false",
+                        "whenHoliday": "suppress"
+                    }
+                ]
+            }
+        ]
+    }
   }
 }

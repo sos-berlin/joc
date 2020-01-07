@@ -20,8 +20,9 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.ConfigurationMime;
-import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.schedule.Configuration200;
+import com.sos.joc.model.schedule.RunTime;
+import com.sos.joc.model.schedule.RunTime200;
 import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
 
@@ -104,13 +105,13 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, command, xPath, "schedule", false, accessToken));
             // entity.setDeliveryDate(Date.from(Instant.now()));
 
-            com.sos.joc.model.common.RunTime runTime = new com.sos.joc.model.common.RunTime();
+            RunTime runTime = new RunTime();
             runTime.setRunTimeIsTemporary(false);
             runTime.setSurveyDate(entity.getConfiguration().getSurveyDate());
 
             runTime.setRunTimeXml(entity.getConfiguration().getContent().getXml());
             runTime.setRunTime(XmlDeserializer.deserialize(entity.getConfiguration().getContent().getXml(),
-                    com.sos.joc.model.joe.schedule.RunTime.class));
+                    com.sos.joc.model.joe.schedule.Schedule.class));
             runTimeAnswer.setRunTime(runTime);
             runTimeAnswer.setDeliveryDate(Date.from(Instant.now()));
 

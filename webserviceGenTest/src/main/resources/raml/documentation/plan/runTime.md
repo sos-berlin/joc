@@ -1,1 +1,1 @@
-<tr><td>``runTime``</td><td>required, string</td><td>run time in xml format</td><td></td><td></td></tr>
+<tr><td>``runTime``</td><td>required, object</td><td>run time in JSON format</td><td></td><td></td></tr>
