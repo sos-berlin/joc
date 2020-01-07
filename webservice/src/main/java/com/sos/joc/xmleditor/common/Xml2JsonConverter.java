@@ -1,6 +1,6 @@
 package com.sos.joc.xmleditor.common;
 
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.net.ConnectException;
 import java.nio.file.Files;
@@ -33,13 +33,14 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
+import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 
 public class Xml2JsonConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Xml2JsonConverter.class);
     private static boolean isDebugEnabled = LOGGER.isDebugEnabled();
-   
+
     private XPath xpathSchema;
     private XPath xpathXml;
     private Node rootSchema;
@@ -61,11 +62,15 @@ public class Xml2JsonConverter {
         }
 
         try {
-            init(new InputSource(Files.newInputStream(schema)), new InputSource(new StringReader(xml)));
+            // init(new InputSource(Files.newInputStream(schema)), new InputSource(new StringReader(xml)));
+            // read UTF-8 BOM too
+            init(new InputSource(Files.newInputStream(schema)), new InputSource(new ByteArrayInputStream(xml.getBytes(JocXmlEditor.CHARSET))));
         } catch (ConnectException e) {
             throw new Exception(String.format("[%s][cant't get schema]%s", schema.toString(), e.toString()), e);
         } catch (Exception e) {
-            throw new Exception(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
+            LOGGER.error(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
+            // throw new Exception(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
+            throw new Exception(String.format("[%s]XML can't be loaded. See JOC Cockpit Log for details.", e.toString()));
         }
         try {
             uuid = -1;
@@ -82,9 +87,12 @@ public class Xml2JsonConverter {
 
     private void init(InputSource schemaSource, InputSource xmlSource) throws Exception {
         String method = "init";
+
+        schemaSource.setEncoding(JocXmlEditor.CHARSET);
+        Document schemaDoc = getXmlFileDocument(schemaSource);
+
         xpathSchema = XPathFactory.newInstance().newXPath();
         xpathSchema.setNamespaceContext(getSchemaNamespaceContext());
-        Document schemaDoc = getXmlFileDocument(schemaSource);
         XPathExpression schemaExpression = xpathSchema.compile("/xs:schema");
         rootSchema = (Node) schemaExpression.evaluate(schemaDoc, XPathConstants.NODE);
         if (rootSchema == null) {
@@ -97,6 +105,7 @@ public class Xml2JsonConverter {
             rootElementNameXml = root.getNodeValue();
         }
 
+        xmlSource.setEncoding(JocXmlEditor.CHARSET);
         Document xmlDoc = getXmlFileDocument(xmlSource);
         xpathXml = XPathFactory.newInstance().newXPath();
         XPathExpression xmlExpression = xpathXml.compile("/" + rootElementNameXml);

@@ -46,7 +46,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
-                JocXmlEditor.tempCreateDirs();
+                JocXmlEditor.setRealPath();
 
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
                     ReadOtherConfigurationAnswer answer = handleOtherConfigurations(in);
@@ -110,11 +110,11 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                     configuration.setId(Integer.parseInt(item.get("0").toString()));
                     configuration.setName(item.get("1").toString());
                     configuration.setSchemaIdentifier(item.get("2").toString());// fileName or http(s) location
-                    
+
                     if (!schemas.contains(configuration.getSchemaIdentifier())) {
                         schemas.add(configuration.getSchemaIdentifier());
                     }
-                    
+
                     configurations.add(configuration);
                 }
                 answer.setConfigurations(configurations);
