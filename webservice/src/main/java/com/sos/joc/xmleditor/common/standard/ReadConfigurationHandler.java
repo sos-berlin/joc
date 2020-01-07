@@ -153,7 +153,7 @@ public class ReadConfigurationHandler {
                     // configuration from draft - should be recreated
                     answer.setConfigurationJson(convert(type, draft.getConfiguration()));
                     answer.setRecreateJson(true);
-                } else {// configuration from draft - should not be recreated, only converted
+                } else {// configuration from draft - should not be recreated
                     answer.setConfigurationJson(current.getConfigurationJson());
                     answer.setRecreateJson(false);
                 }
