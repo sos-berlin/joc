@@ -64,9 +64,7 @@ public class JocXmlEditor {
     }
 
     public static Path getStandardAbsoluteSchemaLocation(ObjectType type) throws Exception {
-        if (realPath == null) {
-            tempCreateDirs();
-        }
+        setRealPath();
         Path path = realPath;
         if (path != null) {
             path = path.resolve(getStandardRelativeSchemaLocation(type));
@@ -75,17 +73,13 @@ public class JocXmlEditor {
     }
 
     public static List<Path> getOthersAbsoluteSchemaLocations() throws Exception {
-        if (realPath == null) {
-            tempCreateDirs();
-        }
+        setRealPath();
         Path path = realPath == null ? Paths.get(System.getProperty("user.dir")) : realPath;
         return getFiles(path.resolve(getOthersRelativeSchemaLocation().toString()), false, "xsd");
     }
 
     public static Path getOthersAbsoluteSchemaLocation(String name) throws Exception {
-        if (realPath == null) {
-            tempCreateDirs();
-        }
+        setRealPath();
         Path path = realPath;
         if (path != null) {
             path = path.resolve(getOthersRelativeSchemaLocation(name));
@@ -94,9 +88,7 @@ public class JocXmlEditor {
     }
 
     public static Path getOthersAbsoluteHttpSchemaLocation(String name) throws Exception {
-        if (realPath == null) {
-            tempCreateDirs();
-        }
+        setRealPath();
         Path path = realPath;
         if (path != null) {
             path = path.resolve(getOthersRelativeHttpSchemaLocation(name));
@@ -289,30 +281,14 @@ public class JocXmlEditor {
         }
     }
 
-    public static void tempCreateDirs() throws Exception {
-        if (Globals.sosShiroProperties != null && Globals.servletContextRealPath != null) {
-            java.nio.file.Path xsd = Globals.sosShiroProperties.resolvePath(JOC_SCHEMA_LOCATION);
-            if (!Files.exists(xsd)) {
-                CopyDirectory yade = new CopyDirectory(Globals.servletContextRealPath.resolve("xsd/yade"), xsd.resolve("yade"));
-                yade.copy();
-
-                CopyDirectory notification = new CopyDirectory(Globals.servletContextRealPath.resolve("xsd/notification"), xsd.resolve(
-                        "notification"));
-                notification.copy();
-
-                CopyDirectory others = new CopyDirectory(Globals.servletContextRealPath.resolve("xsd/other"), xsd.resolve("others"));
-                others.copy();
-
-                Files.createDirectories(xsd.resolve("others/http"));
-            }
+    public static void setRealPath() throws Exception {
+        if (realPath != null) {
+            return;
+        }
+        if (Globals.sosShiroProperties != null) {
             realPath = Globals.sosShiroProperties.resolvePath(".");
         } else {
-            LOGGER.info(String.format(
-                    "[skip][one or more of the properties is null][Globals.sosShiroProperties=%s][Globals.servletContextRealPath=%s]",
-                    Globals.sosShiroProperties, Globals.servletContextRealPath));
-        }
-        if (realPath == null) {
-            realPath = Globals.servletContextRealPath;
+            throw new Exception("Globals.sosShiroProperties is null");
         }
     }
 
