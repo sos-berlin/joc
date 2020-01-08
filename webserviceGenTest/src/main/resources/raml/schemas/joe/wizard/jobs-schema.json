@@ -1,8 +1,8 @@
 {
   "title": "jobs",
-  "id": "schemas/joe/wizzard/jobs",
+  "id": "schemas/joe/wizard/jobs",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.wizzard.Jobs",
+  "javaType": "com.sos.joc.model.joe.wizard.Jobs",
   "type": "object",
   "required" : [
     "deliveryDate",

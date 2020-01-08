@@ -1,5 +1,4 @@
-    * path
-    * name
-    * title
-    * javaClass
-    * description (in HTML format)
+* path
+* name
+* title
+* javaClass

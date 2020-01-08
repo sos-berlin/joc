@@ -1,8 +1,8 @@
 {
   "title": "jobs filter",
-  "id": "schemas/joe/wizzard/jobsFilter",
+  "id": "schemas/joe/wizard/jobFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.wizzard.JobsFilter",
+  "javaType": "com.sos.joc.model.joe.wizard.JobFilter",
   "type": "object",
   "required" : [
     "jobschedulerId",
@@ -12,11 +12,8 @@
     "jobschedulerId": {
       "type": "string"
     },
-    "path": {
+    "jitlPath": {
       "type": "string"
-    },
-    "isOrderJob": {
-      "type": "boolean"
     }
   }
 }

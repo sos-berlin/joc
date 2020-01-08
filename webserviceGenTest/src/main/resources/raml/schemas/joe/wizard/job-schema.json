@@ -1,8 +1,8 @@
 {
 	"title": "job",
-	"id": "schemas/joe/wizzard/job",
+	"id": "schemas/joe/wizard/job",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"javaType": "com.sos.joc.model.joe.wizzard.Job",
+	"javaType": "com.sos.joc.model.joe.wizard.Job",
 	"type": "object",
 	"required": [
 		"path",
@@ -13,10 +13,10 @@
 		"deliveryDate": {
       		"$ref": "../../common/deliveryDate-schema.json"
     	},
-		"path": {
+		"jitlPath": {
 			"$ref": "../../common/path-schema.json"
 		},
-		"name": {
+		"jitlName": {
 			"type": "string"
 		},
 		"title": {
@@ -25,15 +25,11 @@
 		"javaClass": {
 			"type": "string"
 		},
-		"description": {
-			"description": "string in html format",
-			"type": "string"
-		},
 		"params": {
 			"type": "array",
 			"items": {
 				"type": "object",
-				"javaType": "com.sos.joc.model.joe.wizzard.Params",
+				"javaType": "com.sos.joc.model.joe.wizard.Param",
 				"properties": {
 					"name": {
 						"type": "string"

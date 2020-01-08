@@ -3049,12 +3049,12 @@ traits:
         200:
           body:
             application/json:
-  /wizzard/jobs:
+  /wizard/jobs:
     type:
       postJSON:
         description: Collection of all JITL Job Specifications
         description1: !include documentation/job/orderJob.md
-        description2: !include documentation/joe/pathRequired.md
+        description2: " "
         description3: " "
         description4: " "
         description5: " "
@@ -3064,15 +3064,15 @@ traits:
         description9: " "
         description10: " "
         description200: !include documentation/joe/jitlJobs.md
-        schema: !include schemas/joe/wizzard/jobsFilter-schema.json
-        schema200: !include schemas/joe/wizzard/jobs-schema.json
+        schema: !include schemas/joe/wizard/jobsFilter-schema.json
+        schema200: !include schemas/joe/wizard/jobs-schema.json
         example: " "
         example200: " "
-  /wizzard/job:
+  /wizard/job:
     type:
       postJSON:
         description: sends JITL Jobs Specification
-        description1: !include documentation/common/pathRequired.md
+        description1: !include documentation/joe/docuPathRequired.md
         description2: " "
         description3: " "
         description4: " "
@@ -3083,8 +3083,8 @@ traits:
         description9: " "
         description10: " "
         description200:  !include documentation/joe/jitlJob.md
-        schema: !include schemas/joe/wizzard/jobFilter-schema.json
-        schema200: !include schemas/joe/wizzard/job-schema.json
+        schema: !include schemas/joe/wizard/jobFilter-schema.json
+        schema200: !include schemas/joe/wizard/job-schema.json
         example: " "
         example200: " "
         
