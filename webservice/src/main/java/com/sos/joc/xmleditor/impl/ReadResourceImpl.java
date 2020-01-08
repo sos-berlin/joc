@@ -88,15 +88,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
         ReadConfigurationHandler handler = new ReadConfigurationHandler(this, in.getObjectType());
         handler.readCurrent(item, in.getJobschedulerId(), (in.getForceLive() != null && in.getForceLive()));
-
-        ReadStandardConfigurationAnswer answer = handler.getAnswer();
-        if (answer.getRecreateJson() && item != null) {
-            if (item.getConfigurationDraftJson() == null && item.getConfigurationDraft() != null) {
-                item.setConfigurationDraftJson(answer.getConfigurationJson());
-                updateItem(item);
-            }
-        }
-        return answer;
+        return handler.getAnswer();
     }
 
     private ReadOtherConfigurationAnswer handleOtherConfigurations(ReadConfiguration in) throws Exception {
@@ -177,24 +169,6 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 LOGGER.trace(String.format("[%s]%s", id, SOSString.toString(item, Arrays.asList("configurationDraft", "configurationDraftJson",
                         "configurationDeployed", "configurationDeployedJson"))));
             }
-            return item;
-        } catch (Throwable e) {
-            Globals.rollback(session);
-            throw e;
-        } finally {
-            Globals.disconnect(session);
-        }
-    }
-
-    private DBItemXmlEditorObject updateItem(DBItemXmlEditorObject item) throws Exception {
-        SOSHibernateSession session = null;
-        try {
-            session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
-
-            session.beginTransaction();
-            session.update(item);
-            session.commit();
-
             return item;
         } catch (Throwable e) {
             Globals.rollback(session);
