@@ -1,14 +1,15 @@
 package com.sos.joc.orders.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.common.Ok;
 import com.sos.joc.model.order.AddedOrders;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
@@ -41,7 +42,7 @@ public class OrdersResourceOrderCommandAddOrderImplTest {
         modifyOrderSchema.setOrders(orders);
         modifyOrderSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceCommandAddOrderImpl ordersResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
-        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersAdd(accessToken, modifyOrderSchema);
+        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersAdd(accessToken, Globals.xmlMapper.writeValueAsBytes(modifyOrderSchema));
         AddedOrders okSchema = (AddedOrders) ordersResponse.getEntity();
         assertEquals("postOrdersCommandAddOrder", true, okSchema.getOk());
     }

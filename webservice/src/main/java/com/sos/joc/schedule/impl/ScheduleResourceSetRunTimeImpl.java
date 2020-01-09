@@ -43,14 +43,10 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 	private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
 
 	@Override
-	public JOCDefaultResponse postScheduleSetRuntime(String xAccessToken, String accessToken,
-			ModifyRunTime modifyRuntime) throws Exception {
-		return postScheduleSetRuntime(getAccessToken(xAccessToken, accessToken), modifyRuntime);
-	}
-
-	public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRunTime modifyRuntime) throws Exception {
+	public JOCDefaultResponse postScheduleSetRuntime(String accessToken, byte[] modifyRuntimeBytes) {
 		SOSHibernateSession session = null;
 		try {
+		    ModifyRunTime modifyRuntime = Globals.objectMapper.readValue(modifyRuntimeBytes, ModifyRunTime.class);
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken,
 					modifyRuntime.getJobschedulerId(),
 					getPermissonsJocCockpit(modifyRuntime.getJobschedulerId(), accessToken).getSchedule().getChange()

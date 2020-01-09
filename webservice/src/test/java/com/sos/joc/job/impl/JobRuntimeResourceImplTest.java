@@ -1,6 +1,6 @@
 package com.sos.joc.job.impl;
  
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class JobRuntimeResourceImplTest {
         jobFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         jobFilterSchema.setJob(TestEnvWebserviceTest.JOB);
         JobRunTimeResourceImpl jobRunTimeImpl = new JobRunTimeResourceImpl();
-        JOCDefaultResponse jobResponse = jobRunTimeImpl.postJobRunTime(accessToken, jobFilterSchema);
+        JOCDefaultResponse jobResponse = jobRunTimeImpl.postJobRunTimeWithXML(accessToken, jobFilterSchema);
         RunTime200 jobRunTimeSchema = (RunTime200) jobResponse.getEntity();
         LOGGER.info(jobRunTimeSchema.getRunTime().getRunTimeXml());
         assertTrue("", jobRunTimeSchema.getRunTime().getRunTimeXml().startsWith("<run_time"));

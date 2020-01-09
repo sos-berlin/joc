@@ -1,11 +1,13 @@
 package com.sos.joc.orders.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Ok;
@@ -44,8 +46,9 @@ public class OrdersResourceOrderCommandsImplTest {
         modifyOrderSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceCommandModifyOrderImpl ordersResourceHistoryImpl = new OrdersResourceCommandModifyOrderImpl();
         OrdersResourceCommandAddOrderImpl ordersAddResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
-        JOCDefaultResponse ordersResponse = ordersAddResourceHistoryImpl.postOrdersAdd(accessToken, modifyOrderSchema);
-        ordersResponse = ordersResourceHistoryImpl.postOrdersSetState(accessToken, modifyOrderSchema);
+        byte[] modifyOrderSchemaBytes = Globals.xmlMapper.writeValueAsBytes(modifyOrderSchema);
+        JOCDefaultResponse ordersResponse = ordersAddResourceHistoryImpl.postOrdersAdd(accessToken, modifyOrderSchemaBytes);
+        ordersResponse = ordersResourceHistoryImpl.postOrdersSetState(accessToken, modifyOrderSchemaBytes);
         Ok okSchema = (Ok) ordersResponse.getEntity();
         assertEquals("postOrdersCommand", true, okSchema.getOk());
         OrdersResourceCommandDeleteOrderImpl ordersDeleteResourceHistoryImpl = new OrdersResourceCommandDeleteOrderImpl();

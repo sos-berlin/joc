@@ -73,12 +73,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private DBLayerReporting dbLayerReporting = null;
 
     @Override
-    public JOCDefaultResponse postOrdersStart(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersStart(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrders modifyOrders) {
+    public JOCDefaultResponse postOrdersStart(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             return postOrdersCommand(accessToken, "start", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isStart(), modifyOrders);
         } catch (JocException e) {
@@ -90,12 +87,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersSuspend(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersSuspend(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersSuspend(String accessToken, ModifyOrders modifyOrders) {
+    public JOCDefaultResponse postOrdersSuspend(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             return postOrdersCommand(accessToken, "suspend", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isSuspend(), modifyOrders);
         } catch (JocException e) {
@@ -107,12 +101,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersResume(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersResume(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrders modifyOrders) {
+    public JOCDefaultResponse postOrdersResume(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             SOSPermissionJocCockpit perm = getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken);
             boolean hasResumeOrderPerm = perm.getOrder().getExecute().isResume() || perm.getYADE().getExecute().isTransferStart();
             return postOrdersCommand(accessToken, "resume", hasResumeOrderPerm, modifyOrders);
@@ -125,12 +116,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersReset(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersReset(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersReset(String accessToken, ModifyOrders modifyOrders) {
+    public JOCDefaultResponse postOrdersReset(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             return postOrdersCommand(accessToken, "reset", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isReset(), modifyOrders);
         } catch (JocException e) {
@@ -142,12 +130,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersSetState(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersSetState(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersSetState(String accessToken, ModifyOrders modifyOrders) {
+    public JOCDefaultResponse postOrdersSetState(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             return postOrdersCommand(accessToken, "set_state", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getChange().isState(), modifyOrders);
         } catch (JocException e) {
@@ -159,12 +144,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersSetRunTime(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersSetRunTime(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrders modifyOrders) {
+    public JOCDefaultResponse postOrdersSetRunTime(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getChange().isRunTime(), modifyOrders);
         } catch (JocException e) {
@@ -176,12 +158,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersRemoveSetBack(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersRemoveSetBack(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
+    public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isRemoveSetback(), modifyOrders);
         } catch (JocException e) {

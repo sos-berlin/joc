@@ -1,9 +1,13 @@
 package com.sos.joc.orders.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Ok;
@@ -43,7 +47,7 @@ public class OrdersResourceOrderCommandDeleteOrderImplTest {
         OrdersResourceCommandDeleteOrderImpl ordersDeleteResourceHistoryImpl = new OrdersResourceCommandDeleteOrderImpl();
         OrdersResourceCommandAddOrderImpl ordersAddResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
 
-        JOCDefaultResponse ordersResponse = ordersAddResourceHistoryImpl.postOrdersAdd(accessToken, modifyOrdersSchema);
+        JOCDefaultResponse ordersResponse = ordersAddResourceHistoryImpl.postOrdersAdd(accessToken, Globals.xmlMapper.writeValueAsBytes(modifyOrdersSchema));
         ordersResponse = ordersDeleteResourceHistoryImpl.postOrdersDelete(accessToken, modifyOrdersSchema);
         Ok okSchema = (Ok) ordersResponse.getEntity();
         assertEquals("postOrdersCommandDeleteOrder", true, okSchema.getOk());

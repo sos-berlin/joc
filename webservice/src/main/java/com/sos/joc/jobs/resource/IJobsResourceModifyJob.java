@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.job.ModifyJobs;
 
 public interface IJobsResourceModifyJob {
 
@@ -16,38 +15,38 @@ public interface IJobsResourceModifyJob {
     @Path("stop")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsStop(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyJobs modifyJobs) throws Exception;
+    public JOCDefaultResponse postJobsStop(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
 
     @POST
     @Path("unstop")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsUnstop(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyJobs modifyJobs) throws Exception;
+    public JOCDefaultResponse postJobsUnstop(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
 
     @POST
     @Path("end_all_tasks")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsEndAllTasks(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyJobs modifyJobs) throws Exception;
+    public JOCDefaultResponse postJobsEndAllTasks(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
 
     @POST
     @Path("suspend_all_tasks")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsSuspendAllTasks(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyJobs modifyJobs) throws Exception;
+    public JOCDefaultResponse postJobsSuspendAllTasks(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
 
     @POST
     @Path("continue_all_tasks")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsContinueAllTasks(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyJobs modifyJobs) throws Exception;
+    public JOCDefaultResponse postJobsContinueAllTasks(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
 
  
     @POST
     @Path("set_run_time")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsSetRunTime(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyJobs modifyJobs) throws Exception;
+    public JOCDefaultResponse postJobsSetRunTime(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
     
 
 }

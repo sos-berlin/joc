@@ -24,8 +24,9 @@ public class PlanFromRunTimeResourceImpl extends JOCResourceImpl implements IPla
     private static final String API_CALL = "./plan/from_run_time";
 
     @Override
-    public JOCDefaultResponse postPlan(String accessToken, RunTimePlanFilter planFilter) throws Exception {
+    public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) throws Exception {
         try {
+            RunTimePlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, RunTimePlanFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     planFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {

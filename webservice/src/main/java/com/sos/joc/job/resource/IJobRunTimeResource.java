@@ -15,11 +15,6 @@ public interface IJobRunTimeResource {
     @POST
     @Path("run_time")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobRunTimeWithXML(@HeaderParam("X-Access-Token") String xAccessToken, JobFilter jobFilterSchema);
-    
-    @POST
-    @Path("run_time_json")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobRunTime(@HeaderParam("X-Access-Token") String xAccessToken, JobFilter jobFilterSchema);
+    public JOCDefaultResponse postJobRunTimeWithXML(@HeaderParam("X-Access-Token") String xAccessToken, JobFilter jobFilter);
 
 }

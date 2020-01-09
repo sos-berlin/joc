@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
@@ -60,53 +59,6 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
             }
             
             return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(runTimeAnswer));
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
-
-    @Override
-    public JOCDefaultResponse postOrderRunTime(String accessToken, OrderFilter orderFilter) {
-        SOSHibernateSession connection = null;
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL + "_json", orderFilter, accessToken, orderFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    orderFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-
-            RunTime200 runTimeAnswer = new RunTime200();
-            checkRequiredParameter("orderId", orderFilter.getOrderId());
-            checkRequiredParameter("jobChain", orderFilter.getJobChain());
-
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            String jobChainPath = normalizePath(orderFilter.getJobChain());
-            String orderCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, orderFilter.getOrderId(), "run_time");
-            runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken);
-
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL + "_json");
-            CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
-            List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(),
-                    "ORDER", jobChainPath + "," + orderFilter.getOrderId());
-            if (dbCalendars != null && !dbCalendars.isEmpty()) {
-                List<Calendar> calendars = new ArrayList<Calendar>();
-                for (CalendarUsageConfiguration dbCalendar : dbCalendars) {
-                    if (dbCalendar.getCalendar() != null) {
-                        calendars.add(dbCalendar.getCalendar());
-                    }
-                }
-                runTimeAnswer.getRunTime().setCalendars(calendars);
-            }
-            
-            final byte[] bytes = Globals.objectMapper.writeValueAsBytes(runTimeAnswer);
-            
-            return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);
-            //return JOCDefaultResponse.responseStatus200(runTimeAnswer);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -59,12 +59,9 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     private DBLayerReporting dbLayerReporting = null;
 
     @Override
-    public JOCDefaultResponse postOrdersAdd(String xAccessToken, String accessToken, ModifyOrders modifyOrders) throws Exception {
-        return postOrdersAdd(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersAdd(String accessToken, ModifyOrders modifyOrders) throws Exception {
+    public JOCDefaultResponse postOrdersAdd(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getJobChain().getExecute().isAddOrder());
             if (jocDefaultResponse != null) {
