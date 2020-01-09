@@ -14,6 +14,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
+import com.sos.joc.classes.documentation.Documentation;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
@@ -119,6 +120,12 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 } catch (Exception e) {
                     //
                 }
+            }
+            
+            if (body.getDocPath() != null && !body.getDocPath().isEmpty()) {
+                Documentation.assignDocu(body.getJobschedulerId(), body.getPath(), body.getDocPath(), body.getObjectType(), API_CALL + "_DOC_ASSIGN");
+            } else {
+                Documentation.unassignDocu(body.getJobschedulerId(), body.getPath(), body.getObjectType(), API_CALL + "_DOC_UNASSIGN");
             }
             
             return JOCDefaultResponse.responseStatusJSOk(item.getModified());
