@@ -26,7 +26,7 @@ public class OrderRuntimeResourceImplTest {
         orderFilterSchema.setOrderId(TestEnvWebserviceTest.ORDER);
         orderFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrderRunTimeResourceImpl orderRunTimeImpl = new OrderRunTimeResourceImpl();
-        JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(accessToken, orderFilterSchema);
+        JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTimeWithXML(accessToken, orderFilterSchema);
         RunTime200 orderRunTimeSchema = (RunTime200) ordersResponse.getEntity();
         assertTrue("postOrderRunTimeTest", orderRunTimeSchema.getRunTime().getRunTimeXml().startsWith("<run_time"));
     }
