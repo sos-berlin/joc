@@ -27,37 +27,43 @@ public class Documentation {
              {
         SOSHibernateSession connection = null;
         try {
-            if (docPath == null || docPath.isEmpty()) {
-                throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", "documentation"));
-            }
             connection = Globals.createSosHibernateStatelessConnection(apiCall);
-            DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            String type = objType.name();
-            if (objType == JobSchedulerObjectType.WORKINGDAYSCALENDAR) {
-                CalendarsDBLayer calDbLayer = new CalendarsDBLayer(connection);
-                DBItemInventoryClusterCalendar dbCalendar = calDbLayer.getCalendar(jobschedulerId, jsObjectPath);
-                if (CalendarType.NON_WORKING_DAYS.name().equals(dbCalendar.getType())) {
-                    type = JobSchedulerObjectType.NONWORKINGDAYSCALENDAR.name();
-                }
-            }
-            DBItemDocumentationUsage dbDocUsage = dbLayer.getDocumentationUsageForAssignment(jobschedulerId, jsObjectPath, type);
-            DBItemDocumentation dbDoc = dbLayer.getDocumentation(jobschedulerId, docPath);
-            if (dbDocUsage != null) {
-                dbDocUsage.setDocumentationId(dbDoc.getId());
-                dbDocUsage.setModified(Date.from(Instant.now()));
-                connection.update(dbDocUsage);
-            } else {
-                DBItemDocumentationUsage newUsage = new DBItemDocumentationUsage();
-                newUsage.setSchedulerId(jobschedulerId);
-                newUsage.setPath(jsObjectPath);
-                newUsage.setObjectType(type);
-                newUsage.setDocumentationId(dbDoc.getId());
-                newUsage.setCreated(Date.from(Instant.now()));
-                newUsage.setModified(newUsage.getCreated());
-                connection.save(newUsage);
-            }
+            assignDocu(connection, jobschedulerId, jsObjectPath, docPath, objType);
         } finally {
             Globals.disconnect(connection);
+        }
+    }
+    
+    public static void assignDocu(SOSHibernateSession connection, String jobschedulerId, String jsObjectPath, String docPath,
+            JobSchedulerObjectType objType) throws JocMissingRequiredParameterException, JocConfigurationException,
+            DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException, DBOpenSessionException {
+        if (docPath == null || docPath.isEmpty()) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", "documentation"));
+        }
+        DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
+        String type = objType.name();
+        if (objType == JobSchedulerObjectType.WORKINGDAYSCALENDAR) {
+            CalendarsDBLayer calDbLayer = new CalendarsDBLayer(connection);
+            DBItemInventoryClusterCalendar dbCalendar = calDbLayer.getCalendar(jobschedulerId, jsObjectPath);
+            if (CalendarType.NON_WORKING_DAYS.name().equals(dbCalendar.getType())) {
+                type = JobSchedulerObjectType.NONWORKINGDAYSCALENDAR.name();
+            }
+        }
+        DBItemDocumentationUsage dbDocUsage = dbLayer.getDocumentationUsageForAssignment(jobschedulerId, jsObjectPath, type);
+        DBItemDocumentation dbDoc = dbLayer.getDocumentation(jobschedulerId, docPath);
+        if (dbDocUsage != null) {
+            dbDocUsage.setDocumentationId(dbDoc.getId());
+            dbDocUsage.setModified(Date.from(Instant.now()));
+            connection.update(dbDocUsage);
+        } else {
+            DBItemDocumentationUsage newUsage = new DBItemDocumentationUsage();
+            newUsage.setSchedulerId(jobschedulerId);
+            newUsage.setPath(jsObjectPath);
+            newUsage.setObjectType(type);
+            newUsage.setDocumentationId(dbDoc.getId());
+            newUsage.setCreated(Date.from(Instant.now()));
+            newUsage.setModified(newUsage.getCreated());
+            connection.save(newUsage);
         }
     }
 
@@ -66,21 +72,26 @@ public class Documentation {
         SOSHibernateSession connection = null;
         try {
             connection = Globals.createSosHibernateStatelessConnection(apiCall);
-            DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-            String type = objType.name();
-            if (objType == JobSchedulerObjectType.WORKINGDAYSCALENDAR) {
-                CalendarsDBLayer calDbLayer = new CalendarsDBLayer(connection);
-                DBItemInventoryClusterCalendar dbCalendar = calDbLayer.getCalendar(jobschedulerId, jsObjectPath);
-                if (CalendarType.NON_WORKING_DAYS.name().equals(dbCalendar.getType())) {
-                    type = JobSchedulerObjectType.NONWORKINGDAYSCALENDAR.name();
-                }
-            }
-            DBItemDocumentationUsage dbDocUsage = dbLayer.getDocumentationUsageForAssignment(jobschedulerId, jsObjectPath, type);
-            if (dbDocUsage != null) {
-                connection.delete(dbDocUsage);
-            }
+            unassignDocu(connection, jobschedulerId, jsObjectPath, objType);
         } finally {
             Globals.disconnect(connection);
+        }
+    }
+    
+    public static void unassignDocu(SOSHibernateSession connection, String jobschedulerId, String jsObjectPath, JobSchedulerObjectType objType)
+            throws JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException, DBOpenSessionException {
+        DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
+        String type = objType.name();
+        if (objType == JobSchedulerObjectType.WORKINGDAYSCALENDAR) {
+            CalendarsDBLayer calDbLayer = new CalendarsDBLayer(connection);
+            DBItemInventoryClusterCalendar dbCalendar = calDbLayer.getCalendar(jobschedulerId, jsObjectPath);
+            if (CalendarType.NON_WORKING_DAYS.name().equals(dbCalendar.getType())) {
+                type = JobSchedulerObjectType.NONWORKINGDAYSCALENDAR.name();
+            }
+        }
+        DBItemDocumentationUsage dbDocUsage = dbLayer.getDocumentationUsageForAssignment(jobschedulerId, jsObjectPath, type);
+        if (dbDocUsage != null) {
+            connection.delete(dbDocUsage);
         }
     }
 }

@@ -123,9 +123,9 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             }
             
             if (body.getDocPath() != null && !body.getDocPath().isEmpty()) {
-                Documentation.assignDocu(body.getJobschedulerId(), body.getPath(), body.getDocPath(), body.getObjectType(), API_CALL + "_DOC_ASSIGN");
+                Documentation.assignDocu(sosHibernateSession, body.getJobschedulerId(), body.getPath(), body.getDocPath(), body.getObjectType());
             } else {
-                Documentation.unassignDocu(body.getJobschedulerId(), body.getPath(), body.getObjectType(), API_CALL + "_DOC_UNASSIGN");
+                Documentation.unassignDocu(sosHibernateSession, body.getJobschedulerId(), body.getPath(), body.getObjectType());
             }
             
             return JOCDefaultResponse.responseStatusJSOk(item.getModified());
