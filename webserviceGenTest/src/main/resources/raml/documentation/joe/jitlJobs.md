@@ -1,4 +1,4 @@
-* path
-* name
+* docPath
+* docName
 * title
 * javaClass

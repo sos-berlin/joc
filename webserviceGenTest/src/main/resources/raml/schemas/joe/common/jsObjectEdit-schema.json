@@ -37,6 +37,9 @@
     "account": {
       	"type": "string"
     },
+    "docPath": {
+      	"type": "string"
+    },
     "auditLog": {
     	"$ref": "../../audit/auditParams-schema.json"
     }

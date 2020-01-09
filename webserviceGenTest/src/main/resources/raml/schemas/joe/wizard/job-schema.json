@@ -5,18 +5,18 @@
 	"javaType": "com.sos.joc.model.joe.wizard.Job",
 	"type": "object",
 	"required": [
-		"path",
-		"name",
+		"docPath",
+		"docName",
 		"javaClass"
 	],
 	"properties": {
 		"deliveryDate": {
       		"$ref": "../../common/deliveryDate-schema.json"
     	},
-		"jitlPath": {
+		"docPath": {
 			"$ref": "../../common/path-schema.json"
 		},
-		"jitlName": {
+		"docName": {
 			"type": "string"
 		},
 		"title": {

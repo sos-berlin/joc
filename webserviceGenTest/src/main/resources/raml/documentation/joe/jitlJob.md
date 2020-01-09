@@ -1,5 +1,5 @@
-* path
-* name
+* docPath
+* docName
 * title
 * javaClass
 * params: parameter items with

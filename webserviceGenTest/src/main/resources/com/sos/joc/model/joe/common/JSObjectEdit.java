@@ -40,7 +40,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({ "deliveryDate", "configurationDate", "jobschedulerId", "path", "oldPath", "objectType", "objectVersionStatus", "configuration",
-        "account", "auditLog" })
+        "account", "docPath", "auditLog" })
 public class JSObjectEdit {
 
     /** delivery date
@@ -80,6 +80,8 @@ public class JSObjectEdit {
     private IJSObject configuration;
     @JsonProperty("account")
     private String account;
+    @JsonProperty("docPath")
+    private String docPath;
     /** auditParams
      * <p>
     */
@@ -245,6 +247,18 @@ public class JSObjectEdit {
     public void setAccount(String account) {
         this.account = account;
     }
+    
+    /** @return The docPath */
+    @JsonProperty("docPath")
+    public String getDocPath() {
+        return docPath;
+    }
+
+    /** @param path The docPath */
+    @JsonProperty("docPath")
+    public void setDocPath(String docPath) {
+        this.docPath = docPath;
+    }
 
     /** auditParams
      * <p>
@@ -285,7 +299,7 @@ public class JSObjectEdit {
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(deliveryDate).append(configurationDate).append(jobschedulerId).append(path).append(oldPath).append(
-                objectType).append(objectVersionStatus).append(configuration).append(account).append(auditLog).toHashCode();
+                objectType).append(objectVersionStatus).append(configuration).append(docPath).append(account).append(auditLog).toHashCode();
     }
 
     @Override
@@ -299,8 +313,8 @@ public class JSObjectEdit {
         JSObjectEdit rhs = ((JSObjectEdit) other);
         return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(configurationDate, rhs.configurationDate).append(jobschedulerId,
                 rhs.jobschedulerId).append(path, rhs.path).append(oldPath, rhs.oldPath).append(objectType, rhs.objectType).append(objectVersionStatus,
-                        rhs.objectVersionStatus).append(configuration, rhs.configuration).append(account, rhs.account).append(auditLog, rhs.auditLog)
-                .isEquals();
+                        rhs.objectVersionStatus).append(configuration, rhs.configuration).append(docPath, rhs.docPath).append(account, rhs.account)
+                .append(auditLog, rhs.auditLog).isEquals();
     }
 
 }
