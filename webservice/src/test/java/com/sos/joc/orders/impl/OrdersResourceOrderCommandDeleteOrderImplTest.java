@@ -48,7 +48,7 @@ public class OrdersResourceOrderCommandDeleteOrderImplTest {
         OrdersResourceCommandAddOrderImpl ordersAddResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
 
         JOCDefaultResponse ordersResponse = ordersAddResourceHistoryImpl.postOrdersAdd(accessToken, Globals.xmlMapper.writeValueAsBytes(modifyOrdersSchema));
-        ordersResponse = ordersDeleteResourceHistoryImpl.postOrdersDelete(accessToken, modifyOrdersSchema);
+        ordersResponse = ordersDeleteResourceHistoryImpl.postOrdersDelete(accessToken, Globals.xmlMapper.writeValueAsBytes(modifyOrdersSchema));
         Ok okSchema = (Ok) ordersResponse.getEntity();
         assertEquals("postOrdersCommandDeleteOrder", true, okSchema.getOk());
     }

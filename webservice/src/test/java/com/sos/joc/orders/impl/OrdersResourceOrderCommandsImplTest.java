@@ -52,7 +52,7 @@ public class OrdersResourceOrderCommandsImplTest {
         Ok okSchema = (Ok) ordersResponse.getEntity();
         assertEquals("postOrdersCommand", true, okSchema.getOk());
         OrdersResourceCommandDeleteOrderImpl ordersDeleteResourceHistoryImpl = new OrdersResourceCommandDeleteOrderImpl();
-        ordersResponse = ordersDeleteResourceHistoryImpl.postOrdersDelete(accessToken, modifyOrderSchema);
+        ordersResponse = ordersDeleteResourceHistoryImpl.postOrdersDelete(accessToken, Globals.xmlMapper.writeValueAsBytes(modifyOrderSchema));
         okSchema = (Ok) ordersResponse.getEntity();
         assertEquals("postOrdersCommandDeleteOrder", true, okSchema.getOk());
     }
