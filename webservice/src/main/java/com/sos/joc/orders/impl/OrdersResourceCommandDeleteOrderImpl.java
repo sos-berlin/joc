@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -26,12 +27,9 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
-    public JOCDefaultResponse postOrdersDelete(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersDelete(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrders modifyOrders) {
+    public JOCDefaultResponse postOrdersDelete(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder().getDelete().isTemporary());
             if (jocDefaultResponse != null) {
