@@ -11,7 +11,6 @@ import javax.ws.rs.core.MediaType;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.event.custom.EventIdsFilter;
 import com.sos.joc.model.event.custom.ModifyEvent;
-import com.sos.joc.model.order.ModifyOrders;
 
  
 public interface IModifyCustomEventResource {
@@ -21,14 +20,14 @@ public interface IModifyCustomEventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.TEXT_PLAIN })
     public JOCDefaultResponse addEvent(            
-            @HeaderParam("X-Access-Token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+            @HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrdersBytes) throws Exception;
     
     @POST
     @Path("custom/remove")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.TEXT_PLAIN })
     public JOCDefaultResponse removeEvent(            
-            @HeaderParam("X-Access-Token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+            @HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrdersBytes) throws Exception;
     
     @POST
     @Path("custom/delete_events")

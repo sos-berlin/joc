@@ -47,8 +47,8 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
     private SchedulerEventDBLayer schedulerEventDBLayer;
 
     @Override
-    public JOCDefaultResponse addEvent(String accessToken, ModifyOrders modifyOrders) throws JocException {
-        return executeModifyEvent(ADD, modifyOrders, accessToken);
+    public JOCDefaultResponse addEvent(String accessToken, byte[] modifyOrdersBytes) throws JocException {
+        return executeModifyEvent(ADD, modifyOrdersBytes, accessToken);
     }
 
     private void createProcessOrder(String jobChain) throws JocException {
@@ -76,14 +76,15 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
     }
 
     @Override
-    public JOCDefaultResponse removeEvent(String accessToken, ModifyOrders modifyOrders) throws JocException {
-        return executeModifyEvent(REMOVE, modifyOrders, accessToken);
+    public JOCDefaultResponse removeEvent(String accessToken, byte[] modifyOrdersBytes) throws JocException {
+        return executeModifyEvent(REMOVE, modifyOrdersBytes, accessToken);
     }
 
-    private JOCDefaultResponse executeModifyEvent(String request, ModifyOrders modifyOrders, String accessToken) throws JocException {
+    private JOCDefaultResponse executeModifyEvent(String request, byte[] modifyOrdersBytes, String accessToken) throws JocException {
 
         SOSHibernateSession session = null;
         try {
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + request, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getJobChain().getExecute().isAddOrder());
             if (jocDefaultResponse != null) {
