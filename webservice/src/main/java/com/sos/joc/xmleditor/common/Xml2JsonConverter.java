@@ -69,8 +69,7 @@ public class Xml2JsonConverter {
             throw new Exception(String.format("[%s][cant't get schema]%s", schema.toString(), e.toString()), e);
         } catch (Exception e) {
             LOGGER.error(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
-            // throw new Exception(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
-            throw new Exception(String.format("[%s]XML can't be loaded. See JOC Cockpit Log for details.", e.toString()));
+            throw new Exception(String.format("XML can't be loaded: %s", e.getMessage()));
         }
         try {
             uuid = -1;
@@ -86,8 +85,6 @@ public class Xml2JsonConverter {
     }
 
     private void init(InputSource schemaSource, InputSource xmlSource) throws Exception {
-        String method = "init";
-
         schemaSource.setEncoding(JocXmlEditor.CHARSET);
         Document schemaDoc = getXmlFileDocument(schemaSource);
 
@@ -96,7 +93,7 @@ public class Xml2JsonConverter {
         XPathExpression schemaExpression = xpathSchema.compile("/xs:schema");
         rootSchema = (Node) schemaExpression.evaluate(schemaDoc, XPathConstants.NODE);
         if (rootSchema == null) {
-            throw new Exception(String.format("[%s]\"xs:schema\" element not found in the schema file", method));
+            throw new Exception("\"xs:schema\" element not found in the schema file");
         }
 
         if (rootElementNameXml == null) {
@@ -111,7 +108,7 @@ public class Xml2JsonConverter {
         XPathExpression xmlExpression = xpathXml.compile("/" + rootElementNameXml);
         rootXml = (Node) xmlExpression.evaluate(xmlDoc, XPathConstants.NODE);
         if (rootXml == null) {
-            throw new Exception(String.format("[%s]root element \"%s\" not found", method, rootElementNameXml));
+            throw new Exception(String.format("Root element \"%s\" not found", rootElementNameXml));
         }
     }
 

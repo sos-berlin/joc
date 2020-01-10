@@ -9,17 +9,17 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
-import com.sos.joc.model.xmleditor.schema.assign.AssignSchemaConfiguration;
+import com.sos.joc.model.xmleditor.schema.reassign.ReassignSchemaConfiguration;
 
-public interface IAssignSchemaResource {
+public interface IReassignSchemaResource {
 
-    public static final String PATH = "schema/assign";
+    public static final String PATH = "schema/reassign";
     public static final String IMPL_PATH = JocXmlEditor.getResourceImplPath(PATH);
 
     @POST
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse assign(@HeaderParam("X-Access-Token") final String accessToken, AssignSchemaConfiguration in);
+    public JOCDefaultResponse reassign(@HeaderParam("X-Access-Token") final String accessToken, ReassignSchemaConfiguration in);
 
 }

@@ -12,16 +12,17 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
-import com.sos.joc.model.xmleditor.schema.assign.AssignSchemaConfiguration;
-import com.sos.joc.model.xmleditor.schema.assign.AssignSchemaConfigurationAnswer;
+import com.sos.joc.model.xmleditor.schema.assign.ReassignSchemaConfigurationAnswer;
+import com.sos.joc.model.xmleditor.schema.reassign.ReassignSchemaConfiguration;
+import com.sos.joc.xmleditor.common.Xml2JsonConverter;
 import com.sos.joc.xmleditor.common.schema.SchemaHandler;
-import com.sos.joc.xmleditor.resource.IAssignSchemaResource;
+import com.sos.joc.xmleditor.resource.IReassignSchemaResource;
 
 @Path(JocXmlEditor.APPLICATION_PATH)
-public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssignSchemaResource {
+public class ReassignSchemaResourceImpl extends JOCResourceImpl implements IReassignSchemaResource {
 
     @Override
-    public JOCDefaultResponse assign(final String accessToken, final AssignSchemaConfiguration in) {
+    public JOCDefaultResponse reassign(final String accessToken, final ReassignSchemaConfiguration in) {
         try {
             checkRequiredParameters(in);
 
@@ -38,8 +39,9 @@ public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssign
         }
     }
 
-    private void checkRequiredParameters(final AssignSchemaConfiguration in) throws Exception {
+    private void checkRequiredParameters(final ReassignSchemaConfiguration in) throws Exception {
         checkRequiredParameter("jobschedulerId", in.getJobschedulerId());
+        checkRequiredParameter("configuration", in.getConfiguration());
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
         if (in.getUri() == null) {
             if (in.getFileName() == null || in.getFileContent() == null) {
@@ -48,7 +50,7 @@ public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssign
         }
     }
 
-    private JOCDefaultResponse checkPermissions(final String accessToken, final AssignSchemaConfiguration in) throws Exception {
+    private JOCDefaultResponse checkPermissions(final String accessToken, final ReassignSchemaConfiguration in) throws Exception {
         SOSPermissionJocCockpit permissions = getPermissonsJocCockpit(in.getJobschedulerId(), accessToken);
         boolean permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
         JOCDefaultResponse response = init(IMPL_PATH, in, accessToken, in.getJobschedulerId(), permission);
@@ -60,14 +62,20 @@ public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssign
         return response;
     }
 
-    private AssignSchemaConfigurationAnswer getSuccess(final AssignSchemaConfiguration in) throws Exception {
+    private ReassignSchemaConfigurationAnswer getSuccess(final ReassignSchemaConfiguration in) throws Exception {
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             SchemaHandler h = new SchemaHandler();
             h.process(in.getUri(), in.getFileName(), in.getFileContent());
             if (Files.exists(h.getTarget())) {
-                AssignSchemaConfigurationAnswer answer = new AssignSchemaConfigurationAnswer();
+
+                Xml2JsonConverter converter = new Xml2JsonConverter();
+                String configurationJson = converter.convert(in.getObjectType(), h.getTarget(), in.getConfiguration());
+
+                ReassignSchemaConfigurationAnswer answer = new ReassignSchemaConfigurationAnswer();
                 answer.setSchema(JocXmlEditor.getFileContent(h.getTarget()));
                 answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(h.getSource()));
+                answer.setConfigurationJson(configurationJson);
+                answer.setRecreateJson(true);
                 return answer;
             } else {
                 throw new Exception(String.format("[%s][target=%s]target file not found", h.getSource(), h.getTarget()));
