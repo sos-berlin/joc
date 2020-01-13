@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import javax.json.JsonArray;
 import javax.ws.rs.Path;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -33,6 +35,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.audit.DeployJoeAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
+import com.sos.joc.classes.documentation.Documentation;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
@@ -65,6 +68,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
     private static final String ROOT_FOLDER = "/";
     private static final String API_CALL = "./joe/deploy";
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeployResourceImpl.class);
 
     @Override
     public JOCDefaultResponse deploy(final String accessToken, final FilterDeploy body) {
@@ -263,6 +267,11 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             storeAuditLogEntry(deployJoeAudit);
                             touchedFolders.add(joeObject.getFolder());
                             dbLayerJoeObjects.delete(joeObject);
+                            try {
+                                Documentation.unassignDocu(sosHibernateSession, body.getJobschedulerId(), joeObject.getPath(), JobSchedulerObjectType.fromValue(objType));
+                            } catch (Exception e) {
+                                LOGGER.warn(String.format("Assigned documentation for %s %s couldn't deleted", objType, joeObject.getPath()), e);
+                            }
                             deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), jsObjType, true));
                         }
                     }

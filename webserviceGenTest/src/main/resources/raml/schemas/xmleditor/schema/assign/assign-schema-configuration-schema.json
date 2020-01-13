@@ -1,8 +1,8 @@
 {
 	"title": "xmleditor assign schema configuration in",
-	"id": "schemas/xmleditor/assign/schema/assign-schema-configuration-schema",
+	"id": "schemas/xmleditor/schema/assign/assign-schema-configuration-schema",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"javaType": "com.sos.joc.model.xmleditor.assign.schema.AssignSchemaConfiguration",
+	"javaType": "com.sos.joc.model.xmleditor.schema.assign.AssignSchemaConfiguration",
 	"type": "object",
 	"description": "",
 	"required": [

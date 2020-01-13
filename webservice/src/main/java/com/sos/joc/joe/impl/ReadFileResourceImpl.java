@@ -13,6 +13,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOEHelper;
+import com.sos.joc.classes.documentation.Documentation;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -147,6 +148,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             jsObjectEdit.setPath(path);
             jsObjectEdit.setObjectType(body.getObjectType());
             jsObjectEdit.setDeliveryDate(Date.from(Instant.now()));
+            jsObjectEdit.setDocPath(Documentation.getDocumentationPath(sosHibernateSession, body.getJobschedulerId(), path, body.getObjectType()));
 
             return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(jsObjectEdit));
 

@@ -90,7 +90,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         DBItemXmlEditorObject item = new DBItemXmlEditorObject();
         item.setSchedulerId(in.getJobschedulerId());
         item.setObjectType(in.getObjectType().name());
-        item.setName(name);
+        item.setName(name.trim());
         item.setConfigurationDraft(in.getConfiguration());
         item.setConfigurationDraftJson(in.getConfigurationJson());
         if (in.getObjectType().equals(ObjectType.OTHER)) {
@@ -108,7 +108,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
 
     private DBItemXmlEditorObject update(SOSHibernateSession session, StoreConfiguration in, DBItemXmlEditorObject item, String name)
             throws Exception {
-        item.setName(name);
+        item.setName(name.trim());
         item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
         item.setConfigurationDraftJson(in.getConfigurationJson());
         if (in.getObjectType().equals(ObjectType.OTHER)) {
