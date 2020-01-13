@@ -61,6 +61,13 @@ public class Documentation {
         String type = getObjectType(connection, jobschedulerId, jsObjectPath, objType);
         return dbLayer.getDocumentationUsageForAssignment(jobschedulerId, jsObjectPath, type);
     }
+    
+    public static DBItemDocumentationUsage getDocumentationUsage(DocumentationDBLayer dbLayer, String jobschedulerId, String jsObjectPath,
+            JobSchedulerObjectType objType) throws JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException,
+            SOSHibernateException, DBOpenSessionException {
+        String type = getObjectType(dbLayer.getSession(), jobschedulerId, jsObjectPath, objType);
+        return dbLayer.getDocumentationUsageForAssignment(jobschedulerId, jsObjectPath, type);
+    }
 
     public static void assignDocu(String jobschedulerId, String jsObjectPath, String docPath, JobSchedulerObjectType objType, String apiCall)
             throws JocMissingRequiredParameterException, JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException,
@@ -114,10 +121,15 @@ public class Documentation {
     public static void unassignDocu(SOSHibernateSession connection, String jobschedulerId, String jsObjectPath, JobSchedulerObjectType objType)
             throws JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException, DBOpenSessionException {
         DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-        String type = getObjectType(connection, jobschedulerId, jsObjectPath, objType);
+        unassignDocu(dbLayer, jobschedulerId, jsObjectPath, objType);
+    }
+    
+    public static void unassignDocu(DocumentationDBLayer dbLayer, String jobschedulerId, String jsObjectPath, JobSchedulerObjectType objType)
+            throws JocConfigurationException, DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException, DBOpenSessionException {
+        String type = getObjectType(dbLayer.getSession(), jobschedulerId, jsObjectPath, objType);
         DBItemDocumentationUsage dbDocUsage = dbLayer.getDocumentationUsageForAssignment(jobschedulerId, jsObjectPath, type);
         if (dbDocUsage != null) {
-            connection.delete(dbDocUsage);
+            dbLayer.getSession().delete(dbDocUsage);
         }
     }
 
