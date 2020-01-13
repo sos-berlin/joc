@@ -176,12 +176,14 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
             for (OutConditionEvent event : outCondition.getOutconditionEvents()) {
                 boolean eventIsUsedInExpression = false;
-                for (JSCondition jsCondition : listOfConditions) {
-                    if (jsCondition.typeIsEvent() && (jsCondition.typeIsGlobalEvent() == event.getGlobalEvent())) {
-                        if (jsCondition.getEventName().equals(event.getEvent()) && ("".equals(jsCondition.getConditionJobStream()) || outCondition
-                                .getJobStream().equals(jsCondition.getConditionJobStream()))) {
-                            eventIsUsedInExpression = true;
-                            continue;
+                if ("create".equals(event.getCommand())) {
+                    for (JSCondition jsCondition : listOfConditions) {
+                        if (jsCondition.typeIsEvent() && (jsCondition.typeIsGlobalEvent() == event.getGlobalEvent())) {
+                            if (jsCondition.getEventName().equals(event.getEvent()) && ("".equals(jsCondition.getConditionJobStream()) || outCondition
+                                    .getJobStream().equals(jsCondition.getConditionJobStream()))) {
+                                eventIsUsedInExpression = true;
+                                continue;
+                            }
                         }
                     }
                 }
