@@ -7,8 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionCommandsMaster;
@@ -21,7 +22,7 @@ import com.sos.joc.classes.JOCJsonCommand;
 
 public class SOSShiroCurrentUser {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSShiroCurrentUser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSShiroCurrentUser.class);
     private Subject currentSubject;
     private String username;
     private String password;
