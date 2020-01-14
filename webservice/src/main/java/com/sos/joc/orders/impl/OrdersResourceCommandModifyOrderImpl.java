@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Path;
 
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -272,8 +273,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     ModifyOrder configuration = jocConfiguration.modifyOrderRuntime(order.getRunTime(), this, jobChainPath, order.getOrderId());
 
                     if (configuration == null) { // adhoc order
-                        ValidateXML.validateAgainstJobSchedulerSchema(order.getRunTime());
-                        xml.add(XMLBuilder.parse(order.getRunTime()));
+                        Document doc = ValidateXML.validateAgainstJobSchedulerSchema(order.getRunTime());
+                        if (doc != null) {
+                            xml.add(doc.getRootElement());
+                        }
                         jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
 
                         updateRunTimeIsTemporary(jobChainPath, order.getOrderId(), true);
@@ -283,13 +286,14 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
                         updateDailyPlan(dailyPlanCalender2DBFilter);
                     } else {
-                        ValidateXML.validateAgainstJobSchedulerSchema(configuration.getRunTime());
+                        Document doc = ValidateXML.validateAgainstJobSchedulerSchema(configuration.getRunTime());
                         XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                        Element orderElement = XMLBuilder.parse(configuration.getRunTime());
-                        orderElement.addAttribute("job_chain", Paths.get(configuration.getJobChain()).getFileName().toString());
-                        orderElement.addAttribute("id", order.getOrderId());
-
-                        xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+                        if (doc != null) {
+                            Element orderElement = doc.getRootElement();
+                            orderElement.addAttribute("job_chain", Paths.get(configuration.getJobChain()).getFileName().toString());
+                            orderElement.addAttribute("id", order.getOrderId());
+                            xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+                        }
                         jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
 
                         if (session == null) {

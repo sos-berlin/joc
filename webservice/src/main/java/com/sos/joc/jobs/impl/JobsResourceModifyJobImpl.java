@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import org.dom4j.Document;
 import org.dom4j.Element;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -170,12 +171,14 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
                     JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
                     String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTime(), this, jobPath);
-
-                    ValidateXML.validateAgainstJobSchedulerSchema(configuration);
+                    
                     XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                    Element jobElement = XMLBuilder.parse(configuration);
-                    jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
-                    xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
+                    Document doc = ValidateXML.validateAgainstJobSchedulerSchema(configuration);
+                    if (doc != null) {
+                        Element jobElement = doc.getRootElement();
+                        jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
+                        xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
+                    }
                     String commandAsXml = xmlBuilder.asXML();
                     jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
 

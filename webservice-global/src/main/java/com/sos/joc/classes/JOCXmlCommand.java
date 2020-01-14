@@ -491,7 +491,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
             jobSchedulerObjectElement.setAttribute("name", p.getFileName().toString());
         }
         XMLBuilder modifyHotFolder = new XMLBuilder("modify_hot_folder");
-        org.dom4j.Element elem = XMLBuilder.parse(getXmlString(jobSchedulerObjectElement));
+        org.dom4j.Element elem = XMLBuilder.parse(getXmlString(jobSchedulerObjectElement)).getRootElement();
         modifyHotFolder.addAttribute("folder", p.getParent().toString().replace('\\', '/')).add(elem);
         return modifyHotFolder.asXML();
     }

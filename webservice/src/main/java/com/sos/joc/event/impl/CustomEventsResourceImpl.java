@@ -105,7 +105,7 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 if (item.getParameters() != null && !item.getParameters().isEmpty()) {
                     try {
-                        Element elem = XMLBuilder.parse(item.getParameters());
+                        Element elem = XMLBuilder.parse(item.getParameters()).getRootElement();
                         @SuppressWarnings("unchecked")
                         List<Element> paramNodes = elem.elements("param");
                         if (paramNodes != null) {

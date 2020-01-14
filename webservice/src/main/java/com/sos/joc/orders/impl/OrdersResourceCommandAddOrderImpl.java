@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Path;
 
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -151,8 +152,10 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             xml.add(getParams(order.getParams()));
             if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
                 try {
-                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
-                    xml.add(XMLBuilder.parse(order.getRunTime()));
+                    Document doc = ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
+                    if (doc != null) {
+                        xml.add(doc.getRootElement());
+                    }
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {

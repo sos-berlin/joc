@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,15 +57,15 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 			ModifyScheduleAudit scheduleAudit = new ModifyScheduleAudit(modifyRuntime);
 			logAuditMessage(scheduleAudit);
 			checkRequiredParameter("schedule", modifyRuntime.getSchedule());
-			ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTime());
+			Document doc = ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTime());
 
 			String schedulePath = normalizePath(modifyRuntime.getSchedule());
 			XMLBuilder command = new XMLBuilder("modify_hot_folder");
-
-			Element scheduleElement = XMLBuilder.parse(modifyRuntime.getRunTime());
-			scheduleElement.addAttribute("name", Paths.get(schedulePath).getFileName().toString());
-			command.addAttribute("folder", getParent(schedulePath)).add(scheduleElement);
-
+			if (doc != null) {
+			    Element scheduleElement = doc.getRootElement();
+			    scheduleElement.addAttribute("name", Paths.get(schedulePath).getFileName().toString());
+	            command.addAttribute("folder", getParent(schedulePath)).add(scheduleElement);
+			}
 			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 			String commandAsXml = command.asXML();
 			jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
