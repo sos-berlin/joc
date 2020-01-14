@@ -23,6 +23,9 @@
 		"schema": {
 			"type": "string"
 		},
+		"schemaIdentifier": {
+			"type": "string"
+		},
 		"state": {
 			"$ref": "read-standard-configuration-answer-state-schema.json"
 		},

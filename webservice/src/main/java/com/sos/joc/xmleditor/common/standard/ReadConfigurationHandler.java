@@ -109,6 +109,7 @@ public class ReadConfigurationHandler {
         }
 
         answer.setSchema(JocXmlEditor.getFileContent(JocXmlEditor.getStandardAbsoluteSchemaLocation(type)));
+        answer.setSchemaIdentifier(JocXmlEditor.getStandardSchemaIdentifier(type));
         answer.getState().setDeployed(deployed);
     }
 
