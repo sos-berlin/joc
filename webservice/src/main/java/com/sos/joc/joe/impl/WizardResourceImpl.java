@@ -1,5 +1,6 @@
 package com.sos.joc.joe.impl;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.Instant;
@@ -17,6 +18,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -25,6 +27,8 @@ import org.dom4j.io.DocumentSource;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -43,6 +47,7 @@ import com.sos.joc.model.joe.wizard.JobFilter;
 import com.sos.joc.model.joe.wizard.Jobs;
 import com.sos.joc.model.joe.wizard.JobsFilter;
 import com.sos.joc.model.joe.wizard.Param;
+import com.sos.xml.XMLBuilder;
 
 @Path("joe/wizard")
 public class WizardResourceImpl extends JOCResourceImpl implements IWizardResource {
@@ -68,10 +73,7 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
             List<DBItemDocumentation> jitlDocs = docDbLayer.getDocumentations(body.getJobschedulerId(), "/sos/jitl-jobs");
             Jobs jobs = new Jobs();
             if (jitlDocs != null) {
-                SAXReader reader = new SAXReader();
-                reader.setValidation(false);
-                reader.setStripWhitespaceText(true);
-                reader.setIgnoreComments(true);
+                SAXReader reader = XMLBuilder.createSaxReader();
 
                 List<Job> jobList = new ArrayList<Job>();
                 for (DBItemDocumentation jitlDoc : jitlDocs) {
@@ -81,7 +83,24 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
                     if (jitlDoc.getName().endsWith(".languages.xml")) {
                         continue;
                     }
-                    Document doc = reader.read(new StringReader(jitlDoc.getContent()));
+                    Document doc;
+                    try {
+                        doc = reader.read(new StringReader(jitlDoc.getContent()));
+                    } catch (DocumentException e) {
+                        Throwable nested = e.getNestedException();
+                        if (nested != null && SAXParseException.class.isInstance(nested)) {
+                            // On Apache, this should be thrown when disallowing DOCTYPE
+                            throw new SAXException("A DOCTYPE was passed into the XML document", e);
+                        } else if (nested != null && IOException.class.isInstance(nested)) {
+                            // XXE that points to a file that doesn't exist
+                            throw new IOException("IOException occurred, XXE may still possible: " + e.getMessage(), e);
+                        } else {
+                            throw e;
+                        }
+                    }
+                    if (doc == null) {
+                        continue;
+                    }
                     Element jobNode = doc.getRootElement().element("job");
 
                     if (jobNode == null) {
@@ -137,11 +156,6 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
                 throw new DBMissingDataException(String.format("The documentation '%s' is missing", body.getDocPath()));
             }
 
-            SAXReader reader = new SAXReader();
-            reader.setValidation(false);
-            reader.setStripWhitespaceText(true);
-            reader.setIgnoreComments(true);
-
             Map<String, String> uris = new HashMap<String, String>();
             uris.put("jobdoc", "http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1");
 
@@ -155,7 +169,7 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
             XPath xpathNote = DocumentHelper.createXPath("jobdoc:note[@language='en']");
             xpathNote.setNamespaceURIs(uris);
 
-            Document doc = reader.read(new StringReader(jitlDoc.getContent()));
+            Document doc = XMLBuilder.parse(jitlDoc.getContent());
             Element jobNode = doc.getRootElement().element("job");
 
             Job job = new Job();
@@ -203,7 +217,7 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
         String paramDoc = null;
         try {
             if (note != null) {
-                paramDoc = transform(transformer, DocumentHelper.parseText(note.asXML()));
+                paramDoc = transform(transformer, XMLBuilder.parse(note.asXML()));
                 if (paramDoc != null) {
                     paramDoc = paramDoc.replaceFirst("^\\s*<\\?xml[^\\?]+\\?>", "").replaceFirst("^\\s*<!DOCTYPE[^>]+>\\s*", "").replaceAll(
                             " xmlns=\"http://www.w3.org/1999/xhtml\"", "").replaceAll("\\s+", " ").replaceAll("> <", "><");

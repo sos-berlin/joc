@@ -10,7 +10,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,28 +21,29 @@ import com.sos.joc.model.joe.job.Description;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.job.Script;
 import com.sos.joc.model.joe.nodeparams.Config;
+import com.sos.xml.XMLBuilder;
 
 public class XmlDeserializer {
 
     public static <T> T deserialize(byte[] xml, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException,
-            IOException, JobSchedulerBadRequestException, DocumentException {
+            IOException, JobSchedulerBadRequestException, DocumentException, SAXException {
         switch (clazz.getSimpleName()) {
         case "Job":
-            return clazz.cast(deserializeJob(getDocument(xml)));
+            return clazz.cast(deserializeJob(XMLBuilder.parse(new ByteArrayInputStream(xml))));
         case "Config": //NODEPARAMS
-            return clazz.cast(deserializeNodeParams(getDocument(xml)));
+            return clazz.cast(deserializeNodeParams(XMLBuilder.parse(new ByteArrayInputStream(xml))));
         default:
             return Globals.xmlMapper.readValue(bytesToString(xml), clazz);
         }
     }
     
     public static <T> T deserialize(String xml, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException,
-            JobSchedulerBadRequestException, DocumentException {
+            JobSchedulerBadRequestException, DocumentException, SAXException {
         switch (clazz.getSimpleName()) {
         case "Job":
-            return clazz.cast(deserializeJob(getDocument(xml)));
+            return clazz.cast(deserializeJob(XMLBuilder.parse(xml)));
         case "Config": // NODEPARAMS
-            return clazz.cast(deserializeNodeParams(getDocument(xml)));
+            return clazz.cast(deserializeNodeParams(XMLBuilder.parse(xml)));
         default:
             return Globals.xmlMapper.readValue(stripWhitespaceText(xml), clazz);
         }
@@ -60,22 +61,6 @@ public class XmlDeserializer {
         }
     }
 
-    private static Document getDocument(byte[] xml) throws DocumentException {
-        SAXReader reader = new SAXReader();
-        reader.setValidation(false);
-        reader.setStripWhitespaceText(true);
-        reader.setIgnoreComments(true);
-        return reader.read(new ByteArrayInputStream(xml));
-    }
-    
-    private static Document getDocument(String xml) throws DocumentException {
-        SAXReader reader = new SAXReader();
-        reader.setValidation(false);
-        reader.setStripWhitespaceText(true);
-        reader.setIgnoreComments(true);
-        return reader.read(new StringReader(xml));
-    }
-    
     private static String domToString(Document doc) {
         return stripWhitespaceText(doc.asXML());
     }
