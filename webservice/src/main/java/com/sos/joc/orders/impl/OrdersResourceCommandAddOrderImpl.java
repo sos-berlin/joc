@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Path;
 
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.hibernate.exception.ConstraintViolationException;
 

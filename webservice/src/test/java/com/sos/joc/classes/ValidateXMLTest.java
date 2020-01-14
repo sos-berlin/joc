@@ -25,7 +25,7 @@ public class ValidateXMLTest {
         s.append("<run_time begin=\"00:00\" time_zone=\"Europe/Berlin\"/>");
         boolean check = false;
         try {
-            check = ValidateXML.validateRunTimeAgainstJobSchedulerSchema(s.toString());
+            check = ValidateXML.validateRunTimeAgainstJobSchedulerSchema(s.toString()) != null;
         } catch (Exception e) {
             e.printStackTrace();
         }
