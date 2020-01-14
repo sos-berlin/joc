@@ -67,12 +67,15 @@ public class ReassignSchemaResourceImpl extends JOCResourceImpl implements IReas
             SchemaHandler h = new SchemaHandler();
             h.process(in.getUri(), in.getFileName(), in.getFileContent());
             if (Files.exists(h.getTarget())) {
+                JocXmlEditor.parseXml(in.getConfiguration());
+                String schema = JocXmlEditor.getFileContent(h.getTarget());
+                JocXmlEditor.parseXml(schema);
 
                 Xml2JsonConverter converter = new Xml2JsonConverter();
                 String configurationJson = converter.convert(in.getObjectType(), h.getTarget(), in.getConfiguration());
 
                 ReassignSchemaConfigurationAnswer answer = new ReassignSchemaConfigurationAnswer();
-                answer.setSchema(JocXmlEditor.getFileContent(h.getTarget()));
+                answer.setSchema(schema);
                 answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(h.getSource()));
                 answer.setConfigurationJson(configurationJson);
                 answer.setRecreateJson(true);

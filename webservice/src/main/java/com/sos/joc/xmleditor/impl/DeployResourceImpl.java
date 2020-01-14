@@ -6,6 +6,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import org.dom4j.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -61,22 +62,25 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 XmlEditorAudit audit = new XmlEditorAudit(in);
                 logAuditMessage(audit);
 
+                // step 1 - check for vulnerabilities
+                Document xmlDoc = JocXmlEditor.parseXml(in.getConfiguration());
+
                 session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
 
-                // step 1 - store draft in the database
+                // step 2 - store draft in the database
                 DBItemXmlEditorObject item = getItem(dbLayer, in);
 
-                // step 2 - validate
+                // step 3 - validate
                 XsdValidator validator = new XsdValidator(JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType()));
                 try {
-                    validator.validate(item.getConfigurationDraft());
+                    validator.validate(xmlDoc, item.getConfigurationDraft());
                 } catch (XsdValidatorException e) {
                     LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
                     response = JOCDefaultResponse.responseStatus200(ValidateResourceImpl.getError(e));
                 }
 
-                // step 3 - deploy
+                // step 4 - deploy
                 if (response == null) {
                     Date deployed = putFile(in, item.getConfigurationDraft());
 

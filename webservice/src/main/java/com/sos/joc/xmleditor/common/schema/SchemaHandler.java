@@ -28,8 +28,7 @@ public class SchemaHandler {
         } else {
             source = fileUri;
             URI uri = new URI(source);
-            if (JocXmlEditor.isHttp(source)) {
-                // http(s)://
+            if (JocXmlEditor.isHttp(source)) {// http(s)://
                 if (isDebugEnabled) {
                     LOGGER.debug(String.format("[%s]copy from http(s)", source));
                 }

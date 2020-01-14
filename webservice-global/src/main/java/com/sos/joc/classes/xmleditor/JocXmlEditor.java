@@ -12,6 +12,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.dom4j.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
+import com.sos.xml.XMLBuilder;
 
 import sos.util.SOSString;
 
@@ -58,6 +60,20 @@ public class JocXmlEditor {
     public static final String NEW_LINE = "\r\n";
 
     private static Path realPath = null;
+
+    public static Document parseXml(String xml) throws Exception {
+        if (!SOSString.isEmpty(xml)) {
+            return null;
+        }
+        return XMLBuilder.parse(xml);
+    }
+
+    public static Document parseXml(InputStream is) throws Exception {
+        if (is == null) {
+            return null;
+        }
+        return XMLBuilder.parse(is);
+    }
 
     public static String getResourceImplPath(final String path) {
         return String.format("./%s/%s", APPLICATION_PATH, path);

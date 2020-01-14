@@ -65,8 +65,11 @@ public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssign
             SchemaHandler h = new SchemaHandler();
             h.process(in.getUri(), in.getFileName(), in.getFileContent());
             if (Files.exists(h.getTarget())) {
+                String schema = JocXmlEditor.getFileContent(h.getTarget());
+                JocXmlEditor.parseXml(schema);
+
                 AssignSchemaConfigurationAnswer answer = new AssignSchemaConfigurationAnswer();
-                answer.setSchema(JocXmlEditor.getFileContent(h.getTarget()));
+                answer.setSchema(schema);
                 answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(h.getSource()));
                 return answer;
             } else {

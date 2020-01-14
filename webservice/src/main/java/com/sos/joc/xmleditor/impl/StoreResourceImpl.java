@@ -33,6 +33,8 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
+                JocXmlEditor.parseXml(in.getConfiguration());
+
                 session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
                 session.beginTransaction();
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
