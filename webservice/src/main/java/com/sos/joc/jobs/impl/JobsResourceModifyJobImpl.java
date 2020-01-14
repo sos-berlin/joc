@@ -19,7 +19,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyJobAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.classes.configuration.JSObjectConfiguration;
@@ -39,6 +38,7 @@ import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.schedule.RunTime;
+import com.sos.xml.XMLBuilder;
 
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {
@@ -160,14 +160,16 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     modifyJob.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
                     JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
                     String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTimeXml(), this, jobPath);
-                    ValidateXML.validateAgainstJobSchedulerSchema(configuration);
+                    Document doc = ValidateXML.validateAgainstJobSchedulerSchema(configuration);
                     
                     if (versionIsOlderThan("1.13.1")) {
 
                         XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                        Element jobElement = XMLBuilder.parse(configuration);
-                        jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
-                        xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
+                        if (doc != null) {
+                            Element jobElement = doc.getRootElement();
+                            jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
+                            xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
+                        }
                         jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
                     } else {
                         

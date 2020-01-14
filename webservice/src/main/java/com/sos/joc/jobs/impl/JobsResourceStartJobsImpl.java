@@ -13,7 +13,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.StartJobAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
@@ -26,6 +25,7 @@ import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.job.StartJobs;
 import com.sos.joc.model.job.StartedTasks;
 import com.sos.joc.model.job.TaskPath200;
+import com.sos.xml.XMLBuilder;
 
 @Path("jobs")
 public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsResourceStartJob {

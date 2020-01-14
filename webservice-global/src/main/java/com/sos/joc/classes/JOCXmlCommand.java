@@ -44,6 +44,7 @@ import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.xml.SOSXmlCommand;
+import com.sos.xml.XMLBuilder;
 
 import sos.xml.SOSXMLXPath;
 

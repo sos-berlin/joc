@@ -12,6 +12,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.junit.Test;
 import org.xml.sax.SAXException;
+import com.sos.xml.XMLBuilder;
 
 public class XMLBuilderTest {
 

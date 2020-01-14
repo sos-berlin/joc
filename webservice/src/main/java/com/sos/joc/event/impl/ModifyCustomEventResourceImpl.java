@@ -18,7 +18,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.DeleteEventsAudit;
 import com.sos.joc.classes.audit.ModifyEventAudit;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
@@ -31,6 +30,7 @@ import com.sos.joc.model.event.custom.EventIdsFilter;
 import com.sos.joc.model.event.custom.ModifyEvent;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
+import com.sos.xml.XMLBuilder;
 
 @Path("events")
 public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IModifyCustomEventResource {

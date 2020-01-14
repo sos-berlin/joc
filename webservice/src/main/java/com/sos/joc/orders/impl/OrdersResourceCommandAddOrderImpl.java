@@ -26,7 +26,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.calendar.SendEventScheduled;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
@@ -49,6 +48,7 @@ import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.model.order.OrderPath200;
 import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
+import com.sos.xml.XMLBuilder;
 
 @Path("orders")
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
@@ -153,8 +153,10 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 try {
                     RunTime runTime = XmlSerializer.serializeAbstractSchedule(order.getRunTime());
                     order.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
-                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTimeXml());
-                    xml.add(XMLBuilder.parse(order.getRunTimeXml()));
+                    Document doc = ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTimeXml());
+                    if (doc != null) {
+                        xml.add(doc.getRootElement());                        
+                    }
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {

@@ -12,7 +12,6 @@ import org.w3c.dom.NodeList;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyTaskAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
@@ -21,6 +20,7 @@ import com.sos.joc.model.job.ModifyTasks;
 import com.sos.joc.model.job.TaskId;
 import com.sos.joc.model.job.TasksFilter;
 import com.sos.joc.tasks.resource.ITasksResourceKill;
+import com.sos.xml.XMLBuilder;
 
 @Path("tasks")
 public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksResourceKill {

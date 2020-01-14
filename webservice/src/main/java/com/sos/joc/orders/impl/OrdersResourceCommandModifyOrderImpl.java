@@ -34,7 +34,6 @@ import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.classes.calendar.SendEventScheduled;
@@ -62,6 +61,7 @@ import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
+import com.sos.xml.XMLBuilder;
 
 @Path("orders")
 public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
@@ -260,8 +260,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     ModifyOrder configuration = jocConfiguration.modifyOrderRuntime(order.getRunTimeXml(), this, jobChainPath, order.getOrderId());
 
                     if (configuration == null) { // adhoc order
-                        ValidateXML.validateAgainstJobSchedulerSchema(order.getRunTimeXml());
-                        xml.add(XMLBuilder.parse(order.getRunTimeXml()));
+                        Document doc = ValidateXML.validateAgainstJobSchedulerSchema(order.getRunTimeXml());
+                        if (doc != null) {
+                            xml.add(doc.getRootElement());
+                        }
                         jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
 
                         updateRunTimeIsTemporary(jobChainPath, order.getOrderId(), true);
@@ -272,15 +274,16 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         updateDailyPlan(dailyPlanCalender2DBFilter);
                     } else {
                         
-                        ValidateXML.validateAgainstJobSchedulerSchema(configuration.getRunTimeXml());
-                        
+                        Document doc = ValidateXML.validateAgainstJobSchedulerSchema(configuration.getRunTimeXml());
                         if (versionIsOlderThan("1.13.1")) {
 
                             XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                            Element orderElement = XMLBuilder.parse(configuration.getRunTimeXml());
-                            orderElement.addAttribute("job_chain", Paths.get(configuration.getJobChain()).getFileName().toString());
-                            orderElement.addAttribute("id", order.getOrderId());
-                            xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+                            if (doc != null) {
+                                Element orderElement = doc.getRootElement();
+                                orderElement.addAttribute("job_chain", Paths.get(configuration.getJobChain()).getFileName().toString());
+                                orderElement.addAttribute("id", order.getOrderId());
+                                xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+                            }
                             jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
                         } else {
 

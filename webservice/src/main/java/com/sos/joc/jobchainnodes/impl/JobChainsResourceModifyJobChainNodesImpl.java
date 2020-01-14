@@ -9,7 +9,6 @@ import javax.ws.rs.Path;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyJobChainNodeAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
@@ -18,6 +17,7 @@ import com.sos.joc.jobchainnodes.resources.IJobChainsResourceModifyJobChainNodes
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.jobChain.ModifyJobChainNode;
 import com.sos.joc.model.jobChain.ModifyJobChainNodes;
+import com.sos.xml.XMLBuilder;
 
 @Path("job_chain_nodes")
 public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl

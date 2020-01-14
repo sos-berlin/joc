@@ -12,8 +12,8 @@ import javax.xml.validation.Validator;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.xml.XMLBuilder;
 
 public class ValidateXML {
 

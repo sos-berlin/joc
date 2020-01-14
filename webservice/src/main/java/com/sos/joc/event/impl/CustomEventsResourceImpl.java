@@ -20,7 +20,6 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.event.resource.ICustomEventsResource;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
@@ -28,6 +27,7 @@ import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.event.custom.Event;
 import com.sos.joc.model.event.custom.Events;
 import com.sos.joc.model.event.custom.EventsFilter;
+import com.sos.xml.XMLBuilder;
 
 @Path("events")
 public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustomEventsResource {

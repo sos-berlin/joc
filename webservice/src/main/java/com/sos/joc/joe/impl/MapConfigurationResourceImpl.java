@@ -1,12 +1,19 @@
 package com.sos.joc.joe.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.DocumentSource;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -32,12 +39,34 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
+            
             SAXReader reader = new SAXReader();
+            reader.setIncludeExternalDTDDeclarations(false);
+            reader.setIncludeInternalDTDDeclarations(false);
+            reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            reader.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader("")));
             reader.setValidation(false);
             reader.setStripWhitespaceText(true);
             reader.setIgnoreComments(true);
-            Document doc = reader.read(new ByteArrayInputStream(requestBody));
+            
+            Document doc;
+            try {
+                doc = reader.read(new ByteArrayInputStream(requestBody));
+            } catch (DocumentException e) {
+                Throwable nested = e.getNestedException();
+                if (nested != null && SAXParseException.class.isInstance(nested)) {
+                    // On Apache, this should be thrown when disallowing DOCTYPE
+                    throw new SAXException("A DOCTYPE was passed into the XML document", e);
+                } else if (nested != null && IOException.class.isInstance(nested)) {
+                    // XXE that points to a file that doesn't exist
+                    throw new IOException("IOException occurred, XXE may still possible: " + e.getMessage(), e);
+                } else {
+                    throw e;
+                }
+            }
+
             final String rootElementName = doc.getRootElement().getName().toLowerCase();
             String objType = rootElementName.replaceAll("_", "").toUpperCase();
             if ("SETTINGS".equals(objType)) {
@@ -48,7 +77,7 @@ public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMa
                 throw new JobSchedulerBadRequestException("unsupported xml: " + rootElementName);
             }
             if (!"NODEPARAMS".equals(objType)) {
-                ValidateXML.validateAgainstJobSchedulerSchema(new ByteArrayInputStream(requestBody));
+                ValidateXML.validateAgainstJobSchedulerSchema(new DocumentSource(doc));
             }
             byte[] bytes = Globals.objectMapper.writeValueAsBytes(XmlDeserializer.deserialize(doc, JOEHelper.CLASS_MAPPING.get(objType)));
             return JOCDefaultResponse.responseStatus200(bytes, MediaType.APPLICATION_JSON);

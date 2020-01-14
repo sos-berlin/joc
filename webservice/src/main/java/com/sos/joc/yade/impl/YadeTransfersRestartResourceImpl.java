@@ -13,7 +13,6 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.yade.TransferFileUtils;
 import com.sos.joc.db.yade.JocDBLayerYade;
@@ -27,6 +26,7 @@ import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.yade.ModifyTransfer;
 import com.sos.joc.model.yade.ModifyTransfers;
 import com.sos.joc.yade.resource.IYadeTransfersRestartResource;
+import com.sos.xml.XMLBuilder;
 
 @Path("yade")
 public class YadeTransfersRestartResourceImpl extends JOCResourceImpl implements IYadeTransfersRestartResource {

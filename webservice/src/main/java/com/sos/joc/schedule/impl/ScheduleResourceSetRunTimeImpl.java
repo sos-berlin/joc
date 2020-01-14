@@ -22,7 +22,6 @@ import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyScheduleAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
@@ -36,6 +35,7 @@ import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.joe.schedule.Schedule;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
+import com.sos.xml.XMLBuilder;
 
 @Path("schedule")
 public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements IScheduleResourceSetRunTime {
@@ -65,7 +65,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 			
 			Schedule runTime = XmlSerializer.serializeAbstractSchedule(modifyRuntime.getRunTime());
 			modifyRuntime.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
-			ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTimeXml());
+			Document doc = ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTimeXml());
 
 			String schedulePath = normalizePath(modifyRuntime.getSchedule());
 			
@@ -73,9 +73,11 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
                 XMLBuilder command = new XMLBuilder("modify_hot_folder");
 
-                Element scheduleElement = XMLBuilder.parse(modifyRuntime.getRunTimeXml());
-                scheduleElement.addAttribute("name", Paths.get(schedulePath).getFileName().toString());
-                command.addAttribute("folder", getParent(schedulePath)).add(scheduleElement);
+                if (doc != null) {
+                    Element scheduleElement = doc.getRootElement();
+                    scheduleElement.addAttribute("name", Paths.get(schedulePath).getFileName().toString());
+                    command.addAttribute("folder", getParent(schedulePath)).add(scheduleElement);
+                }
 
                 JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
                 jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
