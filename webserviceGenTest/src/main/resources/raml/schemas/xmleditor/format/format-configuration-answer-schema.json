@@ -1,0 +1,13 @@
+{
+	"title": "xmleditor xml pretty formatting answer",
+	"id": "schemas/xmleditor/format/format-configuration-answer-schema",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.xmleditor.format.FormatConfigurationAnswer",
+	"type": "object",
+	"description": "",
+	"properties": {
+		"configuration": {
+			"type": "string"
+		}
+	}
+}
