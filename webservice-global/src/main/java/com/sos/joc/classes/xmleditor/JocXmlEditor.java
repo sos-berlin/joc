@@ -72,6 +72,15 @@ public class JocXmlEditor {
         return path;
     }
 
+    public static String getStandardSchemaIdentifier(ObjectType type) throws Exception {
+        if (type.equals(ObjectType.YADE)) {
+            return JobSchedulerXmlEditor.SCHEMA_FILENAME_YADE;
+        } else if (type.equals(ObjectType.NOTIFICATION)) {
+            return JobSchedulerXmlEditor.SCHEMA_FILENAME_NOTIFICATION;
+        }
+        return null;
+    }
+
     public static List<Path> getOthersAbsoluteSchemaLocations() throws Exception {
         setRealPath();
         Path path = realPath == null ? Paths.get(System.getProperty("user.dir")) : realPath;
