@@ -79,6 +79,17 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>com.sos-berlin.joc</groupId>
+			<artifactId>sos-raml</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>com.sos-berlin.jobscheduler</groupId>
 			<artifactId>sos-security</artifactId>
 			<version>${project.version}</version>
