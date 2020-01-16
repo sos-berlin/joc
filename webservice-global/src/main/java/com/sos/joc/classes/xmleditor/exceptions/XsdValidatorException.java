@@ -5,9 +5,9 @@ import org.xml.sax.SAXParseException;
 public class XsdValidatorException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    private final String elementName;
-    private final String elementPosition;
-    private final int elementDepth;
+    private String elementName;
+    private String elementPosition;
+    private int elementDepth;
     private int lineNumber = 1;
     private int columnNumber = 1;
 

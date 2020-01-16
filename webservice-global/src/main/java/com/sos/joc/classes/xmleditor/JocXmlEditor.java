@@ -2,8 +2,6 @@ package com.sos.joc.classes.xmleditor;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -14,15 +12,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
 import org.dom4j.Document;
-import org.dom4j.io.DocumentSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -326,75 +316,6 @@ public class JocXmlEditor {
         } else {
             throw new Exception("Globals.sosShiroProperties is null");
         }
-    }
-
-    public static String formatXmlX(StringBuilder xml, boolean generateXmlDeclaration) throws Exception {
-        if (xml == null) {
-            return null;
-        }
-        return formatXmlX(xml.toString(), generateXmlDeclaration);
-    }
-
-    public static String formatXmlX(String xml, boolean generateXmlDeclaration) throws Exception {
-        if (SOSString.isEmpty(xml)) {
-            return null;
-        }
-        StreamResult result = null;
-        try {
-            Source source = new StreamSource(new StringReader(xml.replaceAll(">\\s+<", "><").trim()));
-            result = new StreamResult(new StringWriter());
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
-            transformer.transform(source, result);
-            if (generateXmlDeclaration) {
-                return new StringBuilder(XML_DECLARATION).append(NEW_LINE).append(result.getWriter().toString()).toString();
-            }
-            return result.getWriter().toString();
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            try {
-                if (result.getWriter() != null) {
-                    result.getWriter().close();
-                }
-            } catch (Throwable e) {
-            }
-        }
-
-    }
-
-    public static String formatXml(Document xml, boolean generateXmlDeclaration) throws Exception {
-        if (xml == null) {
-            return null;
-        }
-        StreamResult result = null;
-        try {
-            Source source = new DocumentSource(xml);
-            result = new StreamResult(new StringWriter());
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-            // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
-            transformer.transform(source, result);
-            if (generateXmlDeclaration) {
-                return new StringBuilder(XML_DECLARATION).append(NEW_LINE).append(result.getWriter().toString()).toString();
-            }
-            return result.getWriter().toString();
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            try {
-                if (result.getWriter() != null) {
-                    result.getWriter().close();
-                }
-            } catch (Throwable e) {
-            }
-        }
-
     }
 
 }

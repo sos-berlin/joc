@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import org.dom4j.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -64,8 +63,14 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 XmlEditorAudit audit = new XmlEditorAudit(in);
                 logAuditMessage(audit);
 
-                // step 1 - check for vulnerabilities
-                Document xmlDoc = JocXmlEditor.parseXml(in.getConfiguration());
+                // step 1 - check for vulnerabilities and validate
+                XsdValidator validator = new XsdValidator(JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType()));
+                try {
+                    validator.validate(in.getConfiguration());
+                } catch (XsdValidatorException e) {
+                    LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
+                    return JOCDefaultResponse.responseStatus200(ValidateResourceImpl.getError(e));
+                }
 
                 session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
@@ -73,38 +78,28 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 // step 2 - store draft in the database
                 DBItemXmlEditorObject item = getItem(dbLayer, in);
 
-                // step 3 - validate
-                XsdValidator validator = new XsdValidator(JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType()));
-                try {
-                    validator.validate(xmlDoc, item.getConfigurationDraft());
-                } catch (XsdValidatorException e) {
-                    LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
-                    response = JOCDefaultResponse.responseStatus200(ValidateResourceImpl.getError(e));
+                // step 3 - deploy
+                Map<Date, String> result = putFile(in, item.getConfigurationDraft());
+
+                // step 4 - update db
+                Date deployed = result.keySet().iterator().next();
+                audit.setStartTime(deployed);
+                DBItemAuditLog auditItem = storeAuditLogEntry(audit);
+                if (auditItem != null) {
+                    item.setAuditLogId(auditItem.getId());
                 }
+                item.setConfigurationDeployed(result.get(deployed));
+                item.setConfigurationDeployedJson(item.getConfigurationDraftJson());
+                item.setConfigurationDraft(null);
+                item.setConfigurationDraftJson(null);
+                item.setAccount(getAccount());
+                item.setDeployed(deployed);
+                item.setModified(new Date());
 
-                // step 4 - deploy
-                if (response == null) {
-                    Map<Date, String> result = putFile(in, item.getConfigurationDraft());
-                    Date deployed = result.keySet().iterator().next();
-
-                    audit.setStartTime(deployed);
-                    DBItemAuditLog auditItem = storeAuditLogEntry(audit);
-                    if (auditItem != null) {
-                        item.setAuditLogId(auditItem.getId());
-                    }
-                    item.setConfigurationDeployed(result.get(deployed));
-                    item.setConfigurationDeployedJson(item.getConfigurationDraftJson());
-                    item.setConfigurationDraft(null);
-                    item.setConfigurationDraftJson(null);
-                    item.setAccount(getAccount());
-                    item.setDeployed(deployed);
-                    item.setModified(new Date());
-
-                    session.beginTransaction();
-                    session.update(item);
-                    session.commit();
-                    response = JOCDefaultResponse.responseStatus200(getSuccess(deployed));
-                }
+                session.beginTransaction();
+                session.update(item);
+                session.commit();
+                response = JOCDefaultResponse.responseStatus200(getSuccess(deployed));
             }
             return response;
         } catch (JocException e) {
@@ -214,8 +209,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         if (indx > -1) {
             configuration = configuration.substring(indx - 1);
         }
-        LOGGER.info(configuration);
-        return sb.append(JocXmlEditor.formatXml(JocXmlEditor.parseXml(configuration), false)).toString();
+        return sb.append(configuration).toString();
     }
 
     private byte[] convertXml2Ini(String configuration, String deployedDateTime) throws Exception {

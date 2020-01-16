@@ -4,13 +4,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.dom4j.Document;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.classes.xmleditor.exceptions.XsdValidatorException;
 
 public class XsdValidatorTest {
@@ -26,9 +24,8 @@ public class XsdValidatorTest {
         LOGGER.info(schema.toRealPath().toString());
 
         XsdValidator validator = new XsdValidator(schema);
-        Document xmlDoc = JocXmlEditor.parseXml(xml);
         try {
-            validator.validate(xmlDoc, xml);
+            validator.validate(xml);
         } catch (XsdValidatorException e) {
             LOGGER.error(String.format("[errorElement=%s][errorDepth=%s]errorElementPosition=%s", e.getElementName(), e.getElementDepth(), e
                     .getElementPosition()));
@@ -46,9 +43,8 @@ public class XsdValidatorTest {
         LOGGER.info(schema.toFile().getCanonicalPath());
 
         XsdValidator validator = new XsdValidator(schema);
-        Document xmlDoc = JocXmlEditor.parseXml(xml);
         try {
-            validator.validate(xmlDoc, xml);
+            validator.validate(xml);
         } catch (XsdValidatorException e) {
             LOGGER.error(String.format("[errorElement=%s][errorDepth=%s]errorElementPosition=%s", e.getElementName(), e.getElementDepth(), e
                     .getElementPosition()));

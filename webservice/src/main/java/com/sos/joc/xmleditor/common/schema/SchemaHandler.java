@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
 
+import sos.util.SOSString;
+
 public class SchemaHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchemaHandler.class);
@@ -20,13 +22,16 @@ public class SchemaHandler {
         source = null;
         target = null;
         if (fileUri == null) {
-            source = fileName;
+            if (SOSString.isEmpty(fileName)) {
+                throw new Exception("missing schema file name");
+            }
+            source = fileName.trim();
             if (isDebugEnabled) {
                 LOGGER.debug(String.format("[%s]create from local file", source));
             }
             target = JocXmlEditor.createOthersSchema(source, fileContent);
         } else {
-            source = fileUri;
+            source = fileUri.replaceAll("\\\\", "/").trim();
             URI uri = new URI(source);
             if (JocXmlEditor.isHttp(source)) {// http(s)://
                 if (isDebugEnabled) {

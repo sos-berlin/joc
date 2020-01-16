@@ -4,7 +4,6 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import org.dom4j.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,18 +35,16 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
             JOCDefaultResponse response = checkPermissions(accessToken, in);
 
             if (response == null) {
-                // check for vulnerabilities
-                Document xmlDoc = JocXmlEditor.parseXml(in.getConfiguration());
-
                 java.nio.file.Path schema = null;
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
                     schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
                 } else {
                     schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
                 }
+                // check for vulnerabilities and validate
                 XsdValidator validator = new XsdValidator(schema);
                 try {
-                    validator.validate(xmlDoc, in.getConfiguration());
+                    validator.validate(in.getConfiguration());
                 } catch (XsdValidatorException e) {
                     LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
                     response = JOCDefaultResponse.responseStatus200(getError(e));

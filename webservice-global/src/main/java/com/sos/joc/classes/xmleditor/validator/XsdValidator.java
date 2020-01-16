@@ -29,7 +29,7 @@ public class XsdValidator {
         schema = sourceSchema;
     }
 
-    public void validate(Document xmlDoc, String content) throws Exception {
+    public void validate(String content) throws Exception {
         if (schema == null) {
             throw new Exception("missing schema");
         }
@@ -39,6 +39,15 @@ public class XsdValidator {
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[schema][use local file]%s", schema));
         }
+
+        try {
+            // TODO
+            // check for vulnerabilities
+            // Document xmlDoc = JocXmlEditor.parseXml(content);
+        } catch (Exception e) {
+            // throw new XsdValidatorException(e);
+        }
+
         InputStream is = null;
         try {
             is = Files.newInputStream(schema);
