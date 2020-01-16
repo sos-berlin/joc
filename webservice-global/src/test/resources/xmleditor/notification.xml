@@ -3,7 +3,12 @@
 	system_id="MonitorSystem">
 	<Notification>
 		<NotificationMonitor>
-			<NotificationCommand><![CDATA[test]]></NotificationCommand>
+			<NotificationCommand>
+			<![CDATA[test
+line 2
+
+line4]]>
+		</NotificationCommand>
 		</NotificationMonitor>
 		<NotificationObjects>
 			<TimerRef notifications="1" ref="xxx" notify_on_error="false" />

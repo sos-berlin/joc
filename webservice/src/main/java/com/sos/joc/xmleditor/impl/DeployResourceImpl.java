@@ -2,7 +2,9 @@ package com.sos.joc.xmleditor.impl;
 
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 
@@ -82,14 +84,15 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                 // step 4 - deploy
                 if (response == null) {
-                    Date deployed = putFile(in, item.getConfigurationDraft());
+                    Map<Date, String> result = putFile(in, item.getConfigurationDraft());
+                    Date deployed = result.keySet().iterator().next();
 
                     audit.setStartTime(deployed);
                     DBItemAuditLog auditItem = storeAuditLogEntry(audit);
                     if (auditItem != null) {
                         item.setAuditLogId(auditItem.getId());
                     }
-                    item.setConfigurationDeployed(item.getConfigurationDraft());
+                    item.setConfigurationDeployed(result.get(deployed));
                     item.setConfigurationDeployedJson(item.getConfigurationDraftJson());
                     item.setConfigurationDraft(null);
                     item.setConfigurationDraftJson(null);
@@ -173,7 +176,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         return answer;
     }
 
-    private Date putFile(DeployConfiguration in, String configuration) throws Exception {
+    private Map<Date, String> putFile(DeployConfiguration in, String configuration) throws Exception {
         String file = null;// for exception
         try {
             JOCHotFolder hotFolder = new JOCHotFolder(this);
@@ -184,16 +187,14 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             } catch (Exception e) {
             }
 
+            String content = getXmlFileContent(in.getObjectType(), configuration, deployedDateTime);
             file = JocXmlEditor.getJobSchedulerLivePathXml(in.getObjectType());
+            hotFolder.putFile(file, content.getBytes(JocXmlEditor.CHARSET));
             if (in.getObjectType().equals(ObjectType.YADE)) {
-                hotFolder.putFile(file, getXmlFileContent(in.getObjectType(), configuration, deployedDateTime));
-
                 file = JocXmlEditor.getJobSchedulerLivePathYadeIni();
                 hotFolder.putFile(file, convertXml2Ini(configuration, deployedDateTime));
-            } else {
-                hotFolder.putFile(file, getXmlFileContent(in.getObjectType(), configuration, deployedDateTime));
             }
-            return deployed;
+            return Collections.singletonMap(deployed, content);
         } catch (Throwable e) {
             LOGGER.error(String.format("[%s][%s][%s]%s could't put configuration: %s", in.getJobschedulerId(), in.getObjectType().name(), file,
                     JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, e.toString()), e);
@@ -202,7 +203,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         }
     }
 
-    private byte[] getXmlFileContent(ObjectType objectType, String configuration, String deployedDateTime) throws Exception {
+    private String getXmlFileContent(ObjectType objectType, String configuration, String deployedDateTime) throws Exception {
         StringBuilder sb = getXmlFileHeader(objectType, deployedDateTime);
         int indx = -1;
         if (objectType.equals(ObjectType.YADE)) {
@@ -213,7 +214,8 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         if (indx > -1) {
             configuration = configuration.substring(indx - 1);
         }
-        return sb.append(configuration).toString().getBytes(JocXmlEditor.CHARSET);
+        LOGGER.info(configuration);
+        return sb.append(JocXmlEditor.formatXml(JocXmlEditor.parseXml(configuration), false)).toString();
     }
 
     private byte[] convertXml2Ini(String configuration, String deployedDateTime) throws Exception {
@@ -233,7 +235,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     }
 
     private StringBuilder getXmlFileHeader(ObjectType objectType, String deployedDateTime) {
-        StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append(JocXmlEditor.NEW_LINE);
+        StringBuilder sb = new StringBuilder(JocXmlEditor.XML_DECLARATION).append(JocXmlEditor.NEW_LINE);
         sb.append("<!-- ").append(String.format(DEPLOY_HEADER, deployedDateTime)).append(" -->").append(JocXmlEditor.NEW_LINE);
         sb.append("<!-- ").append(String.format(DEPLOY_HEADER_MESSAGE, objectType.name())).append(" -->").append(JocXmlEditor.NEW_LINE);
         return sb;

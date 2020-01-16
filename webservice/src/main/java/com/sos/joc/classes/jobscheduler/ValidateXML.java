@@ -64,7 +64,9 @@ public class ValidateXML {
             } else {
                 return null;
             }
-        } catch (Exception e) {
+        } catch (JobSchedulerBadRequestException e) {
+            throw e;
+        }catch (Exception e) {
             throw new JobSchedulerBadRequestException(e);
         }
     }
