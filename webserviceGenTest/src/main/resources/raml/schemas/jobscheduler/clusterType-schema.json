@@ -1,6 +1,5 @@
 {
   "title": "jobscheduler cluster type",
-  "id": "schemas/jobscheduler/clusterType",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.ClusterType",
   "type": "string",

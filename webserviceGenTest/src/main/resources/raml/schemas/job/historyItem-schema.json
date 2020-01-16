@@ -1,6 +1,5 @@
 {
   "title": "task in history collection",
-  "id": "schemas/job/historyItem",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.TaskHistoryItem",
   "type": "object",

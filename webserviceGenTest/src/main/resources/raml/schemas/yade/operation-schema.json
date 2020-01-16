@@ -1,6 +1,5 @@
 {
   "title": " yade operation",
-  "id": "schemas/yade/operation",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.Operation",
   "type": "string",

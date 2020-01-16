@@ -1,6 +1,5 @@
 {
   "title": "yade filter",
-  "id": "schemas/order/fileFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.FileFilter",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "item of step history collection of one order run",
-  "id": "schemas/order/stepHistoryItem",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.order.OrderStepHistoryItem",
   "type": "object",

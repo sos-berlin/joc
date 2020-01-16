@@ -1,6 +1,5 @@
 {
   "title": "orderHistory state text",
-  "id": "schemas/common/historyStateText",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.common.HistoryStateText",
   "type": "string",

@@ -1,6 +1,5 @@
 {
   "title": "JobScheduler cluster member",
-  "id": "schemas/jobscheduler/clusterMember",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.ClusterMember",
   "type": "object",

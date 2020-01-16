@@ -1,6 +1,5 @@
 {
   "title": "jobscheduler (permanent part)",
-  "id": "schemas/jobscheduler/jobscheduler_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.JobSchedulerP",
   "type": "object",

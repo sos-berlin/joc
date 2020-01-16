@@ -1,6 +1,5 @@
 {
   "title": "agents with delivery date (permant part)",
-  "id": "schemas/jobscheduler/agents_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.AgentsP",
   "type": "object",

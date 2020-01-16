@@ -1,6 +1,5 @@
 {
   "title": "agentsFilter",
-  "id": "schemas/report/agentsFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.report.AgentsFilter",
   "type": "object",

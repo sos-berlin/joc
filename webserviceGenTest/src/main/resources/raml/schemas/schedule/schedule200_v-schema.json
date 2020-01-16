@@ -1,6 +1,5 @@
 {
   "title": "schedule with delivery date (volatile part)",
-  "id": "schemas/schedule/schedule200_v",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.schedule.ScheduleV200",
   "type": "object",

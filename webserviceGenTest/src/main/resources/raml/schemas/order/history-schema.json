@@ -1,6 +1,5 @@
 {
   "title": "history collection of orders",
-  "id": "schemas/order/history",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "one item per started order",
   "javaType": "com.sos.joc.model.order.OrderHistory",

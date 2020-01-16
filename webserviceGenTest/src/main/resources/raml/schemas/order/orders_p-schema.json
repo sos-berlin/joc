@@ -1,6 +1,5 @@
 {
   "title": "orders with delivery date (permant part)",
-  "id": "schemas/order/orders_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.order.OrdersP",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "num of agents",
-  "id": "schemas/jobscheduler/numOfAgents",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "javaType": "com.sos.joc.model.jobscheduler.NumOfAgentsInCluster",

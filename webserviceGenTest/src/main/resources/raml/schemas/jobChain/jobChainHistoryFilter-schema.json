@@ -1,6 +1,5 @@
 {
   "title": "jobChainFilter",
-  "id": "schemas/jobChain/jobChainFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobChain.JobChainHistoryFilter",
   "type": "object",

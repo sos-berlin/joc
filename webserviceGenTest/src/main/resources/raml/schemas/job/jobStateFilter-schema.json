@@ -1,6 +1,5 @@
 {
   "title": "job state text",
-  "id": "schemas/job/jobStateFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.JobStateFilter",
   "type": "string",

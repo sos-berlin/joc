@@ -1,6 +1,5 @@
 {
   "title": "jobscheduler platform",
-  "id": "schemas/jobscheduler/os",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.OperatingSystem",
   "type": "object",

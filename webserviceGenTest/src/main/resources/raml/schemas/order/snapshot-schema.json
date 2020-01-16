@@ -1,6 +1,5 @@
 {
   "title": "orders overview snapshot",
-  "id": "schemas/order/snapshot",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.order.OrdersSnapshot",
   "type": "object",

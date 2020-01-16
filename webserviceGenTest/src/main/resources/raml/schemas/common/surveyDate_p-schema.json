@@ -1,6 +1,5 @@
 {
   "title": "survey date of the inventory data; last time the inventory job has checked the live folder",
-  "id": "schemas/common/surveyDate_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ",
   "type": "string",

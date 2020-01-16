@@ -1,6 +1,5 @@
 {
   "title": "protocol, host, port, account",
-  "id": "schemas/yade/protocolFragment",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.ProtocolFragment",
   "type": "object",

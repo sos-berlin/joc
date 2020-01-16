@@ -1,6 +1,5 @@
 {
 	"title": "login",
-	"id": "schemas/user/login",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"javaType": "com.sos.joc.model.configuration.Login",
 	"type": "object",

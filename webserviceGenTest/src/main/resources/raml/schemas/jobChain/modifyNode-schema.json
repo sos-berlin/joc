@@ -1,6 +1,5 @@
 {
   "title": "modify job chain node",
-  "id": "schemas/jobChain/modifyNode",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "the command is part of the web servive url",
   "javaType": "com.sos.joc.model.jobChain.ModifyJobChainNodes",

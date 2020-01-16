@@ -1,6 +1,5 @@
 {
   "title": "comments",
-  "id": "schemas/audit/comments",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.audit.Comments",
   "type": "object",

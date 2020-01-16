@@ -1,6 +1,5 @@
 {
   "title": "scheduleConfigurationFilter",
-  "id": "schemas/job/scheduleConfigurationFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.schedule.ScheduleConfigurationFilter",
   "type": "object",

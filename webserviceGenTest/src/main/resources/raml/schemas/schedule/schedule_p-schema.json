@@ -1,6 +1,5 @@
 {
   "title": "schedule (permant part)",
-  "id": "schemas/schedule/schedule_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.schedule.ScheduleP",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "Documentation import",
-  "id": "schemas/docu/documentationImport",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.docu.DocumentationImport",
   "type": "object",

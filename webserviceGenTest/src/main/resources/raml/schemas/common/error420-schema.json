@@ -1,6 +1,5 @@
 {
   "title": "error object with delivery date",
-  "id": "schemas/common/error420",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.common.Err420",
   "type": "object",

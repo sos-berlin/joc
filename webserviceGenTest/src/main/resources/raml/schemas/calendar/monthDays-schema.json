@@ -1,6 +1,5 @@
 {
   "title": "DaysOfMonth for MonthDays or Ultimos",
-  "id": "schemas/calendar/monthDays",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.MonthDays",
   "type": "object",

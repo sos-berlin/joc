@@ -1,6 +1,5 @@
 {
   "title": "orderPath200",
-  "id": "schemas/order/orderPath200",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.order.OrderPath200",
   "type": "object",

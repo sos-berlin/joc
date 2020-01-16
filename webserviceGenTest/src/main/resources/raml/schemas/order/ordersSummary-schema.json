@@ -1,6 +1,5 @@
 {
   "title": "job chain order summary",
-  "id": "schemas/order/ordersSummary",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "only relevant for order jobs and is empty if job's order queue is empty",
   "javaType": "com.sos.joc.model.order.OrdersSummary",

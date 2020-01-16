@@ -1,6 +1,5 @@
 {
   "title": "order (permanent part)",
-  "id": "schemas/order/order_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.order.OrderP",
   "type": "object",

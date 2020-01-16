@@ -1,6 +1,5 @@
 {
   "title": "taskId of Order",
-  "id": "schemas/job/taskIdOfOrder",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "Only relevant for order jobs; cause=order resp.",
   "javaType": "com.sos.joc.model.job.TaskIdOfOrder",

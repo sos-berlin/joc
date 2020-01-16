@@ -1,6 +1,5 @@
 {
   "title": "configurations",
-  "id": "schemas/configuration/configurations",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.configuration.Configurations",
   "type": "object",

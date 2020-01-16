@@ -1,6 +1,5 @@
 {
   "title": "process class conf filter",
-  "id": "schemas/order/processClassConfigurationFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.processClass.ProcessClassConfigurationFilter",
   "type": "object",

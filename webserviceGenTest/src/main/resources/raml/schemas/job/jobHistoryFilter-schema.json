@@ -1,6 +1,5 @@
 {
   "title": "jobFilter",
-  "id": "schemas/job/jobFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.TaskHistoryFilter",
   "type": "object",

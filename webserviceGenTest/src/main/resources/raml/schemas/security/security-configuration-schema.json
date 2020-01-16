@@ -1,6 +1,5 @@
 {
 	"title": "security_configuration",
-	"id": "schemas/security/security_configuration",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"javaType": "com.sos.joc.model.security.SecurityConfiguration",
 	"type": "object",

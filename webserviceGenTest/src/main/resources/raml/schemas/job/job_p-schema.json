@@ -1,6 +1,5 @@
 {
   "title": "job object (permanent part)",
-  "id": "schemas/job/job_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.JobP",
   "type": "object",

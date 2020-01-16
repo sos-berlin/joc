@@ -1,6 +1,5 @@
 {
   "title": "register event",
-  "id": "schemas/event/register",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.event.RegisterEvent",
   "type": "object",

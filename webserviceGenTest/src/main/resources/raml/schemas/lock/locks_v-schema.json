@@ -1,6 +1,5 @@
 {
   "title": "locks (volatile part)",
-  "id": "schemas/lock/locks_v",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.lock.LocksV",
   "type": "object",

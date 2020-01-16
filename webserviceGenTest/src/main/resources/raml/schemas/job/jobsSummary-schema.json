@@ -1,6 +1,5 @@
 {
   "title": "job summary",
-  "id": "schemas/job/jobsSummary",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.JobsSummary",
   "type": "object",

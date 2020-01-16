@@ -1,6 +1,5 @@
 {
   "title": "order filter with history id",
-  "id": "schemas/order/orderFilterWithHistoryId",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.order.OrderHistoryFilter",
   "type": "object",

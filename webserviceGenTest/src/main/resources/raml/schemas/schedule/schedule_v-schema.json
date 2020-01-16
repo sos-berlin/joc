@@ -1,6 +1,5 @@
 {
   "title": "schedule",
-  "id": "schemas/schedule/schedule_v",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.schedule.ScheduleV",
   "type": "object",

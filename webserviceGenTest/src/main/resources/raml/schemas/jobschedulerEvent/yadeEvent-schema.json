@@ -1,6 +1,5 @@
 {
   "title": "jobscheduler custom event for YADE",
-  "id": "schemas/jobschedulerEvent/yadeEvent",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.jobscheduler.model.event.YadeEvent",
   "type": "object",

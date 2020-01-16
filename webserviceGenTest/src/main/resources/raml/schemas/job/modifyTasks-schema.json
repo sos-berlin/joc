@@ -1,6 +1,5 @@
 {
   "title": "task modify",
-  "id": "schemas/job/modifyTasks",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "the command is part of the web servive url",
   "javaType": "com.sos.joc.model.job.ModifyTasks",

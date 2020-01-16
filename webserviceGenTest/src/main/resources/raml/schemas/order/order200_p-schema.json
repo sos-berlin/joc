@@ -1,6 +1,5 @@
 {
   "title": "order with delivray date (permanent part)",
-  "id": "schemas/order/order200_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.order.OrderP200",
   "type": "object",

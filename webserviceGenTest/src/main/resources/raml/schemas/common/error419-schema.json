@@ -1,6 +1,5 @@
 {
   "title": "error object for http 419",
-  "id": "schemas/common/error419",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.common.Err419",
   "type": "object",

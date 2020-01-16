@@ -1,6 +1,5 @@
 {
   "title": "dailyPlanItem",
-  "id": "schemas/plan/planItem",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "javaType": "com.sos.joc.model.plan.PlanItem",

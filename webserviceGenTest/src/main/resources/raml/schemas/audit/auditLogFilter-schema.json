@@ -1,6 +1,5 @@
 {
   "title": "auditLogFilter",
-  "id": "schemas/audit/auditLogFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.audit.AuditLogFilter",
   "type": "object",

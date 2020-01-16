@@ -1,6 +1,5 @@
 {
   "title": "jobscheduler state text",
-  "id": "schemas/jobscheduler/stateText",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.JobSchedulerStateText",
   "type": "string",

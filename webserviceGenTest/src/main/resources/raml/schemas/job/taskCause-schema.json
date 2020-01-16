@@ -1,6 +1,5 @@
 {
   "title": "task cause",
-  "id": "schemas/job/taskCause",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "For order jobs only cause=order possible",
   "javaType": "com.sos.joc.model.job.TaskCause",

@@ -1,6 +1,5 @@
 {
   "title": "calendar rename filter",
-  "id": "schemas/calendar/calendarRenameFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.CalendarRenameFilter",
   "type": "object",

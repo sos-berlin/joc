@@ -1,6 +1,5 @@
 {
   "title": "check custom event",
-  "id": "schemas/event/checkCustomEvent",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.event.custom.CheckEvent",
   "type": "object",

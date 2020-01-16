@@ -1,6 +1,5 @@
 {
   "title": "fileOrderSource (permanent part)",
-  "id": "schemas/jobchain/fileWatchingNode_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobChain.FileWatchingNodeP",
   "type": "object",

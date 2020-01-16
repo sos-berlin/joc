@@ -1,6 +1,5 @@
 {
   "title": "yade history",
-  "id": "schemas/yade/transfers",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.Transfers",
   "type": "object",

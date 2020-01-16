@@ -1,6 +1,5 @@
 {
   "title": "log info with delivery date",
-  "id": "schemas/common/logInfo200",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.common.LogInfo200",
   "type": "object",

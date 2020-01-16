@@ -1,6 +1,5 @@
 {
   "title": "JobScheduler objects filter",
-  "id": "schemas/event/jobSchedulerObjectFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.event.JobSchedulerObjects",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "modify tranfers",
-  "id": "schemas/order/modifyTransfers",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.ModifyTransfers",
   "type": "object",

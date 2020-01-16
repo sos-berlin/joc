@@ -1,6 +1,5 @@
 {
   "title": "processClass configuration",
-  "id": "schemas/agentCluster/configuration",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.processClass.Configuration",
   "xmlElement": "process_class",

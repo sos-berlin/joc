@@ -1,6 +1,5 @@
 {
   "title": "running task",
-  "id": "schemas/job/runningTask",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "javaType": "com.sos.joc.model.job.RunningTask",

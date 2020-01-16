@@ -1,6 +1,5 @@
 {
   "title": "fileOrderSource (volatile part)",
-  "id": "schemas/jobchain/fileWatchingNode_v",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobChain.FileWatchingNodeV",
   "type": "object",

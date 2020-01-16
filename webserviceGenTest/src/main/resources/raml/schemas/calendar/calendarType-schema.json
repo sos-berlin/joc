@@ -1,6 +1,5 @@
 {
   "title": "calendar type",
-  "id": "schemas/calendar/calendarType",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.CalendarType",
   "type": "string",

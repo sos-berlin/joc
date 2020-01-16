@@ -1,6 +1,5 @@
 {
   "title": "configurationsDeleteFilter",
-  "id": "schemas/configuration/configurationsDeleteFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.configuration.ConfigurationsDeleteFilter",
   "type": "object",

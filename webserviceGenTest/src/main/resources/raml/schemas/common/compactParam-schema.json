@@ -1,6 +1,5 @@
 {
   "title": "compact parameter",
-  "id": "schemas/common/compactParam",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "controls if the object view is compact or detailed",
   "type": "boolean",

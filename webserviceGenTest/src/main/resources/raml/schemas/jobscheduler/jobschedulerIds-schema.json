@@ -1,6 +1,5 @@
 {
   "title": "jobschedulerIds",
-  "id": "schemas/jobscheduler/jobschedulerIds",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.JobSchedulerIds",
   "type": "object",

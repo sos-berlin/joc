@@ -1,6 +1,5 @@
 {
   "title": "jobscheduler custom event for Custom (Classic) Evens",
-  "id": "schemas/jobschedulerEvent/customEvent",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.jobscheduler.model.event.CustomEvent",
   "type": "object",

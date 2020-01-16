@@ -1,6 +1,5 @@
 {
   "title": "configurationsFilter",
-  "id": "schemas/configuration/configurationsFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.configuration.ConfigurationsFilter",
   "type": "object",

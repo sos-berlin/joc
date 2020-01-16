@@ -1,6 +1,5 @@
 {
   "title": "yade overview snapshot",
-  "id": "schemas/yade/snapshot",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.YadeSnapshot",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "ScheduleDocuFilter",
-  "id": "schemas/schedule/ScheduleDocuFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.schedule.ScheduleDocuFilter",
   "type": "object",

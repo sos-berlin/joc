@@ -1,6 +1,5 @@
 {
   "title": "jobChain state",
-  "id": "schemas/jobChain/jobChainState",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobChain.JobChainState",
   "type": "object",

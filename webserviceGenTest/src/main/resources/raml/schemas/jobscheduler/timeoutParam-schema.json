@@ -1,6 +1,5 @@
 {
   "title": "timeoutParam",
-  "id": "schemas/jobscheduler/timeoutParam",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.TimeoutParameter",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "jobscheduler custom event for calendar and calendar usage",
-  "id": "schemas/jobschedulerEvent/calendarEvent",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.jobscheduler.model.event.CalendarEvent",
   "type": "object",

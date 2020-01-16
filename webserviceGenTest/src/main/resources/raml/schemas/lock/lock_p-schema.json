@@ -1,6 +1,5 @@
 {
   "title": "lock object (permanent part)",
-  "id": "schemas/lock/lock_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.lock.LockP",
   "type": "object",

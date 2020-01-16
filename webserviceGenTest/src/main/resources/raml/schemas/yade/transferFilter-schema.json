@@ -1,6 +1,5 @@
 {
   "title": "yade filter",
-  "id": "schemas/order/transferFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.TransferFilter",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "start task response",
-  "id": "schemas/job/startTasks",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.StartedTasks",
   "type": "object",

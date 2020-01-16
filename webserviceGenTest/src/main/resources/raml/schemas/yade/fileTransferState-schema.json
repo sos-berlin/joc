@@ -1,6 +1,5 @@
 {
   "title": "state for each transferred file",
-  "id": "schemas/yade/fileTransferState",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.FileTransferState",
   "type": "object",

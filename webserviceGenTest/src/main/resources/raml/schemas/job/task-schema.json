@@ -1,6 +1,5 @@
 {
   "title": "task",
-  "id": "schemas/job/task",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.Task",
   "type": "object",

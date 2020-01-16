@@ -1,6 +1,5 @@
 {
   "title": "schedule state",
-  "id": "schemas/plan/scheduleState",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.schedule.ScheduleState",
   "type": "object",

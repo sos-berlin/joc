@@ -1,6 +1,5 @@
 {
   "title": "job chains with delivery date (volatile part)",
-  "id": "schemas/jobChain/jobChains_v",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobChain.JobChainsV",
   "type": "object",

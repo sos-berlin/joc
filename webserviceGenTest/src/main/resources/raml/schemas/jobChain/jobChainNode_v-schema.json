@@ -1,6 +1,5 @@
 {
   "title": "jobChainNode (volatile part)",
-  "id": "schemas/jobchain/jobChainNode_v",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobChain.JobChainNodeV",
   "type": "object",

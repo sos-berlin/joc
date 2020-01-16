@@ -1,6 +1,5 @@
 {
   "title": "process class (permanent part)",
-  "id": "schemas/processClass/processClass_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.processClass.ProcessClassP",
   "type": "object",

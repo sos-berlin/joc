@@ -1,6 +1,5 @@
 {
 	"title": "treeFilter",
-	"id": "schemas/tree/treeFilter",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"javaType": "com.sos.joc.model.tree.TreeFilter",
 	"type": "object",

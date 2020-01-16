@@ -1,6 +1,5 @@
 {
   "title": "plan filter",
-  "id": "schemas/order/planFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.plan.PlanFilter",
   "type": "object",

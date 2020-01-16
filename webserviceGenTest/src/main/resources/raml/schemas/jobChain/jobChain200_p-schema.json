@@ -1,6 +1,5 @@
 {
   "title": "job chain with delivery date (permanent part)",
-  "id": "schemas/jobChain/jobChain200_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobChain.JobChainP200",
   "type": "object",

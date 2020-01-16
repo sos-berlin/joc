@@ -1,6 +1,5 @@
 {
   "title": "params or environment variables",
-  "id": "schemas/common/nameValuePairs",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "array",
   "items": {

@@ -1,6 +1,5 @@
 {
   "title": "add order response",
-  "id": "schemas/order/addOrders",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.order.AddedOrders",
   "type": "object",

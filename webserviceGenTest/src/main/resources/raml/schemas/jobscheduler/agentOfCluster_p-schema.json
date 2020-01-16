@@ -1,6 +1,5 @@
 {
   "title": "agent of cluster (permanent part)",
-  "id": "schemas/jobscheduler/agentOfCluster_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.AgentOfCluster",
   "type": "object",

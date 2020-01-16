@@ -1,6 +1,5 @@
 {
   "title": "orders filter",
-  "id": "schemas/order/ordersFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.order.OrdersFilter",
   "type": "object",

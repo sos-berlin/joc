@@ -1,6 +1,5 @@
 {
   "title": "task with delivery date",
-  "id": "schemas/job/task200",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.Task200",
   "type": "object",

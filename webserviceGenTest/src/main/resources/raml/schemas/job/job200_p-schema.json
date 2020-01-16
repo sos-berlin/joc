@@ -1,6 +1,5 @@
 {
   "title": "job object with delivery date (permant part)",
-  "id": "schemas/job/job200_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.JobP200",
   "type": "object",

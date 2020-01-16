@@ -1,6 +1,5 @@
 {
   "title": "job locks (volatile)",
-  "id": "schemas/job/locks_v",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "array",
   "items": {

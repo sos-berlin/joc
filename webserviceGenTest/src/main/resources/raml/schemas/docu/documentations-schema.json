@@ -1,6 +1,5 @@
 {
   "title": "Documentations",
-  "id": "schemas/docu/documentations",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.docu.Documentations",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "task state text",
-  "id": "schemas/job/taskStateText",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.TaskStateText",
   "type": "string",

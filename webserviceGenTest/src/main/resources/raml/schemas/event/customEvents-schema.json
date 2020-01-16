@@ -1,6 +1,5 @@
 {
   "title": "Events",
-  "id": "schemas/event/customEvents",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.event.custom.Events",
   "type": "object",

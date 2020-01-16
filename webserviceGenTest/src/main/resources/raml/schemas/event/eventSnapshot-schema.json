@@ -1,6 +1,5 @@
 {
   "title": "event snapshot",
-  "id": "schemas/event/eventSnapshot",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.event.EventSnapshot",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "yade files",
-  "id": "schemas/yade/files",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.TransferFiles",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "compact parameter",
-  "id": "schemas/common/suppressNotExistExceptionParam",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "controls if an exception raises when Object doesn't exist",
   "type": "boolean",

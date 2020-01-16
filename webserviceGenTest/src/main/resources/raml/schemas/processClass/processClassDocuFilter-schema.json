@@ -1,6 +1,5 @@
 {
   "title": "ProcessClassDocuFilter",
-  "id": "schemas/processClass/processClassDocuFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.processClass.ProcessClassDocuFilter",
   "type": "object",

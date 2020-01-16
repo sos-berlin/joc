@@ -1,6 +1,5 @@
 {
   "title": "configuration mime filter",
-  "id": "schemas/common/configurationMimeFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "The configuration can have a HTML representation where the HTML gets a highlighting via CSS classes.",
   "javaType": "com.sos.joc.model.common.ConfigurationMime",

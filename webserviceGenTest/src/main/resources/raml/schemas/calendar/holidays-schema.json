@@ -1,6 +1,5 @@
 {
   "title": "holidays",
-  "id": "schemas/calendar/holidays",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.Holidays",
   "type": "object",

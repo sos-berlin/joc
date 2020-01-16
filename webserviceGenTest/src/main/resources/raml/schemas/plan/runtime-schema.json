@@ -1,6 +1,5 @@
 {
   "title": "run time",
-  "id": "schemas/plan/runtime",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.plan.RunTime",
   "type": "object",

@@ -1,6 +1,5 @@
 {
   "title": "Documentation content filter",
-  "id": "schemas/docu/documentationContent",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.docu.DocumentationShowFilter",
   "type": "object",

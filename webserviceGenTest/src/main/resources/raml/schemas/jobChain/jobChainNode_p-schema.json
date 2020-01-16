@@ -1,6 +1,5 @@
 {
   "title": "jobChainNode (permanent part)",
-  "id": "schemas/jobchain/jobChainNode_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobChain.JobChainNodeP",
   "type": "object",

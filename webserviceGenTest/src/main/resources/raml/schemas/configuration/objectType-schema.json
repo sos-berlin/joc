@@ -1,6 +1,5 @@
 {
   "title": "configuration object type",
-  "id": "schemas/configuration/objectType",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.configuration.ConfigurationObjectType",
   "type": "string",

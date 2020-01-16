@@ -1,6 +1,5 @@
 {
   "title": "job modify",
-  "id": "schemas/job/modifyRuntime",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.ModifyRunTime",
   "type": "array",

@@ -1,6 +1,5 @@
 {
   "title": "schedule with delivery date (permanent part)",
-  "id": "schemas/schedule/schedule200_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.schedule.ScheduleP200",
   "type": "object",

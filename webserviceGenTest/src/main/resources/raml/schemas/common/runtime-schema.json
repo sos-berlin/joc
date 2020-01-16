@@ -1,6 +1,5 @@
 {
   "title": "runtime",
-  "id": "schemas/common/runtime",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd",
   "javaType": "com.sos.joc.model.common.RunTime",

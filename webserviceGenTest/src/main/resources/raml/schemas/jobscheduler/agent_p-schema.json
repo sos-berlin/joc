@@ -1,6 +1,5 @@
 {
   "title": "jobscheduler agent (permanent part)",
-  "id": "schemas/jobscheduler/agent_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.AgentP",
   "type": "object",

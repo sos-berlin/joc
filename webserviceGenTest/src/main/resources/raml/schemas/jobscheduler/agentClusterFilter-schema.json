@@ -1,6 +1,5 @@
 {
   "title": "agent cluster filter",
-  "id": "schemas/jobscheduler/agentClusterFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.AgentClusterFilter",
   "type": "object",
