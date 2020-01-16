@@ -12,6 +12,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import com.sos.exception.SOSDoctypeException;
+
 public class XMLBuilder {
 
     private Element root;
@@ -28,7 +30,7 @@ public class XMLBuilder {
         return new XMLBuilder(name).getRoot();
     }
 
-    public static Document parse(String xmlString) throws DocumentException, SAXException, IOException {
+    public static Document parse(String xmlString) throws DocumentException, SOSDoctypeException, IOException, SAXException {
         SAXReader reader = new SAXReader();
         reader.setIncludeExternalDTDDeclarations(false);
         reader.setIncludeInternalDTDDeclarations(false);
@@ -45,9 +47,9 @@ public class XMLBuilder {
             doc = reader.read(new StringReader(xmlString));
         } catch (DocumentException e) {
             Throwable nested = e.getNestedException();
-            if (nested != null && SAXParseException.class.isInstance(nested)) {
+            if (nested != null && SAXParseException.class.isInstance(nested) && nested.getMessage().toUpperCase().contains("DOCTYPE")) {
                 // On Apache, this should be thrown when disallowing DOCTYPE
-                throw new SAXException("A DOCTYPE was passed into the XML document", e);
+                throw new SOSDoctypeException("A DOCTYPE was passed into the XML document", e);
             } else if (nested != null && IOException.class.isInstance(nested)) {
                 // XXE that points to a file that doesn't exist
                 throw new IOException("IOException occurred, XXE may still possible: " + e.getMessage(), e);
