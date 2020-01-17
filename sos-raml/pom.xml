@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.sos-berlin</groupId>
 		<artifactId>joc</artifactId>
-		<version>1.12.12-SNAPSHOT</version>
+		<version>1.13.3-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.sos-berlin.joc</groupId>
@@ -48,7 +48,6 @@
 			<plugin>
 				<groupId>org.jsonschema2pojo</groupId>
 				<artifactId>jsonschema2pojo-maven-plugin</artifactId>
-				<version>0.4.23</version>
 				<dependencies>
 					<dependency>
 						<groupId>com.sos-berlin</groupId>
@@ -104,6 +103,7 @@
 								<exclude>jobschedulerEvent/*.json</exclude>
 								<exclude>calendar/*.json</exclude>
 								<exclude>agentCluster/*.json</exclude>
+								<exclude>joe/**/*.json</exclude>
 							</excludes>
 						</configuration>
 						<goals>
@@ -146,23 +146,140 @@
 						</goals>
 					</execution>
 					<execution>
-						<id>generate-agent-model</id>
+						<id>generate-joe-model</id>
 						<configuration>
 							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
 							<targetPackage>com.sos.joc.model</targetPackage>
 							<removeOldOutput>false</removeOldOutput>
 							<annotationStyle>jackson2</annotationStyle>
-							<customAnnotator>com.sos.annotator.JacksonXMLAgentAnnotator</customAnnotator>
+							<customAnnotator>com.sos.annotator.JacksonXMLJoeConfigurationAnnotator</customAnnotator>
+							<inclusionLevel>NON_EMPTY</inclusionLevel><!-- no empty strings in 
+								xml representation -->
 							<propertyWordDelimiters>- </propertyWordDelimiters>
 							<initializeCollections>false</initializeCollections>
 							<includeAdditionalProperties>false</includeAdditionalProperties>
+							<!-- includeConstructors>true</includeConstructors -->
 							<includes>
-								<include>agentCluster/*.json</include>
+								<include>joe/**/*.json</include>
 							</includes>
 						</configuration>
 						<goals>
 							<goal>generate</goal>
 						</goals>
+					</execution>
+					<execution>
+						<id>generate-joe-model2</id>
+						<configuration>
+							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
+							<targetPackage>com.sos.joc.model</targetPackage>
+							<removeOldOutput>false</removeOldOutput>
+							<annotationStyle>jackson2</annotationStyle>
+							<customAnnotator>com.sos.annotator.JacksonXMLJoeConfigurationAnnotator</customAnnotator>
+							<propertyWordDelimiters>- </propertyWordDelimiters>
+							<initializeCollections>false</initializeCollections>
+							<includeAdditionalProperties>false</includeAdditionalProperties>
+							<!-- includeConstructors>true</includeConstructors -->
+							<includes>
+								<include>joe/common/param-schema.json</include>
+								<include>joe/jobChain/nodeParams-schema.json</include>
+								<include>joe/job/envvar-schema.json</include>
+							</includes>
+						</configuration>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-interfaces-and-abstract-classes</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/java-gen/com/sos/joc</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}/classes/com/sos/joc</directory>
+									<includes>
+										<include>**/*.java</include>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+							<overwrite>true</overwrite>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>modify some pojos</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target description="modify initial values">
+								<!-- to provide that at least an empty run_time is created at job -->
+								<replaceregexp flags="ig" byline="true"
+									match="(private RunTime runTime)( = null)?;" replace="\1 = new RunTime();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/job/Job.java"
+									preserveLastModified="true" />
+								<!-- to provide that at least an empty run_time is created at order -->
+								<replaceregexp flags="ig" byline="true"
+									match="(private RunTime runTime)( = null)?;" replace="\1 = new RunTime();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/order/Order.java"
+									preserveLastModified="true" />
+								<!-- makes AbstractSchedule.java abstract -->
+								<replaceregexp flags="ig" byline="true"
+									match="(public )(class AbstractSchedule)" replace="\1abstract \2"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/schedule/AbstractSchedule.java"
+									preserveLastModified="true" />
+								<!-- change hashcode and equals -->
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new HashCodeBuilder).*" replace="\1().append(name).toHashCode();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/other/FolderItem.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new EqualsBuilder).*" replace="\1().append(name, rhs.name).isEquals();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/other/FolderItem.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new HashCodeBuilder).*"
+									replace="\1().append(folder).append(objectName).append(jobschedulerId).append(objectType).toHashCode();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/common/Deployable.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new EqualsBuilder).*"
+									replace="\1().append(folder, rhs.folder).append(objectName, rhs.objectName).append(jobschedulerId, rhs.jobschedulerId).append(objectType, rhs.objectType).isEquals();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/common/Deployable.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new HashCodeBuilder).*" replace="\1().append(path).toHashCode();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/Tree.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new EqualsBuilder).*" replace="\1().append(path, rhs.path).isEquals();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/Tree.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new HashCodeBuilder).*" replace="\1().appendSuper(super.hashCode()).toHashCode();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/JoeTree.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new EqualsBuilder).*" replace="\1().appendSuper(super.equals(other)).isEquals();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/JoeTree.java"
+									preserveLastModified="true" />
+							</target>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

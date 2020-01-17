@@ -2,7 +2,6 @@ package com.sos.joc.joe.common;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +14,7 @@ import org.xml.sax.SAXException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sos.exception.SOSDoctypeException;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.model.joe.job.Description;
@@ -38,7 +38,7 @@ public class XmlDeserializer {
     }
     
     public static <T> T deserialize(String xml, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException,
-            JobSchedulerBadRequestException, DocumentException, SAXException {
+            JobSchedulerBadRequestException, DocumentException, SAXException, SOSDoctypeException {
         switch (clazz.getSimpleName()) {
         case "Job":
             return clazz.cast(deserializeJob(XMLBuilder.parse(xml)));
