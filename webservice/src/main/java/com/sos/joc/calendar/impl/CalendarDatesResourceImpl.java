@@ -20,6 +20,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarDatesFilter;
 import com.sos.joc.model.calendar.Dates;
+import com.sos.schema.JsonValidator;
 
 @Path("calendar")
 public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalendarDatesResource {
@@ -27,10 +28,12 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
 	private static final String API_CALL = "./calendar/dates";
 
 	@Override
-	public JOCDefaultResponse postCalendarDates(String accessToken, CalendarDatesFilter calendarFilter)
+	public JOCDefaultResponse postCalendarDates(String accessToken, byte[] calendarFilterBytes)
 			throws Exception {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(calendarFilterBytes, CalendarDatesFilter.class);
+		    CalendarDatesFilter calendarFilter = Globals.objectMapper.readValue(calendarFilterBytes, CalendarDatesFilter.class);
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken,
 					calendarFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(calendarFilter.getJobschedulerId(), accessToken).getCalendar().getView()
