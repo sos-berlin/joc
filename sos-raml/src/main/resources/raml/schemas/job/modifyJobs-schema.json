@@ -1,0 +1,24 @@
+{
+  "title": "modify job commands",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.ModifyJobs",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "jobs"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "$ref": "modifyJob-schema.json"
+      }
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

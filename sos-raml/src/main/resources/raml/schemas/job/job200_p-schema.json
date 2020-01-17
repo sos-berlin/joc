@@ -1,0 +1,14 @@
+{
+  "title": "job object with delivery date (permant part)",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.JobP200",
+  "type": "object",
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "job": {
+      "$ref": "job_p-schema.json"
+    }
+  }
+}

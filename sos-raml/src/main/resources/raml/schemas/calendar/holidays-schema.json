@@ -1,0 +1,17 @@
+{
+  "title": "holidays",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Holidays",
+  "type": "object",
+  "properties": {
+    "nationalCalendar": {
+      "type": "string"
+    },
+    "dates": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/date-schema.json"
+      }
+    }
+  }
+}

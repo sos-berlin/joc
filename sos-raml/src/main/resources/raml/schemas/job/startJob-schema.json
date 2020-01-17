@@ -1,0 +1,27 @@
+{
+  "title": "start job command",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.StartJob",
+  "type": "object",
+  "required": [
+    "job"
+  ],
+  "properties": {
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "at": {
+      "$ref": "../common/timestampWithNow-schema.json"
+    },
+    "timeZone": {
+      "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+      "type": "string"
+    },
+    "params": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    },
+    "environment": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    }
+  }
+}

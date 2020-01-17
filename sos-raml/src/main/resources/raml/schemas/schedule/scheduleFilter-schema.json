@@ -1,0 +1,21 @@
+{
+  "title": "scheduleFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.schedule.ScheduleFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "schedule"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "schedule": {
+      "$ref": "../common/path-schema.json"
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    }
+  }
+}

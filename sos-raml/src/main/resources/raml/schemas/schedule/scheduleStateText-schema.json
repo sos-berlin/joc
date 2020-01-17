@@ -1,0 +1,11 @@
+{
+  "title": "schedule state text",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.schedule.ScheduleStateText",
+  "type": "string",
+  "enum": [
+    "ACTIVE",
+    "INACTIVE",
+    "UNKNOWN"
+  ]
+}

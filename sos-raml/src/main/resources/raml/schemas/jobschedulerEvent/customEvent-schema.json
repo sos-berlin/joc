@@ -1,0 +1,26 @@
+{
+  "title": "jobscheduler custom event for Custom (Classic) Evens",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.jobscheduler.model.event.CustomEvent",
+  "type": "object",
+  "properties": {
+    "TYPE": {
+      "type": "string",
+      "default": "VariablesCustomEvent"
+    },
+    "key": {
+      "type": "string"
+    },
+    "eventId": {
+      "type": "string"
+    },
+    "variables": {
+      "javaType": "com.sos.jobscheduler.model.event.CustomEventVariables",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

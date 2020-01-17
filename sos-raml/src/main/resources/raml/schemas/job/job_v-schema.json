@@ -1,0 +1,126 @@
+{
+  "title": "job (volatile part)",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.JobV",
+  "type": "object",
+  "oneOf": [
+    {
+      "description": "as child of nodes only path and state are required; only configurationStatus is optional",
+      "required": [
+        "path",
+        "state"
+      ]
+    },
+    {
+      "description": "parameter compact=true; only locks and configurationStatus are optional",
+      "required": [
+        "surveyDate",
+        "path",
+        "name",
+        "state",
+        "stateText",
+        "ordersSummary",
+        "numOfRunningTasks",
+        "numOfQueuedTasks",
+        "runTimeIsTemporary"
+      ]
+    },
+    {
+      "description": "parameter compact=false or undefined; all other fields below are optional",
+      "required": [
+        "surveyDate",
+        "path",
+        "name",
+        "state",
+        "stateText",
+        "ordersSummary",
+        "numOfRunningTasks",
+        "numOfQueuedTasks",
+        "runTimeIsTemporary",
+        "allTasks",
+        "allSteps"
+      ]
+    }
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "name": {
+      "type": "string"
+    },
+    "orderQueue": {
+      "description": "Only for /job/orderQueue",
+      "type": "array",
+      "items": {
+        "$ref": "../order/order_v-schema.json"
+      }
+    },
+    "allTasks": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "allSteps": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "state": {
+      "$ref": "jobState-schema.json"
+    },
+    "stateText": {
+      "type": "string"
+    },
+    "locks": {
+      "$ref": "locks_v-schema.json"
+    },
+    "temporary": {
+      "type": "boolean"
+    },
+    "numOfRunningTasks": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "runningTasks": {
+      "type": "array",
+      "items": {
+        "$ref": "runningTask-schema.json"
+      }
+    },
+    "numOfQueuedTasks": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "taskQueue": {
+      "type": "array",
+      "items": {
+        "$ref": "queuedTask-schema.json"
+      }
+    },
+    "params": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    },
+    "configurationStatus": {
+      "$ref": "../common/configurationStatus-schema.json"
+    },
+    "error": {
+      "description": "if state=error",
+      "$ref": "../common/error-schema.json"
+    },
+    "ordersSummary": {
+      "$ref": "../order/ordersSummary-schema.json"
+    },
+    "nextStartTime": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "nextStartNever": {
+      "type": "boolean"
+    },
+    "delayUntil": {
+      "description": "Only relevant for standalone jobs with a delay_after_error configuration.",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "runTimeIsTemporary": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

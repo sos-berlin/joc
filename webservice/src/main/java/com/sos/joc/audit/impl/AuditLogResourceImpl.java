@@ -20,15 +20,20 @@ import com.sos.joc.model.audit.AuditLog;
 import com.sos.joc.model.audit.AuditLogFilter;
 import com.sos.joc.model.audit.AuditLogItem;
 import com.sos.joc.model.order.OrderPath;
+import com.sos.schema.JsonValidator;
 
 @Path("audit_log")
 public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogResource {
 
     private static final String API_CALL = "./audit_log";
 
-    public JOCDefaultResponse postAuditLog(String accessToken, AuditLogFilter auditLogFilter) throws Exception {
+    @Override
+    public JOCDefaultResponse postAuditLog(String accessToken, byte[] auditLogFilterBytes) {
+        
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(auditLogFilterBytes, AuditLogFilter.class);
+            AuditLogFilter auditLogFilter = Globals.objectMapper.readValue(auditLogFilterBytes, AuditLogFilter.class);
             if (auditLogFilter.getJobschedulerId() == null) {
                 auditLogFilter.setJobschedulerId("");
             }
@@ -109,11 +114,6 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             audits.add(auditLogItem);
         }
         return audits;
-    }
-
-    @Override
-    public JOCDefaultResponse postAuditLog(String xAccessToken, String accessToken, AuditLogFilter auditLogFilter) throws Exception {
-        return postAuditLog(getAccessToken(xAccessToken, accessToken), auditLogFilter);
     }
 
 }

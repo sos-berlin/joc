@@ -72,7 +72,7 @@ public class Globals {
     public static String servletContextContextPath = null; // /joc
     public static Path servletContextRealPath = null;
     public static URI servletBaseUri = null;
-
+    
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {
             try {

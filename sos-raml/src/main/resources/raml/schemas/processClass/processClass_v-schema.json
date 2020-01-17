@@ -1,0 +1,35 @@
+{
+  "title": "process class (volatile part)",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.processClass.ProcessClassV",
+  "type": "object",
+  "required": [
+    "surveyDate",
+    "path",
+    "name",
+    "numOfProcesses"
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "name": {
+      "type": "string"
+    },
+    "numOfProcesses": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "processes": {
+      "type": "array",
+      "items": {
+        "$ref": "process-schema.json"
+      }
+    },
+    "configurationStatus": {
+      "$ref": "../common/configurationStatus-schema.json"
+    }
+  }
+}

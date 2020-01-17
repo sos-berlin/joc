@@ -1,7 +1,0 @@
-{
-  "title": "non negative integer",
-  "id": "schemas/common/nonNegativeInteger",
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "integer",
-  "minimum": 0
-}

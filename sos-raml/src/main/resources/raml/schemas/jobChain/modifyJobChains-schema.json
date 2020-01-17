@@ -1,0 +1,24 @@
+{
+  "title": "stop or unstop command",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "the command is part of the web servive url",
+  "javaType": "com.sos.joc.model.jobChain.ModifyJobChains",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobChains": {
+      "type": "array",
+      "items": {
+        "$ref": "modifyJobChain-schema.json"
+      }
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

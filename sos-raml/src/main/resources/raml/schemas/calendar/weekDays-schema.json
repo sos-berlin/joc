@@ -1,0 +1,23 @@
+{
+  "title": "weekdays",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.WeekDays",
+  "type": "object",
+  "required": [
+    "days"
+  ],
+  "properties": {
+    "from": {
+      "$ref": "../common/date-schema.json"
+    },
+    "to": {
+      "$ref": "../common/date-schema.json"
+    },
+    "days": {
+      "type": "array",
+      "items": {
+        "$ref": "dayOfWeek-schema.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "title": "task filter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.TaskFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "taskId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "filename": {
+      "type": "string"
+    },
+    "mime": {
+      "$ref": "../common/logMimeFilter-schema.json"
+    }
+  }
+}

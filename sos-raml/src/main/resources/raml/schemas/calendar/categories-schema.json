@@ -1,0 +1,21 @@
+{
+  "title": "categories",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Categories",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "categories"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

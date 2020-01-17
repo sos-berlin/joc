@@ -1,0 +1,28 @@
+{
+  "title": "job modify",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "the command is part of the web servive url",
+  "javaType": "com.sos.joc.model.job.ModifyJob",
+  "type": "object",
+  "required": [
+    "job"
+  ],
+  "properties": {
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "runTime": {
+      "$ref": "../joe/schedule/runTime-schema.json"
+    },
+    "runTimeXml": {
+      "description": "A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd",
+      "type": "string"
+    },
+    "calendars": {
+      "type": "array",
+      "items": {
+        "$ref": "../calendar/calendar-schema.json"
+      }
+    }
+  }
+}

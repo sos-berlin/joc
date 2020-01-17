@@ -1,0 +1,23 @@
+{
+  "title": "check custom event",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.custom.CheckEvent",
+  "type": "object",
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "eventClass": {
+      "type": "string"
+    },
+    "eventId": {
+      "type": "string"
+    },
+    "exitCode": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "xPath": {
+      "type": "string"
+    }
+  }
+}

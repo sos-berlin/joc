@@ -1,0 +1,25 @@
+{
+  "title": "job locks (volatile)",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "javaType": "com.sos.joc.model.job.LockUseV",
+    "type": "object",
+    "required": [
+      "path",
+      "exclusive",
+      "available"
+    ],
+    "properties": {
+      "path": {
+        "$ref": "../common/path-schema.json"
+      },
+      "available": {
+        "type": "boolean"
+      },
+      "exclusive": {
+        "type": "boolean"
+      }
+    }
+  }
+}
