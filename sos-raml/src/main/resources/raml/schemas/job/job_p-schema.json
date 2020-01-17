@@ -1,5 +1,6 @@
 {
   "title": "job object (permanent part)",
+  "id": "schemas/job/job_p",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.job.JobP",
   "type": "object",
@@ -54,6 +55,10 @@
     "maxTasks": {
       "$ref": "../common/nonNegativeInteger-schema.json",
       "default": 1
+    },
+    "criticality": {
+      "type": "string",
+      "default": "normal"
     },
     "locks": {
       "$ref": "locks_p-schema.json"

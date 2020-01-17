@@ -1,5 +1,6 @@
 {
 	"title": "In-Condition",
+	"id": "schemas/jobstreams/incondition",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "In Condition",
 	"javaType": "com.sos.joc.model.jobstreams.InCondition",
@@ -25,6 +26,12 @@
 		},
 		"conditionExpression": {
 			"$ref": "condition_expression-schema.json"
+		},
+		"nexPeriod": {
+			"$ref": "../common/date-schema.json"
+		},
+		"notInPeriod": {
+			"type": "boolean"
 		},
 		"inconditionCommands": {
 			"type": "array",
