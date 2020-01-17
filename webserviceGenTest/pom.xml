@@ -44,13 +44,6 @@
 									<followSymlinks>false</followSymlinks>
 								</fileset>
 								<fileset>
-									<directory>${project.build.directory}/java-gen</directory>
-									<includes>
-										<include>**/*</include>
-									</includes>
-									<followSymlinks>false</followSymlinks>
-								</fileset>
-								<fileset>
 									<directory>${project.build.directory}</directory>
 									<includes>
 										<include>*.jar</include>

@@ -19,6 +19,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.CalendarDocuFilter;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.docu.DocumentationShowFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("calendar")
 public class CalendarResourceDocumentationImpl extends JOCResourceImpl implements ICalendarResourceDocumentation {
@@ -28,11 +29,11 @@ public class CalendarResourceDocumentationImpl extends JOCResourceImpl implement
     private static final String API_CALL_UNASSIGN = API_CALL + "/unassign";
 
     @Override
-    public JOCDefaultResponse postDocumentation(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
+    public JOCDefaultResponse postDocumentation(String xAccessToken, String accessToken, String jobschedulerId, String path) {
         return postDocumentation(getAccessToken(xAccessToken, accessToken), jobschedulerId, path);
     }
 
-    public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) throws Exception {
+    public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) {
         SOSHibernateSession connection = null;
         try {
             DocumentationShowFilter documentationFilter = new DocumentationShowFilter();
@@ -73,8 +74,10 @@ public class CalendarResourceDocumentationImpl extends JOCResourceImpl implement
     }
 
     @Override
-    public JOCDefaultResponse assignDocu(String xAccessToken, CalendarDocuFilter filter) throws Exception {
+    public JOCDefaultResponse assignDocu(String xAccessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, CalendarDocuFilter.class);
+            CalendarDocuFilter filter = Globals.objectMapper.readValue(filterBytes, CalendarDocuFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getCalendar().isAssignDocumentation());
             if (jocDefaultResponse != null) {
@@ -96,8 +99,10 @@ public class CalendarResourceDocumentationImpl extends JOCResourceImpl implement
     }
 
     @Override
-    public JOCDefaultResponse unassignDocu(String xAccessToken, CalendarDocuFilter filter) throws Exception {
+    public JOCDefaultResponse unassignDocu(String xAccessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, CalendarDocuFilter.class);
+            CalendarDocuFilter filter = Globals.objectMapper.readValue(filterBytes, CalendarDocuFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_UNASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getCalendar().isAssignDocumentation());
             if (jocDefaultResponse != null) {

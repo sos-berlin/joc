@@ -44,6 +44,7 @@ import com.sos.joc.model.calendar.CalendarObjectFilter;
 import com.sos.joc.model.calendar.CalendarRenameFilter;
 import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.Dates;
+import com.sos.schema.JsonValidator;
 
 @Path("calendar")
 public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalendarEditResource {
@@ -54,12 +55,13 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 	private static final String API_CALL_MOVE = "./calendar/rename";
 
 	@Override
-	public JOCDefaultResponse postStoreCalendar(String accessToken, CalendarObjectFilter calendarFilter)
-			throws Exception {
+	public JOCDefaultResponse postStoreCalendar(String accessToken, byte[] calendarFilterBytes) {
 		SOSHibernateSession connection = null;
 		Set<String> eventCommands = new HashSet<String>();
 		List<DBItemInventoryInstance> clusterMembers = null;
 		try {
+		    JsonValidator.validateFailFast(calendarFilterBytes, CalendarObjectFilter.class);
+		    CalendarObjectFilter calendarFilter = Globals.objectMapper.readValue(calendarFilterBytes, CalendarObjectFilter.class);
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL_STORE, calendarFilter, accessToken,
 					calendarFilter.getJobschedulerId(), true);
 			if (jocDefaultResponse != null) {
@@ -196,11 +198,12 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 	}
 
 	@Override
-	public JOCDefaultResponse postSaveAsCalendar(String accessToken, CalendarObjectFilter calendarFilter)
-			throws Exception {
+	public JOCDefaultResponse postSaveAsCalendar(String accessToken, byte[] calendarFilterBytes) {
 		SOSHibernateSession connection = null;
 		List<DBItemInventoryInstance> clusterMembers = null;
 		try {
+		    JsonValidator.validateFailFast(calendarFilterBytes, CalendarObjectFilter.class);
+            CalendarObjectFilter calendarFilter = Globals.objectMapper.readValue(calendarFilterBytes, CalendarObjectFilter.class);
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL_SAVE_AS, calendarFilter, accessToken,
 					calendarFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(calendarFilter.getJobschedulerId(), accessToken).getCalendar().getEdit()
@@ -266,12 +269,13 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 	}
 
 	@Override
-	public JOCDefaultResponse postRenameCalendar(String accessToken, CalendarRenameFilter calendarFilter)
-			throws Exception {
+	public JOCDefaultResponse postRenameCalendar(String accessToken, byte[] calendarFilterBytes) {
 		SOSHibernateSession connection = null;
 		Set<String> eventCommands = new HashSet<String>();
 		List<DBItemInventoryInstance> clusterMembers = null;
 		try {
+		    JsonValidator.validateFailFast(calendarFilterBytes, CalendarRenameFilter.class);
+		    CalendarRenameFilter calendarFilter = Globals.objectMapper.readValue(calendarFilterBytes, CalendarRenameFilter.class);
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL_MOVE, calendarFilter, accessToken,
 					calendarFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(calendarFilter.getJobschedulerId(), accessToken).getCalendar().getEdit()
