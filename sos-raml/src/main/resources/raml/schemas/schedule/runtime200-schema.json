@@ -1,0 +1,18 @@
+{
+  "title": "runtime with delivery date",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.schedule.RunTime200",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "runTime"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "runTime": {
+      "$ref": "../schedule/runtime-schema.json"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+	"title": "xmleditor delete draft configuration in",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.xmleditor.delete.DeleteDraft",
+	"type": "object",
+	"description": "id only for OTHER",
+	"required": [
+		"jobschedulerId",
+		"objectType"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"type": "string"
+		},
+		"objectType": {
+			"$ref": "../common/object-type-schema.json"
+		},
+		"id": {
+			"type": "integer"
+		}
+	}
+}

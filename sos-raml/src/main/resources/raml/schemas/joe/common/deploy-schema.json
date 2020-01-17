@@ -1,0 +1,34 @@
+{
+  "title": "Answer for Deploy",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.DeployAnswer",
+  "type": "object",
+  "description": "",
+  "required": [
+    "jobschedulerId",
+    "path"
+  ],
+  "properties": {
+  	"jobschedulerId": {
+      	"type": "string"
+    },
+    "folder": {
+      	"$ref": "../../common/path-schema.json"
+    },
+  	"recursive": {
+      	"type": "boolean"
+    },
+    "objectName": {
+      	"type": "string"
+    },
+    "objectType": {
+      	"$ref": "../../common/type-schema.json"
+    },
+    "report": {
+        "type": "array",
+        "items": {
+           "$ref": "deploy-message-schema.json"
+         }
+    }
+  }
+}

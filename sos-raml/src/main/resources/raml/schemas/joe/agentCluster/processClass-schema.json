@@ -1,0 +1,61 @@
+{
+  "title": "processClass without name, replace, spooler_id attributes",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.processclass.ProcessClass",
+  "javaInterfaces" : [
+    "com.sos.joc.model.joe.common.IJSObject"
+  ],
+  "xmlElement": "process_class",
+  "type": "object",
+  "required": [
+    "maxProcesses"
+  ],
+  "properties": {
+    "maxProcesses": {
+      "$ref": "../../common/nonNegativeInteger-schema.json"
+    },
+    "timeout": {
+      "$ref": "../../common/nonNegativeInteger-schema.json"
+    },
+    "remoteScheduler": {
+      "type": "string"
+    },
+    "remoteSchedulers": {
+      "xmlElement": "remote_schedulers",
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.processclass.RemoteSchedulers",
+      "required": [
+        "remoteSchedulerList"
+      ],
+      "properties": {
+        "select": {
+          "description": "first, next",
+          "type": "string",
+          "default": "first"
+        },
+        "remoteSchedulerList": {
+          "type": "array",
+          "xmlElement": "remote_scheduler",
+          "items": {
+            "javaType": "com.sos.joc.model.joe.processclass.RemoteScheduler",
+            "type": "object",
+            "required": [
+              "remoteScheduler"
+            ],
+            "properties": {
+              "remoteScheduler": {
+                "type": "string"
+              },
+              "httpHeartbeatTimeout": {
+                "$ref": "../../common/nonNegativeInteger-schema.json" 
+              },
+              "httpHeartbeatPeriod": {
+                "$ref": "../../common/nonNegativeInteger-schema.json" 
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

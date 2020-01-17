@@ -1,0 +1,18 @@
+{
+  "title": "include for parameters",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.ParamInclude",
+  "xmlElement": "include",
+  "type": "object",
+  "properties": {
+    "file": {
+      "type": "string"
+    },
+    "liveFile": {
+      "type": "string"
+    },
+    "node": {
+      "type": "string"
+    }
+  }
+}

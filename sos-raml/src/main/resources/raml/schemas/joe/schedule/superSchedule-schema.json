@@ -1,0 +1,89 @@
+{
+	"title": "super class for schedule and run_time",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.joe.schedule.AbstractSchedule",
+	"type": "object",
+	"properties": {
+		"timeZone": {
+			"type": "string"
+		},
+		"begin": {
+			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9]{2})?",
+			"type": "string"
+		},
+		"end": {
+			"description": "pattern: [0-9]{1,2}:[0-9]{2}(:[0-9]{2})?",
+			"type": "string"
+		},
+		"letRun": {
+			"description": "possible values: yes, no, 1, 0, true, false",
+			"type": "string",
+			"default": "false"
+		},
+		"runOnce": {
+			"xmlElement": "once",
+			"description": "possible values: yes, no, 1, 0, true, false",
+			"type": "string",
+			"default": "false"
+		},
+		"periods": {
+			"$ref": "periods-schema.json"
+		},
+		"ats": {
+			"xmlElement": "at",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"javaType": "com.sos.joc.model.joe.schedule.At",
+				"properties": {
+					"at": {
+						"description": "yyyy-mm-dd HH:MM[:SS]",
+						"type": "string"
+					}
+				}
+			}
+		},
+		"dates": {
+			"xmlElement": "date",
+			"type": "array",
+			"items": {
+				"xmlElement": "date",
+				"type": "object",
+				"javaType": "com.sos.joc.model.joe.schedule.Date",
+				"required": [
+					"date"
+				],
+				"properties": {
+					"date": {
+						"type": "string"
+					},
+					"calendar": {
+						"type": "string"
+					},
+					"periods": {
+						"$ref": "periods-schema.json"
+					}
+				}
+			}
+		},
+		"weekdays": {
+			"$ref": "weekdays-schema.json"
+		},
+		"monthdays": {
+			"$ref": "monthdays-schema.json"
+		},
+		"ultimos": {
+			"$ref": "ultimos-schema.json"
+		},
+		"months": {
+			"$ref": "months-schema.json"
+		},
+		"holidays": {
+			"$ref": "holidays-schema.json"
+		},
+		"calendars": {
+			"type": "string",
+      		"isXmlCData": true
+		}
+	}
+}

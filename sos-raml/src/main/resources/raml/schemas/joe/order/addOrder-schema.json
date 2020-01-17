@@ -1,0 +1,31 @@
+{
+  "title": "add order",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.order.AddOrder",
+  "type": "object",
+  "extends" : {
+    "$ref": "order-schema.json"
+  },
+  "required": [
+    "jobChain"
+  ],
+  "properties": {
+    "jobChain": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "at": {
+      "type": "string"
+    },
+    "replace": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string"
+    },
+    "suspended": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string"
+    }
+  }
+}

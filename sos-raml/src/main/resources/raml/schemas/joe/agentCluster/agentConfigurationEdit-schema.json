@@ -1,0 +1,32 @@
+{
+    "title": "edit processClass configuration",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "javaType": "com.sos.joc.model.processClass.ConfigurationEdit",
+    "type": "object",
+    "description": "old version from 1.13.0",
+    "required": [
+        "jobschedulerId",
+        "processClass",
+        "configuration"
+    ],
+    "properties": {
+        "deliveryDate": {
+            "$ref": "../../common/deliveryDate-schema.json"
+        },
+        "configurationDate": {
+            "$ref": "../../common/timestamp-schema.json"
+        },
+        "jobschedulerId": {
+            "type": "string"
+        },
+        "processClass": {
+            "$ref": "../../common/path-schema.json"
+        },
+        "configuration": {
+        	"$ref": "processClass-schema.json"
+        },
+    	"auditLog": {
+      		"$ref": "../../audit/auditParams-schema.json"
+    	}
+    }
+}

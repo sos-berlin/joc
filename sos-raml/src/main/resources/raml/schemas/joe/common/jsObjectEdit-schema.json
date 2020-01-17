@@ -1,0 +1,46 @@
+{
+  "title": "abstract super class for editing all JobScheduler Objects",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.JSObjectEdit",
+  "type": "object",
+  "description": "oldPath is used for a move/rename, auditLog only for deploy",
+  "properties": {
+  	"deliveryDate": {
+    	"$ref": "../../common/deliveryDate-schema.json"
+    },
+    "configurationDate": {
+      	"$ref": "../../common/timestamp-schema.json"
+    },
+    "jobschedulerId": {
+      	"type": "string"
+    },
+    "path": {
+      	"$ref": "../../common/path-schema.json"
+    },
+    "oldPath": {
+      	"$ref": "../../common/path-schema.json"
+    },
+    "objectType": {
+      	"$ref": "../../common/type-schema.json"
+    },
+    
+    "objectVersionStatus": {
+      	"$ref": "joe-object-status-schema.json"
+    },
+    
+    "configuration": {
+      	"description": "interface for different json representations of a configuration item",
+      	"type": "object",
+      	"javaType": "com.sos.joc.model.joe.common.IJSObject"
+    },
+    "account": {
+      	"type": "string"
+    },
+    "docPath": {
+      	"type": "string"
+    },
+    "auditLog": {
+    	"$ref": "../../audit/auditParams-schema.json"
+    }
+  }
+}

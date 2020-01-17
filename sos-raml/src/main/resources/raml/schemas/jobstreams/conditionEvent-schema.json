@@ -1,0 +1,29 @@
+{
+	"title": "conditionEvent",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionEvent",
+	"type": "object",
+	"properties": {
+		"jobschedulerId": {
+			"type": "string"
+		},
+		"event": {
+			"type": "string"
+		},
+		"globalEvent": {
+			"type": "boolean"
+		},
+		"path": {
+			"type": "string"
+		},
+		"jobStream": {
+			"type": "string"
+		},
+		"session": {
+			"type": "string"
+		},
+		"outConditionId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		}
+	}
+}

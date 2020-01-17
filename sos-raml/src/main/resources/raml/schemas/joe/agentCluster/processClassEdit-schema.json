@@ -1,0 +1,17 @@
+{
+  "title": "edit process_class configuration",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.processclass.ProcessClassEdit",
+  "type": "object",
+  "required": [
+    "configuration"
+  ],
+  "extends": {
+    "javaType": "com.sos.joc.model.joe.common.JSObjectEdit"
+  },
+  "properties": {
+    "configuration": {
+      "$ref": "processClass-schema.json"
+    }
+  }
+}

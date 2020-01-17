@@ -1,0 +1,17 @@
+{
+  "title": "edit job configuration",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.job.JobEdit",
+  "type": "object",
+  "required": [
+    "configuration"
+  ],
+  "extends": {
+    "javaType": "com.sos.joc.model.joe.common.JSObjectEdit"
+  },
+  "properties": {
+    "configuration": {
+      "$ref": "job-schema.json"
+    }
+  }
+}

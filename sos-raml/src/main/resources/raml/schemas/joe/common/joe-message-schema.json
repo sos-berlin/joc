@@ -1,0 +1,14 @@
+{
+  "title": "include",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.JoeMessage",
+  "type": "object",
+  "properties": {
+    "messageText": {
+      "type": "string"
+    },
+    "_messageCode": {
+      "type": "string"
+    }
+  }
+}

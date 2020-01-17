@@ -1,0 +1,32 @@
+{
+  "title": "Out-Condition-Event",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Out Condition Event",
+  "javaType": "com.sos.joc.model.jobstreams.OutConditionEvent",
+  "type": "object",
+  "required": [
+   ],
+  "properties": {
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
+    "command": {
+      "type": "string"
+    }, 
+    "event": {
+      "type": "string"
+    },
+    "exists": {
+      "type": "boolean"
+    },
+    "globalEvent": {
+      "type": "boolean"
+    },
+    "existsInJobStream": {
+      "type": "boolean"
+    },
+    "jobStream": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "In-Condition-Command",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "In Condition",
+  "javaType": "com.sos.joc.model.jobstreams.InConditionCommand",
+  "type": "object",
+  "required": [
+   ],
+  "properties": {
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
+    "command": {
+      "type": "string"
+    },
+    "commandParam": {
+      "type": "string"
+    }
+  }
+}

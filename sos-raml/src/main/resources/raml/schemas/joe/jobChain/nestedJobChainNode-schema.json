@@ -1,0 +1,24 @@
+{
+  "title": "nested jobChainNode",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.jobchain.NestedJobChainNode",
+  "type": "object",
+  "xmlElement": "job_chain_node.job_chain",
+  "extends": {
+    "javaType": "JobChainEndNode"
+  },
+  "properties": {
+    "jobChain": {
+      "description": "path to job chain",
+      "type": "string"
+    },
+    "nextState": {
+      "description": "name of the next job chain node in successful case",
+      "type": "string"
+    },
+    "errorState": {
+      "description": "name of the next job chain node in errornous case",
+      "type": "string"
+    }
+  }
+}

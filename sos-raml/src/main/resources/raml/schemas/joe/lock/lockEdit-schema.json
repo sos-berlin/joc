@@ -1,0 +1,17 @@
+{
+  "title": "edit lock configuration",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.lock.LockEdit",
+  "type": "object",
+  "required": [
+    "configuration"
+  ],
+  "extends": {
+    "javaType": "com.sos.joc.model.joe.common.JSObjectEdit"
+  },
+  "properties": {
+    "configuration": {
+      "$ref": "lock-schema.json"
+    }
+  }
+}
