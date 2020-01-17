@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
+import com.sos.exception.SOSDoctypeException;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
 
 public class XsdValidator {
@@ -41,11 +42,11 @@ public class XsdValidator {
         }
 
         try {
-            // TODO
             // check for vulnerabilities
-            // Document xmlDoc = JocXmlEditor.parseXml(content);
-        } catch (Exception e) {
-            // throw new XsdValidatorException(e);
+            JocXmlEditor.parseXml(content);
+        } catch (SOSDoctypeException e) {
+            throw e;
+        } catch (Throwable e) {
         }
 
         InputStream is = null;
