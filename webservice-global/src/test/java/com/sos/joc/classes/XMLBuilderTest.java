@@ -14,6 +14,8 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 import com.sos.xml.XMLBuilder;
 
+import com.sos.exception.SOSDoctypeException;
+
 public class XMLBuilderTest {
 
     @Test
@@ -37,7 +39,7 @@ public class XMLBuilderTest {
     }
     
     @Test
-    public void testAddOrderWithParams2() throws DocumentException, SAXException, IOException {
+    public void testAddOrderWithParams2() throws SOSDoctypeException, DocumentException, SAXException, IOException {
         Element params = XMLBuilder.create("params");
         params.addElement("param").addAttribute("name", "hallo").addAttribute("value", "welt").addElement("param").addAttribute("name", "hello").addAttribute("value", "world");
         System.out.println(params.asXML());
