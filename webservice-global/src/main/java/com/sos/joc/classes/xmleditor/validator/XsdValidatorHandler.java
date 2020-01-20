@@ -166,7 +166,13 @@ public class XsdValidatorHandler extends DefaultHandler {
                     }
                 }
             }
-            throw new XsdValidatorException(error, currentElement.peek(), getCurrentElementPosition(), currentDepth);
+            String elementName = "XML";
+            try {
+                elementName = currentElement.peek();
+            } catch (Throwable e) {
+            }
+
+            throw new XsdValidatorException(error, elementName, getCurrentElementPosition(), currentDepth);
         }
     }
 

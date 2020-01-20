@@ -69,10 +69,12 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
 
     private void checkRequiredParameters(final ValidateConfiguration in) throws Exception {
         checkRequiredParameter("jobschedulerId", in.getJobschedulerId());
-        checkRequiredParameter("configuration", in.getConfiguration());
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             checkRequiredParameter("schemaIdentifier", in.getSchemaIdentifier());
+        }
+        else {
+            checkRequiredParameter("configuration", in.getConfiguration());
         }
     }
 

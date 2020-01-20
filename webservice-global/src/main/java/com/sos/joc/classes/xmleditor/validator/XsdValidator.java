@@ -15,9 +15,13 @@ import org.dom4j.io.DocumentSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
 
 import com.sos.exception.SOSDoctypeException;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.exceptions.XsdValidatorException;
+
+import sos.util.SOSString;
 
 public class XsdValidator {
 
@@ -39,6 +43,11 @@ public class XsdValidator {
         }
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[schema][use local file]%s", schema));
+        }
+
+        if (SOSString.isEmpty(content)) {
+            SAXParseException cause = new SAXParseException("Missing XML content", "publicId", "systemId", 1, 1);
+            throw new XsdValidatorException(cause, "XML", "1", 1);
         }
 
         try {

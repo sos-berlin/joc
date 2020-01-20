@@ -39,7 +39,7 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 session.beginTransaction();
                 DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
 
-                String name = in.getName();
+                String name = in.getName().replaceAll("<br>", "");
                 DBItemXmlEditorObject item = getOthersObject(dbLayer, in, name);
 
                 if (item == null) {
