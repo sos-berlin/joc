@@ -164,6 +164,8 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                         taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
                         taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
                         taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
+                        taskHistoryItem.setCriticality(dbItemReportTask.getCriticality());
+                        
                         if (dbItemReportTask.getError()) {
                             Err error = new Err();
                             error.setCode(dbItemReportTask.getErrorCode());

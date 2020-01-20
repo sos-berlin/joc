@@ -32,6 +32,10 @@
     "taskId": {
       "type": "string"
     },
+	"criticality": {
+      "type": "string",
+      "default": "normal"
+    },    
     "clusterMember": {
       "type": "string"
     },
