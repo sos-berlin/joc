@@ -27,8 +27,8 @@
 		"conditionExpression": {
 			"$ref": "condition_expression-schema.json"
 		},
-		"nexPeriod": {
-			"$ref": "../common/date-schema.json"
+		"nextPeriod": {
+			"$ref": "../common/deliveryDate-schema.json"
 		},
 		"inconditionCommands": {
 			"type": "array",
