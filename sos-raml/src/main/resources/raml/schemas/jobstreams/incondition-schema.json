@@ -30,9 +30,6 @@
 		"nexPeriod": {
 			"$ref": "../common/date-schema.json"
 		},
-		"notInPeriod": {
-			"type": "boolean"
-		},
 		"inconditionCommands": {
 			"type": "array",
 			"items": {
