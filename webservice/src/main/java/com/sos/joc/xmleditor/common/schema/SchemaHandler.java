@@ -31,19 +31,20 @@ public class SchemaHandler {
             }
             target = JocXmlEditor.createOthersSchema(source, fileContent);
         } else {
-            source = fileUri.replaceAll("\\\\", "/").trim();
-            URI uri = new URI(source);
+            source = fileUri.trim();
+            Path sourcePath = Paths.get(source);
             if (JocXmlEditor.isHttp(source)) {// http(s)://
                 if (isDebugEnabled) {
                     LOGGER.debug(String.format("[%s]copy from http(s)", source));
                 }
+                URI uri = new URI(source);
                 target = JocXmlEditor.downloadOthersSchema(uri);
             } else {
                 if (isDebugEnabled) {
                     LOGGER.debug(String.format("[%s]copy from local file", source));
                 }
-                if (uri.isAbsolute()) {// C://Temp/xyz.xsd
-                    target = JocXmlEditor.copyOthersSchema(Paths.get(source));
+                if (sourcePath.isAbsolute()) {// C://Temp/xyz.xsd
+                    target = JocXmlEditor.copyOthersSchema(sourcePath);
                 } else {// xyz.xsd
                     target = JocXmlEditor.getOthersAbsoluteSchemaLocation(source);
                 }
