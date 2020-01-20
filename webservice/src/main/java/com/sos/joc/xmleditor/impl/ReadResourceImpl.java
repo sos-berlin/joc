@@ -101,7 +101,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             schemas.add(JobSchedulerXmlEditor.SCHEMA_URI_NOTIFICATION);
             schemas.add(JobSchedulerXmlEditor.SCHEMA_URI_YADE);
 
-            List<Map<String, Object>> items = getOtherProperties(in, "id,name,schemaLocation");
+            List<Map<String, Object>> items = getOtherProperties(in, "id,name,schemaLocation", "order by created");
             if (items != null && items.size() > 0) {
                 ArrayList<AnswerConfiguration> configurations = new ArrayList<AnswerConfiguration>();
                 for (int i = 0; i < items.size(); i++) {
@@ -200,14 +200,14 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
         }
     }
 
-    private List<Map<String, Object>> getOtherProperties(ReadConfiguration in, String properties) throws Exception {
+    private List<Map<String, Object>> getOtherProperties(ReadConfiguration in, String properties, String orderBy) throws Exception {
         SOSHibernateSession session = null;
         try {
             session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
             DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
 
             session.beginTransaction();
-            List<Map<String, Object>> items = dbLayer.getObjectProperties(in.getJobschedulerId(), ObjectType.OTHER.name(), properties);
+            List<Map<String, Object>> items = dbLayer.getObjectProperties(in.getJobschedulerId(), ObjectType.OTHER.name(), properties, orderBy);
             session.commit();
             return items;
         } catch (Throwable e) {
