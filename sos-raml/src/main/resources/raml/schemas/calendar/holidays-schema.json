@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "nationalCalendar": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "dates": {
       "type": "array",

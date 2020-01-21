@@ -1,16 +1,16 @@
 package com.sos.joc.orders.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersP;
@@ -35,7 +35,8 @@ public class OrdersResourcePImplTest {
         folders.add(folder);
         ordersFilterSchema.setFolders(folders);
         OrdersResourcePImpl ordersPImpl = new OrdersResourcePImpl();
-        JOCDefaultResponse ordersResponseP = ordersPImpl.postOrdersP(accessToken, ordersFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(ordersFilterSchema);
+        JOCDefaultResponse ordersResponseP = ordersPImpl.postOrdersP(accessToken, b);
 
         OrdersP ordersPSchema = (OrdersP) ordersResponseP.getEntity();
         assertEquals("postjobschedulerClusterTest", TestEnvWebserviceTest.getOrderPath(), ordersPSchema.getOrders().get(0).getPath());
@@ -47,7 +48,8 @@ public class OrdersResourcePImplTest {
         OrdersFilter ordersFilterSchema = new OrdersFilter();
         ordersFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourcePImpl ordersPImpl = new OrdersResourcePImpl();
-        JOCDefaultResponse ordersResponseP = ordersPImpl.postOrdersP(accessToken, ordersFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(ordersFilterSchema);
+        JOCDefaultResponse ordersResponseP = ordersPImpl.postOrdersP(accessToken, b);
         OrdersP ordersPSchema = (OrdersP) ordersResponseP.getEntity();
     }
 

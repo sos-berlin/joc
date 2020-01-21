@@ -9,10 +9,11 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "eventId": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^\\d*$"
     },
     "objects": {
       "description": "collection of JobScheduler object with path and type",

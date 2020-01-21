@@ -28,12 +28,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
     private static final String API_CALL_COMMAND = "./jobscheduler/commands";
 
     @Override
-    public JOCDefaultResponse postJobschedulerCommands(String xAccessToken, String accessToken, JobschedulerCommands jobSchedulerCommands)
-            throws Exception {
-        return postJobschedulerCommands(getAccessToken(xAccessToken, accessToken), jobSchedulerCommands);
-    }
-
-    public JOCDefaultResponse postJobschedulerCommands(String accessToken, JobschedulerCommands jobSchedulerCommands) throws Exception {
+    public JOCDefaultResponse postJobschedulerCommands(String accessToken, JobschedulerCommands jobSchedulerCommands) {
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_COMMAND, jobSchedulerCommands, accessToken, jobSchedulerCommands

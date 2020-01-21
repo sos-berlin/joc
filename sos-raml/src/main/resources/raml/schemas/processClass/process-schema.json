@@ -9,7 +9,6 @@
     "pid",
     "runningSince"
   ],
-  "type": "object",
   "properties": {
     "job": {
       "$ref": "../common/path-schema.json"

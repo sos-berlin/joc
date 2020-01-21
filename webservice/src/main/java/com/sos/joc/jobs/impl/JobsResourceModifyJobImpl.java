@@ -33,6 +33,7 @@ import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
+import com.sos.schema.JsonValidator;
 
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {
@@ -47,12 +48,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
-    public JOCDefaultResponse postJobsStop(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsStop(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
-
-    public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
+    public JOCDefaultResponse postJobsStop(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
+            ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, STOP, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isStop(), modifyJobs);
         } catch (JocException e) {
@@ -64,12 +63,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
-    public JOCDefaultResponse postJobsUnstop(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsUnstop(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
-
-    public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs) {
+    public JOCDefaultResponse postJobsUnstop(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
+            ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, UNSTOP, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isUnstop(), modifyJobs);
         } catch (JocException e) {
@@ -81,12 +78,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
-    public JOCDefaultResponse postJobsSetRunTime(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsSetRunTime(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
-
-    public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
+    public JOCDefaultResponse postJobsSetRunTime(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
+            ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob()
                     .getChange().isRunTime(), modifyJobs);
         } catch (JocException e) {
@@ -98,12 +93,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
-    public JOCDefaultResponse postJobsEndAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsEndAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
-
-    public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
+    public JOCDefaultResponse postJobsEndAllTasks(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
+            ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, END, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isEndAllTasks(), modifyJobs);
         } catch (JocException e) {
@@ -115,12 +108,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
-    public JOCDefaultResponse postJobsSuspendAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsSuspendAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
-
-    public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
+    public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
+            ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, SUSPEND, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isSuspendAllTasks(), modifyJobs);
         } catch (JocException e) {
@@ -132,12 +123,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
-    public JOCDefaultResponse postJobsContinueAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsContinueAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
-
-    public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
+    public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
+            ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isContinueAllTasks(), modifyJobs);
         } catch (JocException e) {

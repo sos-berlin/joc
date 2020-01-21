@@ -8,16 +8,16 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "id": {
       "$ref": "../common/nonNegativeLong-schema.json"
     },
     "eventId": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "eventClass": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "exitCode": {
       "$ref": "../common/nonNegativeInteger-schema.json"
@@ -29,7 +29,7 @@
       "$ref": "../common/path-schema.json"
     },
     "orderId": {
-      "type": "string"
+      "$ref": "../common/filename255-schema.json"
     },
     "created": {
       "$ref": "../common/timestamp-schema.json"
@@ -38,7 +38,7 @@
       "$ref": "../common/timestamp-schema.json"
     },
     "remoteJobSchedulerHost": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "remoteJobSchedulerPort": {
       "$ref": "../common/port-schema.json"

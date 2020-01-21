@@ -19,6 +19,7 @@ import com.sos.joc.model.configuration.Configuration200;
 import com.sos.joc.model.configuration.ConfigurationObjectType;
 import com.sos.joc.model.configuration.ConfigurationOk;
 import com.sos.joc.model.configuration.ConfigurationType;
+import com.sos.schema.JsonValidator;
 
 @Path("configuration")
 public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJocConfigurationResource {
@@ -31,31 +32,6 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
     private SOSHibernateSession connection = null;
     private JocConfigurationDbLayer jocConfigurationDBLayer;
 
-    @Override
-    public JOCDefaultResponse postSaveConfiguration(String xAccessToken, String accessToken, Configuration configuration) throws Exception {
-        return postSaveConfiguration(getAccessToken(xAccessToken, accessToken), configuration);
-    }
-
-    @Override
-    public JOCDefaultResponse postDeleteConfiguration(String xAccessToken, String accessToken, Configuration configuration) throws Exception {
-        return postDeleteConfiguration(getAccessToken(xAccessToken, accessToken), configuration);
-    }
-
-    @Override
-    public JOCDefaultResponse postShareConfiguration(String xAccessToken, String accessToken, Configuration configuration) throws Exception {
-        return postShareConfiguration(getAccessToken(xAccessToken, accessToken), configuration);
-    }
-
-    @Override
-    public JOCDefaultResponse postMakePrivate(String xAccessToken, String accessToken, Configuration configuration) throws Exception {
-        return postMakePrivate(getAccessToken(xAccessToken, accessToken), configuration);
-    }
-
-    @Override
-    public JOCDefaultResponse postReadConfiguration(String xAccessToken, String accessToken, Configuration configuration) throws Exception {
-        return postReadConfiguration(getAccessToken(xAccessToken, accessToken), configuration);
-    }
-
     private void init(Configuration configuration) throws Exception {
         jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
 
@@ -67,8 +43,11 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         jocConfigurationDBLayer.getFilter().setSchedulerId(configuration.getJobschedulerId());
     }
 
-    public JOCDefaultResponse postSaveConfiguration(String accessToken, Configuration configuration) throws Exception {
+    @Override
+    public JOCDefaultResponse postSaveConfiguration(String accessToken, byte[] configurationBytes) {
         try {
+            JsonValidator.validateFailFast(configurationBytes, Configuration.class);
+            Configuration configuration = Globals.objectMapper.readValue(configurationBytes, Configuration.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_SAVE, configuration, accessToken, configuration.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -156,8 +135,11 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
     }
 
-    public JOCDefaultResponse postReadConfiguration(String accessToken, Configuration configuration) throws Exception {
+    @Override
+    public JOCDefaultResponse postReadConfiguration(String accessToken, byte[] configurationBytes) {
         try {
+            JsonValidator.validateFailFast(configurationBytes, Configuration.class);
+            Configuration configuration = Globals.objectMapper.readValue(configurationBytes, Configuration.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_READ, configuration, accessToken, configuration.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -197,8 +179,11 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
     }
 
-    public JOCDefaultResponse postDeleteConfiguration(String accessToken, Configuration configuration) throws Exception {
+    @Override
+    public JOCDefaultResponse postDeleteConfiguration(String accessToken, byte[] configurationBytes) {
         try {
+            JsonValidator.validateFailFast(configurationBytes, Configuration.class);
+            Configuration configuration = Globals.objectMapper.readValue(configurationBytes, Configuration.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE, configuration, accessToken, configuration.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -236,8 +221,11 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         }
     }
 
-    public JOCDefaultResponse postShareConfiguration(String accessToken, Configuration configuration) throws Exception {
+    @Override
+    public JOCDefaultResponse postShareConfiguration(String accessToken, byte[] configurationBytes) {
         try {
+            JsonValidator.validateFailFast(configurationBytes, Configuration.class);
+            Configuration configuration = Globals.objectMapper.readValue(configurationBytes, Configuration.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_SHARE, configuration, accessToken, configuration.getJobschedulerId(),
                     getPermissonsJocCockpit(configuration.getJobschedulerId(), accessToken).getJOCConfigurations().getShare().getChange()
                             .getSharedStatus().isMakeShared());
@@ -270,8 +258,11 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         }
     }
 
-    public JOCDefaultResponse postMakePrivate(String accessToken, Configuration configuration) throws Exception {
+    @Override
+    public JOCDefaultResponse postMakePrivate(String accessToken, byte[] configurationBytes) {
         try {
+            JsonValidator.validateFailFast(configurationBytes, Configuration.class);
+            Configuration configuration = Globals.objectMapper.readValue(configurationBytes, Configuration.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_PRIVATE, configuration, accessToken, configuration.getJobschedulerId(),
                     getPermissonsJocCockpit(configuration.getJobschedulerId(), accessToken).getJOCConfigurations().getShare().getChange()
                             .getSharedStatus().isMakePrivate());

@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "transferIds": {
       "type": "array",
@@ -22,7 +22,9 @@
     "profiles": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "pattern": "^[^<>]*$",
+        "maxLength": 100
       }
     },
     "mandator": {
@@ -50,7 +52,7 @@
     },
     "timeZone": {
       "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "limit": {
       "description": "only for db history urls to restrict the number of responsed records; -1=unlimited",
@@ -84,13 +86,13 @@
     "sourceFiles": {
       "type": "array",
       "items": {
-        "type": "string"
+        "$ref": "../common/clob-schema.json"
       }
     },
     "targetFiles": {
       "type": "array",
       "items": {
-        "type": "string"
+        "$ref": "../common/clob-schema.json"
       }
     }
   }

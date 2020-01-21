@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -26,6 +27,7 @@ import com.sos.joc.model.processClass.ProcessClassV;
 import com.sos.joc.model.processClass.ProcessClassesFilter;
 import com.sos.joc.model.processClass.ProcessClassesV;
 import com.sos.joc.processClasses.resource.IProcessClassesResource;
+import com.sos.schema.JsonValidator;
 
 @Path("process_classes")
 public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProcessClassesResource {
@@ -33,12 +35,11 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     private static final String API_CALL = "./process_classes";
 
     @Override
-    public JOCDefaultResponse postProcessClasses(String xAccessToken, String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
-        return postProcessClasses(getAccessToken(xAccessToken, accessToken), processClassFilter);
-    }
-
-    public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
+    public JOCDefaultResponse postProcessClasses(String accessToken, byte[] processClassFilterBytes) {
         try {
+            JsonValidator.validateFailFast(processClassFilterBytes, ProcessClassesFilter.class);
+            ProcessClassesFilter processClassFilter = Globals.objectMapper.readValue(processClassFilterBytes, ProcessClassesFilter.class);
+            
             SOSPermissionJocCockpit perms = getPermissonsJocCockpit(processClassFilter.getJobschedulerId(), accessToken);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken, processClassFilter.getJobschedulerId(), perms
                     .getProcessClass().getView().isStatus());

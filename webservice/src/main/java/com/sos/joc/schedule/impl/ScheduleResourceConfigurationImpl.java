@@ -21,6 +21,7 @@ import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.schedule.Configuration200;
 import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
+import com.sos.schema.JsonValidator;
 
 @Path("schedule")
 public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implements IScheduleResourceConfiguration {
@@ -28,15 +29,12 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
 	private static final String API_CALL = "./schedule/configuration";
 
 	@Override
-	public JOCDefaultResponse postScheduleConfiguration(String xAccessToken, String accessToken,
-			ScheduleConfigurationFilter scheduleBody) throws Exception {
-		return postScheduleConfiguration(getAccessToken(xAccessToken, accessToken), scheduleBody);
-	}
-
-	public JOCDefaultResponse postScheduleConfiguration(String accessToken, ScheduleConfigurationFilter scheduleBody)
-			throws Exception {
+	public JOCDefaultResponse postScheduleConfiguration(String accessToken, byte[] scheduleBodyBytes) {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(scheduleBodyBytes, ScheduleConfigurationFilter.class);
+		    ScheduleConfigurationFilter scheduleBody = Globals.objectMapper.readValue(scheduleBodyBytes, ScheduleConfigurationFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleBody, accessToken,
 					scheduleBody.getJobschedulerId(),
 					getPermissonsJocCockpit(scheduleBody.getJobschedulerId(), accessToken).getSchedule().getView()

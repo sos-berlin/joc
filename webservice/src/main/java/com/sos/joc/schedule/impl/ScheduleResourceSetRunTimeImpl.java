@@ -30,6 +30,7 @@ import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
+import com.sos.schema.JsonValidator;
 
 @Path("schedule")
 public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements IScheduleResourceSetRunTime {
@@ -38,15 +39,13 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 	private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
 
 	@Override
-	public JOCDefaultResponse postScheduleSetRuntime(String xAccessToken, String accessToken,
-			ModifyRunTime modifyRuntime) throws Exception {
-		return postScheduleSetRuntime(getAccessToken(xAccessToken, accessToken), modifyRuntime);
-	}
-
-	public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRunTime modifyRuntime) throws Exception {
+	public JOCDefaultResponse postScheduleSetRuntime(String accessToken, byte[] modifyRuntimeBytes) {
 		SOSHibernateSession session = null;
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken,
+		    JsonValidator.validateFailFast(modifyRuntimeBytes, ModifyRunTime.class);
+		    ModifyRunTime modifyRuntime = Globals.objectMapper.readValue(modifyRuntimeBytes, ModifyRunTime.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken,
 					modifyRuntime.getJobschedulerId(),
 					getPermissonsJocCockpit(modifyRuntime.getJobschedulerId(), accessToken).getSchedule().getChange()
 							.isEditContent());

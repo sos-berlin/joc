@@ -2,6 +2,7 @@ package com.sos.joc.job.impl;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.configuration.JSObjectConfiguration;
@@ -10,6 +11,7 @@ import com.sos.joc.job.resource.IJobResourceConfiguration;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.job.JobConfigurationFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("job")
 public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJobResourceConfiguration {
@@ -17,16 +19,12 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
 	private static final String API_CALL = "./job/configuration";
 
 	@Override
-	public JOCDefaultResponse postJobConfiguration(String xAccessToken, String accessToken,
-			JobConfigurationFilter jobBody) throws Exception {
-		return postJobConfiguration(getAccessToken(xAccessToken, accessToken), jobBody);
-	}
-
-	public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilter jobBody)
-			throws Exception {
-
+	public JOCDefaultResponse postJobConfiguration(String accessToken, byte[] jobBodyBytes) {
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobBody, accessToken, jobBody.getJobschedulerId(),
+		    JsonValidator.validateFailFast(jobBodyBytes, JobConfigurationFilter.class);
+		    JobConfigurationFilter jobBody = Globals.objectMapper.readValue(jobBodyBytes, JobConfigurationFilter.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobBody, accessToken, jobBody.getJobschedulerId(),
 					getPermissonsJocCockpit(jobBody.getJobschedulerId(), accessToken).getJob().getView().isStatus());
 			if (jocDefaultResponse != null) {
 				return jocDefaultResponse;

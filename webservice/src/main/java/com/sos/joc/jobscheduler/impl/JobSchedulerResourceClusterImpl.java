@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -17,6 +18,7 @@ import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.jobscheduler.Cluster;
 import com.sos.joc.model.jobscheduler.ClusterType;
 import com.sos.joc.model.jobscheduler.Clusters;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceCluster {
@@ -24,14 +26,12 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
 	private static final String API_CALL = "./jobscheduler/cluster";
 
 	@Override
-	public JOCDefaultResponse postJobschedulerCluster(String xAccessToken, String accessToken,
-			JobSchedulerId jobSchedulerFilter) {
-		return postJobschedulerCluster(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
-	}
-
-	public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilter) {
+	public JOCDefaultResponse postJobschedulerCluster(String accessToken, byte[] filterBytes) {
 		try {
-			boolean permitted = getPermissonsJocCockpit(jobSchedulerFilter.getJobschedulerId(), accessToken)
+		    JsonValidator.validateFailFast(filterBytes, JobSchedulerId.class);
+		    JobSchedulerId jobSchedulerFilter = Globals.objectMapper.readValue(filterBytes, JobSchedulerId.class);
+            
+            boolean permitted = getPermissonsJocCockpit(jobSchedulerFilter.getJobschedulerId(), accessToken)
 					.getJobschedulerMasterCluster().getView().isStatus()
 					|| getPermissonsJocCockpit(jobSchedulerFilter.getJobschedulerId(), accessToken)
 							.getJobschedulerMaster().getView().isStatus();

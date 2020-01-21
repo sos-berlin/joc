@@ -20,6 +20,7 @@ import com.sos.joc.model.schedule.ScheduleFilter;
 import com.sos.joc.model.schedule.ScheduleP;
 import com.sos.joc.model.schedule.ScheduleP200;
 import com.sos.joc.schedule.resource.IScheduleResourceP;
+import com.sos.schema.JsonValidator;
 
 @Path("schedule")
 public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleResourceP {
@@ -27,14 +28,13 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
     private static final String API_CALL = "./schedule/p";
 
     @Override
-    public JOCDefaultResponse postScheduleP(String xAccessToken, String accessToken, ScheduleFilter scheduleFilter) throws Exception {
-        return postScheduleP(getAccessToken(xAccessToken, accessToken), scheduleFilter);
-    }
-
-    public JOCDefaultResponse postScheduleP(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
+    public JOCDefaultResponse postScheduleP(String accessToken, byte[] scheduleFilterBytes) {
         SOSHibernateSession connection = null;
 
         try {
+            JsonValidator.validateFailFast(scheduleFilterBytes, ScheduleFilter.class);
+            ScheduleFilter scheduleFilter = Globals.objectMapper.readValue(scheduleFilterBytes, ScheduleFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleFilter, accessToken, scheduleFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(scheduleFilter.getJobschedulerId(), accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {

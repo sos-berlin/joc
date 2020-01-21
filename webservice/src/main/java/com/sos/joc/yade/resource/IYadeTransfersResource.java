@@ -7,14 +7,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.yade.TransferFilter;
 
 public interface IYadeTransfersResource {
 
     @POST
     @Path("transfers")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postYadeTransfers(@HeaderParam("X-Access-Token") String accessToken, TransferFilter filterBody)
-            throws Exception;
+    public JOCDefaultResponse postYadeTransfers(@HeaderParam("X-Access-Token") String accessToken, byte[] filterBody);
 
 }

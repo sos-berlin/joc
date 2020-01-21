@@ -24,6 +24,7 @@ import com.sos.joc.model.jobscheduler.AgentsP;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.OperatingSystem;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
@@ -32,15 +33,13 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
 	private SOSHibernateSession connection = null;
 
 	@Override
-	public JOCDefaultResponse postJobschedulerAgentsP(String xAccessToken, String accessToken,
-			AgentFilter agentFilter) {
-		return postJobschedulerAgentsP(getAccessToken(xAccessToken, accessToken), agentFilter);
-	}
-
-	public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilter) {
+	public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, byte[] filterBytes) {
 
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, agentFilter, accessToken,
+		    JsonValidator.validateFailFast(filterBytes, AgentFilter.class);
+            AgentFilter agentFilter = Globals.objectMapper.readValue(filterBytes, AgentFilter.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, agentFilter, accessToken,
 					agentFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken)
 							.getJobschedulerUniversalAgent().getView().isStatus());

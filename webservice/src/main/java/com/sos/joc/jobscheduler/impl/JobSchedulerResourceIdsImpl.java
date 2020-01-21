@@ -28,10 +28,6 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
     private static final String API_CALL = "./jobscheduler/ids";
 
     @Override
-    public JOCDefaultResponse postJobschedulerIds(String xAccessToken, String accessToken) {
-        return postJobschedulerIds(getAccessToken(xAccessToken, accessToken));
-    }
-
     public JOCDefaultResponse postJobschedulerIds(String accessToken) {
         SOSHibernateSession connection = null;
 

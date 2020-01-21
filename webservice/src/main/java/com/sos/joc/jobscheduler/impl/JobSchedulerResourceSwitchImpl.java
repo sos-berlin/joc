@@ -13,6 +13,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSwitch;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.common.Ok;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements IJobSchedulerResourceSwitch {
@@ -21,16 +22,13 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
 	private static final String SESSION_KEY = "selectedInstance";
 
 	@Override
-	public JOCDefaultResponse postJobschedulerSwitch(String xAccessToken, String accessToken,
-			JobSchedulerId jobSchedulerId) throws Exception {
-		return postJobschedulerSwitch(getAccessToken(xAccessToken, accessToken), jobSchedulerId);
-	}
-
-	public JOCDefaultResponse postJobschedulerSwitch(String accessToken, JobSchedulerId jobSchedulerId)
-			throws Exception {
+	public JOCDefaultResponse postJobschedulerSwitch(String accessToken, byte[] filterBytes) {
 
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken,
+		    JsonValidator.validateFailFast(filterBytes, JobSchedulerId.class);
+            JobSchedulerId jobSchedulerId = Globals.objectMapper.readValue(filterBytes, JobSchedulerId.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken,
 					jobSchedulerId.getJobschedulerId(),
 					getPermissonsJocCockpit(jobSchedulerId.getJobschedulerId(), accessToken).getJobschedulerMaster()
 							.getView().isStatus());

@@ -24,6 +24,7 @@ import com.sos.joc.model.common.LogInfo200;
 import com.sos.joc.model.common.LogMime;
 import com.sos.joc.model.order.OrderHistoryFilter;
 import com.sos.joc.order.resource.IOrderLogResource;
+import com.sos.schema.JsonValidator;
 
 @Path("order")
 public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogResource {
@@ -31,61 +32,41 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
     private static final String API_CALL = "./order/log";
 
     @Override
-    public JOCDefaultResponse postOrderLog(String xAccessToken, String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
-        return postOrderLog(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
-    }
-
-    public JOCDefaultResponse postOrderLog(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
-        return execute(API_CALL, accessToken, orderHistoryFilter);
+    public JOCDefaultResponse postOrderLog(String accessToken, byte[] orderHistoryFilter) {
+        return execute(API_CALL, accessToken, orderHistoryFilter, null);
     }
 
     @Override
-    public JOCDefaultResponse getOrderLogHtml(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String orderId,
-            String jobChain, String historyId, String filename) throws Exception {
-        return getOrderLogHtml(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, orderId, jobChain, historyId, filename);
-    }
-
     public JOCDefaultResponse getOrderLogHtml(String accessToken, String queryAccessToken, String jobschedulerId, String orderId, String jobChain,
-            String historyId, String filename) throws Exception {
+            String historyId, String filename) {
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-        OrderHistoryFilter orderHistoryFilter = setOrderHistoryFilter(jobschedulerId, orderId, jobChain, historyId, filename, LogMime.HTML);
-        return execute(API_CALL + "/html", accessToken, orderHistoryFilter);
+        byte[] orderHistoryFilter = setOrderHistoryFilter(jobschedulerId, orderId, jobChain, historyId, filename);
+        return execute(API_CALL + "/html", accessToken, orderHistoryFilter, LogMime.HTML);
     }
 
     @Override
-    public JOCDefaultResponse downloadOrderLog(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId,
-            String orderId, String jobChain, String historyId, String filename) throws Exception {
-        return downloadOrderLog(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, orderId, jobChain, historyId, filename);
-    }
-
     public JOCDefaultResponse downloadOrderLog(String accessToken, String queryAccessToken, String jobschedulerId, String orderId, String jobChain,
-            String historyId, String filename) throws Exception {
+            String historyId, String filename) {
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-        OrderHistoryFilter orderHistoryFilter = setOrderHistoryFilter(jobschedulerId, orderId, jobChain, historyId, filename, LogMime.PLAIN);
-        return downloadOrderLog(queryAccessToken, orderHistoryFilter);
+        byte[] orderHistoryFilter = setOrderHistoryFilter(jobschedulerId, orderId, jobChain, historyId, filename);
+        return execute(API_CALL + "/download", accessToken, orderHistoryFilter, LogMime.PLAIN);
     }
 
     @Override
-    public JOCDefaultResponse downloadOrderLog(String xAccessToken, String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
-        return downloadOrderLog(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
-    }
-
-    public JOCDefaultResponse downloadOrderLog(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
-        orderHistoryFilter.setMime(LogMime.PLAIN);
-        return execute(API_CALL + "/download", accessToken, orderHistoryFilter);
+    public JOCDefaultResponse downloadOrderLog(String accessToken, byte[] orderHistoryFilter) {
+        return execute(API_CALL + "/download", accessToken, orderHistoryFilter, LogMime.PLAIN);
     }
 
     @Override
-    public JOCDefaultResponse getLogInfo(String xAccessToken, String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
-        return getLogInfo(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
-    }
-
-    public JOCDefaultResponse getLogInfo(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
+    public JOCDefaultResponse getLogInfo(String accessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, OrderHistoryFilter.class);
+            OrderHistoryFilter orderHistoryFilter = Globals.objectMapper.readValue(filterBytes, OrderHistoryFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "/info", orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(orderHistoryFilter.getJobschedulerId(), accessToken).getJob().getView().isTaskLog());
             if (jocDefaultResponse != null) {
@@ -123,8 +104,14 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
         }
     }
 
-    private JOCDefaultResponse execute(String apiCall, String accessToken, OrderHistoryFilter orderHistoryFilter) {
+    private JOCDefaultResponse execute(String apiCall, String accessToken, byte[] filterBytes, LogMime mime) {
         try {
+            JsonValidator.validateFailFast(filterBytes, OrderHistoryFilter.class);
+            OrderHistoryFilter orderHistoryFilter = Globals.objectMapper.readValue(filterBytes, OrderHistoryFilter.class);
+            if (mime != null) {
+                orderHistoryFilter.setMime(mime);
+            }
+            
             JOCDefaultResponse jocDefaultResponse = init(apiCall, orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     orderHistoryFilter.getJobschedulerId(), accessToken).getJob().getView().isTaskLog());
             if (jocDefaultResponse != null) {
@@ -245,16 +232,11 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
         }
     }
 
-    private OrderHistoryFilter setOrderHistoryFilter(String jobschedulerId, String orderId, String jobChain, String historyId, String filename,
-            LogMime mime) {
-        OrderHistoryFilter orderHistoryFilter = new OrderHistoryFilter();
-        orderHistoryFilter.setHistoryId(historyId);
-        orderHistoryFilter.setJobChain(normalizePath(jobChain));
-        orderHistoryFilter.setOrderId(orderId);
-        orderHistoryFilter.setJobschedulerId(jobschedulerId);
-        orderHistoryFilter.setFilename(filename);
-        orderHistoryFilter.setMime(mime);
-        return orderHistoryFilter;
+    private byte[] setOrderHistoryFilter(String jobschedulerId, String orderId, String jobChain, String historyId, String filename) {
+        String json = String.format(
+                "{\"jobschedulerId\": \"%s\", \"historyId\": \"%s\", \"jobChain\": \"%s\", \"orderId\": \"%s\", \"filename\": \"%s\"}",
+                jobschedulerId, historyId, jobChain, orderId, filename);
+        return json.getBytes();
     }
 
     private String getFileName(java.nio.file.Path path) {

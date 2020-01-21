@@ -9,7 +9,7 @@
       "default":"/sos/events/scheduler_event_service"
     },
     "orderId": {
-      "type": "string"
+      "$ref": "../common/filename255-schema.json"
     },
     "jobChain": {
       "$ref": "../common/path-schema.json"
@@ -18,25 +18,26 @@
       "$ref": "../common/path-schema.json"
     },
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "eventClass": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "eventId": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^\\d*$"
     },
     "exitCode": {
       "$ref": "../common/nonNegativeInteger-schema.json"
     },
     "expires": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "expirationPeriod": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "expirationCycle": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "params": {
       "$ref": "../common/nameValuePairs-schema.json"

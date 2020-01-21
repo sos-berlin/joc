@@ -3,6 +3,8 @@ package com.sos.joc.schedules.impl;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.schedule.SchedulesFilter;
@@ -22,7 +24,8 @@ public class SchedulesResourcePImplTest {
         SchedulesFilter schedulesFilterSchema = new SchedulesFilter();
         schedulesFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         SchedulesResourcePImpl schedulesResourcePImpl = new SchedulesResourcePImpl();
-        JOCDefaultResponse jobsResponse = schedulesResourcePImpl.postSchedulesP(accessToken, schedulesFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(schedulesFilterSchema);
+        JOCDefaultResponse jobsResponse = schedulesResourcePImpl.postSchedulesP(accessToken, b);
         SchedulesP schedulesPSchema = (SchedulesP) jobsResponse.getEntity();
         assertEquals("postSchedulesPTest", TestEnvWebserviceTest.JOB_USED, schedulesPSchema.getSchedules().get(0).getUsedByJobs().get(0).getJob());
     }

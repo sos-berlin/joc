@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "fileIds": {
       "type": "array",
@@ -40,13 +40,13 @@
     "sourceFiles": {
       "type": "array",
       "items": {
-        "type": "string"
+        "$ref": "../common/clob-schema.json"
       }
     },
     "targetFiles": {
       "type": "array",
       "items": {
-        "type": "string"
+        "$ref": "../common/clob-schema.json"
       }
     },
     "limit": {

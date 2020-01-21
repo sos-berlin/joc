@@ -25,6 +25,7 @@ import com.sos.joc.model.configuration.ConfigurationType;
 import com.sos.joc.model.configuration.Configurations;
 import com.sos.joc.model.configuration.ConfigurationsDeleteFilter;
 import com.sos.joc.model.configuration.ConfigurationsFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("configurations")
 public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJocConfigurationsResource {
@@ -33,21 +34,11 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
     private static final String API_CALL_DELETE = "./configurations/delete";
 
     @Override
-    public JOCDefaultResponse postConfigurations(String xAccessToken, String accessToken, ConfigurationsFilter configurationsFilter)
-            throws Exception {
-        return postConfigurations(getAccessToken(xAccessToken, accessToken), configurationsFilter);
-    }
-    
-    @Override
-    public JOCDefaultResponse postConfigurationsDelete(String xAccessToken, String accessToken, ConfigurationsDeleteFilter configurationsFilter)
-            throws Exception {
-        return postConfigurationsDelete(getAccessToken(xAccessToken, accessToken), configurationsFilter);
-    }
-
-    public JOCDefaultResponse postConfigurations(String accessToken, ConfigurationsFilter configurationsFilter) throws Exception {
+    public JOCDefaultResponse postConfigurations(String accessToken, byte[] configurationsFilterBytes) {
         SOSHibernateSession connection = null;
         try {
-
+            JsonValidator.validateFailFast(configurationsFilterBytes, ConfigurationsFilter.class);
+            ConfigurationsFilter configurationsFilter = Globals.objectMapper.readValue(configurationsFilterBytes, ConfigurationsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, configurationsFilter, accessToken, configurationsFilter.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -146,9 +137,12 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
         }
     }
     
-    public JOCDefaultResponse postConfigurationsDelete(String accessToken, ConfigurationsDeleteFilter configurationsFilter) throws Exception {
+    @Override
+    public JOCDefaultResponse postConfigurationsDelete(String accessToken, byte[] configurationsFilterBytes) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(configurationsFilterBytes, ConfigurationsDeleteFilter.class);
+            ConfigurationsDeleteFilter configurationsFilter = Globals.objectMapper.readValue(configurationsFilterBytes, ConfigurationsDeleteFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE, configurationsFilter, accessToken, "", getPermissonsJocCockpit("",
                     accessToken).getJobschedulerMaster().getAdministration().isEditPermissions());
             if (jocDefaultResponse != null) {

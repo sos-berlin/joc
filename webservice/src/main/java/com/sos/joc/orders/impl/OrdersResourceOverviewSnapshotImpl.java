@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -30,6 +31,7 @@ import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.order.OrdersSnapshot;
 import com.sos.joc.model.order.OrdersSummary;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
+import com.sos.schema.JsonValidator;
 
 @Path("orders")
 public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implements IOrdersResourceOverviewSnapshot {
@@ -37,14 +39,12 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
     private static final String API_CALL = "./orders/overview/snapshot";
 
     @Override
-    public JOCDefaultResponse postOrdersOverviewSnapshot(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-        return postOrdersOverviewSnapshot(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
-    }
-
-	public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter jobChainsFilter)
-			throws Exception {
+    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, byte[] jobChainsFilterBytes) {
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken,
+		    JsonValidator.validateFailFast(jobChainsFilterBytes, JobChainsFilter.class);
+		    JobChainsFilter jobChainsFilter = Globals.objectMapper.readValue(jobChainsFilterBytes, JobChainsFilter.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken,
 					jobChainsFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(jobChainsFilter.getJobschedulerId(), accessToken).getOrder().getView()
 							.isStatus());

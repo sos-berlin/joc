@@ -9,7 +9,7 @@
   ],
   "properties": {
     "code": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "message": {
       "type": "string"

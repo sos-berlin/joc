@@ -9,7 +9,7 @@
   ],
   "properties": {
     "name": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "maxProcesses": {
       "$ref": "../common/nonNegativeInteger-schema.json"
@@ -18,7 +18,7 @@
       "$ref": "../common/nonNegativeInteger-schema.json"
     },
     "remoteScheduler": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "remoteSchedulers": {
       "xmlElement": "remote_schedulers",
@@ -30,7 +30,8 @@
       "properties": {
         "select": {
           "description": "first, next",
-          "type": "string"
+          "type": "string",
+          "pattern": "^(first|next)$"
         },
         "list": {
           "type": "array",
@@ -43,7 +44,7 @@
             ],
             "properties": {
               "remoteScheduler": {
-                "type": "string"
+                "$ref": "../common/string255-schema.json"
               },
               "httpHeartbeatTimeout": {
                 "$ref": "../common/nonNegativeInteger-schema.json" 

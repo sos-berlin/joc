@@ -18,6 +18,7 @@ import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.order.resource.IOrderRunTimeResource;
+import com.sos.schema.JsonValidator;
 
 @Path("order")
 public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderRunTimeResource {
@@ -25,14 +26,12 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
 	private static final String API_CALL = "./order/run_time";
 
 	@Override
-	public JOCDefaultResponse postOrderRunTime(String xAccessToken, String accessToken, OrderFilter orderFilter)
-			throws Exception {
-		return postOrderRunTime(getAccessToken(xAccessToken, accessToken), orderFilter);
-	}
-
-	public JOCDefaultResponse postOrderRunTime(String accessToken, OrderFilter orderFilter) throws Exception {
+	public JOCDefaultResponse postOrderRunTime(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(filterBytes, OrderFilter.class);
+		    OrderFilter orderFilter = Globals.objectMapper.readValue(filterBytes, OrderFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken,
 					orderFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(orderFilter.getJobschedulerId(), accessToken).getOrder().getView()

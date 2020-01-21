@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.jobChain.JobChainHistoryFilter;
@@ -25,7 +27,8 @@ public class JobChainResourceHistoryImplTest {
         jobChainHistoryFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         jobChainHistoryFilterSchema.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
         JobChainResourceHistoryImpl jobChainHistoryImpl = new JobChainResourceHistoryImpl();
-        JOCDefaultResponse jobsResponse = jobChainHistoryImpl.postJobChainHistory(accessToken, jobChainHistoryFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobChainHistoryFilterSchema);
+        JOCDefaultResponse jobsResponse = jobChainHistoryImpl.postJobChainHistory(accessToken, b);
         OrderHistory historySchema = (OrderHistory) jobsResponse.getEntity();
         assertEquals("postJobChainHistoryTest", TestEnvWebserviceTest.JOB_CHAIN, historySchema.getHistory().get(0).getJobChain());
     }

@@ -16,6 +16,7 @@ import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -26,6 +27,7 @@ import com.sos.joc.model.jobscheduler.AgentFilter;
 import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.AgentUrl;
 import com.sos.joc.model.jobscheduler.AgentsV;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements IJobSchedulerResourceAgents {
@@ -34,12 +36,11 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
 	private static final String AGENTS_API_LIST_PATH = "/jobscheduler/master/api/agent/";
 
 	@Override
-	public JOCDefaultResponse postJobschedulerAgents(String xAccessToken, String accessToken, AgentFilter agentFilter) {
-		return postJobschedulerAgents(getAccessToken(xAccessToken, accessToken), agentFilter);
-	}
-
-	public JOCDefaultResponse postJobschedulerAgents(String accessToken, AgentFilter agentFilter) {
+	public JOCDefaultResponse postJobschedulerAgents(String accessToken, byte[] filterBytes) {
 		try {
+		    JsonValidator.validateFailFast(filterBytes, AgentFilter.class);
+		    AgentFilter agentFilter = Globals.objectMapper.readValue(filterBytes, AgentFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, agentFilter, accessToken,
 					agentFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken)

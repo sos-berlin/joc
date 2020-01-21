@@ -12,6 +12,7 @@ import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.schedule.ScheduleFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceCalendars;
+import com.sos.schema.JsonValidator;
 
 @Path("schedule")
 public class ScheduleResourceCalendarsImpl extends JOCResourceImpl implements IScheduleResourceCalendars {
@@ -19,10 +20,13 @@ public class ScheduleResourceCalendarsImpl extends JOCResourceImpl implements IS
     private static final String API_CALL = "./schedule/calendars";
 
     @Override
-    public JOCDefaultResponse postScheduleCalendars(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
+    public JOCDefaultResponse postScheduleCalendars(String accessToken, byte[] scheduleFilterBytes) {
         SOSHibernateSession connection = null;
 
         try {
+            JsonValidator.validateFailFast(scheduleFilterBytes, ScheduleFilter.class);
+            ScheduleFilter scheduleFilter = Globals.objectMapper.readValue(scheduleFilterBytes, ScheduleFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleFilter, accessToken, scheduleFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(scheduleFilter.getJobschedulerId(), accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {

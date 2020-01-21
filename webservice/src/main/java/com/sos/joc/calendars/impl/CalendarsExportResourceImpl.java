@@ -31,6 +31,7 @@ import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.calendar.CalendarsFilter;
 import com.sos.joc.model.calendar.UsedBy;
 import com.sos.joc.model.common.Folder;
+import com.sos.schema.JsonValidator;
 
 @Path("calendars")
 public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICalendarsExportResource {
@@ -38,9 +39,12 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
     private static final String API_CALL = "./calendars/export";
 
     @Override
-    public JOCDefaultResponse exportCalendars(String accessToken, CalendarsFilter calendarsFilter) throws Exception {
+    public JOCDefaultResponse exportCalendars(String accessToken, byte[] filterBytes) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, CalendarsFilter.class);
+            CalendarsFilter calendarsFilter = Globals.objectMapper.readValue(filterBytes, CalendarsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarsFilter, accessToken, calendarsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(calendarsFilter.getJobschedulerId(), accessToken).getCalendar().getView().isStatus());
             if (jocDefaultResponse != null) {

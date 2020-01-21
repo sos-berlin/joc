@@ -8,7 +8,7 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "jobs": {
       "type": "array",
@@ -51,7 +51,7 @@
     },
     "timeZone": {
       "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "folders": {
       "$ref": "../common/folders-schema.json"

@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Folder;
@@ -33,7 +35,8 @@ public class JobsResourcePImplTest {
         folders.add(folder);
         jobsFilterSchema.setFolders(folders);
         JobsResourcePImpl jobsPImpl = new JobsResourcePImpl();
-        JOCDefaultResponse jobsPResponse = jobsPImpl.postJobsP(accessToken, jobsFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobsFilterSchema);
+        JOCDefaultResponse jobsPResponse = jobsPImpl.postJobsP(accessToken, b);
         JobsP jobsPSchema = (JobsP) jobsPResponse.getEntity();
         assertEquals("postJobsPTest", TestEnvWebserviceTest.JOB, jobsPSchema.getJobs().get(0).getPath());
     }

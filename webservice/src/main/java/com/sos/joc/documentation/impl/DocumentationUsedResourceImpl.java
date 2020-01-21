@@ -14,6 +14,7 @@ import com.sos.joc.documentation.resource.IDocumentationUsedResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.docu.DocumentationFilter;
 import com.sos.joc.model.docu.UsedBy;
+import com.sos.schema.JsonValidator;
 
 @Path("documentation")
 public class DocumentationUsedResourceImpl extends JOCResourceImpl implements IDocumentationUsedResource {
@@ -21,9 +22,11 @@ public class DocumentationUsedResourceImpl extends JOCResourceImpl implements ID
     private static final String API_CALL = "./documentation/used";
 
     @Override
-    public JOCDefaultResponse postDocumentationsUsed(String xAccessToken, DocumentationFilter filter) throws Exception {
+    public JOCDefaultResponse postDocumentationsUsed(String xAccessToken, byte[] filterBytes) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, DocumentationFilter.class);
+            DocumentationFilter filter = Globals.objectMapper.readValue(filterBytes, DocumentationFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
                     .getJobschedulerId(), xAccessToken).getDocumentation().isView());
             if (jocDefaultResponse != null) {

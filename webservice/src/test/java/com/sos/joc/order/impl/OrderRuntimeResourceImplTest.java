@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.RunTime200;
@@ -26,7 +28,8 @@ public class OrderRuntimeResourceImplTest {
         orderFilterSchema.setOrderId(TestEnvWebserviceTest.ORDER);
         orderFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrderRunTimeResourceImpl orderRunTimeImpl = new OrderRunTimeResourceImpl();
-        JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(accessToken, orderFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(orderFilterSchema);
+        JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(accessToken, b);
         RunTime200 orderRunTimeSchema = (RunTime200) ordersResponse.getEntity();
         assertTrue("postOrderRunTimeTest", orderRunTimeSchema.getRunTime().getRunTime().startsWith("<run_time>"));
     }

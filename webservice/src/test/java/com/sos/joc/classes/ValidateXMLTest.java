@@ -54,7 +54,6 @@ public class ValidateXMLTest {
         jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
         jsonMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         jsonMapper.disable(SerializationFeature.WRAP_ROOT_VALUE);
-        jsonMapper.disable(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS);
         jsonMapper.disable(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED);
 //        jsonMapper.enable(SerializationFeature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS);
         jsonMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'"));
@@ -80,7 +79,6 @@ public class ValidateXMLTest {
         xmlMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, Boolean.FALSE);
 //        xmlMapper.configure(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS, Boolean.FALSE);
 //        xmlMapper.configure(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED, Boolean.TRUE);
-        xmlMapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, Boolean.FALSE);
 //        xmlMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, Boolean.FALSE);
 //        xmlMapper.configure(SerializationFeature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS, Boolean.TRUE);
         xmlMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'"));

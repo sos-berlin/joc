@@ -2,6 +2,7 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -12,6 +13,7 @@ import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
 import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl
@@ -26,14 +28,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl
 	private static String API_CALL = "./jobscheduler/";
 
 	@Override
-	public JOCDefaultResponse postJobschedulerTerminate(String xAccessToken, String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-		return postJobschedulerTerminate(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
-	}
-
-	public JOCDefaultResponse postJobschedulerTerminate(String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
+	public JOCDefaultResponse postJobschedulerTerminate(String accessToken, byte[] filterBytes) {
 		try {
+		    JsonValidator.validateFailFast(filterBytes, HostPortTimeOutParameter.class);
+		    HostPortTimeOutParameter urlTimeoutParamSchema = Globals.objectMapper.readValue(filterBytes, HostPortTimeOutParameter.class);
+            
 			boolean permission = getPermissonsJocCockpit(urlTimeoutParamSchema.getJobschedulerId(), accessToken)
 					.getJobschedulerMaster().getExecute().isTerminate();
 			return executeModifyJobSchedulerCommand(TERMINATE, urlTimeoutParamSchema, accessToken, permission);
@@ -46,14 +45,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl
 	}
 
 	@Override
-	public JOCDefaultResponse postJobschedulerRestartTerminate(String xAccessToken, String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-		return postJobschedulerRestartTerminate(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
-	}
-
-	public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
+	public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, byte[] filterBytes) {
 		try {
+		    JsonValidator.validateFailFast(filterBytes, HostPortTimeOutParameter.class);
+            HostPortTimeOutParameter urlTimeoutParamSchema = Globals.objectMapper.readValue(filterBytes, HostPortTimeOutParameter.class);
+            
 			boolean permission = getPermissonsJocCockpit(urlTimeoutParamSchema.getJobschedulerId(), accessToken)
 					.getJobschedulerMaster().getExecute().getRestart().isTerminate();
 			return executeModifyJobSchedulerCommand(RESTART, urlTimeoutParamSchema, accessToken, permission);
@@ -66,14 +62,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl
 	}
 
 	@Override
-	public JOCDefaultResponse postJobschedulerAbort(String xAccessToken, String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-		return postJobschedulerAbort(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
-	}
-
-	public JOCDefaultResponse postJobschedulerAbort(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema)
-			throws Exception {
+	public JOCDefaultResponse postJobschedulerAbort(String accessToken, byte[] filterBytes) {
 		try {
+		    JsonValidator.validateFailFast(filterBytes, HostPortTimeOutParameter.class);
+            HostPortTimeOutParameter urlTimeoutParamSchema = Globals.objectMapper.readValue(filterBytes, HostPortTimeOutParameter.class);
+            
 			boolean permission = getPermissonsJocCockpit(urlTimeoutParamSchema.getJobschedulerId(), accessToken)
 					.getJobschedulerMaster().getExecute().isAbort();
 			return executeModifyJobSchedulerCommand(ABORT, urlTimeoutParamSchema, accessToken, permission);
@@ -86,14 +79,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl
 	}
 
 	@Override
-	public JOCDefaultResponse postJobschedulerRestartAbort(String xAccessToken, String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-		return postJobschedulerRestartAbort(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
-	}
-
-	public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
+	public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken, byte[] filterBytes) {
 		try {
+		    JsonValidator.validateFailFast(filterBytes, HostPortTimeOutParameter.class);
+            HostPortTimeOutParameter urlTimeoutParamSchema = Globals.objectMapper.readValue(filterBytes, HostPortTimeOutParameter.class);
+            
 			boolean permission = getPermissonsJocCockpit(urlTimeoutParamSchema.getJobschedulerId(), accessToken)
 					.getJobschedulerMaster().getExecute().getRestart().isAbort();
 			return executeModifyJobSchedulerCommand(ABORT_AND_RESTART, urlTimeoutParamSchema, accessToken, permission);
@@ -106,14 +96,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl
 	}
 
 	@Override
-	public JOCDefaultResponse postJobschedulerPause(String xAccessToken, String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-		return postJobschedulerPause(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
-	}
-
-	public JOCDefaultResponse postJobschedulerPause(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema)
-			throws Exception {
+	public JOCDefaultResponse postJobschedulerPause(String accessToken, byte[] filterBytes) {
 		try {
+		    JsonValidator.validateFailFast(filterBytes, HostPortTimeOutParameter.class);
+            HostPortTimeOutParameter urlTimeoutParamSchema = Globals.objectMapper.readValue(filterBytes, HostPortTimeOutParameter.class);
+            
 			boolean permission = getPermissonsJocCockpit(urlTimeoutParamSchema.getJobschedulerId(), accessToken)
 					.getJobschedulerMaster().getExecute().isPause();
 			return executeModifyJobSchedulerCommand(PAUSE, urlTimeoutParamSchema, accessToken, permission);
@@ -126,15 +113,12 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl
 	}
 
 	@Override
-	public JOCDefaultResponse postJobschedulerContinue(String xAccessToken, String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-		return postJobschedulerContinue(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
-	}
-
-	public JOCDefaultResponse postJobschedulerContinue(String accessToken,
-			HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
+	public JOCDefaultResponse postJobschedulerContinue(String accessToken, byte[] filterBytes) {
 		try {
-			boolean permission = getPermissonsJocCockpit(urlTimeoutParamSchema.getJobschedulerId(), accessToken)
+		    JsonValidator.validateFailFast(filterBytes, HostPortTimeOutParameter.class);
+            HostPortTimeOutParameter urlTimeoutParamSchema = Globals.objectMapper.readValue(filterBytes, HostPortTimeOutParameter.class);
+            
+            boolean permission = getPermissonsJocCockpit(urlTimeoutParamSchema.getJobschedulerId(), accessToken)
 					.getJobschedulerMaster().getExecute().isContinue();
 			return executeModifyJobSchedulerCommand(CONTINUE, urlTimeoutParamSchema, accessToken, permission);
 		} catch (JocException e) {

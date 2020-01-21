@@ -19,6 +19,7 @@ import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSupervisor;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.jobscheduler.JobSchedulerV;
 import com.sos.joc.model.jobscheduler.JobSchedulerV200;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implements IJobSchedulerResourceSupervisor {
@@ -26,17 +27,14 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
 	private static final String API_CALL = "./jobscheduler/supervisor";
 
 	@Override
-	public JOCDefaultResponse postJobschedulerSupervisor(String xAccessToken, String accessToken,
-			JobSchedulerId jobSchedulerId) throws Exception {
-		return postJobschedulerSupervisor(getAccessToken(xAccessToken, accessToken), jobSchedulerId);
-	}
-
-	public JOCDefaultResponse postJobschedulerSupervisor(String accessToken, JobSchedulerId jobSchedulerId)
-			throws Exception {
+	public JOCDefaultResponse postJobschedulerSupervisor(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
 
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken,
+		    JsonValidator.validateFailFast(filterBytes, JobSchedulerId.class);
+            JobSchedulerId jobSchedulerId = Globals.objectMapper.readValue(filterBytes, JobSchedulerId.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken,
 					jobSchedulerId.getJobschedulerId(),
 					getPermissonsJocCockpit(jobSchedulerId.getJobschedulerId(), accessToken).getJobschedulerMaster()
 							.getView().isStatus());

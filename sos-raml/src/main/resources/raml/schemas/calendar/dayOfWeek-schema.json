@@ -1,8 +1,8 @@
 {
   "title": "dayOfWeek number",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "description": "digit from 0-6, 0=Sunday, 1=Monday, ..., 6=Saturday",
+  "description": "digit from 0-6, 0=Sunday, 1=Monday, ..., 6=Saturday, 7=Sunday (again)",
   "type": "integer",
   "minimum": 0,
-  "maximum": 6
+  "maximum": 7
 }

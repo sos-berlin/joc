@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "fileId": {
       "$ref": "../common/nonNegativeLong-schema.json"

@@ -20,6 +20,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.job.JobFilter;
 import com.sos.joc.model.job.JobP;
 import com.sos.joc.model.job.JobP200;
+import com.sos.schema.JsonValidator;
 
 @Path("job")
 public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
@@ -27,14 +28,13 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
     private static final String API_CALL = "./job/p";
 
     @Override
-    public JOCDefaultResponse postJobP(String xAccessToken, String accessToken, JobFilter jobFilter) throws Exception {
-        return postJobP(getAccessToken(xAccessToken, accessToken), jobFilter);
-    }
-
-    public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter) {
+    public JOCDefaultResponse postJobP(String accessToken, byte[] jobFilterBytes) {
 
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(jobFilterBytes, JobFilter.class);
+            JobFilter jobFilter = Globals.objectMapper.readValue(jobFilterBytes, JobFilter.class);
+            
             // TODO: folder permissions
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());

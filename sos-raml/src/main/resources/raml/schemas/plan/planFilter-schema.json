@@ -8,7 +8,7 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "regex": {
       "$ref": "../common/regexFilter-schema.json"
@@ -32,7 +32,7 @@
     },
     "timeZone": {
       "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "folders": {
 	  "$ref": "../common/folders-schema.json"
@@ -44,7 +44,7 @@
       "$ref": "../common/path-schema.json"
     },
     "orderId": {
-      "type": "string"
+      "$ref": "../common/filename255-schema.json"
     }
   }
 }

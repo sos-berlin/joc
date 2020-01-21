@@ -8,14 +8,14 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "id": {
       "description": "=0, if customization is new",
       "$ref": "../common/nonNegativeLong-schema.json"
     },
     "account": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "configurationType": {
       "$ref": "type-schema.json"
@@ -26,7 +26,7 @@
     },
     "name": {
       "description": "required if configurationType equals CUSTOMIZATION",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "shared": {
       "type": "boolean",
@@ -34,7 +34,7 @@
     },
     "configurationItem": {
       "description": "JSON object as string,  depends on configuration type",
-      "type": "string"
+      "$ref": "../common/clob-schema.json"
     }
   }
 }

@@ -5,16 +5,16 @@
   "type": "object",
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "host": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "port": {
       "$ref": "../common/port-schema.json"
     },
     "filename": {
-      "type": "string"
+      "$ref": "../common/filename255-schema.json"
     },
     "auditLog": {
       "$ref": "../audit/auditParams-schema.json"

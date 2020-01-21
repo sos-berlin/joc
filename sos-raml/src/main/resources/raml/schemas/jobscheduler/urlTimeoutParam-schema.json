@@ -8,10 +8,10 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "host": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "port": {
       "$ref": "../common/port-schema.json"

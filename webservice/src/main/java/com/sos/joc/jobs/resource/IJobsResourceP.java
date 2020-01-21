@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.job.JobsFilter;
 
 
 public interface IJobsResourceP {
@@ -16,7 +15,6 @@ public interface IJobsResourceP {
     @POST
     @Path("p")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsP(            
-            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, JobsFilter jobsFilter) throws Exception;
+    public JOCDefaultResponse postJobsP(@HeaderParam("X-Access-Token") String accessToken, byte[] jobsFilterBytes);
 }
 

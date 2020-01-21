@@ -29,7 +29,8 @@ public class LocksResourcePImplTest {
         LocksFilter locksFilterSchema = new LocksFilter();
         locksFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         LocksResourcePImpl locksResourcePImpl = new LocksResourcePImpl();
-        JOCDefaultResponse jobsResponse = locksResourcePImpl.postLocksP(accessToken, locksFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(locksFilterSchema);
+        JOCDefaultResponse jobsResponse = locksResourcePImpl.postLocksP(accessToken, b);
         LocksP locksVSchema = (LocksP) jobsResponse.getEntity();
         assertEquals("postLocksTest", TestEnvWebserviceTest.LOCK, Globals.normalizePath(locksVSchema.getLocks().get(0).getName()));
         LOGGER.info(jobsResponse.toString());

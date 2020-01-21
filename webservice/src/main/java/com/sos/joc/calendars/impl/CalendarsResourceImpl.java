@@ -32,6 +32,7 @@ import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.calendar.CalendarsFilter;
 import com.sos.joc.model.calendar.UsedBy;
 import com.sos.joc.model.common.Folder;
+import com.sos.schema.JsonValidator;
 
 @Path("calendars")
 public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendarsResource {
@@ -39,18 +40,21 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
     private static final String API_CALL = "./calendars";
 
     @Override
-    public JOCDefaultResponse postCalendars(String accessToken, CalendarsFilter calendarsFilter) throws Exception {
+    public JOCDefaultResponse postCalendars(String accessToken, byte[] calendarsFilter) {
         return postCalendars(accessToken, calendarsFilter, false);
     }
 
     @Override
-    public JOCDefaultResponse postUsedBy(String accessToken, CalendarsFilter calendarsFilter) throws Exception {
+    public JOCDefaultResponse postUsedBy(String accessToken, byte[] calendarsFilter) {
         return postCalendars(accessToken, calendarsFilter, true);
     }
 
-    public JOCDefaultResponse postCalendars(String accessToken, CalendarsFilter calendarsFilter, boolean withUsedBy) throws Exception {
+    public JOCDefaultResponse postCalendars(String accessToken, byte[] filterBytes, boolean withUsedBy) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, CalendarsFilter.class);
+            CalendarsFilter calendarsFilter = Globals.objectMapper.readValue(filterBytes, CalendarsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarsFilter, accessToken, calendarsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(calendarsFilter.getJobschedulerId(), accessToken).getCalendar().getView().isStatus());
             if (jocDefaultResponse != null) {

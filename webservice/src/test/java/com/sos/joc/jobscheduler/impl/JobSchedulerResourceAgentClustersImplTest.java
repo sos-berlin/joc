@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceAgentClustersImpl;
@@ -25,8 +27,8 @@ public class JobSchedulerResourceAgentClustersImplTest {
         AgentClusterFilter agentClusterFilterSchema = new AgentClusterFilter();
         agentClusterFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceAgentClustersImpl jobschedulerResourceAgentClustersImpl = new JobSchedulerResourceAgentClustersImpl();
-        JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceAgentClustersImpl.postJobschedulerAgentClusters(accessToken,
-                agentClusterFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(agentClusterFilterSchema);
+        JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceAgentClustersImpl.postJobschedulerAgentClusters(accessToken, b);
         AgentClusters agentClustersVSchema = (AgentClusters) jobschedulerClusterResponse.getEntity();
         assertEquals("postjobschedulerClusterTest", 1, agentClustersVSchema.getAgentClusters().get(0).getNumOfAgents().getAny().intValue());
     }

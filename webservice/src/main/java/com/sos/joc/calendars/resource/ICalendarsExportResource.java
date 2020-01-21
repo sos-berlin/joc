@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.calendar.CalendarsFilter;
 
  
 public interface ICalendarsExportResource {
@@ -16,5 +15,5 @@ public interface ICalendarsExportResource {
     @POST
     @Path("export")
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
-    public JOCDefaultResponse exportCalendars(@HeaderParam("X-Access-Token") String xAccessToken, CalendarsFilter calendarsFilter) throws Exception;
+    public JOCDefaultResponse exportCalendars(@HeaderParam("X-Access-Token") String xAccessToken, byte[] calendarsFilter);
 }

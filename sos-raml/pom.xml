@@ -48,7 +48,7 @@
 			<plugin>
 				<groupId>org.jsonschema2pojo</groupId>
 				<artifactId>jsonschema2pojo-maven-plugin</artifactId>
-				<version>0.4.23</version>
+				<version>0.5.1</version>
 				<dependencies>
 					<dependency>
 						<groupId>com.sos-berlin</groupId>
@@ -89,6 +89,7 @@
 				<executions>
 					<execution>
 						<id>generate-joc-model</id>
+						<phase>process-classes</phase>
 						<configuration>
 							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
 							<targetPackage>com.sos.joc.model</targetPackage>
@@ -112,6 +113,7 @@
 					</execution>
 					<execution>
 						<id>generate-calendar-model</id>
+						<phase>process-classes</phase>
 						<configuration>
 							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
 							<targetPackage>com.sos.joc.model</targetPackage>
@@ -130,6 +132,7 @@
 					</execution>
 					<execution>
 						<id>generate-event-model</id>
+						<phase>process-classes</phase>
 						<configuration>
 							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
 							<targetPackage>com.sos.jobscheduler.model</targetPackage>
@@ -147,6 +150,7 @@
 					</execution>
 					<execution>
 						<id>generate-agent-model</id>
+						<phase>process-classes</phase>
 						<configuration>
 							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
 							<targetPackage>com.sos.joc.model</targetPackage>
@@ -182,11 +186,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.sos-berlin.commons</groupId>
-			<artifactId>sos-json</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
@@ -194,18 +193,11 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jsonschema2pojo</groupId>
-			<artifactId>jsonschema2pojo-core</artifactId>
-			<version>0.5.1</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

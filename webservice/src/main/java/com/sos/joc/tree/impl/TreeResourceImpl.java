@@ -8,6 +8,7 @@ import java.util.SortedSet;
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.tree.TreePermanent;
@@ -18,6 +19,7 @@ import com.sos.joc.model.tree.Tree;
 import com.sos.joc.model.tree.TreeFilter;
 import com.sos.joc.model.tree.TreeView;
 import com.sos.joc.tree.resource.ITreeResource;
+import com.sos.schema.JsonValidator;
 
 @Path("tree")
 public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
@@ -25,12 +27,11 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
 	private static final String API_CALL = "./tree";
 
 	@Override
-	public JOCDefaultResponse postTree(String xAccessToken, String accessToken, TreeFilter treeBody) throws Exception {
-		return postTree(getAccessToken(xAccessToken, accessToken), treeBody);
-	}
-
-	public JOCDefaultResponse postTree(String accessToken, TreeFilter treeBody) throws Exception {
+	public JOCDefaultResponse postTree(String accessToken, byte[] treeBodyBytes) {
 		try {
+		    JsonValidator.validateFailFast(treeBodyBytes, TreeFilter.class);
+		    TreeFilter treeBody = Globals.objectMapper.readValue(treeBodyBytes, TreeFilter.class);
+            
 			List<JobSchedulerObjectType> types = null;
 			boolean permission = false;
 			SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(treeBody.getJobschedulerId(), accessToken);

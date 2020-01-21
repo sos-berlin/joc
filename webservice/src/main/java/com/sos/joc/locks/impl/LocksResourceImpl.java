@@ -12,6 +12,7 @@ import javax.ws.rs.Path;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -25,6 +26,7 @@ import com.sos.joc.model.lock.LockPath;
 import com.sos.joc.model.lock.LockV;
 import com.sos.joc.model.lock.LocksFilter;
 import com.sos.joc.model.lock.LocksV;
+import com.sos.schema.JsonValidator;
 
 @Path("locks")
 public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource {
@@ -33,12 +35,11 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
     private JOCXmlCommand jocXmlCommand;
 
     @Override
-    public JOCDefaultResponse postLocks(String xAccessToken, String accessToken, LocksFilter locksFilter) throws Exception {
-        return postLocks(getAccessToken(xAccessToken, accessToken), locksFilter);
-    }
-
-    public JOCDefaultResponse postLocks(String accessToken, LocksFilter locksFilter) throws Exception {
+    public JOCDefaultResponse postLocks(String accessToken, byte[] locksFilterBytes) {
         try {
+            JsonValidator.validateFailFast(locksFilterBytes, LocksFilter.class);
+            LocksFilter locksFilter = Globals.objectMapper.readValue(locksFilterBytes, LocksFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, locksFilter, accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     locksFilter.getJobschedulerId(), accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {

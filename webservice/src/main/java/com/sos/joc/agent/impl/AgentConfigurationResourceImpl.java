@@ -41,6 +41,7 @@ import com.sos.joc.model.processClass.Configuration;
 import com.sos.joc.model.processClass.ConfigurationEdit;
 import com.sos.joc.model.processClass.ModifyProcessClass;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("process_class")
 public class AgentConfigurationResourceImpl extends JOCResourceImpl implements IAgentConfigurationResource {
@@ -49,8 +50,11 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
     private static final String FILE_EXTENSION = ".process_class.xml";
 
     @Override
-    public JOCDefaultResponse readAgentConfiguration(String accessToken, ProcessClassConfigurationFilter agentFilter) throws Exception {
+    public JOCDefaultResponse readAgentConfiguration(String accessToken, byte[] agentFilterBytes) {
         try {
+            JsonValidator.validateFailFast(agentFilterBytes, ProcessClassConfigurationFilter.class);
+            ProcessClassConfigurationFilter agentFilter = Globals.objectMapper.readValue(agentFilterBytes, ProcessClassConfigurationFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "read", agentFilter, accessToken, agentFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken).getProcessClass().getView().isConfiguration());
             if (jocDefaultResponse != null) {
@@ -86,8 +90,11 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
     }
 
     @Override
-    public JOCDefaultResponse saveAgentConfiguration(String accessToken, ConfigurationEdit configuration) throws Exception {
+    public JOCDefaultResponse saveAgentConfiguration(String accessToken, byte[] configurationBytes) {
         try {
+            JsonValidator.validateFailFast(configurationBytes, ConfigurationEdit.class);
+            ConfigurationEdit configuration = Globals.objectMapper.readValue(configurationBytes, ConfigurationEdit.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "save", configuration, accessToken, configuration.getJobschedulerId(),
                     getPermissonsJocCockpit(configuration.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());
             if (jocDefaultResponse != null) {
@@ -131,8 +138,11 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
     }
 
     @Override
-    public JOCDefaultResponse deleteAgentConfiguration(String accessToken, ConfigurationEdit agentFilter) throws Exception {
+    public JOCDefaultResponse deleteAgentConfiguration(String accessToken, byte[] agentFilterBytes) {
         try {
+            JsonValidator.validateFailFast(agentFilterBytes, ConfigurationEdit.class);
+            ConfigurationEdit agentFilter = Globals.objectMapper.readValue(agentFilterBytes, ConfigurationEdit.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "delete", agentFilter, accessToken, agentFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(agentFilter.getJobschedulerId(), accessToken).getProcessClass().getChange().isHotFolder());
             if (jocDefaultResponse != null) {

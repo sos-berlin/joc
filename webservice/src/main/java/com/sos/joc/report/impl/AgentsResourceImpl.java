@@ -27,6 +27,7 @@ import com.sos.joc.model.report.Agent;
 import com.sos.joc.model.report.Agents;
 import com.sos.joc.model.report.AgentsFilter;
 import com.sos.joc.report.resource.IAgentsResource;
+import com.sos.schema.JsonValidator;
 
 @Path("report")
 public class AgentsResourceImpl extends JOCResourceImpl implements IAgentsResource {
@@ -66,10 +67,13 @@ public class AgentsResourceImpl extends JOCResourceImpl implements IAgentsResour
 	}
 
 	@Override
-	public JOCDefaultResponse postAgentsReport(String accessToken, AgentsFilter agentsFilter) throws Exception {
+	public JOCDefaultResponse postAgentsReport(String accessToken, byte[] agentsFilterBytes) {
 		SOSHibernateSession connection = null;
 
 		try {
+		    JsonValidator.validateFailFast(agentsFilterBytes, AgentsFilter.class);
+		    AgentsFilter agentsFilter = Globals.objectMapper.readValue(agentsFilterBytes, AgentsFilter.class);
+            
 			if (agentsFilter.getJobschedulerId() == null) {
 				agentsFilter.setJobschedulerId("");
 			}

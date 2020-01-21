@@ -11,19 +11,20 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "jobChain": {
       "$ref": "../common/path-schema.json"
     },
     "orderId": {
-      "type": "string"
+      "$ref": "../common/filename255-schema.json"
     },
     "historyId": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^\\d+$"
     },
     "filename": {
-      "type": "string"
+      "$ref": "../common/filename255-schema.json"
     },
     "mime": {
       "$ref": "../common/logMimeFilter-schema.json"

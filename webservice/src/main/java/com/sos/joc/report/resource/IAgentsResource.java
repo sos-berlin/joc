@@ -7,7 +7,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.report.AgentsFilter;
 
  
 public interface IAgentsResource {
@@ -15,6 +14,5 @@ public interface IAgentsResource {
     @POST
     @Path("agents")
     @Produces({ "application/json" })
-    public JOCDefaultResponse postAgentsReport(            
-            @HeaderParam("X-Access-Token") String xAccessToken, AgentsFilter agentsFilter) throws Exception;
+    public JOCDefaultResponse postAgentsReport(@HeaderParam("X-Access-Token") String xAccessToken, byte[] agentsFilter);
 }

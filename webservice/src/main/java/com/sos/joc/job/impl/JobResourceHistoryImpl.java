@@ -32,6 +32,7 @@ import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryFilter;
 import com.sos.joc.model.job.TaskHistoryItem;
+import com.sos.schema.JsonValidator;
 
 @Path("job")
 public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResourceHistory {
@@ -40,13 +41,12 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
     private static final String API_CALL = "./job/history";
 
     @Override
-    public JOCDefaultResponse postJobHistory(String xAccessToken, String accessToken, TaskHistoryFilter taskHistoryFilter) throws Exception {
-        return postJobHistory(getAccessToken(xAccessToken, accessToken), taskHistoryFilter);
-    }
-
-    public JOCDefaultResponse postJobHistory(String accessToken, TaskHistoryFilter taskHistoryFilter) throws Exception {
+    public JOCDefaultResponse postJobHistory(String accessToken, byte[] taskHistoryFilterBytes) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(taskHistoryFilterBytes, TaskHistoryFilter.class);
+            TaskHistoryFilter taskHistoryFilter = Globals.objectMapper.readValue(taskHistoryFilterBytes, TaskHistoryFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskHistoryFilter, accessToken, taskHistoryFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(taskHistoryFilter.getJobschedulerId(), accessToken).getJob().getView().isHistory());
             if (jocDefaultResponse != null) {

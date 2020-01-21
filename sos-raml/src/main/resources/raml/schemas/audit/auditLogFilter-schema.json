@@ -8,7 +8,7 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "jobs": {
       "type": "array",
@@ -39,7 +39,7 @@
           },
           "orderId": {
             "description": "if orderId undefined or empty then all orders of specified job chain are requested",
-            "type": "string"
+            "$ref": "../common/filename255-schema.json"
           }
         }
       }
@@ -54,7 +54,7 @@
       "$ref": "../common/folders-schema.json"
     },
     "account": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "regex": {
       "$ref": "../common/regexFilter-schema.json"
@@ -69,7 +69,7 @@
     },
     "timeZone": {
       "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "limit": {
       "description": "restricts the number of responsed records; -1=unlimited",
@@ -77,7 +77,7 @@
       "default": 10000
     },
     "ticketLink": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     }
   }
 }

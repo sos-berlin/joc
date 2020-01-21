@@ -12,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.annotation.CompressedAlready;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.order.OrderHistoryFilter;
 
 public interface IOrderLogResource {
 
@@ -21,39 +20,36 @@ public interface IOrderLogResource {
     @CompressedAlready
     @Consumes("application/json")
     //@Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrderLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
-            OrderHistoryFilter orderHistoryFilter) throws Exception;
+    public JOCDefaultResponse postOrderLog(@HeaderParam("X-Access-Token") String accessToken, byte[] orderHistoryFilter);
 
     @GET
     @Path("log/html")
     @CompressedAlready
     //@Produces({ MediaType.TEXT_HTML })
-    public JOCDefaultResponse getOrderLogHtml(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+    public JOCDefaultResponse getOrderLogHtml(@HeaderParam("X-Access-Token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
             @QueryParam("orderId") String orderId, @QueryParam("jobChain") String jobChain, @QueryParam("historyId") String historyId,
-            @QueryParam("filename") String filename) throws Exception;
+            @QueryParam("filename") String filename);
 
     @GET
     @Path("log/download")
     @CompressedAlready
     //@Produces({ MediaType.APPLICATION_OCTET_STREAM })
-    public JOCDefaultResponse downloadOrderLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+    public JOCDefaultResponse downloadOrderLog(@HeaderParam("X-Access-Token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
             @QueryParam("orderId") String orderId, @QueryParam("jobChain") String jobChain, @QueryParam("historyId") String historyId,
-            @QueryParam("filename") String filename) throws Exception;
+            @QueryParam("filename") String filename);
 
     @POST
     @Path("log/download")
     @CompressedAlready
     @Consumes("application/json")
     //@Produces({ MediaType.APPLICATION_OCTET_STREAM })
-    public JOCDefaultResponse downloadOrderLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
-            OrderHistoryFilter orderHistoryFilter) throws Exception;
+    public JOCDefaultResponse downloadOrderLog(@HeaderParam("X-Access-Token") String accessToken, byte[] orderHistoryFilter);
 
     @POST
     @Path("log/info")
     @Consumes("application/json")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse getLogInfo(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
-            OrderHistoryFilter orderHistoryFilter) throws Exception;
+    public JOCDefaultResponse getLogInfo(@HeaderParam("X-Access-Token") String accessToken, byte[] orderHistoryFilter);
 }

@@ -26,6 +26,7 @@ import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersP;
 import com.sos.joc.orders.resource.IOrdersResourceP;
+import com.sos.schema.JsonValidator;
 
 @Path("orders")
 public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResourceP {
@@ -33,14 +34,13 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     private static final String API_CALL = "./orders/p";
 
     @Override
-    public JOCDefaultResponse postOrdersP(String xAccessToken, String accessToken, OrdersFilter ordersFilter) throws Exception {
-        return postOrdersP(getAccessToken(xAccessToken, accessToken), ordersFilter);
-    }
-
-    public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilter ordersFilter) throws Exception {
+    public JOCDefaultResponse postOrdersP(String accessToken, byte[] ordersFilterBytes) {
         SOSHibernateSession connection = null;
 
         try {
+            JsonValidator.validateFailFast(ordersFilterBytes, OrdersFilter.class);
+            OrdersFilter ordersFilter = Globals.objectMapper.readValue(ordersFilterBytes, OrdersFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken, ordersFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(ordersFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {

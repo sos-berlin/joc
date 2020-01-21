@@ -7,7 +7,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobscheduler.TimeoutParameter;
 
 public interface IJobSchedulerResourceModifyJobSchedulerCluster {
 
@@ -15,27 +14,23 @@ public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     @Path("cluster/terminate")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JOCDefaultResponse postJobschedulerTerminate(@HeaderParam("X-Access-Token") String xAccessToken,
-            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
+    public JOCDefaultResponse postJobschedulerTerminate(@HeaderParam("X-Access-Token") String accessToken, byte[] timeoutParameter);
 
     @POST
     @Path("cluster/restart")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JOCDefaultResponse postJobschedulerRestartTerminate(@HeaderParam("X-Access-Token") String xAccessToken,
-            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
+    public JOCDefaultResponse postJobschedulerRestartTerminate(@HeaderParam("X-Access-Token") String accessToken, byte[] timeoutParameter);
 
     @POST
     @Path("cluster/reactivate")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JOCDefaultResponse postJobschedulerReactivate(@HeaderParam("X-Access-Token") String xAccessToken,
-            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
+    public JOCDefaultResponse postJobschedulerReactivate(@HeaderParam("X-Access-Token") String accessToken, byte[] timeoutParameter);
 
     @POST
     @Path("cluster/terminate_failsafe")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JOCDefaultResponse postJobschedulerTerminateFailSafe(@HeaderParam("X-Access-Token") String xAccessToken,
-            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
+    public JOCDefaultResponse postJobschedulerTerminateFailSafe(@HeaderParam("X-Access-Token") String accessToken, byte[] timeoutParameter);
 }

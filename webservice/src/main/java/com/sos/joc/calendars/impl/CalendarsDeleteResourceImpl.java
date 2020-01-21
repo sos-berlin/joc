@@ -36,6 +36,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.CalendarsFilter;
 import com.sos.joc.model.common.Err419;
+import com.sos.schema.JsonValidator;
 
 @Path("calendars")
 public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICalendarsDeleteResource {
@@ -46,10 +47,13 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
     private Set<String> eventCommands = new HashSet<String>();
 
     @Override
-    public JOCDefaultResponse postDeleteCalendars(String accessToken, CalendarsFilter calendarsFilter) throws Exception {
+    public JOCDefaultResponse postDeleteCalendars(String accessToken, byte[] filterBytes) {
         SOSHibernateSession connection = null;
         List<DBItemInventoryInstance> clusterMembers = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, CalendarsFilter.class);
+            CalendarsFilter calendarsFilter = Globals.objectMapper.readValue(filterBytes, CalendarsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarsFilter, accessToken, calendarsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(calendarsFilter.getJobschedulerId(), accessToken).getCalendar().getEdit().isDelete());
             if (jocDefaultResponse != null) {

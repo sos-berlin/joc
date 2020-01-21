@@ -12,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.annotation.CompressedAlready;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.job.TaskFilter;
 
 public interface ITaskLogResource {
 
@@ -21,37 +20,34 @@ public interface ITaskLogResource {
     @CompressedAlready
     @Consumes("application/json")
     //@Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTaskLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
-            TaskFilter taskFilter) throws Exception;
+    public JOCDefaultResponse postTaskLog(@HeaderParam("X-Access-Token") String accessToken, byte[] taskFilter);
 
     @GET
     @Path("log/html")
     @CompressedAlready
     //@Produces({ MediaType.TEXT_HTML })
-    public JOCDefaultResponse getTaskLogHtml(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+    public JOCDefaultResponse getTaskLogHtml(@HeaderParam("X-Access-Token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
-            @QueryParam("taskId") String taskId, @QueryParam("filename") String filename) throws Exception;
+            @QueryParam("taskId") String taskId, @QueryParam("filename") String filename);
 
     @GET
     @Path("log/download")
     @CompressedAlready
     //@Produces({ MediaType.APPLICATION_OCTET_STREAM })
-    public JOCDefaultResponse downloadTaskLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+    public JOCDefaultResponse downloadTaskLog(@HeaderParam("X-Access-Token") String accessToken,
             @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
-            @QueryParam("taskId") String taskId, @QueryParam("filename") String filename) throws Exception;
+            @QueryParam("taskId") String taskId, @QueryParam("filename") String filename);
 
     @POST
     @Path("log/download")
     @CompressedAlready
     @Consumes("application/json")
     //@Produces({ MediaType.APPLICATION_OCTET_STREAM })
-    public JOCDefaultResponse downloadTaskLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
-            TaskFilter taskFilter) throws Exception;
+    public JOCDefaultResponse downloadTaskLog(@HeaderParam("X-Access-Token") String accessToken, byte[] taskFilter);
 
     @POST
     @Path("log/info")
     @Consumes("application/json")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse getLogInfo(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
-            TaskFilter taskFilter) throws Exception;
+    public JOCDefaultResponse getLogInfo(@HeaderParam("X-Access-Token") String accessToken, byte[] taskFilter);
 }

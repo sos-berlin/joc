@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.order.OrderHistory;
@@ -23,7 +25,8 @@ public class OrdersResourceHistoryImplTest {
         OrdersFilter ordersFilterSchema = new OrdersFilter();
         ordersFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceHistoryImpl ordersResourceHistoryImpl = new OrdersResourceHistoryImpl();
-        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersHistory(accessToken, ordersFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(ordersFilterSchema);
+        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersHistory(accessToken, b);
         OrderHistory historySchema = (OrderHistory) ordersResponse.getEntity();
         assertEquals("postOrdersHistory", TestEnvWebserviceTest.JOB_CHAIN, historySchema.getHistory().get(0).getJobChain());
     }

@@ -18,6 +18,7 @@ import com.sos.joc.model.job.JobFilter;
 import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.job.JobV200;
+import com.sos.schema.JsonValidator;
 
 @Path("job")
 public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
@@ -25,13 +26,12 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
 	private static final String API_CALL = "./job";
 
 	@Override
-	public JOCDefaultResponse postJob(String xAccessToken, String accessToken, JobFilter jobFilter) throws Exception {
-		return postJob(getAccessToken(xAccessToken, accessToken), jobFilter);
-	}
-
-	public JOCDefaultResponse postJob(String accessToken, JobFilter jobFilter) throws Exception {
+	public JOCDefaultResponse postJob(String accessToken, byte[] jobFilterBytes) {
 	    SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(jobFilterBytes, JobFilter.class);
+            JobFilter jobFilter = Globals.objectMapper.readValue(jobFilterBytes, JobFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
 					jobFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());

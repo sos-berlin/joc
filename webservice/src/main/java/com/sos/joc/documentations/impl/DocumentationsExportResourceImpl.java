@@ -50,6 +50,7 @@ import com.sos.joc.model.docu.DeployDocumentation;
 import com.sos.joc.model.docu.DeployDocumentations;
 import com.sos.joc.model.docu.DocumentationsFilter;
 import com.sos.joc.model.docu.ExportInfo;
+import com.sos.schema.JsonValidator;
 
 @Path("documentations")
 public class DocumentationsExportResourceImpl extends JOCResourceImpl implements IDocumentationsExportResource {
@@ -59,10 +60,12 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
     public static final String DEPLOY_USAGE_JSON = "/sos-documentation-usages.json";
 
     @Override
-    public JOCDefaultResponse postExportDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
+    public JOCDefaultResponse postExportDocumentations(String xAccessToken, byte[] filterBytes) {
 
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, DocumentationsFilter.class);
+            DocumentationsFilter filter = Globals.objectMapper.readValue(filterBytes, DocumentationsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
                     .getJobschedulerId(), xAccessToken).getDocumentation().isExport());
             if (jocDefaultResponse != null) {
@@ -109,8 +112,7 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
     }
 
     @Override
-    public JOCDefaultResponse getExportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String filename)
-            throws Exception {
+    public JOCDefaultResponse getExportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String filename) {
         try {
             xAccessToken = getAccessToken(xAccessToken, accessToken);
             ExportInfo file = new ExportInfo();
@@ -173,10 +175,12 @@ public class DocumentationsExportResourceImpl extends JOCResourceImpl implements
     }
 
     @Override
-    public JOCDefaultResponse postExportInfo(String xAccessToken, DocumentationsFilter filter) throws Exception {
+    public JOCDefaultResponse postExportInfo(String xAccessToken, byte[] filterBytes) {
         SOSHibernateSession connection = null;
         ZipOutputStream zipOut = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, DocumentationsFilter.class);
+            DocumentationsFilter filter = Globals.objectMapper.readValue(filterBytes, DocumentationsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "/info", filter, xAccessToken, filter.getJobschedulerId(),
                     getPermissonsJocCockpit(filter.getJobschedulerId(), xAccessToken).getDocumentation().isExport());
             if (jocDefaultResponse != null) {

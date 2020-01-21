@@ -28,6 +28,7 @@ import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.event.custom.Event;
 import com.sos.joc.model.event.custom.Events;
 import com.sos.joc.model.event.custom.EventsFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("events")
 public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustomEventsResource {
@@ -43,10 +44,12 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
     }
 
     @Override
-    public JOCDefaultResponse postCustomEvents(String accessToken, EventsFilter eventFilter) {
+    public JOCDefaultResponse postCustomEvents(String accessToken, byte[] eventFilterBytes) {
 
         SOSHibernateSession session = null;
         try {
+            JsonValidator.validateFailFast(eventFilterBytes, EventsFilter.class);
+            EventsFilter eventFilter = Globals.objectMapper.readValue(eventFilterBytes, EventsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, eventFilter, accessToken, eventFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     eventFilter.getJobschedulerId(), accessToken).getEvent().getView().isStatus());
             if (jocDefaultResponse != null) {

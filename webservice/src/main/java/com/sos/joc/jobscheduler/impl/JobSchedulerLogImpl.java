@@ -25,6 +25,7 @@ import com.sos.joc.jobscheduler.resource.IJobSchedulerLogResource;
 import com.sos.joc.model.common.LogInfo;
 import com.sos.joc.model.common.LogInfo200;
 import com.sos.joc.model.jobscheduler.HostPortParameter;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedulerLogResource {
@@ -33,34 +34,27 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
     private static final String DEBUGLOG_API_CALL = "./jobscheduler/debuglog";
 
     @Override
-    public JOCDefaultResponse getMainLog(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String host,
-            Integer port, String filename) throws Exception {
-        return getMainLog(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, host, port, filename);
-    }
-
     public JOCDefaultResponse getMainLog(String accessToken, String queryAccessToken, String jobschedulerId, String host, Integer port,
-            String filename) throws Exception {
-
-        HostPortParameter hostPortParams = new HostPortParameter();
-        hostPortParams.setJobschedulerId(jobschedulerId);
-        hostPortParams.setHost(host);
-        hostPortParams.setPort(port);
-        hostPortParams.setFilename(filename);
+            String filename) {
 
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-
-        return getLog(accessToken, hostPortParams, LOG_API_CALL);
+        String json = String.format("{\"jobschedulerId\": \"%s\", \"host\": \"%s\", \"port\": %d, \"filename\": \"%s\"}", jobschedulerId, host, port,
+                filename);
+        return getLog(accessToken, json.getBytes(), LOG_API_CALL);
     }
 
     @Override
-    public JOCDefaultResponse getMainLog(String xAccessToken, String accessToken, HostPortParameter hostPortParamSchema) throws Exception {
-        return getLog(getAccessToken(xAccessToken, accessToken), hostPortParamSchema, LOG_API_CALL);
+    public JOCDefaultResponse getMainLog(String accessToken, byte[] hostPortParamSchema) {
+        return getLog(accessToken, hostPortParamSchema, LOG_API_CALL);
     }
 
-    public JOCDefaultResponse getLog(String accessToken, HostPortParameter hostPortParamSchema, String apiCall) throws Exception {
+    public JOCDefaultResponse getLog(String accessToken, byte[] filterBytes, String apiCall) {
         try {
+            JsonValidator.validateFailFast(filterBytes, HostPortParameter.class);
+            HostPortParameter hostPortParamSchema = Globals.objectMapper.readValue(filterBytes, HostPortParameter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(apiCall, hostPortParamSchema, accessToken, hostPortParamSchema.getJobschedulerId(),
                     getPermissonsJocCockpit(hostPortParamSchema.getJobschedulerId(), accessToken).getJobschedulerMaster().getView().isMainlog());
             if (jocDefaultResponse != null) {
@@ -113,12 +107,15 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
     }
 
     @Override
-    public JOCDefaultResponse getLogInfo(String xAccessToken, String accessToken, HostPortParameter hostPortParamSchema) throws Exception {
-        return getLogInfo(getAccessToken(xAccessToken, accessToken), hostPortParamSchema, LOG_API_CALL);
+    public JOCDefaultResponse getLogInfo(String accessToken, byte[] hostPortParamSchema) {
+        return getLogInfo(accessToken, hostPortParamSchema, LOG_API_CALL);
     }
 
-    public JOCDefaultResponse getLogInfo(String accessToken, HostPortParameter hostPortParamSchema, String apiCall) throws Exception {
+    public JOCDefaultResponse getLogInfo(String accessToken, byte[] filterBytes, String apiCall) {
         try {
+            JsonValidator.validateFailFast(filterBytes, HostPortParameter.class);
+            HostPortParameter hostPortParamSchema = Globals.objectMapper.readValue(filterBytes, HostPortParameter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(apiCall + "/info", hostPortParamSchema, accessToken, hostPortParamSchema
                     .getJobschedulerId(), getPermissonsJocCockpit(hostPortParamSchema.getJobschedulerId(), accessToken).getJobschedulerMaster()
                             .getView().isMainlog());
@@ -158,35 +155,25 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
     }
     
     @Override
-    public JOCDefaultResponse getDebugLog(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String host,
-            Integer port, String filename) throws Exception {
-        return getDebugLog(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, host, port, filename);
-    }
-
     public JOCDefaultResponse getDebugLog(String accessToken, String queryAccessToken, String jobschedulerId, String host, Integer port,
-            String filename) throws Exception {
-
-        HostPortParameter hostPortParams = new HostPortParameter();
-        hostPortParams.setJobschedulerId(jobschedulerId);
-        hostPortParams.setHost(host);
-        hostPortParams.setPort(port);
-        hostPortParams.setFilename(filename);
+            String filename) {
 
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-
-        return getLog(accessToken, hostPortParams, DEBUGLOG_API_CALL);
+        String json = String.format("{\"jobschedulerId\": \"%s\", \"host\": \"%s\", \"port\": %d, \"filename\": \"%s\"}", jobschedulerId, host, port,
+                filename);
+        return getLog(accessToken, json.getBytes(), DEBUGLOG_API_CALL);
     }
     
     @Override
-    public JOCDefaultResponse getDebugLog(String xAccessToken, String accessToken, HostPortParameter hostPortParamSchema) throws Exception {
-        return getLog(getAccessToken(xAccessToken, accessToken), hostPortParamSchema, DEBUGLOG_API_CALL);
+    public JOCDefaultResponse getDebugLog(String accessToken, byte[] hostPortParamSchema) {
+        return getLog(accessToken, hostPortParamSchema, DEBUGLOG_API_CALL);
     }
     
     @Override
-    public JOCDefaultResponse getDebugLogInfo(String xAccessToken, String accessToken, HostPortParameter hostPortParamSchema) throws Exception {
-        return getLogInfo(getAccessToken(xAccessToken, accessToken), hostPortParamSchema, DEBUGLOG_API_CALL);
+    public JOCDefaultResponse getDebugLogInfo(String accessToken, byte[] hostPortParamSchema) {
+        return getLogInfo(accessToken, hostPortParamSchema, DEBUGLOG_API_CALL);
     }
 
     private java.nio.file.Path getLogPath(String apiCall, String accessToken, HostPortParameter hostPortParamSchema, boolean withFilenameCheck) throws Exception {

@@ -29,6 +29,7 @@ import com.sos.joc.model.job.OrderPath;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
 import com.sos.joc.tasks.resource.ITasksResourceHistory;
+import com.sos.schema.JsonValidator;
 
 @Path("tasks")
 public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksResourceHistory {
@@ -36,14 +37,13 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
     private static final String API_CALL = "./tasks/history";
 
     @Override
-    public JOCDefaultResponse postTasksHistory(String xAccessToken, String accessToken, JobsFilter jobsFilter) throws Exception {
-        return postTasksHistory(getAccessToken(xAccessToken, accessToken), jobsFilter);
-    }
-
-    public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
+    public JOCDefaultResponse postTasksHistory(String accessToken, byte[] jobsFilterBytes) {
         SOSHibernateSession connection = null;
 
         try {
+            JsonValidator.validateFailFast(jobsFilterBytes, JobsFilter.class);
+            JobsFilter jobsFilter = Globals.objectMapper.readValue(jobsFilterBytes, JobsFilter.class);
+            
             if (jobsFilter.getJobschedulerId() == null) {
                 jobsFilter.setJobschedulerId("");
             }

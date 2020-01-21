@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -26,6 +27,7 @@ import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.job.StartJobs;
 import com.sos.joc.model.job.StartedTasks;
 import com.sos.joc.model.job.TaskPath200;
+import com.sos.schema.JsonValidator;
 
 @Path("jobs")
 public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsResourceStartJob {
@@ -35,12 +37,11 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
     private List<TaskPath200> taskPaths = new ArrayList<TaskPath200>();
 
     @Override
-    public JOCDefaultResponse postJobsStart(String xAccessToken, String accessToken, StartJobs startJobs) throws Exception {
-        return postJobsStart(getAccessToken(xAccessToken, accessToken), startJobs);
-    }
-
-    public JOCDefaultResponse postJobsStart(String accessToken, StartJobs startJobs) throws Exception {
+    public JOCDefaultResponse postJobsStart(String accessToken, byte[] startJobsBytes) {
         try {
+            JsonValidator.validateFailFast(startJobsBytes, StartJobs.class);
+            StartJobs startJobs = Globals.objectMapper.readValue(startJobsBytes, StartJobs.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, startJobs, accessToken, startJobs.getJobschedulerId(), getPermissonsJocCockpit(
                     startJobs.getJobschedulerId(), accessToken).getJob().getExecute().isStart());
             if (jocDefaultResponse != null) {

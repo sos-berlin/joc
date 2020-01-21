@@ -6,7 +6,7 @@
   "properties": {
     "filename": {
       "description": "name of temporary file. Can be used as parameter for GET Method of ./documentations/export",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "deliveryDate": {
       "$ref": "../common/deliveryDate-schema.json"

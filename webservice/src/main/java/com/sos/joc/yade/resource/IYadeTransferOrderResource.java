@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.yade.ModifyTransfer;
 
 
 public interface IYadeTransferOrderResource {
@@ -15,6 +14,5 @@ public interface IYadeTransferOrderResource {
     @POST
     @Path("transfer/order")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postYadeTransferOrder(@HeaderParam("X-Access-Token") String accessToken, ModifyTransfer filterBody)
-            throws Exception;
+    public JOCDefaultResponse postYadeTransferOrder(@HeaderParam("X-Access-Token") String accessToken, byte[] filterBody);
 }

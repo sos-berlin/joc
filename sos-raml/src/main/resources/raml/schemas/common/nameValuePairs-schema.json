@@ -11,7 +11,7 @@
     ],
     "properties": {
       "name": {
-        "type": "string"
+        "$ref": "../common/string255-schema.json"
       },
       "value": {
         "type": "string"

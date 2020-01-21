@@ -5,8 +5,7 @@
   "type": "object",
   "required": [
     "jobschedulerId",
-    "processClass",
-    "configuration"
+    "processClass"
   ],
   "properties": {
     "deliveryDate": {
@@ -16,7 +15,7 @@
       "$ref": "../common/timestamp-schema.json"
     },
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "processClass": {
       "$ref": "../common/path-schema.json"

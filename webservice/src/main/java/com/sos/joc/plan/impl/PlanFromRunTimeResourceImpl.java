@@ -5,6 +5,7 @@ import javax.ws.rs.Path;
 import org.w3c.dom.Element;
 
 import com.sos.jobscheduler.RuntimeResolver;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -12,6 +13,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.plan.RunTime;
 import com.sos.joc.model.plan.RunTimePlanFilter;
 import com.sos.joc.plan.resource.IPlanFromRunTimeResource;
+import com.sos.schema.JsonValidator;
 
 import sos.xml.SOSXMLXPath;
 
@@ -21,8 +23,11 @@ public class PlanFromRunTimeResourceImpl extends JOCResourceImpl implements IPla
 	private static final String API_CALL = "./plan/from_run_time";
 
 	@Override
-	public JOCDefaultResponse postPlan(String accessToken, RunTimePlanFilter planFilter) throws Exception {
+	public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) {
 		try {
+		    JsonValidator.validateFailFast(planFilterBytes, RunTimePlanFilter.class);
+		    RunTimePlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, RunTimePlanFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken,
 					planFilter.getJobschedulerId(), getPermissonsJocCockpit(planFilter.getJobschedulerId(), accessToken)
 							.getOrder().getView().isStatus());

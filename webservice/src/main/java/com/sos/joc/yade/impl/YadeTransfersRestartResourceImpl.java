@@ -27,6 +27,7 @@ import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.yade.ModifyTransfer;
 import com.sos.joc.model.yade.ModifyTransfers;
 import com.sos.joc.yade.resource.IYadeTransfersRestartResource;
+import com.sos.schema.JsonValidator;
 
 @Path("yade")
 public class YadeTransfersRestartResourceImpl extends JOCResourceImpl implements IYadeTransfersRestartResource {
@@ -35,11 +36,13 @@ public class YadeTransfersRestartResourceImpl extends JOCResourceImpl implements
 	private List<Err419> listOfErrors = new ArrayList<Err419>();
 
 	@Override
-	public JOCDefaultResponse postYadeTransfersRestart(String accessToken, ModifyTransfers filterBody)
-			throws Exception {
+	public JOCDefaultResponse postYadeTransfersRestart(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
+		    JsonValidator.validateFailFast(filterBytes, ModifyTransfers.class);
+            ModifyTransfers filterBody = Globals.objectMapper.readValue(filterBytes, ModifyTransfers.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
 					filterBody.getJobschedulerId(), getPermissonsJocCockpit(filterBody.getJobschedulerId(), accessToken)
 							.getYADE().getExecute().isTransferStart());
 			if (jocDefaultResponse != null) {

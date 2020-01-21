@@ -26,6 +26,7 @@ import com.sos.joc.model.processClass.ProcessClassPath;
 import com.sos.joc.model.processClass.ProcessClassesFilter;
 import com.sos.joc.model.processClass.ProcessClassesP;
 import com.sos.joc.processClasses.resource.IProcessClassesResourceP;
+import com.sos.schema.JsonValidator;
 
 @Path("process_classes")
 public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IProcessClassesResourceP {
@@ -33,14 +34,13 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
     private static final String API_CALL = "./process_classes/p";
 
     @Override
-    public JOCDefaultResponse postProcessClassesP(String xAccessToken, String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
-        return postProcessClassesP(getAccessToken(xAccessToken, accessToken), processClassFilter);
-    }
-
-    public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
+    public JOCDefaultResponse postProcessClassesP(String accessToken, byte[] processClassFilterBytes) {
         SOSHibernateSession connection = null;
 
         try {
+            JsonValidator.validateFailFast(processClassFilterBytes, ProcessClassesFilter.class);
+            ProcessClassesFilter processClassFilter = Globals.objectMapper.readValue(processClassFilterBytes, ProcessClassesFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken, processClassFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(processClassFilter.getJobschedulerId(), accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
