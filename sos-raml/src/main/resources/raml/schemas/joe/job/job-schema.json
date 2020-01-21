@@ -20,6 +20,12 @@
       "type": "string",
       "default": "false"
     },
+    "criticality": {
+      "xmlElement": "criticality",
+      "description": "possible values: normal, minor, major",
+      "type": "string",
+      "default": "normal"
+    },
     "enabled": {
       "description": "possible values: yes, no, 1, 0, true, false",
       "type": "string",

@@ -23,6 +23,7 @@ import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
 import com.sos.joc.model.common.HistoryStateText;
+import com.sos.joc.model.job.JobCriticalityFilter;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.OrderPath;
@@ -93,6 +94,12 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                     if (jobsFilter.getHistoryStates().size() > 0) {
                         for (HistoryStateText historyStateText : jobsFilter.getHistoryStates()) {
                             reportTaskExecutionsDBLayer.getFilter().addState(historyStateText.toString());
+                        }
+                    }
+
+                    if (jobsFilter.getCriticality().size() > 0) {
+                        for (JobCriticalityFilter criticality : jobsFilter.getCriticality()) {
+                            reportTaskExecutionsDBLayer.getFilter().addCriticality(criticality.toString());
                         }
                     }
 
