@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -138,8 +140,23 @@ public class JocXmlEditor {
     }
 
     public static String getFileName(URI uri) {
-        String path = uri.toString();
+        String path = null;
+        try {
+            path = URLDecoder.decode(uri.toString(), CHARSET);
+        } catch (Throwable e) {
+            path = uri.toString().replaceAll("%20", " ");
+        }
         return path.substring(path.lastIndexOf('/') + 1);
+    }
+
+    public static URI toURI(String uri) throws Exception {
+        URL url;
+        try {
+            url = new URL(URLDecoder.decode(uri, CHARSET));
+        } catch (Throwable e) {
+            return new URI(uri.replaceAll(" ", "%20"));
+        }
+        return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
     }
 
     public static String getStandardRelativeSchemaLocation(final ObjectType type) {
@@ -279,17 +296,16 @@ public class JocXmlEditor {
     public static Path getOthersSchemaFile(String path, boolean downloadIfHttp) throws Exception {
         Path file = null;
         if (isHttp(path)) {
-            URI uri = new URI(path);
             if (downloadIfHttp) {
                 try {
-                    file = downloadOthersSchema(uri);
+                    file = downloadOthersSchema(toURI(path));
                 } catch (Throwable e) {
                     LOGGER.error(String.format("[%s]can't download file, try to find in the %s location ..", path,
                             getOthersRelativeHttpSchemaLocation()));
                 }
             }
             if (file == null) {
-                file = JocXmlEditor.getOthersAbsoluteHttpSchemaLocation(getFileName(uri));
+                file = JocXmlEditor.getOthersAbsoluteHttpSchemaLocation(getFileName(toURI(path)));
             }
 
         } else {

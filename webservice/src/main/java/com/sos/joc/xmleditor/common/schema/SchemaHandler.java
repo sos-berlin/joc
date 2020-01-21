@@ -1,6 +1,5 @@
 package com.sos.joc.xmleditor.common.schema;
 
-import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -32,16 +31,15 @@ public class SchemaHandler {
             target = JocXmlEditor.createOthersSchema(source, fileContent);
         } else {
             source = fileUri.trim();
-            Path sourcePath = Paths.get(source);
             if (JocXmlEditor.isHttp(source)) {// http(s)://
                 if (isDebugEnabled) {
                     LOGGER.debug(String.format("[%s]copy from http(s)", source));
                 }
-                URI uri = new URI(source);
-                target = JocXmlEditor.downloadOthersSchema(uri);
+                target = JocXmlEditor.downloadOthersSchema(JocXmlEditor.toURI(source));
             } else {
+                Path sourcePath = Paths.get(source);
                 if (isDebugEnabled) {
-                    LOGGER.debug(String.format("[%s]copy from local file", source));
+                    LOGGER.debug(String.format("[%s]copy from local file", sourcePath));
                 }
                 if (sourcePath.isAbsolute()) {// C://Temp/xyz.xsd
                     target = JocXmlEditor.copyOthersSchema(sourcePath);
