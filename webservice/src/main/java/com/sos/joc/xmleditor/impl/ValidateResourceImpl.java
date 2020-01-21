@@ -47,16 +47,13 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
                     validator.validate(in.getConfiguration());
                 } catch (XsdValidatorException e) {
                     LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
-                    response = JOCDefaultResponse.responseStatus200(getError(e));
+                    return JOCDefaultResponse.responseStatus200(getError(e));
                 }
 
-                if (response == null) {
-                    if (isDebugEnabled) {
-                        LOGGER.debug(String.format("[%s][%s][%s]validated", in.getJobschedulerId(), in.getObjectType().name(), validator
-                                .getSchema()));
-                    }
-                    response = JOCDefaultResponse.responseStatus200(getSuccess());
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[%s][%s][%s]validated", in.getJobschedulerId(), in.getObjectType().name(), validator.getSchema()));
                 }
+                response = JOCDefaultResponse.responseStatus200(getSuccess());
             }
             return response;
         } catch (JocException e) {
@@ -72,8 +69,7 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             checkRequiredParameter("schemaIdentifier", in.getSchemaIdentifier());
-        }
-        else {
+        } else {
             checkRequiredParameter("configuration", in.getConfiguration());
         }
     }
