@@ -44,6 +44,7 @@ public class JsonValidator {
         {
             put("ConfigurationEdit", "agentCluster/configurationEdit-schema.json");
             put("AuditLogFilter", "audit/auditLogFilter-schema.json");
+            put("AuditParams", "audit/auditParams-schema.json");
             
             put("CalendarDatesFilter", "calendar/calendarDatesFilter-schema.json");
             put("CalendarObjectFilter", "calendar/calendarObjectFilter-schema.json");
@@ -60,6 +61,7 @@ public class JsonValidator {
             put("DocumentationShowFilter", "docu/documentationShow-schema.json");
             put("DocumentationFilter", "docu/documentationFilter-schema.json");
             put("DocumentationsFilter", "docu/documentationsFilter-schema.json");
+            put("DocumentationImport", "docu/documentationImport-schema.json");
             
             put("CheckEvent", "event/checkCustomEvent-schema.json");
             put("EventsFilter", "event/customEventsFilter-schema.json");

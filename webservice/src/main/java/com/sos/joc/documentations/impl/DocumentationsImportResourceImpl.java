@@ -54,6 +54,7 @@ import com.sos.joc.model.common.JobSchedulerObject;
 import com.sos.joc.model.docu.DeployDocumentation;
 import com.sos.joc.model.docu.DeployDocumentations;
 import com.sos.joc.model.docu.DocumentationImport;
+import com.sos.schema.JsonValidator;
 
 @Path("documentations")
 public class DocumentationsImportResourceImpl extends JOCResourceImpl implements IDocumentationsImportResource {
@@ -69,9 +70,10 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
     @Override
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String directory,
             FormDataBodyPart body, String timeSpent, String ticketLink, String comment) throws Exception {
-        AuditParams auditLog = new AuditParams();
-        auditLog.setComment(comment);
-        auditLog.setTicketLink(ticketLink);
+        
+        String json = String.format("{\"comment\": \"%s\", \"ticketLink\": \"%s\"}", ticketLink, ticketLink);
+        JsonValidator.validateFailFast(json.getBytes(), AuditParams.class);
+        AuditParams auditLog = Globals.objectMapper.readValue(json, AuditParams.class);
         try {
             auditLog.setTimeSpent(Integer.valueOf(timeSpent));
         } catch (Exception e) {
@@ -84,15 +86,19 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
 
         InputStream stream = null;
         try {
-            DocumentationImport filter = new DocumentationImport();
-            filter.setJobschedulerId(jobschedulerId);
             if (directory == null || directory.isEmpty()) {
                 directory = "/";
+            } else {
+                directory = normalizeFolder(directory.replace('\\', '/'));
             }
-            filter.setFolder(normalizeFolder(directory.replace('\\', '/')));
+            
+            String file = "";
             if (body != null) {
-                filter.setFile(URLDecoder.decode(body.getContentDisposition().getFileName(), "UTF-8"));
+                file = URLDecoder.decode(body.getContentDisposition().getFileName(), "UTF-8");
             }
+            String json = String.format("{\"jobschedulerId\": \"%s\", \"folder\": \"%s\", \"file\": \"%s\"}", jobschedulerId, directory, file);
+            JsonValidator.validateFailFast(json.getBytes(), DocumentationImport.class);
+            DocumentationImport filter = Globals.objectMapper.readValue(json, DocumentationImport.class);
             filter.setAuditLog(auditLog);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, jobschedulerId, getPermissonsJocCockpit(filter
