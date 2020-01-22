@@ -12,6 +12,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
 import com.sos.joc.model.jobscheduler.TimeoutParameter;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobSchedulerCluster {

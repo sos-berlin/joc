@@ -27,6 +27,7 @@ import com.sos.joc.model.yade.ModifyTransfer;
 import com.sos.joc.model.yade.ModifyTransfers;
 import com.sos.joc.yade.resource.IYadeTransfersRestartResource;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("yade")
 public class YadeTransfersRestartResourceImpl extends JOCResourceImpl implements IYadeTransfersRestartResource {

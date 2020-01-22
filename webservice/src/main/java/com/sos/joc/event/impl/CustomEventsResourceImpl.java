@@ -28,6 +28,7 @@ import com.sos.joc.model.event.custom.Event;
 import com.sos.joc.model.event.custom.Events;
 import com.sos.joc.model.event.custom.EventsFilter;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("events")
 public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustomEventsResource {

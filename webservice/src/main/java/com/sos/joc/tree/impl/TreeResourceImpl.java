@@ -90,8 +90,11 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
     }
 
     @Override
-    public JOCDefaultResponse postJoeTree(String accessToken, TreeFilter treeBody) throws Exception {
+    public JOCDefaultResponse postJoeTree(String accessToken, byte[] treeBodyBytes) {
         try {
+            JsonValidator.validateFailFast(treeBodyBytes, TreeFilter.class);
+            TreeFilter treeBody = Globals.objectMapper.readValue(treeBodyBytes, TreeFilter.class);
+            
             List<JobSchedulerObjectType> types = null;
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(treeBody.getJobschedulerId(), accessToken);
             boolean permission = sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView();

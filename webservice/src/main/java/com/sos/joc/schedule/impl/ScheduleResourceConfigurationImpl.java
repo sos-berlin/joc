@@ -40,16 +40,11 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
 		    JsonValidator.validateFailFast(scheduleBodyBytes, ScheduleConfigurationFilter.class);
 		    ScheduleConfigurationFilter scheduleBody = Globals.objectMapper.readValue(scheduleBodyBytes, ScheduleConfigurationFilter.class);
             
+		    JOCDefaultResponse jocDefaultResponse = init(API_CALL_C, scheduleBody, accessToken, scheduleBody.getJobschedulerId(),
+                    getPermissonsJocCockpit(scheduleBody.getJobschedulerId(), accessToken).getSchedule().getView().isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleBody, accessToken,
-					scheduleBody.getJobschedulerId(),
-					getPermissonsJocCockpit(scheduleBody.getJobschedulerId(), accessToken).getSchedule().getView()
-							.isConfiguration());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
 
             checkRequiredParameter("schedule", scheduleBody.getSchedule());
 
@@ -92,9 +87,12 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
     }
 
     @Override
-    public JOCDefaultResponse postScheduleRunTime(String accessToken, ScheduleConfigurationFilter scheduleBody) {
+    public JOCDefaultResponse postScheduleRunTime(String accessToken, byte[] scheduleBodyBytes) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(scheduleBodyBytes, ScheduleConfigurationFilter.class);
+            ScheduleConfigurationFilter scheduleBody = Globals.objectMapper.readValue(scheduleBodyBytes, ScheduleConfigurationFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_R, scheduleBody, accessToken, scheduleBody.getJobschedulerId(),
                     getPermissonsJocCockpit(scheduleBody.getJobschedulerId(), accessToken).getSchedule().getView().isConfiguration());
             if (jocDefaultResponse != null) {

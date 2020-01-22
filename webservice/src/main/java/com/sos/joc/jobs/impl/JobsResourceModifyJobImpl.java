@@ -37,6 +37,7 @@ import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
 import com.sos.schema.JsonValidator;
+import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.xml.XMLBuilder;
 

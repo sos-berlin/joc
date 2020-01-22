@@ -31,6 +31,7 @@ import com.sos.joc.model.event.custom.ModifyEvent;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("events")
 public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IModifyCustomEventResource {

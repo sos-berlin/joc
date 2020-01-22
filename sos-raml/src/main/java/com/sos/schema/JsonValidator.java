@@ -42,7 +42,7 @@ public class JsonValidator {
         private static final long serialVersionUID = 1L;
 
         {
-            put("ConfigurationEdit", "agentCluster/configurationEdit-schema.json");
+            put("ConfigurationEdit", "joe/agentCluster/agentConfigurationEdit-schema.json");
             put("AuditLogFilter", "audit/auditLogFilter-schema.json");
             put("AuditParams", "audit/auditParams-schema.json");
             
@@ -91,11 +91,11 @@ public class JsonValidator {
             put("LockDocuFilter", "lock/lockDocuFilter-schema.json");
             put("LocksFilter", "lock/locksFilter-schema.json");
             
-            put("ProcessClassConfigurationFilter", "processClass/processClassConfigurationFilter-schema.json"); //
+            put("ProcessClassConfigurationFilter", "processClass/processClassConfigurationFilter-schema.json");
             put("ProcessClassDocuFilter", "processClass/processClassDocuFilter-schema.json");
             put("ProcessClassesFilter", "processClass/processClassesFilter-schema.json");
             
-            put("ScheduleConfigurationFilter", "schedule/scheduleConfigurationFilter-schema.json");
+            put("ScheduleConfigurationFilter", "schedule/scheduleConfigurationFilter-schema.json"); //check
             put("ScheduleDocuFilter", "schedule/scheduleDocuFilter-schema.json");
             put("ScheduleFilter", "schedule/scheduleFilter-schema.json");
             put("ModifyRunTime", "schedule/modifyRunTime-schema.json");

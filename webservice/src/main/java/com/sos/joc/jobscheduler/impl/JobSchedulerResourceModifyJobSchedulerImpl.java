@@ -13,6 +13,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
 import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl

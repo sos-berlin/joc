@@ -19,6 +19,7 @@ import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.jobChain.ModifyJobChainNode;
 import com.sos.joc.model.jobChain.ModifyJobChainNodes;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("job_chain_nodes")
 public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl

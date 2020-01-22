@@ -27,6 +27,7 @@ import com.sos.joc.model.job.StartJobs;
 import com.sos.joc.model.job.StartedTasks;
 import com.sos.joc.model.job.TaskPath200;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("jobs")
 public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsResourceStartJob {

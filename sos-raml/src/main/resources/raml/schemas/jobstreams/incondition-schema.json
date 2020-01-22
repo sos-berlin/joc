@@ -1,6 +1,5 @@
 {
 	"title": "In-Condition",
-	"id": "schemas/jobstreams/incondition",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "In Condition",
 	"javaType": "com.sos.joc.model.jobstreams.InCondition",

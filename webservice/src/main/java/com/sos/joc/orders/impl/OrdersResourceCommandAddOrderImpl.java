@@ -49,6 +49,7 @@ import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.model.order.OrderPath200;
 import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("orders")
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {

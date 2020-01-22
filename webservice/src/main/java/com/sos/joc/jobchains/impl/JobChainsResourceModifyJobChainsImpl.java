@@ -16,10 +16,10 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobchains.resource.IJobChainsResourceModifyJobChains;
 import com.sos.joc.model.common.Err419;
-import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.jobChain.ModifyJobChain;
 import com.sos.joc.model.jobChain.ModifyJobChains;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("job_chains")
 public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implements IJobChainsResourceModifyJobChains {

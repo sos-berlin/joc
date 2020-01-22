@@ -22,6 +22,7 @@ import com.sos.joc.model.job.TaskId;
 import com.sos.joc.model.job.TasksFilter;
 import com.sos.joc.tasks.resource.ITasksResourceKill;
 import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("tasks")
 public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksResourceKill {
