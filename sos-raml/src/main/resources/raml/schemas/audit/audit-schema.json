@@ -13,7 +13,9 @@
       "$ref": "../common/deliveryDate-schema.json"
     },
     "request": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[^<>]*$",
+      "maxLength": 50
     },
     "created": {
       "$ref": "../common/timestamp-schema.json"
