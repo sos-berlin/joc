@@ -3,23 +3,13 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.CalendarId",
   "type": "object",
-  "anyOf": [
-    {
-      "required": [
-        "jobschedulerId",
-        "id"
-      ]
-    },
-    {
-      "required": [
-        "jobschedulerId",
-        "path"
-      ]
-    }
+  "description": "one of the fields calendar and path is required.",
+  "required": [
+    "jobschedulerId"
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "id": {
       "$ref": "../common/nonNegativeLong-schema.json"

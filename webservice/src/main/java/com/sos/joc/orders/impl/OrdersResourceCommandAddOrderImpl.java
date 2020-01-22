@@ -48,7 +48,7 @@ import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.model.order.OrderPath200;
 import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
-import com.sos.xml.XMLBuilder;
+import com.sos.schema.JsonValidator;
 
 @Path("orders")
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
@@ -62,7 +62,9 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     @Override
     public JOCDefaultResponse postOrdersAdd(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getJobChain().getExecute().isAddOrder());
             if (jocDefaultResponse != null) {

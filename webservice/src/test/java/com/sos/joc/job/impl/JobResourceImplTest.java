@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobs.impl.JobsResourceImplTest;
@@ -31,7 +32,8 @@ public class JobResourceImplTest {
         jobFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         jobFilterSchema.setJob(TestEnvWebserviceTest.JOB);
         JobResourceImpl jobImpl = new JobResourceImpl();
-        JOCDefaultResponse jobsResponse = jobImpl.postJob(accessToken, jobFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobFilterSchema);
+        JOCDefaultResponse jobsResponse = jobImpl.postJob(accessToken, b);
         JobV200 jobV200Schema = (JobV200) jobsResponse.getEntity();
         assertEquals("postJobTest", TestEnvWebserviceTest.JOB, jobV200Schema.getJob().getPath());
     }

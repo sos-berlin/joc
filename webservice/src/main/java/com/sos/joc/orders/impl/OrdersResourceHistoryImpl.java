@@ -30,6 +30,7 @@ import com.sos.joc.model.order.OrderHistoryItem;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.orders.resource.IOrdersResourceHistory;
+import com.sos.schema.JsonValidator;
 
 @Path("orders")
 public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrdersResourceHistory {
@@ -38,15 +39,13 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 	private static final String CHILD_ORDER_PATTERN = "-\\+(\\d+)\\+-";
 
 	@Override
-	public JOCDefaultResponse postOrdersHistory(String xAccessToken, String accessToken, OrdersFilter ordersFilter)
-			throws Exception {
-		return postOrdersHistory(getAccessToken(xAccessToken, accessToken), ordersFilter);
-	}
-
-	public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilter ordersFilter) throws Exception {
+	public JOCDefaultResponse postOrdersHistory(String accessToken, byte[] ordersFilterBytes) {
 		SOSHibernateSession connection = null;
 
 		try {
+		    JsonValidator.validateFailFast(ordersFilterBytes, OrdersFilter.class);
+		    OrdersFilter ordersFilter = Globals.objectMapper.readValue(ordersFilterBytes, OrdersFilter.class);
+            
 			if (ordersFilter.getJobschedulerId() == null) {
 				ordersFilter.setJobschedulerId("");
 			}

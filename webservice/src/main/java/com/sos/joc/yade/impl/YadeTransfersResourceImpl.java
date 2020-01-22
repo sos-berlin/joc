@@ -33,6 +33,7 @@ import com.sos.joc.model.yade.TransferState;
 import com.sos.joc.model.yade.TransferStateText;
 import com.sos.joc.model.yade.Transfers;
 import com.sos.joc.yade.resource.IYadeTransfersResource;
+import com.sos.schema.JsonValidator;
 
 @Path("yade")
 public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeTransfersResource {
@@ -40,12 +41,15 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 	private static final String API_CALL = "./yade/transfers";
 
 	@Override
-	public JOCDefaultResponse postYadeTransfers(String accessToken, TransferFilter filterBody) throws Exception {
+	public JOCDefaultResponse postYadeTransfers(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
-		if (filterBody.getJobschedulerId() == null) {
-			filterBody.setJobschedulerId("");
-		}
 		try {
+		    JsonValidator.validateFailFast(filterBytes, TransferFilter.class);
+		    TransferFilter filterBody = Globals.objectMapper.readValue(filterBytes, TransferFilter.class);
+            
+            if (filterBody.getJobschedulerId() == null) {
+                filterBody.setJobschedulerId("");
+            }
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
 					filterBody.getJobschedulerId(), getPermissonsJocCockpit(filterBody.getJobschedulerId(), accessToken)
 							.getYADE().getView().isStatus());

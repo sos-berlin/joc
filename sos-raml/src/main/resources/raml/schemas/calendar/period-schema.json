@@ -5,22 +5,27 @@
   "type": "object",
   "properties": {
     "singleStart": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9:]*$"
     },
     "begin": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9:]*$"
     },
     "end": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9:]*$"
     },
     "repeat": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9:]*$"
     },
     "absoluteRepeat": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9:]*$"
     },
     "whenHoliday": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     }
   }
 }

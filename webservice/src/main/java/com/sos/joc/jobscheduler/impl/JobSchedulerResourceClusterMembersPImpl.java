@@ -25,6 +25,7 @@ import com.sos.joc.model.jobscheduler.HostPortParameter;
 import com.sos.joc.model.jobscheduler.JobSchedulerP;
 import com.sos.joc.model.jobscheduler.MastersP;
 import com.sos.joc.model.jobscheduler.OperatingSystem;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl
@@ -33,15 +34,13 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl
 	private static final String API_CALL = "./jobscheduler/cluster/members/p";
 
 	@Override
-	public JOCDefaultResponse postJobschedulerClusterMembers(String xAccessToken, String accessToken,
-			JobSchedulerId jobSchedulerFilter) {
-		return postJobschedulerClusterMembers(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
-	}
-
-	public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilter) {
+	public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
 		try {
-			if (jobSchedulerFilter.getJobschedulerId() == null) {
+		    JsonValidator.validateFailFast(filterBytes, JobSchedulerId.class);
+            JobSchedulerId jobSchedulerFilter = Globals.objectMapper.readValue(filterBytes, JobSchedulerId.class);
+            
+            if (jobSchedulerFilter.getJobschedulerId() == null) {
 				jobSchedulerFilter.setJobschedulerId("");
 			}
 

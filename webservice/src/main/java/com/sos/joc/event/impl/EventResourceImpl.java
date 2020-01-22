@@ -55,6 +55,7 @@ import com.sos.joc.model.event.JobSchedulerEvent;
 import com.sos.joc.model.event.JobSchedulerEvents;
 import com.sos.joc.model.event.JobSchedulerObjects;
 import com.sos.joc.model.event.RegisterEvent;
+import com.sos.schema.JsonValidator;
 
 @Path("events")
 public class EventResourceImpl extends JOCResourceImpl implements IEventResource {
@@ -68,11 +69,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
     public static final Integer EVENT_TIMEOUT = 90;
     
     @Override
-    public JOCDefaultResponse postEvent(String xAccessToken, String accessToken, RegisterEvent eventBody) throws Exception {
-        return postEvent(getAccessToken(xAccessToken, accessToken), eventBody);
-    }
-
-    public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) {
+    public JOCDefaultResponse postEvent(String accessToken, byte[] eventBodyBytes) {
 
         JobSchedulerEvents entity = new JobSchedulerEvents();
         Map<String, JobSchedulerEvent> eventList = new HashMap<String, JobSchedulerEvent>();
@@ -82,6 +79,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         SOSHibernateSession connection = null;
 
         try {
+            JsonValidator.validateFailFast(eventBodyBytes, RegisterEvent.class);
+            RegisterEvent eventBody = Globals.objectMapper.readValue(eventBodyBytes, RegisterEvent.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, eventBody, accessToken, "", getPermissonsJocCockpit("", accessToken)
                     .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {

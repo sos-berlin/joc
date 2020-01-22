@@ -8,8 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.processClass.ConfigurationEdit;
-import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 
 public interface IAgentConfigurationResource {
     
@@ -17,18 +15,18 @@ public interface IAgentConfigurationResource {
     @Path("read")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse readAgentConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, ProcessClassConfigurationFilter processClassFilter) throws Exception;
+    public JOCDefaultResponse readAgentConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, byte[] processClassFilterBytes);
 
     @POST
     @Path("save")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse saveAgentConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, ConfigurationEdit configuration) throws Exception;
+    public JOCDefaultResponse saveAgentConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, byte[] configurationBytes);
     
     @POST
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse deleteAgentConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, ConfigurationEdit agentFilter) throws Exception;
+    public JOCDefaultResponse deleteAgentConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, byte[] configurationBytes);
 
 }

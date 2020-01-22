@@ -42,7 +42,8 @@ public class OrdersResourceOrderCommandAddOrderImplTest {
         modifyOrderSchema.setOrders(orders);
         modifyOrderSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceCommandAddOrderImpl ordersResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
-        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersAdd(accessToken, Globals.xmlMapper.writeValueAsBytes(modifyOrderSchema));
+        byte[] b = Globals.objectMapper.writeValueAsBytes(modifyOrderSchema);
+        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersAdd(accessToken, b);
         AddedOrders okSchema = (AddedOrders) ordersResponse.getEntity();
         assertEquals("postOrdersCommandAddOrder", true, okSchema.getOk());
     }

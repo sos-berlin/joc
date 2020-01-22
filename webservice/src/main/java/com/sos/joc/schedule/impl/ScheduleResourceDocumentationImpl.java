@@ -19,6 +19,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.docu.DocumentationShowFilter;
 import com.sos.joc.model.schedule.ScheduleDocuFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceDocumentation;
+import com.sos.schema.JsonValidator;
 
 @Path("schedule")
 public class ScheduleResourceDocumentationImpl extends JOCResourceImpl implements IScheduleResourceDocumentation {
@@ -28,16 +29,16 @@ public class ScheduleResourceDocumentationImpl extends JOCResourceImpl implement
     private static final String API_CALL_UNASSIGN = API_CALL + "/unassign";
 
     @Override
-    public JOCDefaultResponse postDocumentation(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
+    public JOCDefaultResponse postDocumentation(String xAccessToken, String accessToken, String jobschedulerId, String path) {
         return postDocumentation(getAccessToken(xAccessToken, accessToken), jobschedulerId, path);
     }
 
-    public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) throws Exception {
+    public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) {
         SOSHibernateSession connection = null;
         try {
-            DocumentationShowFilter documentationFilter = new DocumentationShowFilter();
-            documentationFilter.setJobschedulerId(jobschedulerId);
-            documentationFilter.setPath(path);
+            String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
+            JsonValidator.validateFailFast(json.getBytes(), DocumentationShowFilter.class);
+            DocumentationShowFilter documentationFilter = Globals.objectMapper.readValue(json, DocumentationShowFilter.class);
             documentationFilter.setType(JobSchedulerObjectType.SCHEDULE);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
@@ -73,8 +74,11 @@ public class ScheduleResourceDocumentationImpl extends JOCResourceImpl implement
     }
 
     @Override
-    public JOCDefaultResponse assignDocu(String xAccessToken, ScheduleDocuFilter filter) throws Exception {
+    public JOCDefaultResponse assignDocu(String xAccessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, ScheduleDocuFilter.class);
+            ScheduleDocuFilter filter = Globals.objectMapper.readValue(filterBytes, ScheduleDocuFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getSchedule().isAssignDocumentation());
             if (jocDefaultResponse != null) {
@@ -96,8 +100,11 @@ public class ScheduleResourceDocumentationImpl extends JOCResourceImpl implement
     }
 
     @Override
-    public JOCDefaultResponse unassignDocu(String xAccessToken, ScheduleDocuFilter filter) throws Exception {
+    public JOCDefaultResponse unassignDocu(String xAccessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, ScheduleDocuFilter.class);
+            ScheduleDocuFilter filter = Globals.objectMapper.readValue(filterBytes, ScheduleDocuFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_UNASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getSchedule().isAssignDocumentation());
             if (jocDefaultResponse != null) {

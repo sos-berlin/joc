@@ -18,7 +18,7 @@ import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandDeleteOrder;
-import com.sos.xml.XMLBuilder;
+import com.sos.schema.JsonValidator;
 
 @Path("orders")
 public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandDeleteOrder {
@@ -29,7 +29,9 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersDelete(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder().getDelete().isTemporary());
             if (jocDefaultResponse != null) {

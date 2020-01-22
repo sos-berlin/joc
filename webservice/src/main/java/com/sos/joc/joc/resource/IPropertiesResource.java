@@ -16,6 +16,6 @@ public interface IPropertiesResource {
     @Path("properties")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postProperties(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken) throws Exception;
+    public JOCDefaultResponse postProperties(@HeaderParam("X-Access-Token") String accessToken);
 
 }

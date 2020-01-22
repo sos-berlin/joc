@@ -30,7 +30,7 @@ import com.sos.joc.model.event.custom.EventIdsFilter;
 import com.sos.joc.model.event.custom.ModifyEvent;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
-import com.sos.xml.XMLBuilder;
+import com.sos.schema.JsonValidator;
 
 @Path("events")
 public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IModifyCustomEventResource {
@@ -47,7 +47,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
     private SchedulerEventDBLayer schedulerEventDBLayer;
 
     @Override
-    public JOCDefaultResponse addEvent(String accessToken, byte[] modifyOrdersBytes) throws JocException {
+    public JOCDefaultResponse addEvent(String accessToken, byte[] modifyOrdersBytes) {
         return executeModifyEvent(ADD, modifyOrdersBytes, accessToken);
     }
 
@@ -76,15 +76,17 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
     }
 
     @Override
-    public JOCDefaultResponse removeEvent(String accessToken, byte[] modifyOrdersBytes) throws JocException {
+    public JOCDefaultResponse removeEvent(String accessToken, byte[] modifyOrdersBytes) {
         return executeModifyEvent(REMOVE, modifyOrdersBytes, accessToken);
     }
 
-    private JOCDefaultResponse executeModifyEvent(String request, byte[] modifyOrdersBytes, String accessToken) throws JocException {
+    private JOCDefaultResponse executeModifyEvent(String request, byte[] modifyOrdersBytes, String accessToken) {
 
         SOSHibernateSession session = null;
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + request, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getJobChain().getExecute().isAddOrder());
             if (jocDefaultResponse != null) {
@@ -225,10 +227,12 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
     }
 
     @Override
-    public JOCDefaultResponse addEvent(String accessToken, ModifyEvent modifyEvent) throws Exception {
+    public JOCDefaultResponse addEvent2(String accessToken, byte[] modifyEventBytes) {
 
         SOSHibernateSession session = null;
         try {
+            JsonValidator.validateFailFast(modifyEventBytes, ModifyEvent.class);
+            ModifyEvent modifyEvent = Globals.objectMapper.readValue(modifyEventBytes, ModifyEvent.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "add_event", modifyEvent, accessToken, modifyEvent.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyEvent.getJobschedulerId(), accessToken).getEvent().getExecute().isAdd());
             if (jocDefaultResponse != null) {
@@ -268,9 +272,11 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
     }
 
     @Override
-    public JOCDefaultResponse deleteEvents(String accessToken, EventIdsFilter eventIdsFilter) throws Exception {
+    public JOCDefaultResponse deleteEvents(String accessToken, byte[] eventIdsFilterBytes) {
         SOSHibernateSession session = null;
         try {
+            JsonValidator.validateFailFast(eventIdsFilterBytes, EventIdsFilter.class);
+            EventIdsFilter eventIdsFilter = Globals.objectMapper.readValue(eventIdsFilterBytes, EventIdsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "delete_events", eventIdsFilter, accessToken, eventIdsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(eventIdsFilter.getJobschedulerId(), accessToken).getEvent().getExecute().isDelete());
             if (jocDefaultResponse != null) {

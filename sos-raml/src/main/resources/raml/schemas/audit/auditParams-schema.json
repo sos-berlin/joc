@@ -5,14 +5,14 @@
   "type": "object",
   "properties": {
     "comment": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "timeSpent": {
       "description": "in minutes",
       "$ref": "../common/nonNegativeInteger-schema.json"
     },
     "ticketLink": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     }
   }
 }

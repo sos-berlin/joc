@@ -10,13 +10,13 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "path": {
-      "type": "string"
+      "$ref": "../common/path-schema.json"
     },
     "newPath": {
-      "type": "string"
+      "$ref": "../common/path-schema.json"
     },
     "auditLog": {
       "$ref": "../audit/auditParams-schema.json"

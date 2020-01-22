@@ -18,6 +18,7 @@ import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.order.resource.IOrderRunTimeResource;
+import com.sos.schema.JsonValidator;
 
 @Path("order")
 public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderRunTimeResource {
@@ -26,14 +27,19 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
 
     // old school with JOC-730
     @Override
-    public JOCDefaultResponse postOrderRunTimeWithXML(String accessToken, OrderFilter orderFilter) {
+	public JOCDefaultResponse postOrderRunTime(String accessToken, byte[] filterBytes) {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken, orderFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(orderFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+		    JsonValidator.validateFailFast(filterBytes, OrderFilter.class);
+		    OrderFilter orderFilter = Globals.objectMapper.readValue(filterBytes, OrderFilter.class);
+            
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken,
+					orderFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(orderFilter.getJobschedulerId(), accessToken).getOrder().getView()
+							.isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
             RunTime200 runTimeAnswer = new RunTime200();
             checkRequiredParameter("orderId", orderFilter.getOrderId());

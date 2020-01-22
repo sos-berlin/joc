@@ -10,7 +10,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.annotation.Compress;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.JOClog;
 
 public interface ILogResource {
 
@@ -18,7 +17,7 @@ public interface ILogResource {
     @POST
     @Compress
     //@Produces({ MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postLog(@HeaderParam("X-Access-Token") String accessToken, JOClog jocLog);
+    public JOCDefaultResponse postLog(@HeaderParam("X-Access-Token") String accessToken, byte[] jocLog);
 
     @Path("log")
     @GET

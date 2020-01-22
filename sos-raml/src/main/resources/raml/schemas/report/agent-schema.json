@@ -16,7 +16,7 @@
     "agent": {
       "description": "Url of an Agent",
       "type": "string",
-      "pattern": "https?://.+"
+      "pattern": "^https?://.+$"
     },
     "cause": {
       "$ref": "../job/taskCause-schema.json"

@@ -5,7 +5,7 @@
 	"type": "object",
 	"properties": {
 		"defaultProfileAccount": {
-			"type": "string"
+			"$ref": "../common/string255-schema.json"
 		},
 		"customLogo": {
 			"$ref": "loginLogo-schema.json"

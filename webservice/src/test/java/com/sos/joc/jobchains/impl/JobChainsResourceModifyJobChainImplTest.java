@@ -1,14 +1,14 @@
 package com.sos.joc.jobchains.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Ok;
@@ -41,7 +41,8 @@ public class JobChainsResourceModifyJobChainImplTest {
         modifySchema.setJobChains(listOfJobChains);
 
         JobChainsResourceModifyJobChainsImpl jobChainsResourceCommandModifyJobChainsImpl = new JobChainsResourceModifyJobChainsImpl();
-        JOCDefaultResponse jobsResponse = jobChainsResourceCommandModifyJobChainsImpl.postJobChainsStop(accessToken, modifySchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(modifySchema);
+        JOCDefaultResponse jobsResponse = jobChainsResourceCommandModifyJobChainsImpl.postJobChainsStop(accessToken, b);
         Ok okSchema = (Ok) jobsResponse.getEntity();
         assertEquals("postJobChainsStopTest", true, okSchema.getOk());
     }
@@ -63,7 +64,8 @@ public class JobChainsResourceModifyJobChainImplTest {
         modifySchema.setJobChains(listOfJobChains);
 
         JobChainsResourceModifyJobChainsImpl jobChainsResourceCommandModifyJobChainsImpl = new JobChainsResourceModifyJobChainsImpl();
-        JOCDefaultResponse jobsResponse = jobChainsResourceCommandModifyJobChainsImpl.postJobChainsUnStop(accessToken, modifySchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(modifySchema);
+        JOCDefaultResponse jobsResponse = jobChainsResourceCommandModifyJobChainsImpl.postJobChainsUnStop(accessToken, b);
         Ok okSchema = (Ok) jobsResponse.getEntity();
         assertEquals("postJobChainsUnStopTest", true, okSchema.getOk());
     }

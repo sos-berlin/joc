@@ -29,6 +29,7 @@ import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.yade.TransfersSummary;
 import com.sos.joc.model.yade.YadeSnapshot;
 import com.sos.joc.yade.resource.IYadeOverviewSnapshotResource;
+import com.sos.schema.JsonValidator;
 
 @Path("yade")
 public class YadeOverviewSnapshotResourceImpl extends JOCResourceImpl implements IYadeOverviewSnapshotResource {
@@ -36,10 +37,12 @@ public class YadeOverviewSnapshotResourceImpl extends JOCResourceImpl implements
 	private static final String API_CALL = "./yade/overview/snapshot";
 
 	@Override
-	public JOCDefaultResponse postYadeOverviewSnapshot(String accessToken, JobSchedulerId jobschedulerId)
-			throws Exception {
+	public JOCDefaultResponse postYadeOverviewSnapshot(String accessToken, byte[] jobschedulerIdBytes) {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(jobschedulerIdBytes, JobSchedulerId.class);
+		    JobSchedulerId jobschedulerId = Globals.objectMapper.readValue(jobschedulerIdBytes, JobSchedulerId.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobschedulerId, accessToken,
 					jobschedulerId.getJobschedulerId(),
 					getPermissonsJocCockpit(jobschedulerId.getJobschedulerId(), accessToken).getYADE().getView()

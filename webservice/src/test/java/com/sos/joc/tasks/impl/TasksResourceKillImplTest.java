@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.Ok;
@@ -62,7 +63,8 @@ public class TasksResourceKillImplTest {
         modifyTasksSchema.setJobschedulerId("scheduler_current");
         //modifyTasksSchema.setComment("myComment1");
         TasksResourceKillImpl tasksHistoryImpl = new TasksResourceKillImpl();
-        JOCDefaultResponse taskKillResponse = tasksHistoryImpl.postTasksKill(sosShiroCurrentUserAnswer.getAccessToken(), modifyTasksSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(modifyTasksSchema);
+        JOCDefaultResponse taskKillResponse = tasksHistoryImpl.postTasksKill(sosShiroCurrentUserAnswer.getAccessToken(), b);
         Ok okSchema = (Ok) taskKillResponse.getEntity();
         assertEquals("postTasksHistoryTest",true, okSchema.getOk());
      }

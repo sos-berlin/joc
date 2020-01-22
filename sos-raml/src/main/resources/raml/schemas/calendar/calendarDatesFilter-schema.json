@@ -9,7 +9,7 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "calendar": {
       "$ref": "calendar-schema.json"
@@ -18,15 +18,13 @@
       "$ref": "../common/nonNegativeLong-schema.json"
     },
     "path": {
-      "type": "string"
+      "$ref": "../common/path-schema.json"
     },
     "dateFrom": {
-      "type": "string",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+      "$ref": "../common/date-schema.json"
     },
     "dateTo": {
-      "type": "string",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+      "$ref": "../common/date-schema.json"
     }
   }
 }

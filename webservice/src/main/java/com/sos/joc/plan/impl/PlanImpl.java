@@ -36,6 +36,7 @@ import com.sos.joc.model.plan.PlanItem;
 import com.sos.joc.model.plan.PlanState;
 import com.sos.joc.model.plan.PlanStateText;
 import com.sos.joc.plan.resource.IPlanResource;
+import com.sos.schema.JsonValidator;
 
 @Path("plan")
 public class PlanImpl extends JOCResourceImpl implements IPlanResource {
@@ -110,14 +111,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
     }
 
     @Override
-    public JOCDefaultResponse postPlan(String xAccessToken, String accessToken, PlanFilter planFilter) throws Exception {
-        return postPlan(getAccessToken(xAccessToken, accessToken), planFilter);
-    }
-
-    public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
+    public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
             LOGGER.debug("Reading the daily plan");
+            JsonValidator.validateFailFast(planFilterBytes, PlanFilter.class);
+            PlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, PlanFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     planFilter.getJobschedulerId(), accessToken).getDailyPlan().getView().isStatus());
 

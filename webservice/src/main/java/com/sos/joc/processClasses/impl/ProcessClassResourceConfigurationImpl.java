@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -14,6 +15,7 @@ import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 import com.sos.joc.processClasses.resource.IProcessClassResourceConfiguration;
+import com.sos.schema.JsonValidator;
 
 @Path("process_class")
 public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl
@@ -22,17 +24,14 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl
 	private static final String API_CALL = "./process_class/configuration";
 
 	@Override
-	public JOCDefaultResponse postProcessClassConfiguration(String xAccessToken, String accessToken,
-			ProcessClassConfigurationFilter processClassConfigurationFilter) throws Exception {
-		return postProcessClassConfiguration(getAccessToken(xAccessToken, accessToken),
-				processClassConfigurationFilter);
-	}
-
-	public JOCDefaultResponse postProcessClassConfiguration(String accessToken,
-			ProcessClassConfigurationFilter processClassConfigurationFilter) throws Exception {
+	public JOCDefaultResponse postProcessClassConfiguration(String accessToken, byte[] processClassConfigurationFilterBytes) {
 
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassConfigurationFilter, accessToken,
+            JsonValidator.validateFailFast(processClassConfigurationFilterBytes, ProcessClassConfigurationFilter.class);
+            ProcessClassConfigurationFilter processClassConfigurationFilter = Globals.objectMapper.readValue(processClassConfigurationFilterBytes,
+                    ProcessClassConfigurationFilter.class);
+
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassConfigurationFilter, accessToken,
 					processClassConfigurationFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(processClassConfigurationFilter.getJobschedulerId(), accessToken)
 							.getProcessClass().getView().isConfiguration());

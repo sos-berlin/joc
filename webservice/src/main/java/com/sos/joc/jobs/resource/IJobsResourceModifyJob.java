@@ -15,38 +15,37 @@ public interface IJobsResourceModifyJob {
     @Path("stop")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsStop(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
+    public JOCDefaultResponse postJobsStop(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobs);
 
     @POST
     @Path("unstop")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsUnstop(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
+    public JOCDefaultResponse postJobsUnstop(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobs);
 
     @POST
     @Path("end_all_tasks")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsEndAllTasks(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
+    public JOCDefaultResponse postJobsEndAllTasks(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobs);
 
     @POST
     @Path("suspend_all_tasks")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsSuspendAllTasks(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
+    public JOCDefaultResponse postJobsSuspendAllTasks(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobs);
 
     @POST
     @Path("continue_all_tasks")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsContinueAllTasks(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
+    public JOCDefaultResponse postJobsContinueAllTasks(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobs);
 
  
     @POST
     @Path("set_run_time")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsSetRunTime(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobsBytes);
+    public JOCDefaultResponse postJobsSetRunTime(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobs);
     
-
 }

@@ -25,11 +25,7 @@ public class PropertiesImpl extends JOCResourceImpl implements IPropertiesResour
     private List<String> hideViews = new ArrayList<String>();
 
     @Override
-    public JOCDefaultResponse postProperties(String xAccessToken, String accessToken) throws Exception {
-        return postProperties(getAccessToken(xAccessToken, accessToken));
-    }
-
-    public JOCDefaultResponse postProperties(String accessToken) throws Exception {
+    public JOCDefaultResponse postProperties(String accessToken) {
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "", true);

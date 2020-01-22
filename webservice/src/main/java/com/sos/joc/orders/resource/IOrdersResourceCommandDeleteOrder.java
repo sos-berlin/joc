@@ -15,5 +15,5 @@ public interface IOrdersResourceCommandDeleteOrder {
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersDelete(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrdersBytes);
+    public JOCDefaultResponse postOrdersDelete(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrders);
 }

@@ -35,7 +35,7 @@ import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.joe.schedule.Schedule;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
-import com.sos.xml.XMLBuilder;
+import com.sos.schema.JsonValidator;
 
 @Path("schedule")
 public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements IScheduleResourceSetRunTime {
@@ -47,8 +47,10 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 	public JOCDefaultResponse postScheduleSetRuntime(String accessToken, byte[] modifyRuntimeBytes) {
 		SOSHibernateSession session = null;
 		try {
+		    JsonValidator.validateFailFast(modifyRuntimeBytes, ModifyRunTime.class);
 		    ModifyRunTime modifyRuntime = Globals.objectMapper.readValue(modifyRuntimeBytes, ModifyRunTime.class);
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken,
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken,
 					modifyRuntime.getJobschedulerId(),
 					getPermissonsJocCockpit(modifyRuntime.getJobschedulerId(), accessToken).getSchedule().getChange()
 							.isEditContent());

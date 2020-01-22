@@ -21,9 +21,9 @@ import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.docu.DocumentationShowFilter;
 import com.sos.joc.model.docu.DocumentationUrl;
+import com.sos.schema.JsonValidator;
 
 @Path("documentation")
 public class DocumentationShowResourceImpl extends JOCResourceImpl implements IDocumentationShowResource {
@@ -33,25 +33,25 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
     private static final String API_CALL_PREVIEW = "./documentation/preview";
 
     @Override
-    public JOCDefaultResponse show(String xAccessToken, String accessToken, String jobschedulerId, String path, String type) throws Exception {
+    public JOCDefaultResponse show(String xAccessToken, String accessToken, String jobschedulerId, String path, String type) {
         return show(getAccessToken(xAccessToken, accessToken), jobschedulerId, path, type);
     }
 
-    public JOCDefaultResponse show(String xAccessToken, String jobschedulerId, String path, String type) throws Exception {
+    public JOCDefaultResponse show(String xAccessToken, String jobschedulerId, String path, String type) {
         try {
-            DocumentationShowFilter documentationFilter = new DocumentationShowFilter();
-            documentationFilter.setJobschedulerId(jobschedulerId);
-            documentationFilter.setPath(path);
-            documentationFilter.setType(JobSchedulerObjectType.fromValue(type));
-            return show(xAccessToken, documentationFilter);
+            String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\", \"type\": \"%s\"}", jobschedulerId, path, type);
+            return show(xAccessToken, json.getBytes());
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
     @Override
-    public JOCDefaultResponse show(String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception {
+    public JOCDefaultResponse show(String xAccessToken, byte[] documentationFilterBytes) {
         try {
+            JsonValidator.validateFailFast(documentationFilterBytes, DocumentationShowFilter.class);
+            DocumentationShowFilter documentationFilter = Globals.objectMapper.readValue(documentationFilterBytes, DocumentationShowFilter.class);
+            
             boolean perm = false;
             if (documentationFilter.getType() != null) {
                 SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(documentationFilter.getJobschedulerId(), xAccessToken);
@@ -102,20 +102,21 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
     }
 
     @Override
-    public JOCDefaultResponse preview(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
+    public JOCDefaultResponse preview(String xAccessToken, String accessToken, String jobschedulerId, String path) {
         return preview(getAccessToken(xAccessToken, accessToken), jobschedulerId, path);
     }
 
-    public JOCDefaultResponse preview(String xAccessToken, String jobschedulerId, String path) throws Exception {
-        DocumentationShowFilter documentationFilter = new DocumentationShowFilter();
-        documentationFilter.setJobschedulerId(jobschedulerId);
-        documentationFilter.setPath(path);
-        return preview(xAccessToken, documentationFilter);
+    public JOCDefaultResponse preview(String xAccessToken, String jobschedulerId, String path) {
+        String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
+        return preview(xAccessToken, json.getBytes());
     }
 
     @Override
-    public JOCDefaultResponse preview(String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception {
+    public JOCDefaultResponse preview(String xAccessToken, byte[] documentationFilterBytes) {
         try {
+            JsonValidator.validateFailFast(documentationFilterBytes, DocumentationShowFilter.class);
+            DocumentationShowFilter documentationFilter = Globals.objectMapper.readValue(documentationFilterBytes, DocumentationShowFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_PREVIEW, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(documentationFilter.getJobschedulerId(), xAccessToken).getDocumentation().isView());
             if (jocDefaultResponse != null) {
@@ -138,8 +139,10 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
     }
 
     @Override
-    public JOCDefaultResponse postUrl(String xAccessToken, DocumentationShowFilter documentationFilter) throws Exception {
+    public JOCDefaultResponse postUrl(String xAccessToken, byte[] documentationFilterBytes) {
         try {
+            JsonValidator.validateFailFast(documentationFilterBytes, DocumentationShowFilter.class);
+            DocumentationShowFilter documentationFilter = Globals.objectMapper.readValue(documentationFilterBytes, DocumentationShowFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_URL, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
                     true);
             if (jocDefaultResponse != null) {

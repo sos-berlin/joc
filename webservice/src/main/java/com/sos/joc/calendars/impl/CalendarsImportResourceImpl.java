@@ -52,6 +52,7 @@ import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.Dates;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.Folder;
+import com.sos.schema.JsonValidator;
 
 @Path("calendars")
 public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICalendarsImportResource {
@@ -64,10 +65,13 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
     private boolean updateUsageIsNecessary = false;
 
     @Override
-    public JOCDefaultResponse importCalendars(String accessToken, CalendarImportFilter calendarImportFilter) throws Exception {
+    public JOCDefaultResponse importCalendars(String accessToken, byte[] filterBytes) {
         SOSHibernateSession connection = null;
         List<DBItemInventoryInstance> clusterMembers = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, CalendarImportFilter.class);
+            CalendarImportFilter calendarImportFilter = Globals.objectMapper.readValue(filterBytes, CalendarImportFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, calendarImportFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(calendarImportFilter.getJobschedulerId(), accessToken).getCalendar().getEdit().isCreate());
             if (jocDefaultResponse != null) {

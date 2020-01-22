@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -14,6 +15,7 @@ import com.sos.joc.lock.resource.ILockResourceConfiguration;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.lock.LockConfigurationFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("lock")
 public class LockResourceConfigurationImpl extends JOCResourceImpl implements ILockResourceConfiguration {
@@ -21,14 +23,11 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
 	private static final String API_CALL = "./lock/configuration";
 
 	@Override
-	public JOCDefaultResponse postLockConfiguration(String xAccessToken, String accessToken,
-			LockConfigurationFilter lockBody) throws Exception {
-		return postLockConfiguration(getAccessToken(xAccessToken, accessToken), lockBody);
-	}
-
-	public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilter lockBody)
-			throws Exception {
+	public JOCDefaultResponse postLockConfiguration(String accessToken, byte[] lockBodyBytes) {
 		try {
+		    JsonValidator.validateFailFast(lockBodyBytes, LockConfigurationFilter.class);
+		    LockConfigurationFilter lockBody = Globals.objectMapper.readValue(lockBodyBytes, LockConfigurationFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, lockBody, accessToken, lockBody.getJobschedulerId(),
 					getPermissonsJocCockpit(lockBody.getJobschedulerId(), accessToken).getLock().getView()
 							.isConfiguration());

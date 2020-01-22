@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Configuration200;
@@ -27,7 +29,8 @@ public class OrderConfigurationResourceImplTest {
         orderConfigurationBody.setOrderId(TestEnvWebserviceTest.ORDER);
         orderConfigurationBody.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrderConfigurationResourceImpl orderConfigurationImpl = new OrderConfigurationResourceImpl();
-        JOCDefaultResponse ordersResponse = orderConfigurationImpl.postOrderConfiguration(accessToken, orderConfigurationBody);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(orderConfigurationBody);
+        JOCDefaultResponse ordersResponse = orderConfigurationImpl.postOrderConfiguration(accessToken, b);
         Configuration200 orderConfigurationSchema = (Configuration200) ordersResponse.getEntity();
         assertEquals("postOrderConfTest",TestEnvWebserviceTest.JOB_CHAIN + "," + TestEnvWebserviceTest.ORDER, orderConfigurationSchema.getConfiguration().getPath());
      }

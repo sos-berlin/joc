@@ -20,6 +20,7 @@ import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.event.resource.ICheckCustomEventResource;
 import com.sos.joc.model.event.custom.CheckEvent;
 import com.sos.joc.model.event.custom.CheckResult;
+import com.sos.schema.JsonValidator;
 
 @Path("events")
 public class CheckCustomEventResourceImpl extends JOCResourceImpl implements ICheckCustomEventResource {
@@ -28,11 +29,13 @@ public class CheckCustomEventResourceImpl extends JOCResourceImpl implements ICh
 	private String xPath = "";
 
 	@Override
-	public JOCDefaultResponse checkEvent(String accessToken, CheckEvent checkEvent) {
+	public JOCDefaultResponse checkEvent(String accessToken, byte[] checkEventBytes) {
 		SOSHibernateSession session = null;
 
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, checkEvent, accessToken,
+		    JsonValidator.validateFailFast(checkEventBytes, CheckEvent.class);
+		    CheckEvent checkEvent = Globals.objectMapper.readValue(checkEventBytes, CheckEvent.class);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, checkEvent, accessToken,
 					checkEvent.getJobschedulerId(), getPermissonsCommands(checkEvent.getJobschedulerId(), accessToken)
 							.getJobschedulerMaster().getView().isParameter());
 			if (jocDefaultResponse != null) {

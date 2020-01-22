@@ -10,13 +10,13 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "jobChain": {
       "$ref": "../common/path-schema.json"
     },
     "orderId": {
-      "type": "string"
+      "$ref": "../common/filename255-schema.json"
     },
     "compact": {
       "$ref": "../common/compactParam-schema.json"

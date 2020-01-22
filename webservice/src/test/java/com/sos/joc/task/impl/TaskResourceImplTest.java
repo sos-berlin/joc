@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.Task200;
@@ -27,7 +29,8 @@ public class TaskResourceImplTest {
         taskFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         TaskResourceImpl taskImpl = new TaskResourceImpl();
         taskFilterSchema.setTaskId("1");
-        JOCDefaultResponse ordersResponse = taskImpl.postTask(accessToken, taskFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(taskFilterSchema);
+        JOCDefaultResponse ordersResponse = taskImpl.postTask(accessToken, b);
         Task200 task200Schema = (Task200) ordersResponse.getEntity();
         assertEquals("postOrderTest", "myPath", task200Schema.getTask().getOrder().getPath());
     }

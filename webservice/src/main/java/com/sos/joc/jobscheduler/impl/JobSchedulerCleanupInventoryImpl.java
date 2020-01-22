@@ -22,6 +22,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerCleanUpInventoryResource;
 import com.sos.joc.model.jobscheduler.HostPortParameter;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerCleanupInventoryImpl extends JOCResourceImpl implements IJobSchedulerCleanUpInventoryResource {
@@ -29,15 +30,12 @@ public class JobSchedulerCleanupInventoryImpl extends JOCResourceImpl implements
 	private static String API_CALL = "./jobscheduler/cleanup";
 
 	@Override
-	public JOCDefaultResponse postJobschedulerCleanupInventory(String xAccessToken, String accessToken,
-			HostPortParameter hostPortParameter) throws Exception {
-		return postJobschedulerCleanupInventory(getAccessToken(xAccessToken, accessToken), hostPortParameter);
-	}
-
-	public JOCDefaultResponse postJobschedulerCleanupInventory(String accessToken, HostPortParameter hostPortParameter)
-			throws Exception {
+	public JOCDefaultResponse postJobschedulerCleanupInventory(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(filterBytes, HostPortParameter.class);
+		    HostPortParameter hostPortParameter = Globals.objectMapper.readValue(filterBytes, HostPortParameter.class);
+            
 			// TODO permission
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, hostPortParameter, accessToken,
 					hostPortParameter.getJobschedulerId(),

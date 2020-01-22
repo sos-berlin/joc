@@ -36,7 +36,7 @@ import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
-import com.sos.joc.model.joe.job.Job;
+import com.sos.schema.JsonValidator;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.xml.XMLBuilder;
 
@@ -55,6 +55,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsStop(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
             ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, STOP, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isStop(), modifyJobs);
@@ -69,6 +70,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsUnstop(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
             ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, UNSTOP, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isUnstop(), modifyJobs);
@@ -83,6 +85,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
             ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob()
                     .getChange().isRunTime(), modifyJobs);
@@ -97,6 +100,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsEndAllTasks(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
             ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, END, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isEndAllTasks(), modifyJobs);
@@ -111,6 +115,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
             ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, SUSPEND, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isSuspendAllTasks(), modifyJobs);
@@ -123,8 +128,9 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
-    public JOCDefaultResponse postJobsContinueAllTasks(String accessToken,byte[] modifyJobsBytes) {
+    public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, byte[] modifyJobsBytes) {
         try {
+            JsonValidator.validateFailFast(modifyJobsBytes, ModifyJobs.class);
             ModifyJobs modifyJobs = Globals.objectMapper.readValue(modifyJobsBytes, ModifyJobs.class);
             return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
                     .isContinueAllTasks(), modifyJobs);

@@ -9,25 +9,25 @@
   ],
   "properties": {
     "orderId": {
-      "type": "string"
+      "$ref": "../common/filename255-schema.json"
     },
     "jobChain": {
       "$ref": "../common/path-schema.json"
     },
     "state": {
       "description": "the name of the node",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "endState": {
       "description": "the name of the end node",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "at": {
       "$ref": "../common/timestampWithNow-schema.json"
     },
     "timeZone": {
       "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "resume": {
       "description": "only useful when changing order state of suspended orders",
@@ -38,7 +38,7 @@
       "type": "boolean"
     },
     "title": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "priority": {
       "$ref": "../common/nonNegativeInteger-schema.json"

@@ -12,33 +12,34 @@
   "properties": {
     "eventId": {
       "description": "unique id of an event, monoton increasing, id/1000=milliseconds of UTC time",
-      "type": "string"
+      "type": "string",
+      "pattern": "^\\d*$"
     },
     "path": {
       "$ref": "../common/path-schema.json"
     },
     "eventType": {
       "description": "FileBasedAdded, FileBasedRemoved, FileBasedReplaced, FileBasedActivated, OrderStarted, OrderStepStarted, OrderStepEnded, OrderNodeChanged, OrderFinished, OrderSetback, OrderSuspended, OrderResumed",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "objectType": {
       "$ref": "../common/type-schema.json"
     },
     "nodeId": {
       "description": "comes with events OrderNodeChanged, OrderStepStarted, OrderFinished",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "fromNodeId": {
       "description": "comes with event OrderNodeChanged",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "taskId": {
       "description": "comes with event OrderStepStarted",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "state": {
       "description": "comes with event ...State",
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "nodeTransition": {
       "description": "comes with event OrderStepEnded",

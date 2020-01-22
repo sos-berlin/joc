@@ -29,6 +29,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.jobChain.JobChainFilter;
 import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.jobChain.JobChainV200;
+import com.sos.schema.JsonValidator;
 
 @Path("job_chain")
 public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainResource {
@@ -36,13 +37,12 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
     private static final String API_CALL = "./job_chain";
 
     @Override
-    public JOCDefaultResponse postJobChain(String xAccessToken, String accessToken, JobChainFilter jobChainFilter) throws Exception {
-        return postJobChain(getAccessToken(xAccessToken, accessToken), jobChainFilter);
-    }
-
-    public JOCDefaultResponse postJobChain(String accessToken, JobChainFilter jobChainFilter) throws Exception {
+    public JOCDefaultResponse postJobChain(String accessToken, byte[] jobChainFilterBytes) {
         SOSHibernateSession session = null;
         try {
+            JsonValidator.validateFailFast(jobChainFilterBytes, JobChainFilter.class);
+            JobChainFilter jobChainFilter = Globals.objectMapper.readValue(jobChainFilterBytes, JobChainFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainFilter, accessToken, jobChainFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(jobChainFilter.getJobschedulerId(), accessToken).getJobChain().getView().isStatus());
             if (jocDefaultResponse != null) {

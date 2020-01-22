@@ -15,5 +15,5 @@ public interface IOrdersResourceCommandAddOrder {
     @Path("add")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersAdd(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrdersBytes);
+    public JOCDefaultResponse postOrdersAdd(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrders);
 }

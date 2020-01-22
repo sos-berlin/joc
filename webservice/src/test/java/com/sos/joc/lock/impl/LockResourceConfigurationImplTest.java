@@ -1,18 +1,18 @@
 package com.sos.joc.lock.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.lock.LockConfigurationFilter;
 
 public class LockResourceConfigurationImplTest {
@@ -32,7 +32,8 @@ public class LockResourceConfigurationImplTest {
         lockConfigurationFilterSchema.setLock(TestEnvWebserviceTest.LOCK);
         lockConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         LockResourceConfigurationImpl lockResourceConfigurationImpl = new LockResourceConfigurationImpl();
-        JOCDefaultResponse jobsResponse = lockResourceConfigurationImpl.postLockConfiguration(accessToken, lockConfigurationFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(lockConfigurationFilterSchema);
+        JOCDefaultResponse jobsResponse = lockResourceConfigurationImpl.postLockConfiguration(accessToken, b);
         Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertEquals("postLockConfigurationTest", TestEnvWebserviceTest.LOCK, configurationSchema.getConfiguration().getPath());
     }
@@ -44,7 +45,8 @@ public class LockResourceConfigurationImplTest {
         lockConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         lockConfigurationFilterSchema.setMime(ConfigurationMime.HTML);
         LockResourceConfigurationImpl lockResourceConfigurationImpl = new LockResourceConfigurationImpl();
-        JOCDefaultResponse jobsResponse = lockResourceConfigurationImpl.postLockConfiguration(accessToken, lockConfigurationFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(lockConfigurationFilterSchema);
+        JOCDefaultResponse jobsResponse = lockResourceConfigurationImpl.postLockConfiguration(accessToken, b);
         Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertNotNull("postLockConfigurationHtmlTest", configurationSchema.getConfiguration().getContent().getHtml());
         LOGGER.info(configurationSchema.getConfiguration().getContent().getHtml());

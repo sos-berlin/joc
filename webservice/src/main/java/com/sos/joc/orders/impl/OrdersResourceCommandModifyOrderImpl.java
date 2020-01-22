@@ -61,7 +61,7 @@ import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
-import com.sos.xml.XMLBuilder;
+import com.sos.schema.JsonValidator;
 
 @Path("orders")
 public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
@@ -76,7 +76,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             return postOrdersCommand(accessToken, "start", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isStart(), modifyOrders);
         } catch (JocException e) {
@@ -90,7 +92,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSuspend(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             return postOrdersCommand(accessToken, "suspend", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isSuspend(), modifyOrders);
         } catch (JocException e) {
@@ -104,7 +108,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersResume(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             SOSPermissionJocCockpit perm = getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken);
             boolean hasResumeOrderPerm = perm.getOrder().getExecute().isResume() || perm.getYADE().getExecute().isTransferStart();
             return postOrdersCommand(accessToken, "resume", hasResumeOrderPerm, modifyOrders);
@@ -119,7 +125,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersReset(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             return postOrdersCommand(accessToken, "reset", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isReset(), modifyOrders);
         } catch (JocException e) {
@@ -133,7 +141,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSetState(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             return postOrdersCommand(accessToken, "set_state", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getChange().isState(), modifyOrders);
         } catch (JocException e) {
@@ -147,7 +157,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getChange().isRunTime(), modifyOrders);
         } catch (JocException e) {
@@ -161,7 +173,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isRemoveSetback(), modifyOrders);
         } catch (JocException e) {

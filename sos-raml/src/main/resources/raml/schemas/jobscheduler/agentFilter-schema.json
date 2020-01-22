@@ -8,7 +8,7 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "agents": {
       "type": "array",
@@ -19,7 +19,7 @@
           "agent": {
             "description": "Url of an Agent",
             "type": "string",
-            "pattern": "https?://.+"
+            "pattern": "^https?://.+$"
           }
         }
       }

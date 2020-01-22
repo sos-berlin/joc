@@ -25,6 +25,7 @@ import com.sos.joc.model.schedule.RunTime;
 import com.sos.joc.model.schedule.RunTime200;
 import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
+import com.sos.schema.JsonValidator;
 
 @Path("schedule")
 public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implements IScheduleResourceConfiguration {
@@ -33,14 +34,22 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
     private static final String API_CALL_R = "./schedule/run_time";
 
     @Override
-    public JOCDefaultResponse postScheduleConfiguration(String accessToken, ScheduleConfigurationFilter scheduleBody) {
+	public JOCDefaultResponse postScheduleConfiguration(String accessToken, byte[] scheduleBodyBytes) {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_C, scheduleBody, accessToken, scheduleBody.getJobschedulerId(),
-                    getPermissonsJocCockpit(scheduleBody.getJobschedulerId(), accessToken).getSchedule().getView().isConfiguration());
+		    JsonValidator.validateFailFast(scheduleBodyBytes, ScheduleConfigurationFilter.class);
+		    ScheduleConfigurationFilter scheduleBody = Globals.objectMapper.readValue(scheduleBodyBytes, ScheduleConfigurationFilter.class);
+            
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleBody, accessToken,
+					scheduleBody.getJobschedulerId(),
+					getPermissonsJocCockpit(scheduleBody.getJobschedulerId(), accessToken).getSchedule().getView()
+							.isConfiguration());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
             checkRequiredParameter("schedule", scheduleBody.getSchedule());
 

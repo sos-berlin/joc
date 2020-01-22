@@ -7,7 +7,7 @@
 
 	"properties": {
 		"jobschedulerId": {
-			"type": "string"
+			"$ref": "../common/filename100-schema.json"
 		},
 
 		"types": {

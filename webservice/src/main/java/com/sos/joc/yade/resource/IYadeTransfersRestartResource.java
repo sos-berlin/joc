@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.yade.ModifyTransfers;
 
 
 public interface IYadeTransfersRestartResource {
@@ -15,6 +14,5 @@ public interface IYadeTransfersRestartResource {
     @POST
     @Path("transfers/restart")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postYadeTransfersRestart(@HeaderParam("X-Access-Token") String accessToken, ModifyTransfers filterBody)
-            throws Exception;
+    public JOCDefaultResponse postYadeTransfersRestart(@HeaderParam("X-Access-Token") String accessToken, byte[] filterBody);
 }

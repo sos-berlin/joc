@@ -18,6 +18,7 @@ import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.documentations.resource.IDocumentationsDeleteResource;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.docu.DocumentationsFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("documentations")
 public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements IDocumentationsDeleteResource {
@@ -25,10 +26,12 @@ public class DocumentationsDeleteResourceImpl extends JOCResourceImpl implements
     private static final String API_CALL = "./documentations/delete";
 
     @Override
-    public JOCDefaultResponse deleteDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
+    public JOCDefaultResponse deleteDocumentations(String xAccessToken, byte[] filterBytes) {
         
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, DocumentationsFilter.class);
+            DocumentationsFilter filter = Globals.objectMapper.readValue(filterBytes, DocumentationsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
                     .getJobschedulerId(), xAccessToken).getDocumentation().isDelete());
             if (jocDefaultResponse != null) {

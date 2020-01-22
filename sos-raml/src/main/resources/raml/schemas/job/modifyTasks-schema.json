@@ -9,7 +9,7 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "jobs": {
       "type": "array",
@@ -26,7 +26,8 @@
               "type": "object",
               "properties": {
                 "taskId": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^\\d+$"
                 }
               }
             }

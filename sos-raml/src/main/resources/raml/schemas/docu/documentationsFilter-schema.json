@@ -8,12 +8,12 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "documentations": {
       "type": "array",
       "items": {
-        "type": "string"
+        "$ref": "../common/path-schema.json"
       }
     },
     "compact": {
@@ -28,7 +28,7 @@
     "types": {
       "type": "array",
       "items": {
-        "type" : "string"
+        "$ref": "../common/string255-schema.json"
       }
     },
     "auditLog": {

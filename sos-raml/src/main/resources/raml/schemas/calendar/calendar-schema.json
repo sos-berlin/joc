@@ -11,7 +11,7 @@
       "$ref": "../common/path-schema.json"
     },
     "name": {
-      "type": "string"
+      "$ref": "../common/filename255-schema.json"
     },
     "basedOn": {
       "$ref": "../common/path-schema.json"
@@ -23,10 +23,10 @@
       "$ref": "calendarType-schema.json"
     },
     "category": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "title": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "from": {
       "$ref": "../common/date-schema.json"

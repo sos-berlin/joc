@@ -21,6 +21,7 @@ import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersHistoricSummary;
 import com.sos.joc.model.order.OrdersOverView;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSummary;
+import com.sos.schema.JsonValidator;
 
 @Path("orders")
 public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implements IOrdersResourceOverviewSummary {
@@ -28,15 +29,14 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
     private static final String API_CALL = "./orders/overview/summary";
 
     @Override
-    public JOCDefaultResponse postOrdersOverviewSummary(String xAccessToken, String accessToken, OrdersFilter ordersFilter) throws Exception {
-        return postOrdersOverviewSummary(getAccessToken(xAccessToken, accessToken), ordersFilter);
-    }
-
-    public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter) throws Exception {
+    public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, byte[] ordersFilterBytes) {
         SOSHibernateSession connection = null;
 
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken,
+		    JsonValidator.validateFailFast(ordersFilterBytes, OrdersFilter.class);
+            OrdersFilter ordersFilter = Globals.objectMapper.readValue(ordersFilterBytes, OrdersFilter.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken,
 					ordersFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(ordersFilter.getJobschedulerId(), accessToken).getOrder().getView()
 							.isStatus());

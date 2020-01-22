@@ -15,6 +15,7 @@ import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.plan.RunTime;
 import com.sos.joc.model.plan.RunTimePlanFilter;
 import com.sos.joc.plan.resource.IPlanFromRunTimeResource;
+import com.sos.schema.JsonValidator;
 
 import sos.xml.SOSXMLXPath;
 
@@ -24,14 +25,17 @@ public class PlanFromRunTimeResourceImpl extends JOCResourceImpl implements IPla
     private static final String API_CALL = "./plan/from_run_time";
 
     @Override
-    public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) throws Exception {
+	public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) {
         try {
-            RunTimePlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, RunTimePlanFilter.class);
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    planFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+		    JsonValidator.validateFailFast(planFilterBytes, RunTimePlanFilter.class);
+		    RunTimePlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, RunTimePlanFilter.class);
+            
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken,
+					planFilter.getJobschedulerId(), getPermissonsJocCockpit(planFilter.getJobschedulerId(), accessToken)
+							.getOrder().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
             checkRequiredParameter("dateTo", planFilter.getDateTo());
             if (planFilter.getRunTime() == null) {

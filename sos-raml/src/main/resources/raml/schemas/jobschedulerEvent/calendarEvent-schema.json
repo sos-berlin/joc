@@ -12,8 +12,7 @@
       "type": "string"
     },
     "eventId": {
-      "type": "string",
-      "format":"utc-millisec"
+      "$ref": "../common/nonNegativeLong-schema.json"
     },
     "variables": {
       "javaType": "com.sos.jobscheduler.model.event.CalendarVariables",

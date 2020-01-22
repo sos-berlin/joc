@@ -27,7 +27,8 @@ public class JobResourceHistoryImplTest {
         jobHistoryFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         jobHistoryFilterSchema.setJob(TestEnvWebserviceTest.JOB);
         JobResourceHistoryImpl jobHistoryImpl = new JobResourceHistoryImpl();
-        JOCDefaultResponse jobsResponse = jobHistoryImpl.postJobHistory(accessToken, jobHistoryFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobHistoryFilterSchema);
+        JOCDefaultResponse jobsResponse = jobHistoryImpl.postJobHistory(accessToken, b);
         TaskHistory history = (TaskHistory) jobsResponse.getEntity();
         assertEquals("postJobHistoryTest", TestEnvWebserviceTest.JOB, Globals.normalizePath(history.getHistory().get(0).getJob()));
     }

@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.report.Agents;
@@ -34,7 +35,8 @@ public class AgentsResourceImplTest {
         agentsFilter.setDateFrom("-7d");
         agentsFilter.setDateTo("0d");
         agentsFilter.setTimeZone("Europe/Berlin");
-        JOCDefaultResponse response = agentsImpl.postAgentsReport(accessToken, agentsFilter);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(agentsFilter);
+        JOCDefaultResponse response = agentsImpl.postAgentsReport(accessToken, b);
         Agents agents = (Agents) response.getEntity();
         assertEquals("postAgentsReportTest", "SP_4012", agents.getAgents().get(0).getJobschedulerId());
     }

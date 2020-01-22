@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.configuration.Configuration;
 
  
 public interface IJocConfigurationResource{
@@ -15,25 +14,25 @@ public interface IJocConfigurationResource{
     @POST
     @Path("save")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postSaveConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, Configuration configuration) throws Exception;
+    public JOCDefaultResponse postSaveConfiguration(@HeaderParam("X-Access-Token") String accessToken, byte[] configurationBytes);
 
     @POST
     @Path("delete")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postDeleteConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, Configuration configuration) throws Exception;
+    public JOCDefaultResponse postDeleteConfiguration(@HeaderParam("X-Access-Token") String accessToken, byte[] configurationBytes);
 
     @POST
     @Path("share")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postShareConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,  Configuration configuration) throws Exception;
+    public JOCDefaultResponse postShareConfiguration(@HeaderParam("X-Access-Token") String accessToken, byte[] configurationBytes);
     
     @POST
     @Path("make_private")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postMakePrivate(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,  Configuration configuration) throws Exception;
+    public JOCDefaultResponse postMakePrivate(@HeaderParam("X-Access-Token") String accessToken, byte[] configurationBytes);
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postReadConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,  Configuration configuration) throws Exception;
+    public JOCDefaultResponse postReadConfiguration(@HeaderParam("X-Access-Token") String accessToken, byte[] configurationBytes);
 
 }

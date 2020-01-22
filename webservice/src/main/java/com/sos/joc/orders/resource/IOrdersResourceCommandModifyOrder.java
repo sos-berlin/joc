@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.order.ModifyOrders;
 
 public interface IOrdersResourceCommandModifyOrder {
 
@@ -16,7 +15,7 @@ public interface IOrdersResourceCommandModifyOrder {
     @Path("start")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersStart(@HeaderParam("X-Access-Token") String accessToken, byte[]  modifyOrders);
+    public JOCDefaultResponse postOrdersStart(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrders);
 
     @POST
     @Path("suspend")

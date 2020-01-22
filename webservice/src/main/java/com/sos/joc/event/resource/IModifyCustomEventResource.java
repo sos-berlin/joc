@@ -9,8 +9,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.event.custom.EventIdsFilter;
-import com.sos.joc.model.event.custom.ModifyEvent;
 
  
 public interface IModifyCustomEventResource {
@@ -19,28 +17,24 @@ public interface IModifyCustomEventResource {
     @Path("custom/add")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse addEvent(            
-            @HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrdersBytes) throws Exception;
+    public JOCDefaultResponse addEvent(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrdersBytes);
     
     @POST
     @Path("custom/remove")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse removeEvent(            
-            @HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrdersBytes) throws Exception;
+    public JOCDefaultResponse removeEvent(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrdersBytes);
     
     @POST
     @Path("custom/delete_events")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse deleteEvents(            
-            @HeaderParam("X-Access-Token") String accessToken, EventIdsFilter eventIdsFilter) throws Exception;
+    public JOCDefaultResponse deleteEvents(@HeaderParam("X-Access-Token") String accessToken, byte[] eventIdsFilterBytes);
 
     @POST
     @Path("custom/add_event")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse addEvent(            
-            @HeaderParam("X-Access-Token") String accessToken, ModifyEvent modifyEvent) throws Exception;
+    public JOCDefaultResponse addEvent2(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyEventBytes);
 
 }

@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobs.impl.JobsResourceImplTest;
@@ -31,7 +32,8 @@ public class JobRuntimeResourceImplTest {
         jobFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         jobFilterSchema.setJob(TestEnvWebserviceTest.JOB);
         JobRunTimeResourceImpl jobRunTimeImpl = new JobRunTimeResourceImpl();
-        JOCDefaultResponse jobResponse = jobRunTimeImpl.postJobRunTimeWithXML(accessToken, jobFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobFilterSchema);
+        JOCDefaultResponse jobResponse = jobRunTimeImpl.postJobRunTime(accessToken, b);
         RunTime200 jobRunTimeSchema = (RunTime200) jobResponse.getEntity();
         LOGGER.info(jobRunTimeSchema.getRunTime().getRunTimeXml());
         assertTrue("", jobRunTimeSchema.getRunTime().getRunTimeXml().startsWith("<run_time"));

@@ -1,9 +1,9 @@
 package com.sos.joc.orders.impl;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.order.OrdersFilter;
@@ -24,7 +24,8 @@ public class OrdersResourceOverviewSummaryImplTest {
         OrdersFilter ordersFilterSchema = new OrdersFilter();
         ordersFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceOverviewSummaryImpl ordersResourceOverviewSummaryImpl = new OrdersResourceOverviewSummaryImpl();
-        JOCDefaultResponse ordersResponse = ordersResourceOverviewSummaryImpl.postOrdersOverviewSummary(accessToken, ordersFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(ordersFilterSchema);
+        JOCDefaultResponse ordersResponse = ordersResourceOverviewSummaryImpl.postOrdersOverviewSummary(accessToken, b);
         OrdersOverView summarySchema = (OrdersOverView) ordersResponse.getEntity();
 //        assertEquals("postOrdersOverviewSummary", 0, summarySchema.getOrders().getFailed().intValue());
     }

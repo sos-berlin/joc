@@ -9,7 +9,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobscheduler.AgentFilter;
  
 public interface IJobSchedulerResourceAgentsP {
  
@@ -18,6 +17,5 @@ public interface IJobSchedulerResourceAgentsP {
     @Path("agents/p")
     @Consumes(MediaType.APPLICATION_JSON )
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobschedulerAgentsP(
-            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, AgentFilter agentFilterSchema) throws Exception;
+    public JOCDefaultResponse postJobschedulerAgentsP(@HeaderParam("X-Access-Token") String accessToken, byte[] agentFilterSchema);
 }

@@ -5,6 +5,7 @@ package com.sos.joc.jobscheduler.impl;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.Globals;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceModifyJobSchedulerImpl;
 import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 
@@ -21,7 +22,8 @@ public class JobSchedulerResourceTerminateImplTest {
         urlTimeoutParamSchema.setJobschedulerId("scheduler_current");
         urlTimeoutParamSchema.setTimeout(30);
         JobSchedulerResourceModifyJobSchedulerImpl jobschedulerResourceTerminateImpl = new JobSchedulerResourceModifyJobSchedulerImpl();
-        jobschedulerResourceTerminateImpl.postJobschedulerTerminate(sosShiroCurrentUserAnswer.getAccessToken(), urlTimeoutParamSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(urlTimeoutParamSchema);
+        jobschedulerResourceTerminateImpl.postJobschedulerTerminate(sosShiroCurrentUserAnswer.getAccessToken(), b);
     }
     
     @Test
@@ -33,7 +35,8 @@ public class JobSchedulerResourceTerminateImplTest {
         urlTimeoutParamSchema.setJobschedulerId("scheduler_current");
         urlTimeoutParamSchema.setTimeout(30);
         JobSchedulerResourceModifyJobSchedulerImpl jobschedulerResourceTerminateImpl = new JobSchedulerResourceModifyJobSchedulerImpl();
-        jobschedulerResourceTerminateImpl.postJobschedulerRestartTerminate(sosShiroCurrentUserAnswer.getAccessToken(), urlTimeoutParamSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(urlTimeoutParamSchema);
+        jobschedulerResourceTerminateImpl.postJobschedulerRestartTerminate(sosShiroCurrentUserAnswer.getAccessToken(), b);
     }
 
 }

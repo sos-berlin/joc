@@ -15,6 +15,7 @@ import com.sos.joc.db.configuration.JocConfigurationDbLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.security.SecurityConfiguration;
 import com.sos.joc.security.resource.ISecurityConfigurationResourceRead;
+import com.sos.schema.JsonValidator;
 
 @Path("security_configuration")
 public class SecurityConfigurationResourceImpl extends JOCResourceImpl implements ISecurityConfigurationResourceRead {
@@ -23,11 +24,7 @@ public class SecurityConfigurationResourceImpl extends JOCResourceImpl implement
 	private static final String API_CALL_WRITE = "./security_configuration/write";
 
 	@Override
-	public JOCDefaultResponse postSecurityConfigurationRead(String xAccessToken, String accessToken) throws Exception {
-		return postSecurityConfigurationRead(getAccessToken(xAccessToken, accessToken));
-	}
-
-	public JOCDefaultResponse postSecurityConfigurationRead(String accessToken) throws Exception {
+	public JOCDefaultResponse postSecurityConfigurationRead(String accessToken) {
 	    SOSHibernateSession connection = null;
 	    try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL_READ, null, accessToken, "", true);
@@ -64,14 +61,11 @@ public class SecurityConfigurationResourceImpl extends JOCResourceImpl implement
 	}
 
 	@Override
-	public JOCDefaultResponse postSecurityConfigurationWrite(String xAccessToken, String accessToken,
-			SecurityConfiguration securityConfiguration) throws Exception {
-		return postSecurityConfigurationWrite(getAccessToken(xAccessToken, accessToken), securityConfiguration);
-	}
-
-	public JOCDefaultResponse postSecurityConfigurationWrite(String accessToken,
-			SecurityConfiguration securityConfiguration) throws Exception {
+	public JOCDefaultResponse postSecurityConfigurationWrite(String accessToken, byte[] securityConfigurationBytes) {
 		try {
+		    JsonValidator.validateFailFast(securityConfigurationBytes, SecurityConfiguration.class);
+		    SecurityConfiguration securityConfiguration = Globals.objectMapper.readValue(securityConfigurationBytes, SecurityConfiguration.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL_WRITE, null, accessToken, "", true);
 			if (jocDefaultResponse != null) {
 				return jocDefaultResponse;

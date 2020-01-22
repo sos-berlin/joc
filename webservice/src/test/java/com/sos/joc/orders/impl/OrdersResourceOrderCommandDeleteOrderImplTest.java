@@ -46,9 +46,9 @@ public class OrdersResourceOrderCommandDeleteOrderImplTest {
         modifyOrdersSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceCommandDeleteOrderImpl ordersDeleteResourceHistoryImpl = new OrdersResourceCommandDeleteOrderImpl();
         OrdersResourceCommandAddOrderImpl ordersAddResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
-
-        JOCDefaultResponse ordersResponse = ordersAddResourceHistoryImpl.postOrdersAdd(accessToken, Globals.xmlMapper.writeValueAsBytes(modifyOrdersSchema));
-        ordersResponse = ordersDeleteResourceHistoryImpl.postOrdersDelete(accessToken, Globals.xmlMapper.writeValueAsBytes(modifyOrdersSchema));
+        byte[] b = Globals.objectMapper.writeValueAsBytes(modifyOrdersSchema);
+        JOCDefaultResponse ordersResponse = ordersAddResourceHistoryImpl.postOrdersAdd(accessToken, b);
+        ordersResponse = ordersDeleteResourceHistoryImpl.postOrdersDelete(accessToken, b);
         Ok okSchema = (Ok) ordersResponse.getEntity();
         assertEquals("postOrdersCommandDeleteOrder", true, okSchema.getOk());
     }

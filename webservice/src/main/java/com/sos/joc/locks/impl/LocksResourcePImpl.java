@@ -25,6 +25,7 @@ import com.sos.joc.model.lock.LockP;
 import com.sos.joc.model.lock.LockPath;
 import com.sos.joc.model.lock.LocksFilter;
 import com.sos.joc.model.lock.LocksP;
+import com.sos.schema.JsonValidator;
 
 @Path("locks")
 public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourceP {
@@ -32,21 +33,22 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
     private static final String API_CALL = "./locks/p";
 
     @Override
-    public JOCDefaultResponse postLocksP(String xAccessToken, String accessToken, LocksFilter locksFilter) throws Exception {
-        return postLocksP(getAccessToken(xAccessToken, accessToken), locksFilter);
-    }
-
-    public JOCDefaultResponse postLocksP(String accessToken, LocksFilter locksFilter) throws Exception {
+    public JOCDefaultResponse postLocksP(String accessToken, byte[] locksFilterBytes) {
         SOSHibernateSession connection = null;
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, locksFilter, accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    locksFilter.getJobschedulerId(), accessToken).getLock().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            // FILTER
+		    JsonValidator.validateFailFast(locksFilterBytes, LocksFilter.class);
+            LocksFilter locksFilter = Globals.objectMapper.readValue(locksFilterBytes, LocksFilter.class);
+            
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, locksFilter, accessToken,
+					locksFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(locksFilter.getJobschedulerId(), accessToken).getLock().getView()
+							.isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			// FILTER
             List<LockPath> locks = locksFilter.getLocks();
             String regex = locksFilter.getRegex();
             boolean withFolderFilter = locksFilter.getFolders() != null && !locksFilter.getFolders().isEmpty();

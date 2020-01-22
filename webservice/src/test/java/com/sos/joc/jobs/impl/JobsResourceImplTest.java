@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Folder;
@@ -34,7 +35,8 @@ public class JobsResourceImplTest {
         JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
-        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, jobsFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobsFilterSchema);
+        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, b);
         JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
         assertEquals("postJobsTest", "hookShell", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
@@ -46,7 +48,8 @@ public class JobsResourceImplTest {
         jobsFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
-        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, jobsFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobsFilterSchema);
+        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, b);
         // JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
         // assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
@@ -73,7 +76,8 @@ public class JobsResourceImplTest {
         folders.add(folder3);
         jobsFilterSchema.setFolders(folders);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
-        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, jobsFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobsFilterSchema);
+        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, b);
         // JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
         // assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         Date end = new Date();
@@ -94,7 +98,8 @@ public class JobsResourceImplTest {
         folders.add(folder);
         jobsFilterSchema.setFolders(folders);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
-        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, jobsFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobsFilterSchema);
+        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, b);
         // JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
         // assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
@@ -108,7 +113,8 @@ public class JobsResourceImplTest {
         states.add(JobStateFilter.PENDING);
         jobsFilterSchema.setStates(states);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
-        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, jobsFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobsFilterSchema);
+        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, b);
         JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
         assertEquals("postJobsTest", "hookShell", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
@@ -121,7 +127,8 @@ public class JobsResourceImplTest {
         jobsFilterSchema.setDateFrom("2016-09-06 00:00:00.000Z");
         jobsFilterSchema.setDateTo("2016-09-06 23:59:59.999Z");
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
-        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, jobsFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobsFilterSchema);
+        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(accessToken, b);
         JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
         assertEquals("postJobsTest", "hookShell", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());

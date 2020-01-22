@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceClusterMembersPImpl;
@@ -25,8 +27,8 @@ public class JobSchedulerResourceClusterMembersPImplTest {
         JobSchedulerId jobSchedulerFilterSchema = new JobSchedulerId();
         jobSchedulerFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceClusterMembersPImpl jobschedulerResourceClusterMembersPImpl = new JobSchedulerResourceClusterMembersPImpl();
-        JOCDefaultResponse jobschedulerClusterMembersPResponse = jobschedulerResourceClusterMembersPImpl.postJobschedulerClusterMembers(accessToken,
-                jobSchedulerFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobSchedulerFilterSchema);
+        JOCDefaultResponse jobschedulerClusterMembersPResponse = jobschedulerResourceClusterMembersPImpl.postJobschedulerClusterMembers(accessToken, b);
         MastersP mastersPSchema = (MastersP) jobschedulerClusterMembersPResponse.getEntity();
         assertEquals("postjobschedulerClusterMembersPTest", TestEnvWebserviceTest.SCHEDULER_ID, mastersPSchema.getMasters().get(0).getJobschedulerId());
     }

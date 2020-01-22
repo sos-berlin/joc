@@ -15,14 +15,15 @@
         "type": "object",
         "properties": {
           "jobschedulerId": {
-            "type": "string"
+            "$ref": "../common/filename100-schema.json"
           },
           "error": {
             "description": "contains error message",
             "$ref": "../common/error-schema.json"
           },
           "eventId": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\d*$"
           },
           "eventSnapshots": {
             "type": "array",

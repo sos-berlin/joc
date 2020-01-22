@@ -14,7 +14,7 @@
     "categories": {
       "type": "array",
       "items": {
-        "type": "string"
+        "$ref": "../common/string255-schema.json"
       }
     }
   }

@@ -14,6 +14,6 @@ public interface IPlanFromRunTimeResource {
     @POST
     @Path("from_run_time")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postPlan(@HeaderParam("X-Access-Token") String xAccessToken, byte[] planFilterBytes) throws Exception;
+    public JOCDefaultResponse postPlan(@HeaderParam("X-Access-Token") String xAccessToken, byte[] runTimeFilter);
 
 }

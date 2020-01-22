@@ -8,10 +8,10 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../common/filename100-schema.json"
     },
     "account": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "configurationType": {
       "$ref": "type-schema.json"

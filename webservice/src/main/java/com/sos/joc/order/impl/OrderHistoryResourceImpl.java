@@ -19,6 +19,7 @@ import com.sos.joc.model.order.OrderHistoryFilter;
 import com.sos.joc.model.order.OrderStepHistory;
 import com.sos.joc.model.order.OrderStepHistoryItem;
 import com.sos.joc.order.resource.IOrderHistoryResource;
+import com.sos.schema.JsonValidator;
 
 @Path("order")
 public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderHistoryResource {
@@ -26,18 +27,13 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
 	private static final String API_CALL = "./order/history";
 
 	@Override
-	public JOCDefaultResponse postOrderHistory(String xAccessToken, String accessToken,
-			OrderHistoryFilter orderHistoryFilter) throws Exception {
-		return postOrderHistory(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
-	}
-
-	public JOCDefaultResponse postOrderHistory(String accessToken, OrderHistoryFilter orderHistoryFilter)
-			throws Exception {
-
+	public JOCDefaultResponse postOrderHistory(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
-
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken,
+		    JsonValidator.validateFailFast(filterBytes, OrderHistoryFilter.class);
+		    OrderHistoryFilter orderHistoryFilter = Globals.objectMapper.readValue(filterBytes, OrderHistoryFilter.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken,
 					orderHistoryFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(orderHistoryFilter.getJobschedulerId(), accessToken).getOrder().getView()
 							.isStatus());

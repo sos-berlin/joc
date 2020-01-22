@@ -18,6 +18,7 @@ import com.sos.joc.job.resource.IJobRunTimeResource;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.job.JobFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("job")
 public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTimeResource {
@@ -25,9 +26,12 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 	private static final String API_CALL = "./job/run_time";
 
 	@Override
-	public JOCDefaultResponse postJobRunTimeWithXML(String accessToken, JobFilter jobFilter) {
+	public JOCDefaultResponse postJobRunTime(String accessToken, byte[] jobFilterBytes) {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(jobFilterBytes, JobFilter.class);
+            JobFilter jobFilter = Globals.objectMapper.readValue(jobFilterBytes, JobFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
 					jobFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
