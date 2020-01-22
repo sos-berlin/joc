@@ -30,7 +30,7 @@ import sos.util.SOSString;
 @Path(JocXmlEditor.APPLICATION_PATH)
 public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReadResourceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteResourceImpl.class);
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
     @Override
@@ -105,12 +105,12 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
 
             session.beginTransaction();
-            boolean deleted = dbLayer.deleteOtherObject(id.longValue());
+            int deleted = dbLayer.deleteOtherObject(id.longValue());
             session.commit();
             if (isTraceEnabled) {
                 LOGGER.trace(String.format("[id=%s]deleted=%s", id, deleted));
             }
-            return deleted;
+            return Math.abs(deleted) > 0;
         } catch (Throwable e) {
             Globals.rollback(session);
             throw e;

@@ -213,6 +213,13 @@ public class JocXmlEditor {
         return true;
     }
 
+    public static boolean checkRequiredParameter(final String paramKey, final List<?> paramVal) throws JocMissingRequiredParameterException {
+        if (paramVal == null || paramVal.size() == 0) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+        }
+        return true;
+    }
+
     public static String getStandardBaseName(ObjectType type) {
         if (type == null) {
             return null;
