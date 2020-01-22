@@ -15,7 +15,7 @@
     "url": {
       "description": "url can be different against host/port if agent behind a proxy",
       "type": "string",
-      "pattern": "https?://.+"
+      "pattern": "^https?://.+$"
     },
     "state": {
       "$ref": "state-schema.json"

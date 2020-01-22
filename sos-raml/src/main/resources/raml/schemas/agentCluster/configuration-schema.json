@@ -31,7 +31,7 @@
         "select": {
           "description": "first, next",
           "type": "string",
-          "pattern": "^(first|next)$"
+          "pattern": "^(first|next)?$"
         },
         "list": {
           "type": "array",

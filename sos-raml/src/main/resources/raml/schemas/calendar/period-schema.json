@@ -6,23 +6,23 @@
   "properties": {
     "singleStart": {
       "type": "string",
-      "pattern": "^[0-9:]$"
+      "pattern": "^[0-9:]*$"
     },
     "begin": {
       "type": "string",
-      "pattern": "^[0-9:]$"
+      "pattern": "^[0-9:]*$"
     },
     "end": {
       "type": "string",
-      "pattern": "^[0-9:]$"
+      "pattern": "^[0-9:]*$"
     },
     "repeat": {
       "type": "string",
-      "pattern": "^[0-9:]$"
+      "pattern": "^[0-9:]*$"
     },
     "absoluteRepeat": {
       "type": "string",
-      "pattern": "^[0-9:]$"
+      "pattern": "^[0-9:]*$"
     },
     "whenHoliday": {
       "$ref": "../common/string255-schema.json"
