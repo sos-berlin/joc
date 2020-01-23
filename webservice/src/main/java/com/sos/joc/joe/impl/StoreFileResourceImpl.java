@@ -25,6 +25,7 @@ import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IStoreFileResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.JSObjectEdit;
+import com.sos.schema.JsonValidator;
 
 @Path("joe")
 public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFileResource {
@@ -36,8 +37,8 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
         SOSHibernateSession sosHibernateSession = null;
         try {
                       
+            JsonValidator.validateFailFast(jsObj, JSObjectEdit.class);
             JSObjectEdit body = Globals.objectMapper.readValue(jsObj, JSObjectEdit.class);
-            checkRequiredParameter("objectType", body.getObjectType());
             
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken); 
             boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
@@ -50,7 +51,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
             if (versionIsOlderThan("1.13.1")) {
                 throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
             }
-
+            checkRequiredParameter("objectType", body.getObjectType());
             checkRequiredParameter("path", body.getPath());
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
             String folder = null;

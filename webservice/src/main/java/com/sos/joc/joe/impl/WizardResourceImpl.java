@@ -43,10 +43,11 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.resource.IWizardResource;
 import com.sos.joc.model.joe.wizard.Job;
-import com.sos.joc.model.joe.wizard.JobFilter;
+import com.sos.joc.model.joe.wizard.JobWizardFilter;
 import com.sos.joc.model.joe.wizard.Jobs;
-import com.sos.joc.model.joe.wizard.JobsFilter;
+import com.sos.joc.model.joe.wizard.JobsWizardFilter;
 import com.sos.joc.model.joe.wizard.Param;
+import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
 
 @Path("joe/wizard")
@@ -58,9 +59,12 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
     private static final Logger LOGGER = LoggerFactory.getLogger(WizardResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobs(final String accessToken, final JobsFilter body) {
+    public JOCDefaultResponse postJobs(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, JobsWizardFilter.class);
+            JobsWizardFilter body = Globals.objectMapper.readValue(filterBytes, JobsWizardFilter.class);
+            
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_JOBS, body, accessToken, body.getJobschedulerId(), permission);
@@ -138,9 +142,12 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
     }
 
     @Override
-    public JOCDefaultResponse postJob(String accessToken, JobFilter body) {
+    public JOCDefaultResponse postJob(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, JobWizardFilter.class);
+            JobWizardFilter body = Globals.objectMapper.readValue(filterBytes, JobWizardFilter.class);
+            
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_JOB, body, accessToken, body.getJobschedulerId(), permission);

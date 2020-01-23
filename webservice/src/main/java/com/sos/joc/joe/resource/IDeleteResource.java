@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.joe.common.Filter;
 
 public interface IDeleteResource {
     
@@ -16,6 +15,6 @@ public interface IDeleteResource {
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse delete(@HeaderParam("X-Access-Token") final String accessToken, final Filter body);
+    public JOCDefaultResponse delete(@HeaderParam("X-Access-Token") final String accessToken, final byte[] body);
 
 }

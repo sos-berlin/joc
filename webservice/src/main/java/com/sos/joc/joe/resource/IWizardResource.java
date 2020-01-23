@@ -8,8 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.joe.wizard.JobFilter;
-import com.sos.joc.model.joe.wizard.JobsFilter;
 
 public interface IWizardResource {
     
@@ -17,12 +15,12 @@ public interface IWizardResource {
     @Path("jobs")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobs(@HeaderParam("X-Access-Token") final String accessToken, final JobsFilter body);
+    public JOCDefaultResponse postJobs(@HeaderParam("X-Access-Token") final String accessToken, final byte[] body);
     
     @POST
     @Path("job")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJob(@HeaderParam("X-Access-Token") final String accessToken, final JobFilter body);
+    public JOCDefaultResponse postJob(@HeaderParam("X-Access-Token") final String accessToken, final byte[] body);
 
 }

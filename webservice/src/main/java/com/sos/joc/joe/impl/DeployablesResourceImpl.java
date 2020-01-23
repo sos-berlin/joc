@@ -13,9 +13,9 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
-import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
@@ -24,6 +24,7 @@ import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Deployable;
 import com.sos.joc.model.joe.common.Deployables;
+import com.sos.schema.JsonValidator;
 
 @Path("joe")
 public class DeployablesResourceImpl extends JOCResourceImpl implements IDeployablesResource {
@@ -31,10 +32,12 @@ public class DeployablesResourceImpl extends JOCResourceImpl implements IDeploya
     private static final String API_CALL = "./joe/deployables";
 
     @Override
-    public JOCDefaultResponse deployables(final String accessToken, final JobSchedulerId body) {
+    public JOCDefaultResponse deployables(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-
+            JsonValidator.validateFailFast(filterBytes, JobSchedulerId.class);
+            JobSchedulerId body = Globals.objectMapper.readValue(filterBytes, JobSchedulerId.class);
+            
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJob() ||
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJobChain() ||

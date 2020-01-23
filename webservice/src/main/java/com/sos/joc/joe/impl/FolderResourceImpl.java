@@ -48,6 +48,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.other.Folder;
 import com.sos.joc.model.joe.other.FolderItem;
+import com.sos.schema.JsonValidator;
 
 @Path("joe")
 public class FolderResourceImpl extends JOCResourceImpl implements IFolderResource {
@@ -58,9 +59,12 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public JOCDefaultResponse readFolder(final String accessToken, final Filter body) {
+    public JOCDefaultResponse readFolder(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, Filter.class);
+            Filter body = Globals.objectMapper.readValue(filterBytes, Filter.class);
+            
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
 

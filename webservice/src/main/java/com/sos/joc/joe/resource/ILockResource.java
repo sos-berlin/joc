@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.joe.lock.LockFilter;
 
 public interface ILockResource {
     
@@ -16,18 +15,18 @@ public interface ILockResource {
     @Path("lock")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse lock(@HeaderParam("X-Access-Token") final String accessToken, final LockFilter body);
+    public JOCDefaultResponse lock(@HeaderParam("X-Access-Token") final String accessToken, final byte[] body);
     
     @POST
     @Path("lock/release")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse release(@HeaderParam("X-Access-Token") final String accessToken, final LockFilter body);
+    public JOCDefaultResponse release(@HeaderParam("X-Access-Token") final String accessToken, final byte[] body);
     
     @POST
     @Path("lock/info")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse lockedBy(@HeaderParam("X-Access-Token") final String accessToken, final LockFilter body);
+    public JOCDefaultResponse lockedBy(@HeaderParam("X-Access-Token") final String accessToken, final byte[] body);
 
 }

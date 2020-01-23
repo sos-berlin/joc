@@ -23,6 +23,7 @@ import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.resource.IDeleteResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
+import com.sos.schema.JsonValidator;
 
 @Path("joe")
 public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResource {
@@ -30,11 +31,12 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
     private static final String API_CALL = "./joe/delete";
 
     @Override
-    public JOCDefaultResponse delete(final String accessToken, final Filter body) {
+    public JOCDefaultResponse delete(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-            checkRequiredParameter("objectType", body.getObjectType());
-
+            JsonValidator.validateFailFast(filterBytes, Filter.class);
+            Filter body = Globals.objectMapper.readValue(filterBytes, Filter.class);
+            
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDelete();
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission);
@@ -42,7 +44,9 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 return jocDefaultResponse;
             }
 
+            checkRequiredParameter("objectType", body.getObjectType());
             checkRequiredParameter("path", body.getPath());
+            
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
             String folder = null;
 

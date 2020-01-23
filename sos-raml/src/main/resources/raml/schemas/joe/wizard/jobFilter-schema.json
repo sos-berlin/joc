@@ -9,10 +9,10 @@
   ],
   "properties": {
     "jobschedulerId": {
-      "type": "string"
+      "$ref": "../../common/filename100-schema.json"
     },
     "docPath": {
-      "type": "string"
+      "$ref": "../../common/path-schema.json"
     }
   }
 }

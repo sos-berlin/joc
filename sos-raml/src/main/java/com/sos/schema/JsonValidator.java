@@ -151,6 +151,9 @@ public class JsonValidator {
             put("FilterDeploy", "joe/common/filter-deploy-schema.json");
             put("Filter", "joe/common/filter-schema.json");
             put("JSObjectEdit", "joe/common/jsObjectEdit-schema.json");
+            put("JobsWizardFilter", "joe/wizard/jobsFilter-schema.json");
+            put("JobWizardFilter", "joe/wizard/jobFilter-schema.json");
+            put("LockFilter", "joe/lock/lockFilter-schema.json");
         }
     });
 

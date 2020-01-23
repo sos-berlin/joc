@@ -21,6 +21,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.resource.IDeleteDraftResource;
 import com.sos.joc.model.joe.common.FilterDeploy;
+import com.sos.schema.JsonValidator;
 
 @Path("joe")
 public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteDraftResource {
@@ -28,10 +29,12 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
     private static final String API_CALL = "./joe/deletedraft";
 
     @Override
-    public JOCDefaultResponse deleteDraft(final String accessToken, final FilterDeploy body) {
+    public JOCDefaultResponse deleteDraft(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-
+            JsonValidator.validateFailFast(filterBytes, FilterDeploy.class);
+            FilterDeploy body = Globals.objectMapper.readValue(filterBytes, FilterDeploy.class);
+            
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission1 = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isDelete();
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission1);

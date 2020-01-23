@@ -21,6 +21,7 @@ import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.resource.ILockResource;
 import com.sos.joc.model.joe.lock.LockFilter;
 import com.sos.joc.model.joe.lock.LockInfo;
+import com.sos.schema.JsonValidator;
 
 @Path("joe")
 public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
@@ -30,23 +31,26 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
     private static final String API_CALL_LOCKED = "./joe/lock/info";
 
     @Override
-    public JOCDefaultResponse lock(final String accessToken, final LockFilter body) {
+    public JOCDefaultResponse lock(final String accessToken, final byte[] body) {
         return lockOrReleaseOrInfo(accessToken, body, true, API_CALL_LOCK);
     }
 
     @Override
-    public JOCDefaultResponse release(String accessToken, LockFilter body) {
+    public JOCDefaultResponse release(String accessToken, byte[] body) {
         return lockOrReleaseOrInfo(accessToken, body, false, API_CALL_RELEASE);
     }
 
     @Override
-    public JOCDefaultResponse lockedBy(String accessToken, LockFilter body) {
+    public JOCDefaultResponse lockedBy(String accessToken, byte[] body) {
         return lockOrReleaseOrInfo(accessToken, body, null, API_CALL_LOCKED);
     }
 
-    private JOCDefaultResponse lockOrReleaseOrInfo(String accessToken, LockFilter body, Boolean lock, String apiCall) {
+    private JOCDefaultResponse lockOrReleaseOrInfo(String accessToken, byte[] filterBytes, Boolean lock, String apiCall) {
         SOSHibernateSession sosHibernateSession = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, LockFilter.class);
+            LockFilter body = Globals.objectMapper.readValue(filterBytes, LockFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(apiCall, body, accessToken, body.getJobschedulerId(), getPermissonsJocCockpit(body
                     .getJobschedulerId(), accessToken).getJobschedulerMaster().getAdministration().getConfigurations().isView());
             if (jocDefaultResponse != null) {

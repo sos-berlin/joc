@@ -60,6 +60,7 @@ import com.sos.joc.model.joe.common.DeployFailReason;
 import com.sos.joc.model.joe.common.DeployFailReasonType;
 import com.sos.joc.model.joe.common.DeployMessage;
 import com.sos.joc.model.joe.common.FilterDeploy;
+import com.sos.schema.JsonValidator;
 
 import sos.xml.SOSXMLXPath;
 
@@ -71,10 +72,12 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
     private static final Logger LOGGER = LoggerFactory.getLogger(DeployResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse deploy(final String accessToken, final FilterDeploy body) {
+    public JOCDefaultResponse deploy(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-
+            JsonValidator.validateFailFast(filterBytes, FilterDeploy.class);
+            FilterDeploy body = Globals.objectMapper.readValue(filterBytes, FilterDeploy.class);
+            
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJob() ||
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isJobChain() ||

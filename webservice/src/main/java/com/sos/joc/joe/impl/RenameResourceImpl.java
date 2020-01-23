@@ -29,6 +29,7 @@ import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.resource.IRenameResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.Filter;
+import com.sos.schema.JsonValidator;
 
 @Path("joe")
 public class RenameResourceImpl extends JOCResourceImpl implements IRenameResource {
@@ -36,11 +37,12 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
     private static final String API_CALL = "./joe/delete";
 
     @Override
-    public JOCDefaultResponse rename(final String accessToken, final Filter body) {
+    public JOCDefaultResponse rename(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession connection = null;
         try {
-            checkRequiredParameter("objectType", body.getObjectType());
-
+            JsonValidator.validateFailFast(filterBytes, Filter.class);
+            Filter body = Globals.objectMapper.readValue(filterBytes, Filter.class);
+            
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
 
@@ -53,8 +55,10 @@ public class RenameResourceImpl extends JOCResourceImpl implements IRenameResour
                 throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
             }
 
+            checkRequiredParameter("objectType", body.getObjectType());
             checkRequiredParameter("path", body.getPath());
             checkRequiredParameter("oldPath", body.getOldPath());
+            
             boolean isDirectory = body.getObjectType() == JobSchedulerObjectType.FOLDER;
             String folder = null;
             String oldFolder = null;

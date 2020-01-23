@@ -12,11 +12,11 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.joc.Globals;
-import com.sos.joc.classes.JOEHelper;
-import com.sos.joc.classes.documentation.Documentation;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOEHelper;
+import com.sos.joc.classes.documentation.Documentation;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -31,6 +31,7 @@ import com.sos.joc.model.joe.common.JSObjectEdit;
 import com.sos.joc.model.joe.common.JoeMessage;
 import com.sos.joc.model.joe.common.JoeObjectStatus;
 import com.sos.joc.model.joe.common.VersionStateText;
+import com.sos.schema.JsonValidator;
 
 @Path("joe")
 public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileResource {
@@ -39,12 +40,12 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
     private static final Logger LOGGER = LoggerFactory.getLogger(ReadFileResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse readFile(final String accessToken, final Filter body) {
+    public JOCDefaultResponse readFile(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-
-            checkRequiredParameter("objectType", body.getObjectType());
-
+            JsonValidator.validateFailFast(filterBytes, Filter.class);
+            Filter body = Globals.objectMapper.readValue(filterBytes, Filter.class);
+            
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
             boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
 
@@ -57,7 +58,9 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
                 throw new JobSchedulerBadRequestException("Unsupported web service: JobScheduler needs at least version 1.13.1");
             }
 
+            checkRequiredParameter("objectType", body.getObjectType());
             checkRequiredParameter("path", body.getPath());
+            
             if (!JOEHelper.CLASS_MAPPING.containsKey(body.getObjectType().value())) {
                 throw new JobSchedulerBadRequestException("Unsupported object type: " + body.getObjectType().value());
             }

@@ -4,20 +4,19 @@
 	"javaType": "com.sos.joc.model.joe.lock.LockFilter",
 	"type": "object",
 	"required": [
-	  "jobschedulerId",
-	  "folder"
+	  "jobschedulerId"
 	],
 	"properties": {
 		"jobschedulerId": {
-      		"type": "string"
+      		"$ref": "../../common/filename100-schema.json"
     	},
     	"folder": {
     		"description": "path of the a folder",
-      		"type": "string"
+      		"$ref": "../../common/path-schema.json"
     	},
     	"path": {
     		"description": "alias of folder",
-      		"type": "string"
+      		"$ref": "../../common/path-schema.json"
     	},
     	"forceLock": {
        		"type": "boolean",
