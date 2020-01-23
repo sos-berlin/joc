@@ -4,7 +4,6 @@
 	"description": "Expression for Condition",
 	"javaType": "com.sos.joc.model.jobstreams.ConditionExpression",
 	"type": "object",
-	"required": [],
 	"properties": {
 		"expression": {
 			"type": "string"

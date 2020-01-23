@@ -128,6 +128,10 @@ public class JsonValidator {
             put("RunTimePlanFilter", "plan/runTimePlanFilter-schema.json");
             put("PlanFilter", "plan/planFilter-schema.json");
             
+            put("ConditionEventsFilter", "jobstreams/conditionEventsFilter-schema.json");
+            put("ConditionEvent", "jobstreams/conditionEvent-schema.json");
+            put("InConditions", "jobstreams/inConditions-schema.json");
+            
             
         }
     });
