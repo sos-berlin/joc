@@ -24,8 +24,7 @@
       "$ref": "../common/string255-schema.json"
     },
     "eventId": {
-      "type": "string",
-      "pattern": "^\\d*$"
+      "$ref": "../common/string255-schema.json"
     },
     "exitCode": {
       "$ref": "../common/nonNegativeInteger-schema.json"
