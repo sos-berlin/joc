@@ -12,7 +12,7 @@
 			"$ref": "../common/deliveryDate-schema.json"
 	     },
 	     "session": {
-			"type": "string"
+			"$ref": "../common/string100-schema.json"
 		 },
          "conditionEvents": {
            "type": "array",

@@ -13,16 +13,15 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
-import com.sos.jitl.jobstreams.db.FilterOutConditions;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.jobstreams.resource.IEditOutConditionsResource;
-import com.sos.joc.model.jobstreams.JobInCondition;
-import com.sos.joc.model.jobstreams.JobOutCondition;
-import com.sos.joc.model.jobstreams.OutConditions;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.jobstreams.resource.IEditOutConditionsResource;
+import com.sos.joc.model.jobstreams.JobOutCondition;
+import com.sos.joc.model.jobstreams.OutConditions;
+import com.sos.schema.JsonValidator;
 
 @Path("jobstreams/edit")
 public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutConditionsResource {
@@ -31,10 +30,12 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
     private static final String API_CALL = "./conditions/edit/out_condition";
 
     @Override
-    public JOCDefaultResponse editJobOutConditions(String accessToken, OutConditions outConditions) throws Exception {
+    public JOCDefaultResponse editJobOutConditions(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-
+            JsonValidator.validateFailFast(filterBytes, OutConditions.class);
+            OutConditions outConditions = Globals.objectMapper.readValue(filterBytes, OutConditions.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, outConditions, accessToken, outConditions.getJobschedulerId(),
                     getPermissonsJocCockpit(outConditions.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {

@@ -9,9 +9,6 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.jobstreams.Constants;
@@ -45,18 +42,21 @@ import com.sos.joc.model.jobstreams.JobstreamConditions;
 import com.sos.joc.model.jobstreams.OutCondition;
 import com.sos.joc.model.jobstreams.OutConditionEvent;
 import com.sos.joc.model.jobstreams.OutConditions;
+import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
 public class OutConditionsImpl extends JOCResourceImpl implements IOutConditionsResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OutConditionsImpl.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(OutConditionsImpl.class);
     private static final String API_CALL = "./conditions/out_conditions";
 
     @Override
-    public JOCDefaultResponse getJobOutConditions(String accessToken, JobsFilter jobFilterSchema) throws Exception {
+    public JOCDefaultResponse getJobOutConditions(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-
+            JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
+            JobsFilter jobFilterSchema = Globals.objectMapper.readValue(filterBytes, JobsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilterSchema, accessToken, jobFilterSchema.getJobschedulerId(),
                     getPermissonsJocCockpit(jobFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
             if (jocDefaultResponse != null) {

@@ -31,6 +31,7 @@ import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
 import com.sos.joc.model.jobstreams.JobStreamFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
 public class JobStreamResourceHistoryImpl extends JOCResourceImpl implements IJobStreamResourceHistory {
@@ -38,14 +39,13 @@ public class JobStreamResourceHistoryImpl extends JOCResourceImpl implements IJo
     private static final String API_CALL = "./jobstream/history";
 
     @Override
-    public JOCDefaultResponse postJobStreamHistory(String xAccessToken, String accessToken, JobStreamFilter jobStreamFilter) throws Exception {
-        return postOrdersHistory(getAccessToken(xAccessToken, accessToken), jobStreamFilter);
-    }
-
-    public JOCDefaultResponse postOrdersHistory(String accessToken, JobStreamFilter jobStreamFilter) throws Exception {
+    public JOCDefaultResponse postJobStreamHistory(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
 
         try {
+            JsonValidator.validateFailFast(filterBytes, JobStreamFilter.class);
+            JobStreamFilter jobStreamFilter = Globals.objectMapper.readValue(filterBytes, JobStreamFilter.class);
+            
             Set<String> listOfJobs = new HashSet<String>();
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobStreamFilter, accessToken, jobStreamFilter.getJobschedulerId(),

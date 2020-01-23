@@ -4,20 +4,20 @@
 	"javaType": "com.sos.joc.model.jobstreams.ConditionEventsFilter",
 	"type": "object",
 	"required": [
-		"masterId"
+		"jobschedulerId"
 	],
 	"properties": {
 		"jobschedulerId": {
-			"type": "string"
+			"$ref": "../common/filename100-schema.json"
 		},
 		"session": {
-			"type": "string"
+			"$ref": "../common/string100-schema.json"
 		},
 		"path": {
-			"type": "string"
+			"$ref": "../common/path-schema.json"
 		},
 		"jobStream": {
-			"type": "string"
+			"$ref": "../common/string255-schema.json"
 		},
 		"outConditionId": {
 			"$ref": "../common/nonNegativeLong-schema.json"

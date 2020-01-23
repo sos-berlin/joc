@@ -4,17 +4,15 @@
   "description": "Out Condition Event",
   "javaType": "com.sos.joc.model.jobstreams.OutConditionEvent",
   "type": "object",
-  "required": [
-   ],
   "properties": {
     "id": {
       "$ref": "../common/nonNegativeLong-schema.json"
     },
     "command": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     }, 
     "event": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     },
     "exists": {
       "type": "boolean"
@@ -26,7 +24,7 @@
       "type": "boolean"
     },
     "jobStream": {
-      "type": "string"
+      "$ref": "../common/string255-schema.json"
     }
   }
 }

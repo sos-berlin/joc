@@ -5,14 +5,14 @@
 	"javaType": "com.sos.joc.model.jobstreams.OutConditions",
 	"type": "object",
 	"required": [
-		"deliveryDate"
+		"jobschedulerId"
 	],
 	"properties": {
 		"deliveryDate": {
 			"$ref": "../common/deliveryDate-schema.json"
 		},
 		"jobschedulerId": {
-			"type": "string"
+			"$ref": "../common/filename100-schema.json"
 		},
 		"jobsOutconditions": {
 			"type": "array",

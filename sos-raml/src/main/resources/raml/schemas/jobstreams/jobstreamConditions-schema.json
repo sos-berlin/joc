@@ -6,7 +6,7 @@
 	"type": "object",
 	"properties": {
 		"jobStream": {
-			"type": "string"
+			"$ref": "../common/string255-schema.json"
 		},
 		"jobs": {
 			"type": "array",

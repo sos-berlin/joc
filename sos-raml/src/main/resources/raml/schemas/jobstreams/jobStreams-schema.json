@@ -5,17 +5,17 @@
 	"javaType": "com.sos.joc.model.jobstreams.JobStreams",
 	"type": "object",
 	"required": [
-		"deliveryDate"
+		"jobschedulerId"
 	],
 	"properties": {
 		"deliveryDate": {
 			"$ref": "../common/deliveryDate-schema.json"
 		},
 		"jobschedulerId": {
-			"type": "string"
+			"$ref": "../common/filename100-schema.json"
 		},
 		"jobStreamFilter": {
-			"type": "string"
+			"$ref": "../common/string255-schema.json"
 		},
 		"jobStreamFolders": {
 			"type": "array",

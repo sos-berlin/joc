@@ -10,9 +10,6 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemOutCondition;
@@ -27,18 +24,21 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobstreams.resource.IJobStreamFoldersResource;
 import com.sos.joc.model.jobstreams.Folders2Jobstream;
 import com.sos.joc.model.jobstreams.JobStreams;
+import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
 public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamFoldersResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamFoldersImpl.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamFoldersImpl.class);
     private static final String API_CALL = "./conditions/jobstream_folders";
 
     @Override
-    public JOCDefaultResponse jobStreamFolders(String accessToken, JobStreams jobStreams) throws Exception {
+    public JOCDefaultResponse jobStreamFolders(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-
+            JsonValidator.validateFailFast(filterBytes, JobStreams.class);
+            JobStreams jobStreams = Globals.objectMapper.readValue(filterBytes, JobStreams.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobStreams, accessToken, jobStreams.getJobschedulerId(), getPermissonsJocCockpit(
                     jobStreams.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
             if (jocDefaultResponse != null) {

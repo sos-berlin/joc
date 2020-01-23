@@ -6,10 +6,10 @@
 	"type": "object",
 	"properties": {
 		"expression": {
-			"type": "string"
+			"$ref": "../common/noScript-schema.json"
 		},
 		"validatedExpression": {
-			"type": "string"
+			"$ref": "../common/noScript-schema.json"
 		},
 		"value": {
 			"type": "boolean"
@@ -17,7 +17,7 @@
 		"jobStreamEvents": {
 			"type": "array",
 			"items": {
-				"type": "string"
+				"$ref": "../common/string255-schema.json"
 			}
 		}
 	}

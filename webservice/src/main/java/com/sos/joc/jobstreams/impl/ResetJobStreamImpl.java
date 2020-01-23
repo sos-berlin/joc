@@ -10,12 +10,14 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.jobstreams.resource.IResetJobStreamResource;
-import com.sos.joc.model.jobstreams.ResetJobStream;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.jobstreams.resource.IResetJobStreamResource;
+import com.sos.joc.model.jobstreams.ResetJobStream;
+import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
 public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStreamResource {
@@ -24,9 +26,11 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
     private static final String API_CALL = "./conditions/resetjobstreams";
 
     @Override
-    public JOCDefaultResponse resetJobStream(String accessToken, ResetJobStream resetJobStream) throws Exception {
+    public JOCDefaultResponse resetJobStream(String accessToken, byte[] filterBytes) {
         try {
-
+            JsonValidator.validateFailFast(filterBytes, ResetJobStream.class);
+            ResetJobStream resetJobStream = Globals.objectMapper.readValue(filterBytes, ResetJobStream.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetJobStream, accessToken, resetJobStream.getJobschedulerId(),
                     getPermissonsJocCockpit(resetJobStream.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {

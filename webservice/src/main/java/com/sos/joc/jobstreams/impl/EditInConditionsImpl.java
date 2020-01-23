@@ -8,14 +8,16 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.jobstreams.db.DBLayerInConditions;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.jobstreams.resource.IEditInConditionsResource;
-import com.sos.joc.model.jobstreams.InConditions;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.jobstreams.resource.IEditInConditionsResource;
+import com.sos.joc.model.jobstreams.InConditions;
+import com.sos.schema.JsonValidator;
 
 @Path("jobstreams/edit")
 public class EditInConditionsImpl extends JOCResourceImpl implements IEditInConditionsResource {
@@ -24,10 +26,12 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
     private static final String API_CALL = "./conditions/edit/in_condition";
 
     @Override
-    public JOCDefaultResponse editJobInConditions(String accessToken, InConditions inConditions) throws Exception {
+    public JOCDefaultResponse editJobInConditions(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
-
+            JsonValidator.validateFailFast(filterBytes, InConditions.class);
+            InConditions inConditions = Globals.objectMapper.readValue(filterBytes, InConditions.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, inConditions, accessToken, inConditions.getJobschedulerId(),
                     getPermissonsJocCockpit(inConditions.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {
@@ -53,7 +57,11 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            sosHibernateSession.rollback();
+            try {
+                sosHibernateSession.rollback();
+            } catch (SOSHibernateException e) {
+                //
+            }
             Globals.disconnect(sosHibernateSession);
         }
     }

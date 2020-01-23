@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobstreams.OutConditions;
  
 public interface IEditOutConditionsResource {
 
@@ -15,6 +14,5 @@ public interface IEditOutConditionsResource {
     @Path("out_condition")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse editJobOutConditions(            
-            @HeaderParam("X-Access-Token") String accessToken, OutConditions outConditions) throws Exception;
+    public JOCDefaultResponse editJobOutConditions(@HeaderParam("X-Access-Token") String accessToken, byte[] outConditions);
 }

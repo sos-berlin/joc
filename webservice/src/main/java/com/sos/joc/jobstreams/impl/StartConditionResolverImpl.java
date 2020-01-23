@@ -7,12 +7,14 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.jobstreams.resource.IStartConditionResolverResource;
-import com.sos.joc.model.jobstreams.StartResolver;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.jobstreams.resource.IStartConditionResolverResource;
+import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
 public class StartConditionResolverImpl extends JOCResourceImpl implements IStartConditionResolverResource {
@@ -21,10 +23,12 @@ public class StartConditionResolverImpl extends JOCResourceImpl implements IStar
     private static final String API_CALL = "./conditions/startConditionResolver";
 
     @Override
-    public JOCDefaultResponse startConditionResolver(String accessToken, StartResolver startResolver) throws Exception {
+    public JOCDefaultResponse startConditionResolver(String accessToken, byte[] filterBytes) {
         try {
-
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, startResolver, accessToken, startResolver.getJobschedulerId(),
+            JsonValidator.validateFailFast(filterBytes, JobSchedulerId.class);
+            JobSchedulerId jobschedulerId = Globals.objectMapper.readValue(filterBytes, JobSchedulerId.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobschedulerId, accessToken, jobschedulerId.getJobschedulerId(),
                     getPermissonsJocCockpit(null, accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

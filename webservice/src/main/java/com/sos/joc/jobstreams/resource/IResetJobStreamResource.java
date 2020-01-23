@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobstreams.ResetJobStream;
  
 public interface IResetJobStreamResource {
 
@@ -15,6 +14,5 @@ public interface IResetJobStreamResource {
     @Path("resetjobstream")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse resetJobStream(            
-            @HeaderParam("X-Access-Token") String accessToken, ResetJobStream jobStream) throws Exception;
+    public JOCDefaultResponse resetJobStream(@HeaderParam("X-Access-Token") String accessToken, byte[] jobStream);
 }

@@ -11,7 +11,7 @@
 		"expressions": {
 			"type": "array",
 			"items": {
-				"type": "string"
+				"$ref": "../common/noScript-schema.json"
 			}
 		}
 	}

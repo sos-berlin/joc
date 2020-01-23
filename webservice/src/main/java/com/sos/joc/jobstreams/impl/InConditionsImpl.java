@@ -9,9 +9,6 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
@@ -50,19 +47,23 @@ import com.sos.joc.model.jobstreams.InConditionCommand;
 import com.sos.joc.model.jobstreams.InConditions;
 import com.sos.joc.model.jobstreams.JobInCondition;
 import com.sos.joc.model.jobstreams.JobstreamConditions;
+import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
 public class InConditionsImpl extends JOCResourceImpl implements IInConditionsResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InConditionsImpl.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(InConditionsImpl.class);
     private static final String API_CALL = "./conditions/in_condition";
     private SOSHibernateSession sosHibernateSession = null;
     private JSConditionResolver jsConditionResolver;
 
     @Override
-    public JOCDefaultResponse getJobInConditions(String accessToken, JobsFilter jobFilterSchema) throws Exception {
+    public JOCDefaultResponse getJobInConditions(String accessToken, byte[] filterBytes) {
 
         try {
+            JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
+            JobsFilter jobFilterSchema = Globals.objectMapper.readValue(filterBytes, JobsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilterSchema, accessToken, jobFilterSchema.getJobschedulerId(),
                     getPermissonsJocCockpit(jobFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
             if (jocDefaultResponse != null) {

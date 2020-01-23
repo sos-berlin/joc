@@ -1,4 +1,5 @@
 package com.sos.joc.jobstreams.resource;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -7,9 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobstreams.ConditionEvent;
-import com.sos.joc.model.jobstreams.ConditionEventsFilter;
- 
 
 public interface IConditionEventsResource {
 
@@ -17,19 +15,17 @@ public interface IConditionEventsResource {
     @Path("eventlist")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse getEvents(            
-            @HeaderParam("X-Access-Token") String accessToken, ConditionEventsFilter conditionEventsFilter) throws Exception;
-    
+    public JOCDefaultResponse getEvents(@HeaderParam("X-Access-Token") String accessToken, byte[] conditionEventsFilter);
+
     @POST
     @Path("event/delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse deleteEvent(            
-            @HeaderParam("X-Access-Token") String accessToken, ConditionEvent conditionEvent) throws Exception;
+    public JOCDefaultResponse deleteEvent(@HeaderParam("X-Access-Token") String accessToken, byte[] conditionEvent);
+
     @POST
     @Path("event/add")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse addEvent(            
-            @HeaderParam("X-Access-Token") String accessToken, ConditionEvent conditionEvent) throws Exception;
+    public JOCDefaultResponse addEvent(@HeaderParam("X-Access-Token") String accessToken, byte[] conditionEvent);
 }

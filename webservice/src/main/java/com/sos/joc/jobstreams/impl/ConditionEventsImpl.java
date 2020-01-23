@@ -7,9 +7,6 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -27,21 +24,23 @@ import com.sos.joc.jobstreams.resource.IConditionEventsResource;
 import com.sos.joc.model.jobstreams.ConditionEvent;
 import com.sos.joc.model.jobstreams.ConditionEvents;
 import com.sos.joc.model.jobstreams.ConditionEventsFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
 public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEventsResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConditionEventsImpl.class);
     private static final String API_CALL_EVENTLIST = "./conditions/eventlist";
     private static final String API_CALL_ADD_EVENT = "./conditions/add_event";
     private static final String API_CALL_DELETE_EVENT = "./conditions/delete_event";
 
     @Override
-    public JOCDefaultResponse getEvents(String accessToken, ConditionEventsFilter conditionEventsFilter) throws Exception {
+    public JOCDefaultResponse getEvents(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
 
         try {
-
+            JsonValidator.validateFailFast(filterBytes, ConditionEventsFilter.class);
+            ConditionEventsFilter conditionEventsFilter = Globals.objectMapper.readValue(filterBytes, ConditionEventsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_EVENTLIST, conditionEventsFilter, accessToken, conditionEventsFilter
                     .getJobschedulerId(), getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getJobStream().getView()
                             .isEventlist());
@@ -98,11 +97,13 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
     }
 
     @Override
-    public JOCDefaultResponse addEvent(String accessToken, ConditionEvent conditionEvent) throws Exception {
+    public JOCDefaultResponse addEvent(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
 
         try {
-
+            JsonValidator.validateFailFast(filterBytes, ConditionEvent.class);
+            ConditionEvent conditionEvent = Globals.objectMapper.readValue(filterBytes, ConditionEvent.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(),
                     getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
@@ -141,11 +142,13 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
     }
 
     @Override
-    public JOCDefaultResponse deleteEvent(String accessToken, ConditionEvent conditionEvent) throws Exception {
+    public JOCDefaultResponse deleteEvent(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
 
         try {
-
+            JsonValidator.validateFailFast(filterBytes, ConditionEvent.class);
+            ConditionEvent conditionEvent = Globals.objectMapper.readValue(filterBytes, ConditionEvent.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(),
                     getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {

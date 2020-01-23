@@ -4,9 +4,6 @@
 	"description": "job In Condition",
 	"javaType": "com.sos.joc.model.jobstreams.JobInCondition",
 	"type": "object",
-	"required": [
-		"deliveryDate"
-	],
 	"properties": {
 		"job": {
 			"$ref": "../common/path-schema.json"

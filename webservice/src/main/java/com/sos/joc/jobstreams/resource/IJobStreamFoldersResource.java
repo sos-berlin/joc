@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobstreams.JobStreams;
  
 public interface IJobStreamFoldersResource {
 
@@ -15,5 +14,5 @@ public interface IJobStreamFoldersResource {
     @Path("jobstream_folders")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse jobStreamFolders(@HeaderParam("X-Access-Token") String accessToken, JobStreams jobStreams) throws Exception;
+    public JOCDefaultResponse jobStreamFolders(@HeaderParam("X-Access-Token") String accessToken, byte[] jobStreams);
 }

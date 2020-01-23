@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobstreams.StartResolver;
  
 public interface IStartConditionResolverResource {
 
@@ -15,6 +14,5 @@ public interface IStartConditionResolverResource {
     @Path("start_condition_resolver")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse startConditionResolver(            
-            @HeaderParam("X-Access-Token") String accessToken, StartResolver startResolver) throws Exception;
+    public JOCDefaultResponse startConditionResolver(@HeaderParam("X-Access-Token") String accessToken, byte[] startResolver);
 }

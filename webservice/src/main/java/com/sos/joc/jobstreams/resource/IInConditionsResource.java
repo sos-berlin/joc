@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.job.JobsFilter;
 
 public interface IInConditionsResource {
 
@@ -15,6 +14,5 @@ public interface IInConditionsResource {
     @Path("in_conditions")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse getJobInConditions(            
-            @HeaderParam("X-Access-Token") String accessToken, JobsFilter jobFilterSchema) throws Exception;
+    public JOCDefaultResponse getJobInConditions(@HeaderParam("X-Access-Token") String accessToken, byte[] jobFilterSchema);
 }

@@ -4,15 +4,12 @@
 	"description": "Out Condition",
 	"javaType": "com.sos.joc.model.jobstreams.OutCondition",
 	"type": "object",
-	"required": [
-		"deliveryDate"
-	],
 	"properties": {
 		"id": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
 		"jobStream": {
-			"type": "string"
+			"$ref": "../common/string255-schema.json"
 		},
 		"conditionExpression": {
 			"$ref": "condition_expression-schema.json"
