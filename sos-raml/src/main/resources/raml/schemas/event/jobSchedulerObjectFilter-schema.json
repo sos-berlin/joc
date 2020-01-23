@@ -4,8 +4,7 @@
   "javaType": "com.sos.joc.model.event.JobSchedulerObjects",
   "type": "object",
   "required": [
-    "jobschedulerId",
-    "eventId"
+    "jobschedulerId"
   ],
   "properties": {
     "jobschedulerId": {
