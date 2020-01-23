@@ -44,19 +44,9 @@ public class ApplyResourceImpl extends JOCResourceImpl implements IApplyResource
             JOCDefaultResponse response = checkPermissions(accessToken, in);
             if (response == null) {
                 // step 1 - check for vulnerabilities and validate
-                java.nio.file.Path schema = null;
-                if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
-                } else {
-                    schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
-                }
-                // check for vulnerabilities and validate
-                XsdValidator validator = new XsdValidator(schema);
-                try {
-                    validator.validate(in.getConfiguration());
-                } catch (XsdValidatorException e) {
-                    LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
-                    return JOCDefaultResponse.responseStatus200(getError(e));
+                response = check(in, false);
+                if (response != null) {
+                    return response;
                 }
 
                 // step 2 - xml2json
@@ -97,6 +87,29 @@ public class ApplyResourceImpl extends JOCResourceImpl implements IApplyResource
         } finally {
             Globals.disconnect(session);
         }
+    }
+
+    private JOCDefaultResponse check(ApplyConfiguration in, boolean validate) throws Exception {
+        if (validate) {
+            java.nio.file.Path schema = null;
+            if (in.getObjectType().equals(ObjectType.OTHER)) {
+                schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
+            } else {
+                schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
+            }
+            // check for vulnerabilities and validate
+            XsdValidator validator = new XsdValidator(schema);
+            try {
+                validator.validate(in.getConfiguration());
+            } catch (XsdValidatorException e) {
+                LOGGER.error(String.format("[%s]%s", validator.getSchema(), e.toString()), e);
+                return JOCDefaultResponse.responseStatus200(getError(e));
+            }
+        } else {
+            // check for vulnerabilities
+            JocXmlEditor.parseXml(in.getConfiguration());
+        }
+        return null;
     }
 
     private ApplyConfigurationAnswer getSuccess(ApplyConfiguration in, DBItemXmlEditorObject item, String json) throws Exception {

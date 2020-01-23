@@ -5,7 +5,9 @@ import java.io.StringWriter;
 import java.net.ConnectException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -46,6 +48,7 @@ public class Xml2JsonConverter {
     private Node rootSchema;
     private Node rootXml;
     private String rootElementNameXml;
+    private List<String> elements;
     private long uuid;
 
     public String convert(ObjectType type, Path schema, String xml) throws Exception {
@@ -73,6 +76,8 @@ public class Xml2JsonConverter {
         }
         try {
             uuid = -1;
+            elements = new ArrayList<String>();
+            elements.add(rootElementNameXml);
 
             JsonObjectBuilder builder = Json.createObjectBuilder();
             builder = buildElements(builder, null, rootXml, 0, 0);
@@ -112,6 +117,26 @@ public class Xml2JsonConverter {
         }
     }
 
+    private boolean fromXsd(String elementName) {
+        if (elements.contains(elementName)) {
+            return true;
+        }
+
+        try {
+            String xpath = String.format("//xs:element[@name='%s']", elementName);
+            XPathExpression ex = xpathSchema.compile(xpath);
+            Node node = (Node) ex.evaluate(rootSchema, XPathConstants.NODE);
+            if (node != null) {
+                elements.add(elementName);
+                return true;
+            }
+        } catch (Throwable e) {
+            LOGGER.error(String.format("[%s]%s", elementName, e.toString()), e);
+        }
+
+        return false;
+    }
+
     private JsonObjectBuilder buildElements(JsonObjectBuilder parentBuilder, Node parent, Node current, long level, long parentId) throws Exception {
         String parentName = parent == null ? "#" : parent.getNodeName();
         boolean expanded = level < 2 ? true : false;
@@ -123,6 +148,7 @@ public class Xml2JsonConverter {
             LOGGER.debug(String.format("[%s][level=%s][parentId=%s][uuid=%s]expanded=%s", current.getNodeName(), level, parentId, uuid, expanded));
         }
         parentBuilder.add("ref", current.getNodeName());
+        parentBuilder.add("xsd", fromXsd(current.getNodeName()));
         parentBuilder.add("parent", parentName);
         parentBuilder.add("uuid", currentUuid);
 
