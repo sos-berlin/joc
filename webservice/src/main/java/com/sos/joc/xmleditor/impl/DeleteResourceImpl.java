@@ -24,6 +24,7 @@ import com.sos.joc.model.xmleditor.delete.DeleteOtherDraftAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
 import com.sos.joc.xmleditor.common.standard.ReadConfigurationHandler;
 import com.sos.joc.xmleditor.resource.IDeleteResource;
+import com.sos.schema.JsonValidator;
 
 import sos.util.SOSString;
 
@@ -34,8 +35,11 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
     @Override
-    public JOCDefaultResponse delete(final String accessToken, final DeleteDraft in) {
+    public JOCDefaultResponse delete(final String accessToken, final byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, DeleteDraft.class);
+            DeleteDraft in = Globals.objectMapper.readValue(filterBytes, DeleteDraft.class);
+            
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);

@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.xmleditor.store.StoreConfiguration;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
 
 public interface IStoreResource {
@@ -20,6 +19,6 @@ public interface IStoreResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse store(@HeaderParam("X-Access-Token") final String accessToken, StoreConfiguration in);
+    public JOCDefaultResponse store(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
 
 }

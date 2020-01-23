@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.xmleditor.validate.ValidateConfiguration;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
 
 public interface IValidateResource {
@@ -20,6 +19,6 @@ public interface IValidateResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse validate(@HeaderParam("X-Access-Token") final String accessToken, ValidateConfiguration in);
+    public JOCDefaultResponse validate(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
 
 }

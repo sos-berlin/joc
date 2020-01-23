@@ -9,7 +9,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
-import com.sos.joc.model.xmleditor.xml2json.Xml2JsonConfiguration;
 
 public interface IXml2JsonResource {
 
@@ -20,6 +19,6 @@ public interface IXml2JsonResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse xml2json(@HeaderParam("X-Access-Token") final String accessToken, Xml2JsonConfiguration in);
+    public JOCDefaultResponse xml2json(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
 
 }

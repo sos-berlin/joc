@@ -21,6 +21,7 @@ import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.delete.all.DeleteAll;
 import com.sos.joc.model.xmleditor.delete.all.DeleteAllAnswer;
 import com.sos.joc.xmleditor.resource.IDeleteAllResource;
+import com.sos.schema.JsonValidator;
 
 import jersey.repackaged.com.google.common.base.Joiner;
 
@@ -31,8 +32,11 @@ public class DeleteAllResourceImpl extends JOCResourceImpl implements IDeleteAll
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
     @Override
-    public JOCDefaultResponse delete(final String accessToken, final DeleteAll in) {
+    public JOCDefaultResponse delete(final String accessToken, final byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, DeleteAll.class);
+            DeleteAll in = Globals.objectMapper.readValue(filterBytes, DeleteAll.class);
+            
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);

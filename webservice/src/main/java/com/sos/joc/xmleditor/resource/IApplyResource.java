@@ -9,7 +9,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
-import com.sos.joc.model.xmleditor.apply.ApplyConfiguration;
 
 public interface IApplyResource {
 
@@ -20,6 +19,6 @@ public interface IApplyResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse apply(@HeaderParam("X-Access-Token") final String accessToken, ApplyConfiguration in);
+    public JOCDefaultResponse apply(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
 
 }

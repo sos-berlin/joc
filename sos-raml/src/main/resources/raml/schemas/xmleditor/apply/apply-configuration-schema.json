@@ -5,28 +5,26 @@
 	"type": "object",
 	"description": "id, name, schemaIdentifier only for OTHER",
 	"required": [
-		"jobschedulerId",
-		"objectType",
-		"configuration"
+		"jobschedulerId"
 	],
 	"properties": {
 		"jobschedulerId": {
-			"type": "string"
+			"$ref": "../../common/filename100-schema.json"
 		},
 		"objectType": {
 			"$ref": "../common/object-type-schema.json"
 		},
 		"configuration": {
-			"type": "string"
+			"$ref": "../../../common/noScript-schema.json"
 		},
 		"id": {
 			"type": "integer"
 		},
 		"name": {
-			"type": "string"
+			"$ref": "../../common/string255-schema.json"
 		},
 		"schemaIdentifier": {
-			"type": "string"
+			"$ref": "../../common/string255-schema.json"
 		}
 	}
 }

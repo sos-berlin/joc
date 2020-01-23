@@ -10,7 +10,7 @@
 	],
 	"properties": {
 		"jobschedulerId": {
-			"type": "string"
+			"$ref": "../../common/filename100-schema.json"
 		},
 		"objectType": {
 			"$ref": "../common/object-type-schema.json"
@@ -19,10 +19,10 @@
 			"type": "integer"
 		},
 		"name": {
-			"type": "string"
+			"$ref": "../../common/string255-schema.json"
 		},
 		"schemaIdentifier": {
-			"type": "string"
+			"$ref": "../../common/string255-schema.json"
 		}
 	}
 }

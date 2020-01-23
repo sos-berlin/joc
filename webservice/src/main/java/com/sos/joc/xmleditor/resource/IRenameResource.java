@@ -9,7 +9,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
-import com.sos.joc.model.xmleditor.rename.RenameConfiguration;
 
 public interface IRenameResource {
 
@@ -20,6 +19,6 @@ public interface IRenameResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse rename(@HeaderParam("X-Access-Token") final String accessToken, RenameConfiguration in);
+    public JOCDefaultResponse rename(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
 
 }

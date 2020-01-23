@@ -3,6 +3,7 @@ package com.sos.joc.xmleditor.impl;
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
@@ -13,13 +14,17 @@ import com.sos.joc.model.xmleditor.xml2json.Xml2JsonConfiguration;
 import com.sos.joc.model.xmleditor.xml2json.Xml2JsonConfigurationAnswer;
 import com.sos.joc.xmleditor.common.Xml2JsonConverter;
 import com.sos.joc.xmleditor.resource.IXml2JsonResource;
+import com.sos.schema.JsonValidator;
 
 @Path(JocXmlEditor.APPLICATION_PATH)
 public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonResource {
 
     @Override
-    public JOCDefaultResponse xml2json(final String accessToken, final Xml2JsonConfiguration in) {
+    public JOCDefaultResponse xml2json(final String accessToken, final byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, Xml2JsonConfiguration.class);
+            Xml2JsonConfiguration in = Globals.objectMapper.readValue(filterBytes, Xml2JsonConfiguration.class);
+            
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);

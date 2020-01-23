@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.xmleditor.read.ReadConfiguration;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
 
 public interface IReadResource {
@@ -20,6 +19,6 @@ public interface IReadResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse read(@HeaderParam("X-Access-Token") final String accessToken, final ReadConfiguration in);
+    public JOCDefaultResponse read(@HeaderParam("X-Access-Token") final String accessToken, final byte[] in);
 
 }

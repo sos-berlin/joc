@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
@@ -20,6 +21,7 @@ import com.sos.joc.model.xmleditor.validate.ErrorMessage;
 import com.sos.joc.model.xmleditor.validate.ValidateConfiguration;
 import com.sos.joc.model.xmleditor.validate.ValidateConfigurationAnswer;
 import com.sos.joc.xmleditor.resource.IValidateResource;
+import com.sos.schema.JsonValidator;
 
 @Path(JocXmlEditor.APPLICATION_PATH)
 public class ValidateResourceImpl extends JOCResourceImpl implements IValidateResource {
@@ -28,8 +30,11 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
     @Override
-    public JOCDefaultResponse validate(final String accessToken, final ValidateConfiguration in) {
+    public JOCDefaultResponse validate(final String accessToken, final byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, ValidateConfiguration.class);
+            ValidateConfiguration in = Globals.objectMapper.readValue(filterBytes, ValidateConfiguration.class);
+            
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);

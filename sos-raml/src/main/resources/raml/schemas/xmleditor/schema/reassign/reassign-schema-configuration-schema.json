@@ -10,22 +10,22 @@
 	],
 	"properties": {
 		"jobschedulerId": {
-			"type": "string"
+			"$ref": "../../../common/filename100-schema.json"
 		},
 		"objectType": {
 			"$ref": "../../common/object-type-schema.json"
 		},
 		"configuration": {
-			"type": "string"
+			"$ref": "../../../common/noScript-schema.json"
 		},
 		"uri": {
-			"type": "string"
+			"$ref": "../../../common/string255-schema.json"
 		},
 		"fileName": {
-			"type": "string"
+			"$ref": "../../../common/filename255-schema.json"
 		},
 		"fileContent": {
-			"type": "string"
+			"$ref": "../../../common/noScript-schema.json"
 		}
 	}
 }

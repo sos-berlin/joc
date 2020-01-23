@@ -9,7 +9,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
-import com.sos.joc.model.xmleditor.delete.all.DeleteAll;
 
 public interface IDeleteAllResource {
 
@@ -20,6 +19,6 @@ public interface IDeleteAllResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse delete(@HeaderParam("X-Access-Token") final String accessToken, final DeleteAll in);
+    public JOCDefaultResponse delete(@HeaderParam("X-Access-Token") final String accessToken, final byte[] in);
 
 }

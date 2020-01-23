@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
@@ -16,13 +17,17 @@ import com.sos.joc.model.xmleditor.schema.assign.AssignSchemaConfiguration;
 import com.sos.joc.model.xmleditor.schema.assign.AssignSchemaConfigurationAnswer;
 import com.sos.joc.xmleditor.common.schema.SchemaHandler;
 import com.sos.joc.xmleditor.resource.IAssignSchemaResource;
+import com.sos.schema.JsonValidator;
 
 @Path(JocXmlEditor.APPLICATION_PATH)
 public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssignSchemaResource {
 
     @Override
-    public JOCDefaultResponse assign(final String accessToken, final AssignSchemaConfiguration in) {
+    public JOCDefaultResponse assign(final String accessToken, final byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, AssignSchemaConfiguration.class);
+            AssignSchemaConfiguration in = Globals.objectMapper.readValue(filterBytes, AssignSchemaConfiguration.class);
+            
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);

@@ -26,6 +26,7 @@ import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.validate.ErrorMessage;
 import com.sos.joc.xmleditor.common.Xml2JsonConverter;
 import com.sos.joc.xmleditor.resource.IApplyResource;
+import com.sos.schema.JsonValidator;
 
 import sos.util.SOSString;
 
@@ -35,9 +36,12 @@ public class ApplyResourceImpl extends JOCResourceImpl implements IApplyResource
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse apply(final String accessToken, final ApplyConfiguration in) {
+    public JOCDefaultResponse apply(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession session = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, ApplyConfiguration.class);
+            ApplyConfiguration in = Globals.objectMapper.readValue(filterBytes, ApplyConfiguration.class);
+            
             // TODO check folder permissions
             checkRequiredParameters(in);
 

@@ -19,6 +19,7 @@ import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.store.StoreConfiguration;
 import com.sos.joc.model.xmleditor.store.StoreConfigurationAnswer;
 import com.sos.joc.xmleditor.resource.IStoreResource;
+import com.sos.schema.JsonValidator;
 
 import sos.util.SOSString;
 
@@ -26,9 +27,12 @@ import sos.util.SOSString;
 public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource {
 
     @Override
-    public JOCDefaultResponse store(final String accessToken, final StoreConfiguration in) {
+    public JOCDefaultResponse store(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession session = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, StoreConfiguration.class);
+            StoreConfiguration in = Globals.objectMapper.readValue(filterBytes, StoreConfiguration.class);
+            
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);

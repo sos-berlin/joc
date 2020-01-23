@@ -30,6 +30,7 @@ import com.sos.joc.model.xmleditor.read.other.ReadOtherConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
 import com.sos.joc.xmleditor.common.standard.ReadConfigurationHandler;
 import com.sos.joc.xmleditor.resource.IReadResource;
+import com.sos.schema.JsonValidator;
 
 import sos.util.SOSString;
 
@@ -40,8 +41,11 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
     @Override
-    public JOCDefaultResponse read(final String accessToken, final ReadConfiguration in) {
+    public JOCDefaultResponse read(final String accessToken, final byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, ReadConfiguration.class);
+            ReadConfiguration in = Globals.objectMapper.readValue(filterBytes, ReadConfiguration.class);
+            
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
