@@ -1,7 +1,7 @@
 {
   "title": "jobs filter",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.joe.wizard.JobsFilter",
+  "javaType": "com.sos.joc.model.joe.wizard.JobsWizardFilter",
   "type": "object",
   "required" : [
     "jobschedulerId"

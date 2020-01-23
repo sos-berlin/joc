@@ -15,7 +15,7 @@
 			"$ref": "../common/object-type-schema.json"
 		},
 		"configuration": {
-			"$ref": "../../../common/noScript-schema.json"
+			"$ref": "../../common/noScript-schema.json"
 		},
 		"id": {
 			"type": "integer"

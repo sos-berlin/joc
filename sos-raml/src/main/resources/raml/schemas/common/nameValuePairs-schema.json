@@ -11,10 +11,10 @@
     ],
     "properties": {
       "name": {
-        "$ref": "../string255-schema.json"
+        "$ref": "string255-schema.json"
       },
       "value": {
-        "$ref": "../noScript-schema.json"
+        "$ref": "noScript-schema.json"
       }
     }
   }

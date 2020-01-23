@@ -142,7 +142,7 @@ public class JsonValidator {
             put("DeleteDraft", "xmleditor/delete/delete-draft-schema.json");
             put("DeployConfiguration", "xmleditor/deploy/deploy-configuration-schema.json");
             put("ReadConfiguration", "xmleditor/read/read-configuration-schema.json");
-            put("ReassignSchemaConfiguration", "xmleditor/schema/reassign/reassign-configuration-schema.json");
+            put("ReassignSchemaConfiguration", "xmleditor/schema/reassign/reassign-schema-configuration-schema.json");
             put("RenameConfiguration", "xmleditor/rename/rename-configuration-schema.json");
             put("StoreConfiguration", "xmleditor/store/store-configuration-schema.json");
             put("ValidateConfiguration", "xmleditor/validate/validate-configuration-schema.json");
@@ -150,6 +150,7 @@ public class JsonValidator {
             
             put("FilterDeploy", "joe/common/filter-deploy-schema.json");
             put("Filter", "joe/common/filter-schema.json");
+            put("JSObjectEdit", "joe/common/jsObjectEdit-schema.json");
         }
     });
 
