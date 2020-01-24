@@ -6,8 +6,7 @@
   "required": [
     "jobschedulerId",
     "jobChain",
-    "orderId",
-    "documentation"
+    "orderId"
   ],
   "properties": {
     "jobschedulerId": {

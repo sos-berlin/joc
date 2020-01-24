@@ -10,6 +10,8 @@ import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Date;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -226,9 +228,19 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
     }
 
     private byte[] setTaskFilter(String jobschedulerId, String taskId, String filename, LogMime mime) {
-        String json = String.format("{\"jobschedulerId\": \"%s\", \"taskId\": \"%s\", \"filename\": \"%s\", \"mime\": \"%s\"}", jobschedulerId,
-                taskId, filename, mime.name());
-        return json.getBytes();
+        
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("jobschedulerId", jobschedulerId);
+        if (taskId != null) {
+            builder.add("taskId", taskId);
+        }
+        if (filename != null) {
+            builder.add("filename", filename);
+        }
+        if (mime != null) {
+            builder.add("mime", mime.name());
+        }
+        return builder.build().toString().getBytes();
     }
 
     private String getFileName(java.nio.file.Path path) {

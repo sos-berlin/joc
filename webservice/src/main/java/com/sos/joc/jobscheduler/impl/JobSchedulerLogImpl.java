@@ -10,6 +10,8 @@ import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Date;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -40,9 +42,18 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-        String json = String.format("{\"jobschedulerId\": \"%s\", \"host\": \"%s\", \"port\": %d, \"filename\": \"%s\"}", jobschedulerId, host, port,
-                filename);
-        return getLog(accessToken, json.getBytes(), LOG_API_CALL);
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("jobschedulerId", jobschedulerId);
+        if (host != null) {
+            builder.add("host", host);
+        }
+        if (port != null) {
+            builder.add("port", port);
+        }
+        if (filename != null) {
+            builder.add("filename", filename);
+        }
+        return getLog(accessToken, builder.build().toString().getBytes(), LOG_API_CALL);
     }
 
     @Override
@@ -161,9 +172,18 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-        String json = String.format("{\"jobschedulerId\": \"%s\", \"host\": \"%s\", \"port\": %d, \"filename\": \"%s\"}", jobschedulerId, host, port,
-                filename);
-        return getLog(accessToken, json.getBytes(), DEBUGLOG_API_CALL);
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("jobschedulerId", jobschedulerId);
+        if (host != null) {
+            builder.add("host", host);
+        }
+        if (port != null) {
+            builder.add("port", port);
+        }
+        if (filename != null) {
+            builder.add("filename", filename);
+        }
+        return getLog(accessToken, builder.build().toString().getBytes(), DEBUGLOG_API_CALL);
     }
     
     @Override

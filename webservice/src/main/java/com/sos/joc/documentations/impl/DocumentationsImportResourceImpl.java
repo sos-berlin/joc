@@ -21,6 +21,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -71,13 +73,22 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String directory,
             FormDataBodyPart body, String timeSpent, String ticketLink, String comment) throws Exception {
         
-        String json = String.format("{\"comment\": \"%s\", \"ticketLink\": \"%s\"}", ticketLink, ticketLink);
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (comment != null) {
+            builder.add("comment", comment);
+        }
+        if (ticketLink != null) {
+            builder.add("ticketLink", ticketLink);
+        }
+        if (timeSpent != null) {
+            try {
+                builder.add("timeSpent", Integer.valueOf(timeSpent));
+            } catch (Exception e) {
+            }
+        }
+        String json = builder.build().toString();
         JsonValidator.validateFailFast(json.getBytes(), AuditParams.class);
         AuditParams auditLog = Globals.objectMapper.readValue(json, AuditParams.class);
-        try {
-            auditLog.setTimeSpent(Integer.valueOf(timeSpent));
-        } catch (Exception e) {
-        }
         return postImportDocumentations(getAccessToken(xAccessToken, accessToken), jobschedulerId, directory, body, auditLog);
     }
 
@@ -96,7 +107,16 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             if (body != null) {
                 file = URLDecoder.decode(body.getContentDisposition().getFileName(), "UTF-8");
             }
-            String json = String.format("{\"jobschedulerId\": \"%s\", \"folder\": \"%s\", \"file\": \"%s\"}", jobschedulerId, directory, file);
+            //String json = String.format("{\"jobschedulerId\": \"%s\", \"folder\": \"%s\", \"file\": \"%s\"}", jobschedulerId, directory, file);
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            builder.add("jobschedulerId", jobschedulerId);
+            if (directory != null) {
+                builder.add("folder", directory);
+            }
+            if (file != null) {
+                builder.add("file", file);
+            }
+            String json = builder.build().toString();
             JsonValidator.validateFailFast(json.getBytes(), DocumentationImport.class);
             DocumentationImport filter = Globals.objectMapper.readValue(json, DocumentationImport.class);
             filter.setAuditLog(auditLog);

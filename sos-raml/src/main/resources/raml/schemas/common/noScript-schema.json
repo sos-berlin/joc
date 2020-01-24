@@ -2,5 +2,5 @@
   "title": "disallow <script and <svg/on",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "string",
-  "pattern": "^((?!<script( |>)|<svg/on).)*$"
+  "pattern": "^(?s)((?!<script( |>)|<svg/on).)*$"
 }
