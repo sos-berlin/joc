@@ -55,6 +55,19 @@ public class ValidatorTest {
         assertTrue(check);
     }
     
+    @Test 
+    public void testTypeLoose() {
+        String s = "{\"jobschedulerId\":\"joc_40444\", \"id\": \"1\"}";
+        boolean check = false;
+        try {
+            JsonValidator.validateFailFast(s.getBytes(), "calendar/calendarId-schema.json");
+            check = true;
+        } catch (Exception e) {
+            LOGGER.error(e.toString());
+        }
+        assertTrue(check);
+    }
+    
     @Test
     public void testLoadingSchemas() {
         List<String> classNames = new ArrayList<String>();
