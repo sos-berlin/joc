@@ -10,6 +10,8 @@ import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Date;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -233,10 +235,22 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
     }
 
     private byte[] setOrderHistoryFilter(String jobschedulerId, String orderId, String jobChain, String historyId, String filename) {
-        String json = String.format(
-                "{\"jobschedulerId\": \"%s\", \"historyId\": \"%s\", \"jobChain\": \"%s\", \"orderId\": \"%s\", \"filename\": \"%s\"}",
-                jobschedulerId, historyId, jobChain, orderId, filename);
-        return json.getBytes();
+        
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("jobschedulerId", jobschedulerId);
+        if(historyId != null) {
+            builder.add("historyId", historyId);
+        }
+        if(orderId != null) {
+            builder.add("orderId", orderId);
+        }
+        if(jobChain != null) {
+            builder.add("jobChain", jobChain);
+        }
+        if(filename != null) {
+            builder.add("filename", filename);
+        }
+        return builder.build().toString().getBytes();
     }
 
     private String getFileName(java.nio.file.Path path) {

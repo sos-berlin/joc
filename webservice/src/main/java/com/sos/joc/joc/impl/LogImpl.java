@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
@@ -167,8 +169,9 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-        String json = String.format("{\"filename\": \"%s\"}", filename);
-        return postLog(accessToken, json.getBytes());
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("filename", filename);
+        return postLog(accessToken, builder.build().toString().getBytes());
     }
 
     private static DirectoryStream<Path> getFileListStream(final Path folder, final String regexp) throws IOException {
