@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.time.Instant;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
@@ -39,8 +41,14 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
 
     public JOCDefaultResponse show(String xAccessToken, String jobschedulerId, String path, String type) {
         try {
-            String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\", \"type\": \"%s\"}", jobschedulerId, path, type);
-            return show(xAccessToken, json.getBytes());
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            builder.add("jobschedulerId", jobschedulerId);
+            builder.add("path", path);
+            if (type != null) {
+                builder.add("type", type);
+            }
+            //String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\", \"type\": \"%s\"}", jobschedulerId, path, type);
+            return show(xAccessToken, builder.build().toString().getBytes());
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
@@ -107,8 +115,11 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
     }
 
     public JOCDefaultResponse preview(String xAccessToken, String jobschedulerId, String path) {
-        String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
-        return preview(xAccessToken, json.getBytes());
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("jobschedulerId", jobschedulerId);
+        builder.add("path", path);
+        //String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
+        return preview(xAccessToken, builder.build().toString().getBytes());
     }
 
     @Override
