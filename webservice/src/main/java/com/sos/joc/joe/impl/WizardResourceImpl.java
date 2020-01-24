@@ -228,7 +228,7 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
                 if (paramDoc != null) {
                     paramDoc = paramDoc.replaceFirst("^\\s*<\\?xml[^\\?]+\\?>", "").replaceFirst("^\\s*<!DOCTYPE[^>]+>\\s*", "").replaceAll(
                             " xmlns=\"http://www.w3.org/1999/xhtml\"", "").replaceAll("\\s+", " ").replaceAll("> <", "><");
-                    paramDoc = "<div class=\"jitl-job-param\">" + paramDoc + "</div>";
+                    paramDoc = "<div class=\"jitl-job-param\">" + paramDoc.trim() + "</div>";
                 }
             }
         } catch (Exception e) {
