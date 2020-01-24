@@ -5,8 +5,7 @@
   "type": "object",
   "required": [
     "jobschedulerId",
-    "schedule",
-    "documentation"
+    "schedule"
   ],
   "properties": {
     "jobschedulerId": {
