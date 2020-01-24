@@ -207,13 +207,12 @@ public class JsonValidator {
 
     // protected for testing
     protected static JsonSchema getSchema(URI schemaUri, boolean failFast) {
+        SchemaValidatorsConfig config = new SchemaValidatorsConfig();
+        config.setTypeLoose(true);
         if (failFast) {
-            SchemaValidatorsConfig config = new SchemaValidatorsConfig();
             config.setFailFast(true);
-            return FACTORY_V4.getSchema(schemaUri, config);
-        } else {
-            return FACTORY_V4.getSchema(schemaUri);
         }
+        return FACTORY_V4.getSchema(schemaUri, config);
     }
     
     private static String getSchemaPath(Class<?> clazz) {
