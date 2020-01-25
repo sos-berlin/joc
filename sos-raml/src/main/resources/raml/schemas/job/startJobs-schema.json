@@ -4,8 +4,7 @@
   "javaType": "com.sos.joc.model.job.StartJobs",
   "type": "object",
   "required": [
-    "jobschedulerId",
-    "jobs"
+    "jobschedulerId"
   ],
   "properties": {
     "jobschedulerId": {

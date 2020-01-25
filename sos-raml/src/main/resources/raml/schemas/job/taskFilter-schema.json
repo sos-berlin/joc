@@ -4,8 +4,7 @@
   "javaType": "com.sos.joc.model.job.TaskFilter",
   "type": "object",
   "required": [
-    "jobschedulerId",
-    "taskId"
+    "jobschedulerId"
   ],
   "properties": {
     "jobschedulerId": {
