@@ -41,11 +41,11 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
     @Override
-    public JOCDefaultResponse read(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, ReadConfiguration.class);
             ReadConfiguration in = Globals.objectMapper.readValue(filterBytes, ReadConfiguration.class);
-            
+
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
@@ -115,7 +115,8 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                     configuration.setName(item.get("1").toString());
                     configuration.setSchemaIdentifier(item.get("2").toString());// fileName or http(s) location
 
-                    if (!schemas.contains(configuration.getSchemaIdentifier())) {
+                    // only http(s), files will be checked later - maybe no longer exists (were removed from the resources directory)
+                    if (JocXmlEditor.isHttp(configuration.getSchemaIdentifier()) && !schemas.contains(configuration.getSchemaIdentifier())) {
                         schemas.add(configuration.getSchemaIdentifier());
                     }
 
@@ -124,7 +125,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 answer.setConfigurations(configurations);
             }
 
-            List<java.nio.file.Path> files = JocXmlEditor.getOthersAbsoluteSchemaLocations();
+            List<java.nio.file.Path> files = JocXmlEditor.getOthersSchemaFiles();
             if (files != null && files.size() > 0) {
                 for (int i = 0; i < files.size(); i++) {
                     // fileName
@@ -149,7 +150,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             } else {
                 answer.getConfiguration().setId(item.getId().intValue());
                 answer.getConfiguration().setName(item.getName());
-                answer.getConfiguration().setSchema(JocXmlEditor.readOthersSchemaFile(item.getSchemaLocation()));
+                answer.getConfiguration().setSchema(JocXmlEditor.readOthersSchema(item.getSchemaLocation()));
                 answer.getConfiguration().setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(item.getSchemaLocation()));
                 answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
                 answer.getConfiguration().setConfigurationJson(item.getConfigurationDraftJson());

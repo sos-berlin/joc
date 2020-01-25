@@ -20,7 +20,7 @@ import com.sos.schema.JsonValidator;
 public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonResource {
 
     @Override
-    public JOCDefaultResponse xml2json(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, Xml2JsonConfiguration.class);
             Xml2JsonConfiguration in = Globals.objectMapper.readValue(filterBytes, Xml2JsonConfiguration.class);
@@ -33,7 +33,7 @@ public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonRe
 
                 java.nio.file.Path schema = null;
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
+                    schema = JocXmlEditor.getOthersSchema(in.getSchemaIdentifier(), false);
                 } else {
                     schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
                 }

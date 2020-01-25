@@ -1,7 +1,7 @@
 {
 	"title": "xmleditor assign schema configuration answer",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"javaType": "com.sos.joc.model.xmleditor.schema.assign.AssignSchemaConfigurationAnswer",
+	"javaType": "com.sos.joc.model.xmleditor.schema.SchemaAssignConfigurationAnswer",
 	"type": "object",
 	"description": "",
 	"properties": {

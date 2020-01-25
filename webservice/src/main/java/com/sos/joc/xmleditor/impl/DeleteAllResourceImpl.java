@@ -32,11 +32,11 @@ public class DeleteAllResourceImpl extends JOCResourceImpl implements IDeleteAll
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
     @Override
-    public JOCDefaultResponse delete(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, DeleteAll.class);
             DeleteAll in = Globals.objectMapper.readValue(filterBytes, DeleteAll.class);
-            
+
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
@@ -46,7 +46,7 @@ public class DeleteAllResourceImpl extends JOCResourceImpl implements IDeleteAll
                     deleteOtherItems(in.getJobschedulerId());
                     response = JOCDefaultResponse.responseStatus200(getSuccess());
                 } else {
-                    throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR_UNSUPPORTED_OBJECT_TYPE, String.format(
+                    throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_UNSUPPORTED_OBJECT_TYPE, String.format(
                             "[%s][%s]unsupported object type(s) for delete all", in.getJobschedulerId(), Joiner.on(",").join(in.getObjectTypes()))));
                 }
 
