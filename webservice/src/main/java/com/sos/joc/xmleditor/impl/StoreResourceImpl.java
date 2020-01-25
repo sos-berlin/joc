@@ -27,7 +27,7 @@ import sos.util.SOSString;
 public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource {
 
     @Override
-    public JOCDefaultResponse store(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession session = null;
         try {
             JsonValidator.validateFailFast(filterBytes, StoreConfiguration.class);

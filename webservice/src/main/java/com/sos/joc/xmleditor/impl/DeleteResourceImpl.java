@@ -35,7 +35,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
     @Override
-    public JOCDefaultResponse delete(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, DeleteDraft.class);
             DeleteDraft in = Globals.objectMapper.readValue(filterBytes, DeleteDraft.class);

@@ -1,7 +1,7 @@
 {
 	"title": "xmleditor reassign schema configuration answer",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"javaType": "com.sos.joc.model.xmleditor.schema.assign.ReassignSchemaConfigurationAnswer",
+	"javaType": "com.sos.joc.model.xmleditor.schema.SchemaReassignConfigurationAnswer",
 	"type": "object",
 	"description": "",
 	"properties": {

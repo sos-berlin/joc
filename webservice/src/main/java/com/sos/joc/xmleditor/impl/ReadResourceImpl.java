@@ -41,11 +41,11 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
     @Override
-    public JOCDefaultResponse read(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, ReadConfiguration.class);
             ReadConfiguration in = Globals.objectMapper.readValue(filterBytes, ReadConfiguration.class);
-            
+
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
@@ -115,7 +115,8 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                     configuration.setName(item.get("1").toString());
                     configuration.setSchemaIdentifier(item.get("2").toString());// fileName or http(s) location
 
-                    if (!schemas.contains(configuration.getSchemaIdentifier())) {
+                    // only http(s), files will be checked later - maybe no longer exists (were removed from the resources directory)
+                    if (JocXmlEditor.isHttp(configuration.getSchemaIdentifier()) && !schemas.contains(configuration.getSchemaIdentifier())) {
                         schemas.add(configuration.getSchemaIdentifier());
                     }
 
@@ -124,7 +125,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 answer.setConfigurations(configurations);
             }
 
-            List<java.nio.file.Path> files = JocXmlEditor.getOthersAbsoluteSchemaLocations();
+            List<java.nio.file.Path> files = JocXmlEditor.getOthersFiles();
             if (files != null && files.size() > 0) {
                 for (int i = 0; i < files.size(); i++) {
                     // fileName

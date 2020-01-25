@@ -36,12 +36,12 @@ public class ApplyResourceImpl extends JOCResourceImpl implements IApplyResource
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse apply(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession session = null;
         try {
             JsonValidator.validateFailFast(filterBytes, ApplyConfiguration.class);
             ApplyConfiguration in = Globals.objectMapper.readValue(filterBytes, ApplyConfiguration.class);
-            
+
             // TODO check folder permissions
             checkRequiredParameters(in);
 

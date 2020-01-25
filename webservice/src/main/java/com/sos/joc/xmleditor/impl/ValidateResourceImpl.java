@@ -30,7 +30,7 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
     @Override
-    public JOCDefaultResponse validate(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, ValidateConfiguration.class);
             ValidateConfiguration in = Globals.objectMapper.readValue(filterBytes, ValidateConfiguration.class);

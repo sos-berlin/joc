@@ -19,6 +19,6 @@ public interface IXml2JsonResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse xml2json(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
+    public JOCDefaultResponse process(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
 
 }

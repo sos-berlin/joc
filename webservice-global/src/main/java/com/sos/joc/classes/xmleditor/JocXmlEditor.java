@@ -58,7 +58,7 @@ public class JocXmlEditor {
     public static final String ERROR_CODE_CONFUGURATION_NOT_FOUND = "XMLEDITOR-404";
     public static final String ERROR_CODE_VALIDATION_ERROR = "XMLEDITOR-405";
     public static final String ERROR_CODE_DEPLOY_ERROR = "XMLEDITOR-406";
-    public static final String ERROR_CODE_DEPLOY_ERROR_UNSUPPORTED_OBJECT_TYPE = "XMLEDITOR-407";
+    public static final String ERROR_CODE_UNSUPPORTED_OBJECT_TYPE = "XMLEDITOR-407";
 
     public static final String NEW_LINE = "\r\n";
 
@@ -100,13 +100,13 @@ public class JocXmlEditor {
         return null;
     }
 
-    public static List<Path> getOthersAbsoluteSchemaLocations() throws Exception {
+    public static List<Path> getOthersFiles() throws Exception {
         setRealPath();
         Path path = realPath == null ? Paths.get(System.getProperty("user.dir")) : realPath;
         return getFiles(path.resolve(getOthersRelativeSchemaLocation().toString()), false, "xsd");
     }
 
-    public static Path getOthersAbsoluteSchemaLocation(String name) throws Exception {
+    public static Path getOthersFile(String name) throws Exception {
         setRealPath();
         Path path = realPath;
         if (path != null) {
@@ -115,7 +115,7 @@ public class JocXmlEditor {
         return path;
     }
 
-    public static Path getOthersAbsoluteHttpSchemaLocation(String name) throws Exception {
+    public static Path getOthersHttpFile(String name) throws Exception {
         setRealPath();
         Path path = realPath;
         if (path != null) {
@@ -272,7 +272,7 @@ public class JocXmlEditor {
 
     public static Path downloadOthersSchema(URI uri) throws Exception {
         String name = getFileName(uri);
-        Path target = getOthersAbsoluteHttpSchemaLocation(name);
+        Path target = getOthersHttpFile(name);
         try (InputStream inputStream = uri.toURL().openStream()) {
             Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (Throwable ex) {
@@ -283,13 +283,13 @@ public class JocXmlEditor {
     }
 
     public static Path copyOthersSchema(Path source) throws Exception {
-        Path target = JocXmlEditor.getOthersAbsoluteSchemaLocation(source.getFileName().toString());
+        Path target = JocXmlEditor.getOthersFile(source.getFileName().toString());
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
         return target;
     }
 
     public static Path createOthersSchema(String fileName, String fileContent) throws Exception {
-        Path target = JocXmlEditor.getOthersAbsoluteSchemaLocation(fileName);
+        Path target = JocXmlEditor.getOthersFile(fileName);
         Files.write(target, fileContent.getBytes(JocXmlEditor.CHARSET), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         return target;
     }
@@ -312,11 +312,11 @@ public class JocXmlEditor {
                 }
             }
             if (file == null) {
-                file = JocXmlEditor.getOthersAbsoluteHttpSchemaLocation(getFileName(toURI(path)));
+                file = JocXmlEditor.getOthersHttpFile(getFileName(toURI(path)));
             }
 
         } else {
-            file = JocXmlEditor.getOthersAbsoluteSchemaLocation(getFileName(Paths.get(path)));
+            file = JocXmlEditor.getOthersFile(getFileName(Paths.get(path)));
         }
         return file;
     }

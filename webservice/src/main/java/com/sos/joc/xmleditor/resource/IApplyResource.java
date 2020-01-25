@@ -19,6 +19,6 @@ public interface IApplyResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse apply(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
+    public JOCDefaultResponse process(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
 
 }
