@@ -170,7 +170,9 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
             accessToken = queryAccessToken;
         }
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("filename", filename);
+        if (filename != null) {
+            builder.add("filename", filename);
+        }
         return postLog(accessToken, builder.build().toString().getBytes());
     }
 
@@ -200,7 +202,7 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
     private void readJettyLoggingProperties() {
         InputStream stream = null;
         Properties properties = new Properties();
-        Path jettyLoggingConf = Paths.get("start.d/logging.ini");
+        Path jettyLoggingConf = Paths.get("start.d/console-capture.ini");
         if (!Files.exists(jettyLoggingConf)) {
             jettyLoggingConf = Paths.get("start.ini");
         }
@@ -210,11 +212,11 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
                 if (stream != null) {
                     properties.load(stream);
                 }
-                if (properties.containsKey("jetty.logging.dir")) {
-                    logDirectory = properties.getProperty("jetty.logging.dir");
+                if (properties.containsKey("jetty.console-capture.dir")) {
+                    logDirectory = properties.getProperty("jetty.console-capture.dir");
                 }
-                if (properties.containsKey("jetty.logging.timezone")) {
-                    logTimezone = properties.getProperty("jetty.logging.timezone");
+                if (properties.containsKey("jetty.console-capture.timezone")) {
+                    logTimezone = properties.getProperty("jetty.console-capture.timezone");
                 }
             } catch (Exception e) {
                 LOGGER.warn(String.format("Error while reading %1$s:", jettyLoggingConf.toString()), e);
