@@ -5,8 +5,8 @@
   "type": "object",
   "required": [
     "jobschedulerId",
-    "calendar",
-    "newCalendar"
+    "path",
+    "newPath"
   ],
   "properties": {
     "jobschedulerId": {

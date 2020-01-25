@@ -3,6 +3,8 @@ package com.sos.joc.calendar.impl;
 import java.time.Instant;
 import java.util.Date;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -36,9 +38,12 @@ public class CalendarResourceDocumentationImpl extends JOCResourceImpl implement
     public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) {
         SOSHibernateSession connection = null;
         try {
-            DocumentationShowFilter documentationFilter = new DocumentationShowFilter();
-            documentationFilter.setJobschedulerId(jobschedulerId);
-            documentationFilter.setPath(path);
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            builder.add("jobschedulerId", jobschedulerId);
+            builder.add("path", path);
+            String json = builder.build().toString();
+            JsonValidator.validateFailFast(json.getBytes(), DocumentationShowFilter.class);
+            DocumentationShowFilter documentationFilter = Globals.objectMapper.readValue(json, DocumentationShowFilter.class);
             documentationFilter.setType(JobSchedulerObjectType.WORKINGDAYSCALENDAR);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),

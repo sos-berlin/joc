@@ -4,10 +4,7 @@
   "javaType": "com.sos.joc.model.order.OrderHistoryFilter",
   "type": "object",
   "required": [
-    "jobschedulerId",
-    "jobChain",
-    "orderId",
-    "historyId"
+    "jobschedulerId"
   ],
   "properties": {
     "jobschedulerId": {
