@@ -125,7 +125,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 answer.setConfigurations(configurations);
             }
 
-            List<java.nio.file.Path> files = JocXmlEditor.getOthersFiles();
+            List<java.nio.file.Path> files = JocXmlEditor.getOthersSchemaFiles();
             if (files != null && files.size() > 0) {
                 for (int i = 0; i < files.size(); i++) {
                     // fileName
@@ -150,7 +150,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             } else {
                 answer.getConfiguration().setId(item.getId().intValue());
                 answer.getConfiguration().setName(item.getName());
-                answer.getConfiguration().setSchema(JocXmlEditor.readOthersSchemaFile(item.getSchemaLocation()));
+                answer.getConfiguration().setSchema(JocXmlEditor.readOthersSchema(item.getSchemaLocation()));
                 answer.getConfiguration().setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(item.getSchemaLocation()));
                 answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
                 answer.getConfiguration().setConfigurationJson(item.getConfigurationDraftJson());

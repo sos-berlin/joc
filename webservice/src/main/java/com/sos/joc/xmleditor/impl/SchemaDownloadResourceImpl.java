@@ -69,7 +69,7 @@ public class SchemaDownloadResourceImpl extends JOCResourceImpl implements ISche
 
         java.nio.file.Path path = null;
         if (in.getObjectType().equals(ObjectType.OTHER)) {
-            path = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), true);
+            path = JocXmlEditor.getOthersSchema(in.getSchemaIdentifier(), true);
         } else {
             path = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
         }

@@ -33,7 +33,7 @@ public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonRe
 
                 java.nio.file.Path schema = null;
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
+                    schema = JocXmlEditor.getOthersSchema(in.getSchemaIdentifier(), false);
                 } else {
                     schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
                 }

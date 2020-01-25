@@ -100,13 +100,13 @@ public class JocXmlEditor {
         return null;
     }
 
-    public static List<Path> getOthersFiles() throws Exception {
+    public static List<Path> getOthersSchemaFiles() throws Exception {
         setRealPath();
         Path path = realPath == null ? Paths.get(System.getProperty("user.dir")) : realPath;
         return getFiles(path.resolve(getOthersRelativeSchemaLocation().toString()), false, "xsd");
     }
 
-    public static Path getOthersFile(String name) throws Exception {
+    public static Path getOthersSchema(String name) throws Exception {
         setRealPath();
         Path path = realPath;
         if (path != null) {
@@ -115,13 +115,67 @@ public class JocXmlEditor {
         return path;
     }
 
-    public static Path getOthersHttpFile(String name) throws Exception {
+    public static Path getOthersHttpSchema(String name) throws Exception {
         setRealPath();
         Path path = realPath;
         if (path != null) {
             path = path.resolve(getOthersRelativeHttpSchemaLocation(name));
         }
         return path;
+    }
+
+    public static Path getOthersSchema(String path, boolean downloadIfHttp) throws Exception {
+        Path file = null;
+        if (isHttp(path)) {
+            if (downloadIfHttp) {
+                try {
+                    file = downloadOthersSchema(toURI(path));
+                } catch (Throwable e) {
+                    LOGGER.error(String.format("[%s]can't download file, try to find in the %s location ..", path,
+                            getOthersRelativeHttpSchemaLocation()));
+                }
+            }
+            if (file == null) {
+                file = JocXmlEditor.getOthersHttpSchema(getFileName(toURI(path)));
+            }
+
+        } else {
+            file = JocXmlEditor.getOthersSchema(getFileName(Paths.get(path)));
+        }
+        return file;
+    }
+
+    public static String readOthersSchema(String path) throws Exception {
+        Path file = getOthersSchema(path, true);
+        if (Files.exists(file)) {
+            return getFileContent(file);
+        } else {
+            throw new Exception(String.format("[%s]file not found", path));
+        }
+    }
+
+    public static Path downloadOthersSchema(URI uri) throws Exception {
+        String name = getFileName(uri);
+        Path target = getOthersHttpSchema(name);
+        try (InputStream inputStream = uri.toURL().openStream()) {
+            Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (Throwable ex) {
+            LOGGER.error(ex.toString(), ex);
+            throw ex;
+        }
+        return target;
+    }
+
+    public static Path copyOthersSchema(Path source) throws Exception {
+        Path target = JocXmlEditor.getOthersSchema(source.getFileName().toString());
+        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+        return target;
+    }
+
+    public static Path createOthersSchema(String fileName, String fileContent) throws Exception {
+        Path target = JocXmlEditor.getOthersSchema(fileName);
+        Files.write(target, fileContent.getBytes(JocXmlEditor.CHARSET), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        return target;
     }
 
     public static String getOthersSchemaIdentifier(String path) {
@@ -270,64 +324,10 @@ public class JocXmlEditor {
         return bytes2string(Files.readAllBytes(path));
     }
 
-    public static Path downloadOthersSchema(URI uri) throws Exception {
-        String name = getFileName(uri);
-        Path target = getOthersHttpFile(name);
-        try (InputStream inputStream = uri.toURL().openStream()) {
-            Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Throwable ex) {
-            LOGGER.error(ex.toString(), ex);
-            throw ex;
-        }
-        return target;
-    }
-
-    public static Path copyOthersSchema(Path source) throws Exception {
-        Path target = JocXmlEditor.getOthersFile(source.getFileName().toString());
-        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-        return target;
-    }
-
-    public static Path createOthersSchema(String fileName, String fileContent) throws Exception {
-        Path target = JocXmlEditor.getOthersFile(fileName);
-        Files.write(target, fileContent.getBytes(JocXmlEditor.CHARSET), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        return target;
-    }
-
     // TODO
     public static boolean isHttp(String path) {
         path = path.toLowerCase();
         return path.startsWith("https://") || path.startsWith("http://");
-    }
-
-    public static Path getOthersSchemaFile(String path, boolean downloadIfHttp) throws Exception {
-        Path file = null;
-        if (isHttp(path)) {
-            if (downloadIfHttp) {
-                try {
-                    file = downloadOthersSchema(toURI(path));
-                } catch (Throwable e) {
-                    LOGGER.error(String.format("[%s]can't download file, try to find in the %s location ..", path,
-                            getOthersRelativeHttpSchemaLocation()));
-                }
-            }
-            if (file == null) {
-                file = JocXmlEditor.getOthersHttpFile(getFileName(toURI(path)));
-            }
-
-        } else {
-            file = JocXmlEditor.getOthersFile(getFileName(Paths.get(path)));
-        }
-        return file;
-    }
-
-    public static String readOthersSchemaFile(String path) throws Exception {
-        Path file = getOthersSchemaFile(path, true);
-        if (Files.exists(file)) {
-            return getFileContent(file);
-        } else {
-            throw new Exception(String.format("[%s]file not found", path));
-        }
     }
 
     public static void setRealPath() throws Exception {
