@@ -170,7 +170,7 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
             accessToken = queryAccessToken;
         }
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        if (filename != null) {
+        if(filename != null) {
             builder.add("filename", filename);
         }
         return postLog(accessToken, builder.build().toString().getBytes());

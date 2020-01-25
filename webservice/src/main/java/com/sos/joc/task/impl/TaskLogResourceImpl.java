@@ -230,7 +230,9 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
     private byte[] setTaskFilter(String jobschedulerId, String taskId, String filename, LogMime mime) {
         
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("jobschedulerId", jobschedulerId);
+        if(jobschedulerId != null) {
+            builder.add("jobschedulerId", jobschedulerId);
+        }
         if (taskId != null) {
             builder.add("taskId", taskId);
         }
