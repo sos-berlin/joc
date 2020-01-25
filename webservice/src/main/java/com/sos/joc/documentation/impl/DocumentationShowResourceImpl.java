@@ -42,8 +42,12 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
     public JOCDefaultResponse show(String xAccessToken, String jobschedulerId, String path, String type) {
         try {
             JsonObjectBuilder builder = Json.createObjectBuilder();
-            builder.add("jobschedulerId", jobschedulerId);
-            builder.add("path", path);
+            if(jobschedulerId != null) {
+                builder.add("jobschedulerId", jobschedulerId);
+            }
+            if(path != null) {
+                builder.add("path", path);
+            }
             if (type != null) {
                 builder.add("type", type);
             }
@@ -116,8 +120,12 @@ public class DocumentationShowResourceImpl extends JOCResourceImpl implements ID
 
     public JOCDefaultResponse preview(String xAccessToken, String jobschedulerId, String path) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("jobschedulerId", jobschedulerId);
-        builder.add("path", path);
+        if(jobschedulerId != null) {
+            builder.add("jobschedulerId", jobschedulerId);
+        }
+        if(path != null) {
+            builder.add("path", path);
+        }
         //String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
         return preview(xAccessToken, builder.build().toString().getBytes());
     }

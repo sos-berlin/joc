@@ -40,8 +40,12 @@ public class OrderResourceDocumentationImpl extends JOCResourceImpl implements I
         try {
             //String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, jobChain + "," + orderId);
             JsonObjectBuilder builder = Json.createObjectBuilder();
-            builder.add("jobschedulerId", jobschedulerId);
-            builder.add("path", jobChain + "," + orderId);
+            if(jobschedulerId != null) {
+                builder.add("jobschedulerId", jobschedulerId);
+            }
+            if(jobChain != null && orderId != null) {
+                builder.add("path", jobChain + "," + orderId);
+            }
             String json = builder.build().toString();
             JsonValidator.validateFailFast(json.getBytes(), DocumentationShowFilter.class);
             DocumentationShowFilter documentationFilter = Globals.objectMapper.readValue(json, DocumentationShowFilter.class);

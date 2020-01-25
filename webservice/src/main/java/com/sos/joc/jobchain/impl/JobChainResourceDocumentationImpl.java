@@ -40,8 +40,12 @@ public class JobChainResourceDocumentationImpl extends JOCResourceImpl implement
         try {
             //String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
             JsonObjectBuilder builder = Json.createObjectBuilder();
-            builder.add("jobschedulerId", jobschedulerId);
-            builder.add("path", path);
+            if(jobschedulerId != null) {
+                builder.add("jobschedulerId", jobschedulerId);
+            }
+            if(path != null) {
+                builder.add("path", path);
+            }
             String json = builder.build().toString();
             JsonValidator.validateFailFast(json.getBytes(), DocumentationShowFilter.class);
             DocumentationShowFilter documentationFilter = Globals.objectMapper.readValue(json, DocumentationShowFilter.class);

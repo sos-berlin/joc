@@ -43,7 +43,9 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             accessToken = queryAccessToken;
         }
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("jobschedulerId", jobschedulerId);
+        if(jobschedulerId != null) {
+            builder.add("jobschedulerId", jobschedulerId);
+        }
         if (host != null) {
             builder.add("host", host);
         }
@@ -173,7 +175,9 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             accessToken = queryAccessToken;
         }
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("jobschedulerId", jobschedulerId);
+        if(jobschedulerId != null) {
+            builder.add("jobschedulerId", jobschedulerId);
+        }
         if (host != null) {
             builder.add("host", host);
         }

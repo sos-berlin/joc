@@ -109,7 +109,9 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
             }
             //String json = String.format("{\"jobschedulerId\": \"%s\", \"folder\": \"%s\", \"file\": \"%s\"}", jobschedulerId, directory, file);
             JsonObjectBuilder builder = Json.createObjectBuilder();
-            builder.add("jobschedulerId", jobschedulerId);
+            if(jobschedulerId != null) {
+                builder.add("jobschedulerId", jobschedulerId);
+            }
             if (directory != null) {
                 builder.add("folder", directory);
             }
