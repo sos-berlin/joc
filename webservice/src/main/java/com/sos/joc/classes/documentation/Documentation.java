@@ -84,17 +84,23 @@ public class Documentation {
     public static void assignDocu(SOSHibernateSession connection, String jobschedulerId, String jsObjectPath, String docPath,
             JobSchedulerObjectType objType) throws JocMissingRequiredParameterException, JocConfigurationException, DBConnectionRefusedException,
             DBInvalidDataException, SOSHibernateException, DBOpenSessionException {
+        DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
+        unassignDocu(dbLayer, jobschedulerId, jsObjectPath, objType);
+    }
+    
+    public static void assignDocu(DocumentationDBLayer dbLayer, String jobschedulerId, String jsObjectPath, String docPath,
+            JobSchedulerObjectType objType) throws JocMissingRequiredParameterException, JocConfigurationException, DBConnectionRefusedException,
+            DBInvalidDataException, SOSHibernateException, DBOpenSessionException {
         if (docPath == null || docPath.isEmpty()) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", "documentation"));
         }
-        DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-        String type = getObjectType(connection, jobschedulerId, jsObjectPath, objType);
+        String type = getObjectType(dbLayer.getSession(), jobschedulerId, jsObjectPath, objType);
         DBItemDocumentationUsage dbDocUsage = dbLayer.getDocumentationUsageForAssignment(jobschedulerId, jsObjectPath, type);
         DBItemDocumentation dbDoc = dbLayer.getDocumentation(jobschedulerId, docPath);
         if (dbDocUsage != null) {
             dbDocUsage.setDocumentationId(dbDoc.getId());
             dbDocUsage.setModified(Date.from(Instant.now()));
-            connection.update(dbDocUsage);
+            dbLayer.getSession().update(dbDocUsage);
         } else {
             DBItemDocumentationUsage newUsage = new DBItemDocumentationUsage();
             newUsage.setSchedulerId(jobschedulerId);
@@ -103,7 +109,7 @@ public class Documentation {
             newUsage.setDocumentationId(dbDoc.getId());
             newUsage.setCreated(Date.from(Instant.now()));
             newUsage.setModified(newUsage.getCreated());
-            connection.save(newUsage);
+            dbLayer.getSession().save(newUsage);
         }
     }
 

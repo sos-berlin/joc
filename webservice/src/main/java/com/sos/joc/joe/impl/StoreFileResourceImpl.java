@@ -81,6 +81,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                     item.setModified(Date.from(Instant.now()));
                     item.setAccount(getAccount());
                     if (!isDirectory) {
+                        item.setDocPath(body.getDocPath());
                         if (body.getConfiguration() != null) {
                             item.setConfiguration(Globals.objectMapper.writeValueAsString(XmlSerializer.serialize(body.getConfiguration(),
                                     JOEHelper.CLASS_MAPPING.get(body.getObjectType().value()))));
@@ -98,6 +99,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                 item.setAuditLogId(null);
                 item.setCreated(Date.from(Instant.now()));
                 if (!isDirectory) {
+                    item.setDocPath(body.getDocPath());
                     if (body.getConfiguration() != null) {
                         item.setConfiguration(Globals.objectMapper.writeValueAsString(XmlSerializer.serialize(body.getConfiguration(),
                                 JOEHelper.CLASS_MAPPING.get(body.getObjectType().value()))));
@@ -122,13 +124,7 @@ public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFile
                     //
                 }
             }
-            
-            if (body.getDocPath() != null && !body.getDocPath().isEmpty()) {
-                Documentation.assignDocu(sosHibernateSession, body.getJobschedulerId(), body.getPath(), body.getDocPath(), body.getObjectType());
-            } else {
-                Documentation.unassignDocu(sosHibernateSession, body.getJobschedulerId(), body.getPath(), body.getObjectType());
-            }
-            
+          
             return JOCDefaultResponse.responseStatusJSOk(item.getModified());
 
         } catch (JoeFolderAlreadyLockedException e) {

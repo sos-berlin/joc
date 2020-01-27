@@ -14,6 +14,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
@@ -89,6 +90,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
                 item.setObjectType(body.getObjectType().value());
                 item.setOperation("delete");
                 item.setPath(body.getPath());
+                item.setDocPath(getDocPath(sosHibernateSession, body.getJobschedulerId(), body.getObjectType(), body.getPath()));
                 if ("/".equals(body.getPath())) {
                     item.setFolder(".");
                 } else {
@@ -114,6 +116,18 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.disconnect(sosHibernateSession);
+        }
+    }
+    
+    private String getDocPath(SOSHibernateSession sosHibernateSession, String jobschedulerId, JobSchedulerObjectType type, String path) {
+        try {
+            if(type == JobSchedulerObjectType.FOLDER) {
+                return null;
+            }
+            DocumentationDBLayer dbLayer = new DocumentationDBLayer(sosHibernateSession);
+            return dbLayer.getDocumentationPath(jobschedulerId, type, path);
+        } catch (Exception e) {
+            return null;
         }
     }
 

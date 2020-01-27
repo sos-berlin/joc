@@ -38,6 +38,7 @@ import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.classes.documentation.Documentation;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
@@ -111,6 +112,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             
             DBLayerJoeObjects dbLayerJoeObjects = new DBLayerJoeObjects(sosHibernateSession);
             DBLayerJoeLocks dbLayerJoeLocks = new DBLayerJoeLocks(sosHibernateSession);
+            DocumentationDBLayer dbLayerDocs = new DocumentationDBLayer(sosHibernateSession);
 //            InventoryFilesDBLayer dbLayerInventoryFiles = new InventoryFilesDBLayer(sosHibernateSession);
             FilterJoeObjects filterJoeObjects = new FilterJoeObjects();
             boolean folderDeploy = body.getObjectType() == null || body.getObjectType() == JobSchedulerObjectType.FOLDER;
@@ -271,7 +273,9 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                             touchedFolders.add(joeObject.getFolder());
                             dbLayerJoeObjects.delete(joeObject);
                             try {
-                                Documentation.unassignDocu(sosHibernateSession, body.getJobschedulerId(), joeObject.getPath(), JobSchedulerObjectType.fromValue(objType));
+                                if (joeObject.getDocPath() != null) {
+                                    Documentation.unassignDocu(dbLayerDocs, body.getJobschedulerId(), joeObject.getPath(), JobSchedulerObjectType.fromValue(objType));
+                                }
                             } catch (Exception e) {
                                 LOGGER.warn(String.format("Assigned documentation for %s %s couldn't deleted", objType, joeObject.getPath()), e);
                             }
@@ -402,6 +406,14 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 
                             touchedFolders.add(joeObject.getFolder());
                             dbLayerJoeObjects.delete(joeObject);
+                            try {
+                                if (joeObject.getDocPath() != null) {
+                                    Documentation.assignDocu(dbLayerDocs, body.getJobschedulerId(), joeObject.getPath(), joeObject.getDocPath(),
+                                            JobSchedulerObjectType.fromValue(objType));
+                                }
+                            } catch (Exception e) {
+                                LOGGER.warn(String.format("Documentation for %s %s couldn't assign", objType, joeObject.getPath()), e);
+                            }
                             deployAnswer.getReport().add(getDeployMessage(joeObject.getPath(), jsObjType, false));
                         }
                     }
