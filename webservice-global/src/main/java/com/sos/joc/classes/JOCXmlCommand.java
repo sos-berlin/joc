@@ -306,7 +306,6 @@ public class JOCXmlCommand extends SOSXmlCommand {
                         } else {
                             out = Files.newOutputStream(path);
                         }
-                        LOGGER.info(Instant.now().getEpochSecond()+"");
                         int bufferSize = 4096;
                         boolean logBeginIsFound = false;
                         Pattern logStartPattern = Pattern.compile(".*>\\s*<log [^>]*level\\s*=[^>]*/?>(.*)", Pattern.DOTALL + Pattern.MULTILINE);
@@ -354,7 +353,6 @@ public class JOCXmlCommand extends SOSXmlCommand {
                             }
                         }
                         out.flush();
-                        LOGGER.info(Instant.now().getEpochSecond()+"");
                         if (!logBeginIsFound) {
                             throwJobSchedulerError(new SOSXMLXPath(new StringBuffer(str))); 
                         }
