@@ -55,7 +55,7 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
 
     private static final String API_CALL_JOBS = "./joe/wizard/jobs";
     private static final String API_CALL_JOB = "./joe/wizard/job";
-    private static final String XSL_FILE = "scheduler_job_documentation_v1.1.xsl";
+    private static final String XSL_FILE = "scheduler_job_documentation_fragment_v1.1.xsl";
     private static final Logger LOGGER = LoggerFactory.getLogger(WizardResourceImpl.class);
 
     @Override
@@ -226,8 +226,7 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
             if (note != null) {
                 paramDoc = transform(transformer, XMLBuilder.parse(note.asXML()));
                 if (paramDoc != null) {
-                    paramDoc = paramDoc.replaceFirst("^\\s*<\\?xml[^\\?]+\\?>", "").replaceFirst("^\\s*<!DOCTYPE[^>]+>\\s*", "").replaceAll(
-                            " xmlns=\"http://www.w3.org/1999/xhtml\"", "").replaceAll("\\s+", " ").replaceAll("> <", "><");
+                    paramDoc = paramDoc.replaceAll(" xmlns=\"http://www.w3.org/1999/xhtml\"", "");
                     paramDoc = "<div class=\"jitl-job-param\">" + paramDoc.trim() + "</div>";
                 }
             }

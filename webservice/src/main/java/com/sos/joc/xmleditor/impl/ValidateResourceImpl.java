@@ -30,7 +30,7 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
     @Override
-    public JOCDefaultResponse validate(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, ValidateConfiguration.class);
             ValidateConfiguration in = Globals.objectMapper.readValue(filterBytes, ValidateConfiguration.class);
@@ -42,7 +42,7 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
             if (response == null) {
                 java.nio.file.Path schema = null;
                 if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
+                    schema = JocXmlEditor.getOthersSchema(in.getSchemaIdentifier(), false);
                 } else {
                     schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
                 }

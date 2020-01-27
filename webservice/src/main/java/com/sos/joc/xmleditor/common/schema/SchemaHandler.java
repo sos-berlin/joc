@@ -44,7 +44,7 @@ public class SchemaHandler {
                 if (sourcePath.isAbsolute()) {// C://Temp/xyz.xsd
                     target = JocXmlEditor.copyOthersSchema(sourcePath);
                 } else {// xyz.xsd
-                    target = JocXmlEditor.getOthersAbsoluteSchemaLocation(source);
+                    target = JocXmlEditor.getOthersSchema(source);
                 }
             }
         }

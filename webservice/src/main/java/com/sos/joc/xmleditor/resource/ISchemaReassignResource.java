@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
 
-public interface IReassignSchemaResource {
+public interface ISchemaReassignResource {
 
     public static final String PATH = "schema/reassign";
     public static final String IMPL_PATH = JocXmlEditor.getResourceImplPath(PATH);
@@ -19,6 +19,6 @@ public interface IReassignSchemaResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse reassign(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
+    public JOCDefaultResponse process(@HeaderParam("X-Access-Token") final String accessToken, byte[] in);
 
 }

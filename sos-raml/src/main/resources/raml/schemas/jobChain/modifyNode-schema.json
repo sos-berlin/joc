@@ -5,8 +5,7 @@
   "javaType": "com.sos.joc.model.jobChain.ModifyJobChainNodes",
   "type": "object",
   "required": [
-    "jobschedulerId",
-    "nodes"
+    "jobschedulerId"
   ],
   "properties": {
     "jobschedulerId": {

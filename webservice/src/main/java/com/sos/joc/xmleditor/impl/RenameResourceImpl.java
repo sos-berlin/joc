@@ -25,14 +25,14 @@ import com.sos.schema.JsonValidator;
 public class RenameResourceImpl extends JOCResourceImpl implements IRenameResource {
 
     @Override
-    public JOCDefaultResponse rename(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession session = null;
         try {
             JsonValidator.validateFailFast(filterBytes, RenameConfiguration.class);
             RenameConfiguration in = Globals.objectMapper.readValue(filterBytes, RenameConfiguration.class);
-            
+
             if (in.getObjectType() != null && !in.getObjectType().equals(ObjectType.OTHER)) {
-                throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR_UNSUPPORTED_OBJECT_TYPE, String.format(
+                throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_UNSUPPORTED_OBJECT_TYPE, String.format(
                         "[%s][%s]unsupported object type for rename", in.getJobschedulerId(), in.getObjectType().name())));
             }
             checkRequiredParameters(in);

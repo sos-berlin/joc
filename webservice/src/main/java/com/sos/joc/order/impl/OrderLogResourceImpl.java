@@ -237,7 +237,9 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
     private byte[] setOrderHistoryFilter(String jobschedulerId, String orderId, String jobChain, String historyId, String filename) {
         
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("jobschedulerId", jobschedulerId);
+        if(jobschedulerId != null) {
+            builder.add("jobschedulerId", jobschedulerId);
+        }
         if(historyId != null) {
             builder.add("historyId", historyId);
         }

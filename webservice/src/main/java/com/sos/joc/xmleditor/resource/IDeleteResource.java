@@ -19,6 +19,6 @@ public interface IDeleteResource {
     @Path(PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse delete(@HeaderParam("X-Access-Token") final String accessToken, final byte[] in);
+    public JOCDefaultResponse process(@HeaderParam("X-Access-Token") final String accessToken, final byte[] in);
 
 }

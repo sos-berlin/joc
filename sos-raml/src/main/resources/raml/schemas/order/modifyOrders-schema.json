@@ -4,8 +4,7 @@
   "javaType": "com.sos.joc.model.order.ModifyOrders",
   "type": "object",
   "required": [
-    "jobschedulerId",
-    "orders"
+    "jobschedulerId"
   ],
   "properties": {
     "jobschedulerId": {

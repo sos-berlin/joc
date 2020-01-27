@@ -13,21 +13,22 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
-import com.sos.joc.model.xmleditor.schema.assign.AssignSchemaConfiguration;
-import com.sos.joc.model.xmleditor.schema.assign.AssignSchemaConfigurationAnswer;
+import com.sos.joc.model.xmleditor.schema.SchemaReassignConfiguration;
+import com.sos.joc.model.xmleditor.schema.SchemaReassignConfigurationAnswer;
+import com.sos.joc.xmleditor.common.Xml2JsonConverter;
 import com.sos.joc.xmleditor.common.schema.SchemaHandler;
-import com.sos.joc.xmleditor.resource.IAssignSchemaResource;
+import com.sos.joc.xmleditor.resource.ISchemaReassignResource;
 import com.sos.schema.JsonValidator;
 
 @Path(JocXmlEditor.APPLICATION_PATH)
-public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssignSchemaResource {
+public class SchemaReassignResourceImpl extends JOCResourceImpl implements ISchemaReassignResource {
 
     @Override
-    public JOCDefaultResponse assign(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         try {
-            JsonValidator.validateFailFast(filterBytes, AssignSchemaConfiguration.class);
-            AssignSchemaConfiguration in = Globals.objectMapper.readValue(filterBytes, AssignSchemaConfiguration.class);
-            
+            JsonValidator.validateFailFast(filterBytes, SchemaReassignConfiguration.class);
+            SchemaReassignConfiguration in = Globals.objectMapper.readValue(filterBytes, SchemaReassignConfiguration.class);
+
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
@@ -43,8 +44,9 @@ public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssign
         }
     }
 
-    private void checkRequiredParameters(final AssignSchemaConfiguration in) throws Exception {
+    private void checkRequiredParameters(final SchemaReassignConfiguration in) throws Exception {
         checkRequiredParameter("jobschedulerId", in.getJobschedulerId());
+        checkRequiredParameter("configuration", in.getConfiguration());
         JocXmlEditor.checkRequiredParameter("objectType", in.getObjectType());
         if (in.getUri() == null) {
             if (in.getFileName() == null || in.getFileContent() == null) {
@@ -53,7 +55,7 @@ public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssign
         }
     }
 
-    private JOCDefaultResponse checkPermissions(final String accessToken, final AssignSchemaConfiguration in) throws Exception {
+    private JOCDefaultResponse checkPermissions(final String accessToken, final SchemaReassignConfiguration in) throws Exception {
         SOSPermissionJocCockpit permissions = getPermissonsJocCockpit(in.getJobschedulerId(), accessToken);
         boolean permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
         JOCDefaultResponse response = init(IMPL_PATH, in, accessToken, in.getJobschedulerId(), permission);
@@ -65,17 +67,23 @@ public class AssignSchemaResourceImpl extends JOCResourceImpl implements IAssign
         return response;
     }
 
-    private AssignSchemaConfigurationAnswer getSuccess(final AssignSchemaConfiguration in) throws Exception {
+    private SchemaReassignConfigurationAnswer getSuccess(final SchemaReassignConfiguration in) throws Exception {
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             SchemaHandler h = new SchemaHandler();
             h.process(in.getUri(), in.getFileName(), in.getFileContent());
             if (Files.exists(h.getTarget())) {
+                JocXmlEditor.parseXml(in.getConfiguration());
                 String schema = JocXmlEditor.getFileContent(h.getTarget());
                 JocXmlEditor.parseXml(schema);
 
-                AssignSchemaConfigurationAnswer answer = new AssignSchemaConfigurationAnswer();
+                Xml2JsonConverter converter = new Xml2JsonConverter();
+                String configurationJson = converter.convert(in.getObjectType(), h.getTarget(), in.getConfiguration());
+
+                SchemaReassignConfigurationAnswer answer = new SchemaReassignConfigurationAnswer();
                 answer.setSchema(schema);
                 answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(h.getSource()));
+                answer.setConfigurationJson(configurationJson);
+                answer.setRecreateJson(true);
                 return answer;
             } else {
                 throw new Exception(String.format("[%s][target=%s]target file not found", h.getSource(), h.getTarget()));

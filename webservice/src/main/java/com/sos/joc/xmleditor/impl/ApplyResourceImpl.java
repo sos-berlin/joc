@@ -36,12 +36,12 @@ public class ApplyResourceImpl extends JOCResourceImpl implements IApplyResource
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse apply(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
         SOSHibernateSession session = null;
         try {
             JsonValidator.validateFailFast(filterBytes, ApplyConfiguration.class);
             ApplyConfiguration in = Globals.objectMapper.readValue(filterBytes, ApplyConfiguration.class);
-            
+
             // TODO check folder permissions
             checkRequiredParameters(in);
 
@@ -97,7 +97,7 @@ public class ApplyResourceImpl extends JOCResourceImpl implements IApplyResource
         if (validate) {
             java.nio.file.Path schema = null;
             if (in.getObjectType().equals(ObjectType.OTHER)) {
-                schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
+                schema = JocXmlEditor.getOthersSchema(in.getSchemaIdentifier(), false);
             } else {
                 schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
             }
@@ -145,7 +145,7 @@ public class ApplyResourceImpl extends JOCResourceImpl implements IApplyResource
     private String convertXml2Json(ApplyConfiguration in) throws Exception {
         java.nio.file.Path schema = null;
         if (in.getObjectType().equals(ObjectType.OTHER)) {
-            schema = JocXmlEditor.getOthersSchemaFile(in.getSchemaIdentifier(), false);
+            schema = JocXmlEditor.getOthersSchema(in.getSchemaIdentifier(), false);
         } else {
             schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
         }
