@@ -1,5 +1,7 @@
 package com.sos.joc.classes;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 
@@ -95,8 +97,13 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
 
     public static JOCDefaultResponse responseOctetStreamDownloadStatus200(Object entity, String filename, Long uncompressedLength) {
+        try {
+            filename = URLEncoder.encode(filename, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+        }
         Response.ResponseBuilder responseBuilder = Response.ok(entity, MediaType.APPLICATION_OCTET_STREAM).header("Content-Disposition",
-                "attachment; filename=\"" + filename + "\"").cacheControl(setNoCaching());
+                "attachment; filename*=UTF-8''" + filename).cacheControl(setNoCaching());
+
         if (uncompressedLength != null) {
             responseBuilder.header("X-Uncompressed-Length", uncompressedLength);
         }

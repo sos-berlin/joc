@@ -3,6 +3,8 @@ package com.sos.joc.xmleditor.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 
 import javax.json.Json;
@@ -41,7 +43,7 @@ public class SchemaDownloadResourceImpl extends JOCResourceImpl implements ISche
             builder.add("show", show == null ? false : Boolean.parseBoolean(show));
 
             if (schemaIdentifier != null) {
-                builder.add("schemaIdentifier", schemaIdentifier);
+                builder.add("schemaIdentifier", URLDecoder.decode(schemaIdentifier, JocXmlEditor.CHARSET));
             }
             String json = builder.build().toString();
 
