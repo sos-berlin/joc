@@ -143,7 +143,7 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
             jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         }
         try {
-            String response = putRestService(uri, body);
+            String response = putByteArrayRestService(uri, body.getBytes());
             checkResponse(response, uri, jocError);
         } catch (SOSConnectionResetException e) {
             if (isForcedClosingHttpClient()) {
