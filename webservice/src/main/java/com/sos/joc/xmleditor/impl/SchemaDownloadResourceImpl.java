@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -24,10 +26,27 @@ import com.sos.schema.JsonValidator;
 public class SchemaDownloadResourceImpl extends JOCResourceImpl implements ISchemaDownloadResource {
 
     @Override
-    public JOCDefaultResponse process(final String accessToken, final byte[] filterBytes) {
+    public JOCDefaultResponse process(final String xAccessToken, String accessToken, String jobschedulerId, String objectType, String show,
+            String schemaIdentifier) {
         try {
-            JsonValidator.validateFailFast(filterBytes, SchemaDownloadConfiguration.class);
-            SchemaDownloadConfiguration in = Globals.objectMapper.readValue(filterBytes, SchemaDownloadConfiguration.class);
+            accessToken = getAccessToken(xAccessToken, accessToken);
+
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            if (jobschedulerId != null) {
+                builder.add("jobschedulerId", jobschedulerId);
+            }
+            if (objectType != null) {
+                builder.add("objectType", objectType);
+            }
+            builder.add("show", show == null ? false : Boolean.parseBoolean(show));
+
+            if (schemaIdentifier != null) {
+                builder.add("schemaIdentifier", schemaIdentifier);
+            }
+            String json = builder.build().toString();
+
+            JsonValidator.validateFailFast(json.getBytes(), SchemaDownloadConfiguration.class);
+            SchemaDownloadConfiguration in = Globals.objectMapper.readValue(json.getBytes(), SchemaDownloadConfiguration.class);
 
             checkRequiredParameters(in);
 
@@ -106,6 +125,10 @@ public class SchemaDownloadResourceImpl extends JOCResourceImpl implements ISche
                 }
             }
         };
-        return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, path.getFileName().toString());
+        if (in.getShow()) {
+            return JOCDefaultResponse.responsePlainStatus200(fileStream);
+        } else {
+            return JOCDefaultResponse.responseOctetStreamDownloadStatus200(fileStream, path.getFileName().toString());
+        }
     }
 }
