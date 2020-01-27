@@ -153,6 +153,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             jsObjectEdit.setObjectType(body.getObjectType());
             jsObjectEdit.setDeliveryDate(Date.from(Instant.now()));
             jsObjectEdit.setDocPath(getDocPath(sosHibernateSession, body.getJobschedulerId(), body.getObjectType(), path, dbItemJoeObject));
+            jsObjectEdit.setIsJitlJob(jsObjectEdit.getDocPath() != null && jsObjectEdit.getDocPath().startsWith("/sos/jitl-jobs"));
 
             return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(jsObjectEdit));
 

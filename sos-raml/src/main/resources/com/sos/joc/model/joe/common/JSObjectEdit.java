@@ -40,7 +40,7 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({ "deliveryDate", "configurationDate", "jobschedulerId", "path", "oldPath", "objectType", "objectVersionStatus", "configuration",
-        "account", "docPath", "auditLog" })
+        "account", "docPath", "auditLog", "isJitlJob" })
 public class JSObjectEdit {
 
     /** delivery date
@@ -87,6 +87,8 @@ public class JSObjectEdit {
     */
     @JsonProperty("auditLog")
     private AuditParams auditLog;
+    @JsonProperty("isJitlJob")
+    private Boolean isJitlJob = false;
 
     /** delivery date
      * <p>
@@ -279,6 +281,16 @@ public class JSObjectEdit {
     public void setAuditLog(AuditParams auditLog) {
         this.auditLog = auditLog;
     }
+    
+    @JsonProperty("isJitlJob")
+    public Boolean getIsJitlJob() {
+        return isJitlJob;
+    }
+    
+    @JsonProperty("isJitlJob")
+    public void setIsJitlJob(Boolean isJitlJob) {
+        this.isJitlJob = isJitlJob;
+    }
 
     @SuppressWarnings({ "unchecked" })
     @JsonIgnore
@@ -299,7 +311,8 @@ public class JSObjectEdit {
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(deliveryDate).append(configurationDate).append(jobschedulerId).append(path).append(oldPath).append(
-                objectType).append(objectVersionStatus).append(configuration).append(docPath).append(account).append(auditLog).toHashCode();
+                objectType).append(objectVersionStatus).append(configuration).append(docPath).append(isJitlJob).append(account).append(auditLog)
+                .toHashCode();
     }
 
     @Override
@@ -313,8 +326,8 @@ public class JSObjectEdit {
         JSObjectEdit rhs = ((JSObjectEdit) other);
         return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(configurationDate, rhs.configurationDate).append(jobschedulerId,
                 rhs.jobschedulerId).append(path, rhs.path).append(oldPath, rhs.oldPath).append(objectType, rhs.objectType).append(objectVersionStatus,
-                        rhs.objectVersionStatus).append(configuration, rhs.configuration).append(docPath, rhs.docPath).append(account, rhs.account)
-                .append(auditLog, rhs.auditLog).isEquals();
+                        rhs.objectVersionStatus).append(configuration, rhs.configuration).append(docPath, rhs.docPath).append(isJitlJob,
+                                rhs.isJitlJob).append(account, rhs.account).append(auditLog, rhs.auditLog).isEquals();
     }
 
 }

@@ -45,6 +45,10 @@
     },
     "auditLog": {
     	"$ref": "../../audit/auditParams-schema.json"
+    },
+    "isJitlJob": {
+    	"type": "boolean",
+    	"default": false
     }
   }
 }
