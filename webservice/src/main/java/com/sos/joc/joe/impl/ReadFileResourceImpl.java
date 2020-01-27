@@ -17,13 +17,17 @@ import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.documentation.Documentation;
+import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.resource.IReadFileResource;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.EmptyConfiguration;
 import com.sos.joc.model.joe.common.Filter;
 import com.sos.joc.model.joe.common.IJSObject;
@@ -151,7 +155,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             jsObjectEdit.setPath(path);
             jsObjectEdit.setObjectType(body.getObjectType());
             jsObjectEdit.setDeliveryDate(Date.from(Instant.now()));
-            jsObjectEdit.setDocPath(Documentation.getDocumentationPath(sosHibernateSession, body.getJobschedulerId(), path, body.getObjectType()));
+            jsObjectEdit.setDocPath(getDocPath(sosHibernateSession, body.getJobschedulerId(), body.getObjectType(), path));
 
             return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(jsObjectEdit));
 
@@ -162,6 +166,15 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.disconnect(sosHibernateSession);
+        }
+    }
+    
+    private String getDocPath(SOSHibernateSession sosHibernateSession, String jobschedulerId, JobSchedulerObjectType type, String path) {
+        try {
+            DocumentationDBLayer dbLayer = new DocumentationDBLayer(sosHibernateSession);
+            return dbLayer.getDocumentationPath(jobschedulerId, type, path);
+        } catch (Exception e) {
+            return null;
         }
     }
 
