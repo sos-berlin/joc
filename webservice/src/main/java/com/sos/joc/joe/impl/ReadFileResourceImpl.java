@@ -152,7 +152,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             jsObjectEdit.setPath(path);
             jsObjectEdit.setObjectType(body.getObjectType());
             jsObjectEdit.setDeliveryDate(Date.from(Instant.now()));
-            jsObjectEdit.setDocPath(getDocPath(sosHibernateSession, body.getJobschedulerId(), body.getObjectType(), path));
+            jsObjectEdit.setDocPath(getDocPath(sosHibernateSession, body.getJobschedulerId(), body.getObjectType(), path, dbItemJoeObject));
 
             return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(jsObjectEdit));
 
@@ -166,8 +166,12 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
         }
     }
     
-    private String getDocPath(SOSHibernateSession sosHibernateSession, String jobschedulerId, JobSchedulerObjectType type, String path) {
+    private String getDocPath(SOSHibernateSession sosHibernateSession, String jobschedulerId, JobSchedulerObjectType type, String path,
+            DBItemJoeObject dbItemJoeObject) {
         try {
+            if (dbItemJoeObject != null && dbItemJoeObject.getDocPath() != null) {
+                return dbItemJoeObject.getDocPath();
+            }
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(sosHibernateSession);
             return dbLayer.getDocumentationPath(jobschedulerId, type, path);
         } catch (Exception e) {
