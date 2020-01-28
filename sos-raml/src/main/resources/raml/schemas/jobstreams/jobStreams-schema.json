@@ -4,9 +4,6 @@
 	"description": "List of all jobStreams and their folders",
 	"javaType": "com.sos.joc.model.jobstreams.JobStreams",
 	"type": "object",
-	"required": [
-		"jobschedulerId"
-	],
 	"properties": {
 		"deliveryDate": {
 			"$ref": "../common/deliveryDate-schema.json"
