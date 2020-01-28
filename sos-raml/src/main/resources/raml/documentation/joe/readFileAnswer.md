@@ -5,7 +5,9 @@
     * deployed
     * configurationDate
     * configuration
-
+* Optional Fields
+    * docPath
+    * isJitlJob
 The configuration contains the JobScheduler Object in JSON representation
 * <a href="../../../../../raml/schemas/joe/job/job-schema.json" target="job">job JSON schema</a> 
 * <a href="../../../../../raml/schemas/joe/jobChain/jobChain-schema.json" target="jobchain">job chain JSON schema</a>

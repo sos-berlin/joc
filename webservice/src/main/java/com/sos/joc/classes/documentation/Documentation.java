@@ -85,7 +85,7 @@ public class Documentation {
             JobSchedulerObjectType objType) throws JocMissingRequiredParameterException, JocConfigurationException, DBConnectionRefusedException,
             DBInvalidDataException, SOSHibernateException, DBOpenSessionException {
         DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
-        unassignDocu(dbLayer, jobschedulerId, jsObjectPath, objType);
+        assignDocu(dbLayer, jobschedulerId, jsObjectPath, docPath, objType);
     }
     
     public static void assignDocu(DocumentationDBLayer dbLayer, String jobschedulerId, String jsObjectPath, String docPath,
