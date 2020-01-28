@@ -119,8 +119,10 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                                 jobPaths.add(job.getJob());
                             }
                         }
-                        JobsVCallable callable = new JobsVCallable(jobPaths, jobsFilter, command, accessToken, summary);
-                        listJobs.putAll(callable.call());
+                        if (!jobPaths.isEmpty()) {
+                            JobsVCallable callable = new JobsVCallable(jobPaths, jobsFilter, command, accessToken, summary);
+                            listJobs.putAll(callable.call());
+                        }
                     }
                 } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                     // no permission
