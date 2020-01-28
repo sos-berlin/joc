@@ -98,7 +98,7 @@ public class JsonValidator {
             put("ScheduleConfigurationFilter", "schedule/scheduleConfigurationFilter-schema.json");
             put("ScheduleDocuFilter", "schedule/scheduleDocuFilter-schema.json");
             put("ScheduleFilter", "schedule/scheduleFilter-schema.json");
-            put("ModifyRunTime", "schedule/modifyRunTime-schema.json");
+            put("ModifyRunTime", "schedule/modifyRuntime-schema.json");
             put("SchedulesFilter", "schedule/schedulesFilter-schema.json");
             
             put("OrderConfigurationFilter", "order/orderConfigurationFilter-schema.json");
