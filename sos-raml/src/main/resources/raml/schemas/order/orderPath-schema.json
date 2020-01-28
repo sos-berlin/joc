@@ -12,7 +12,7 @@
     },
     "orderId": {
       "description": "if orderId undefined or empty then all orders of specified job chain are requested",
-      "$ref": "../common/filename255-schema.json"
+      "$ref": "../common/string255-schema.json"
     }
   }
 }
