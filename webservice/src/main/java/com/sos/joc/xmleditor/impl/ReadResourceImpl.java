@@ -28,6 +28,7 @@ import com.sos.joc.model.xmleditor.read.ReadConfiguration;
 import com.sos.joc.model.xmleditor.read.other.AnswerConfiguration;
 import com.sos.joc.model.xmleditor.read.other.ReadOtherConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
+import com.sos.joc.xmleditor.common.Xml2JsonConverter;
 import com.sos.joc.xmleditor.common.standard.ReadConfigurationHandler;
 import com.sos.joc.xmleditor.resource.IReadResource;
 import com.sos.schema.JsonValidator;
@@ -147,15 +148,27 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             if (item == null) {
                 throw new JocException(new JocError(JocXmlEditor.CODE_NO_CONFIGURATION_EXIST, String.format("[%s][%s][%s]no configuration found", in
                         .getJobschedulerId(), in.getObjectType().name(), in.getId())));
-            } else {
-                answer.getConfiguration().setId(item.getId().intValue());
-                answer.getConfiguration().setName(item.getName());
-                answer.getConfiguration().setSchema(JocXmlEditor.readOthersSchema(item.getSchemaLocation()));
-                answer.getConfiguration().setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(item.getSchemaLocation()));
-                answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
-                answer.getConfiguration().setConfigurationJson(item.getConfigurationDraftJson());
-                answer.getConfiguration().setModified(item.getModified());
             }
+            answer.getConfiguration().setId(item.getId().intValue());
+            answer.getConfiguration().setName(item.getName());
+            answer.getConfiguration().setSchema(JocXmlEditor.readOthersSchema(item.getSchemaLocation()));
+            answer.getConfiguration().setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(item.getSchemaLocation()));
+            answer.getConfiguration().setConfiguration(item.getConfigurationDraft());
+            if (item.getConfigurationDraftJson() == null) {
+                if (item.getConfigurationDraft() == null) {
+                    answer.getConfiguration().setRecreateJson(false);
+                } else {
+                    answer.getConfiguration().setRecreateJson(true);
+                    Xml2JsonConverter converter = new Xml2JsonConverter();
+                    answer.getConfiguration().setConfigurationJson(converter.convert(ObjectType.OTHER, JocXmlEditor.getOthersSchema(item
+                            .getSchemaLocation(), false), item.getConfigurationDraft()));
+                }
+            } else {
+                answer.getConfiguration().setRecreateJson(false);
+                answer.getConfiguration().setConfigurationJson(item.getConfigurationDraftJson());
+            }
+            answer.getConfiguration().setModified(item.getModified());
+
         }
         return answer;
     }
