@@ -14,7 +14,6 @@ import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
-import com.sos.joc.model.job.JobCriticalityFilter;
 import com.sos.joc.model.job.JobP;
 import com.sos.joc.model.job.LockUseP;
 

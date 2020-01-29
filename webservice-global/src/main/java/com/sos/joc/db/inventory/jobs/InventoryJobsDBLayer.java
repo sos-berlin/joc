@@ -72,7 +72,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (criticality != null && criticality.size() > 0) {
                 sql.append( " and (");
                 for (JobCriticalityFilter criticalityEntry : criticality) {
-                    sql.append( "criticality='" + criticalityEntry.toString() + "' or");
+                    sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or");
                 }
                 sql.append(" 1=0) ");
             }
@@ -212,7 +212,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (criticality != null && criticality.size() > 0) {
                 sql.append( " and (");
                 for (JobCriticalityFilter criticalityEntry : criticality) {
-                    sql.append( "criticality='" + criticalityEntry.toString() + "' or");
+                    sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or");
                 }
                 sql.append(" 1=0) ");
             }
@@ -251,7 +251,7 @@ public class InventoryJobsDBLayer extends DBLayer {
                 if (criticality != null && criticality.size() > 0) {
                     sql.append( " and (");
                     for (JobCriticalityFilter criticalityEntry : criticality) {
-                        sql.append( "criticality='" + criticalityEntry.toString() + "' or");
+                        sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or");
                     }
                     sql.append(" 1=0) ");
                 }
@@ -269,7 +269,7 @@ public class InventoryJobsDBLayer extends DBLayer {
                 if (criticality != null && criticality.size() > 0) {
                     sql.append( " and (");
                     for (JobCriticalityFilter criticalityEntry : criticality) {
-                        sql.append( "criticality='" + criticalityEntry.toString() + "' or");
+                        sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or");
                     }
                     sql.append(" 1=0) ");
                 }

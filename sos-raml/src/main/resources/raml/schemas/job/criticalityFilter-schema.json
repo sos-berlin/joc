@@ -5,8 +5,8 @@
   "type": "string",
   "description" : "Criticality of a job",
   "enum": [
-    "normal",
-    "minor",
-    "major"
+    "NORMAL",
+    "MINOR",
+    "MAJOR"
   ]
 }

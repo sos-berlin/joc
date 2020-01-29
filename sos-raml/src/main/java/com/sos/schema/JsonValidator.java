@@ -33,8 +33,8 @@ public class JsonValidator {
     private static final SpecVersion.VersionFlag JSONDRAFT = SpecVersion.VersionFlag.V4;
     // private static final Path RESOURCE_DIR = Paths.get("classpath:raml/schema", "schemas");
     private static final List<NonValidationKeyword> NON_VALIDATION_KEYS = Arrays.asList(new NonValidationKeyword("javaType"),
-            new NonValidationKeyword("javaInterfaces"), new NonValidationKeyword("extends"), new NonValidationKeyword("xmlElement"),
-            new NonValidationKeyword("isXmlCData"), new NonValidationKeyword("isXmlAttribute"));
+            new NonValidationKeyword("javaInterfaces"), new NonValidationKeyword("javaEnumNames"), new NonValidationKeyword("extends"),
+            new NonValidationKeyword("xmlElement"), new NonValidationKeyword("isXmlCData"), new NonValidationKeyword("isXmlAttribute"));
     private static final JsonSchemaFactory FACTORY_V4 = JsonSchemaFactory.builder(JsonSchemaFactory.getInstance(JSONDRAFT)).addMetaSchema(
             JsonMetaSchema.builder(JsonMetaSchema.getV4().getUri(), JsonMetaSchema.getV4()).addKeywords(NON_VALIDATION_KEYS).build()).build();
 

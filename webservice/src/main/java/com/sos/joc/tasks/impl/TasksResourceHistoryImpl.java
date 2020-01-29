@@ -99,7 +99,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
                     if (jobsFilter.getCriticality().size() > 0) {
                         for (JobCriticalityFilter criticality : jobsFilter.getCriticality()) {
-                            reportTaskExecutionsDBLayer.getFilter().addCriticality(criticality.toString());
+                            reportTaskExecutionsDBLayer.getFilter().addCriticality(criticality.value().toLowerCase());
                         }
                     }
 
