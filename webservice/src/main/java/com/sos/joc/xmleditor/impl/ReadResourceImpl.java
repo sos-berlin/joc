@@ -23,9 +23,12 @@ import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
+import com.sos.joc.model.xmleditor.common.ObjectVersionState;
 import com.sos.joc.model.xmleditor.read.ReadConfiguration;
 import com.sos.joc.model.xmleditor.read.other.AnswerConfiguration;
+import com.sos.joc.model.xmleditor.read.other.AnswerConfigurationState;
 import com.sos.joc.model.xmleditor.read.other.ReadOtherConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
 import com.sos.joc.xmleditor.common.Xml2JsonConverter;
@@ -167,6 +170,13 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
                 answer.getConfiguration().setRecreateJson(false);
                 answer.getConfiguration().setConfigurationJson(item.getConfigurationDraftJson());
             }
+            answer.getConfiguration().setState(new AnswerConfigurationState());
+            answer.getConfiguration().getState().setMessage(new AnswerMessage());
+            answer.getConfiguration().getState().setDeployed(false);
+            answer.getConfiguration().getState().getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_NOT_EXIST);
+            answer.getConfiguration().getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
+            answer.getConfiguration().getState().setVersionState(ObjectVersionState.LIVE_NOT_EXIST);
+
             answer.getConfiguration().setModified(item.getModified());
 
         }

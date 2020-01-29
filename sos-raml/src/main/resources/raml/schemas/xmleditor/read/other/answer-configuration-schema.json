@@ -29,6 +29,9 @@
 		"recreateJson": {
 			"type": "boolean"
 		},
+		"state": {
+			"$ref": "answer-configuration-state-schema.json"
+		},
 		"modified": {
 			"$ref": "../../../common/timestamp-schema.json"
 		}
