@@ -72,9 +72,9 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (criticality != null && criticality.size() > 0) {
                 sql.append( " and (");
                 for (JobCriticalityFilter criticalityEntry : criticality) {
-                    sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or");
+                    sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or ");
                 }
-                sql.append(" 1=0) ");
+                sql.append("1=0) ");
             }
 
             Query<DBItemInventoryJob> query = getSession().createQuery(sql.toString());
@@ -212,9 +212,9 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (criticality != null && criticality.size() > 0) {
                 sql.append( " and (");
                 for (JobCriticalityFilter criticalityEntry : criticality) {
-                    sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or");
+                    sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or ");
                 }
-                sql.append(" 1=0) ");
+                sql.append("1=0) ");
             }
 
             sql.append(" and instanceId = :instanceId");
@@ -251,9 +251,9 @@ public class InventoryJobsDBLayer extends DBLayer {
                 if (criticality != null && criticality.size() > 0) {
                     sql.append( " and (");
                     for (JobCriticalityFilter criticalityEntry : criticality) {
-                        sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or");
+                        sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or ");
                     }
-                    sql.append(" 1=0) ");
+                    sql.append("1=0) ");
                 }
 
             } else {
@@ -269,9 +269,9 @@ public class InventoryJobsDBLayer extends DBLayer {
                 if (criticality != null && criticality.size() > 0) {
                     sql.append( " and (");
                     for (JobCriticalityFilter criticalityEntry : criticality) {
-                        sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or");
+                        sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or ");
                     }
-                    sql.append(" 1=0) ");
+                    sql.append("1=0) ");
                 }
 
             }
