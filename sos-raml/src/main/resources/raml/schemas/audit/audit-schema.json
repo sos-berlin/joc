@@ -31,16 +31,16 @@
       "type": "string"
     },
     "job": {
-      "$ref": "../common/path-schema.json"
+      "$ref": "../common/string255-schema.json"
     },
     "jobChain": {
-      "$ref": "../common/path-schema.json"
+      "$ref": "../common/string255-schema.json"
     },
     "orderId": {
       "$ref": "../common/string255-schema.json"
     },
     "calendar": {
-      "$ref": "../common/path-schema.json"
+      "$ref": "../common/string255-schema.json"
     },
     "timeSpent": {
       "description": "in minutes",

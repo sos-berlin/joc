@@ -43,13 +43,13 @@ public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
         setToDelete(operationIsDelete);
         switch (filter.getObjectType()) {
         case JOB:
-            this.job = filter.getFolder() + "/" + filter.getObjectName();
+            this.job = (filter.getFolder() + "/" + filter.getObjectName()).replaceAll("//+", "/");
             break;
         case JOBCHAIN:
-            this.jobChain = filter.getFolder() + "/" + filter.getObjectName();
+            this.jobChain = (filter.getFolder() + "/" + filter.getObjectName()).replaceAll("//+", "/");
             break;
         case ORDER:
-            this.order = filter.getFolder() + "/" + filter.getObjectName();
+            this.order = (filter.getFolder() + "/" + filter.getObjectName()).replaceAll("//+", "/");
             break;
         default:
             break;
