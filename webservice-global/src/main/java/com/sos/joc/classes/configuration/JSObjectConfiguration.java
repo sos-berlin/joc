@@ -6,11 +6,15 @@ import java.util.Date;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.order.ModifyOrder;
 
 import sos.xml.SOSXMLXPath;
@@ -18,6 +22,7 @@ import sos.xml.SOSXMLXPath;
 public class JSObjectConfiguration {
 
     private String accessToken;
+    private boolean getSourceWithXMLCommand = true;
 
     public JSObjectConfiguration() {
     }
@@ -26,20 +31,53 @@ public class JSObjectConfiguration {
         this.accessToken = accessToken;
     }
 
-    public Configuration200 getOrderConfiguration(JOCResourceImpl jocResourceImpl, String jobChain, String orderId, boolean responseInHtml) throws JocException {
+    public JSObjectConfiguration(String accessToken, boolean getSourceWithXMLCommand) {
+        this.accessToken = accessToken;
+        this.getSourceWithXMLCommand = getSourceWithXMLCommand;
+    }
+
+    public Configuration200 getOrderConfiguration(JOCResourceImpl jocResourceImpl, String jobChain, String orderId, boolean responseInHtml)
+            throws JocException {
         Configuration200 entity = new Configuration200();
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
-        String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
-        entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order", responseInHtml, accessToken));
+        if (getSourceWithXMLCommand) {
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
+            String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
+            entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order",
+                    responseInHtml, accessToken));
+        } else {
+            try {
+                entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(new JOCHotFolder(jocResourceImpl), jobChain + "," + orderId,
+                        JobSchedulerObjectType.ORDER, responseInHtml));
+            } catch (JobSchedulerObjectNotExistException e) {
+                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
+                String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
+                entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order",
+                        responseInHtml, accessToken));
+            }
+        }
         entity.setDeliveryDate(Date.from(Instant.now()));
         return entity;
     }
 
     public Configuration200 getJobConfiguration(JOCResourceImpl jocResourceImpl, String job, boolean responseInHtml) throws JocException {
         Configuration200 entity = new Configuration200();
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
-        String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
-        entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml, accessToken));
+
+        if (getSourceWithXMLCommand) {
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
+            String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
+            entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml,
+                    accessToken));
+        } else {
+            try {
+                entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(new JOCHotFolder(jocResourceImpl), job, JobSchedulerObjectType.JOB,
+                        responseInHtml));
+            } catch (JobSchedulerObjectNotExistException e) {
+                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
+                String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
+                entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml,
+                        accessToken));
+            }
+        }
         entity.setDeliveryDate(Date.from(Instant.now()));
         return entity;
     }
@@ -58,7 +96,7 @@ public class JSObjectConfiguration {
             }
             String nestedChain = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/order/@path", null);
             if (nestedChain != null && nestedChain.contains(",")) {
-                nestedChain = nestedChain.split(",", 2)[0]; 
+                nestedChain = nestedChain.split(",", 2)[0];
             } else {
                 nestedChain = jobChain;
             }
@@ -179,11 +217,11 @@ public class JSObjectConfiguration {
             throw new JobSchedulerBadRequestException(e);
         }
     }
-    
+
     private Element cleanEmptyCalendarDates(SOSXMLXPath runTime) throws Exception {
         Element runTimeElement = runTime.getRoot();
         NodeList emptyDates = runTime.selectNodeList("date[not(period)]");
-        for (int i=0; i < emptyDates.getLength(); i++) {
+        for (int i = 0; i < emptyDates.getLength(); i++) {
             Node textNode = emptyDates.item(i).getPreviousSibling();
             if (textNode != null && textNode.getNodeType() == Node.TEXT_NODE) {
                 runTimeElement.removeChild(textNode);

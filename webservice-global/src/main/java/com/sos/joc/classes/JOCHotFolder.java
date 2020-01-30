@@ -2,6 +2,7 @@ package com.sos.joc.classes;
 
 import java.io.StringReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -145,7 +146,7 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
         try {
             String response = null;
             if (body != null) {
-                response = putByteArrayRestService(uri, body.getBytes());
+                response = putByteArrayRestService(uri, body.getBytes(StandardCharsets.ISO_8859_1));
             } else {
                 response = putByteArrayRestService(uri, null);
             }

@@ -34,7 +34,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
 			Configuration200 entity = new Configuration200();
 			if (checkRequiredParameter("orderId", orderBody.getOrderId())
 					&& checkRequiredParameter("jobChain", orderBody.getJobChain())) {
-				JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(accessToken);
+				JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(accessToken, versionIsOlderThan("1.13.1"));
 				boolean responseInHtml = orderBody.getMime() == ConfigurationMime.HTML;
 				entity = jocConfiguration.getOrderConfiguration(this, orderBody.getJobChain(), orderBody.getOrderId(),
 						responseInHtml);
