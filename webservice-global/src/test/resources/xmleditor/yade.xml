@@ -2,7 +2,43 @@
 <Configurations>
 	<Fragments>
 		<ProtocolFragments>
-			<FTPFragment name="my_server">
+			<FTPFragment name="my_server_1">
+				<BasicConnection>
+					<Hostname>
+          		<![CDATA[cs://yade/FTP/ftp_server@url]]>
+					</Hostname>
+				</BasicConnection>
+				<BasicAuthentication>
+					<Account>
+					<![CDATA[cs://yade/FTP/ftp_server@user]]>
+					</Account>
+					<Password>
+					<![CDATA[cs://yade/FTP/ftp_server@password]]>
+					</Password>
+				</BasicAuthentication>
+				<CredentialStoreFragmentRef
+					ref="yade_credential_store" />
+				<PassiveMode>true</PassiveMode>
+			</FTPFragment>
+			<FTPFragment name="my_server_1">
+				<BasicConnection>
+					<Hostname>
+          		<![CDATA[cs://yade/FTP/ftp_server@url]]>
+					</Hostname>
+				</BasicConnection>
+				<BasicAuthentication>
+					<Account>
+					<![CDATA[cs://yade/FTP/ftp_server@user]]>
+					</Account>
+					<Password>
+					<![CDATA[cs://yade/FTP/ftp_server@password]]>
+					</Password>
+				</BasicAuthentication>
+				<CredentialStoreFragmentRef
+					ref="yade_credential_storex" />
+				<PassiveMode>true</PassiveMode>
+			</FTPFragment>
+			<FTPFragment name="my_server_3">
 				<BasicConnection>
 					<Hostname>
           		<![CDATA[cs://yade/FTP/ftp_server@url]]>

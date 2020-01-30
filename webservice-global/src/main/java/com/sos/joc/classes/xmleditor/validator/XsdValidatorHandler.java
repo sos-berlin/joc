@@ -72,6 +72,7 @@ public class XsdValidatorHandler extends DefaultHandler {
                 }
             }
         }
+
         handleError();
     }
 
@@ -130,19 +131,22 @@ public class XsdValidatorHandler extends DefaultHandler {
                 if (msg.startsWith("cvc-identity-constraint")) {
                     // xs:key -> xs:keyref issue, try to find the KeyRef element position
 
-                    // Message, e.g.:
-                    // cvc-identity-constraint.4.3: Key 'CredentialStoreFragmentKeyRef' with value 'yade_credential_storex' not found for identity constraint of
-                    // element 'Configurations'.
-                    List<String> l = Arrays.asList(msg.split(" ")).stream().filter(x -> x.startsWith("'")).collect(Collectors.toList());
-                    if (l.size() == 3) {
-                        String key = l.get(1).replaceAll("'", "");
-                        if (refElements.containsKey(key)) {
-                            String[] arr = refElements.get(key).split(REF_DELIMITER);
-                            String position = arr[1];
-                            throw new XsdValidatorException(error, arr[0], position, position.split(PATH_DELIMITER).length);
+                    // TODO check cvc-identity-constraint code?
+                    if (msg.toLowerCase().contains("not found for identity")) {
+                        // Message, e.g.:
+                        // cvc-identity-constraint.4.3: Key 'CredentialStoreFragmentKeyRef' with value 'yade_credential_storex' not found for identity
+                        // constraint of
+                        // element 'Configurations'.
+                        List<String> l = Arrays.asList(msg.split(" ")).stream().filter(x -> x.startsWith("'")).collect(Collectors.toList());
+                        if (l.size() == 3) {
+                            String key = l.get(1).replaceAll("'", "");
+                            if (refElements.containsKey(key)) {
+                                String[] arr = refElements.get(key).split(REF_DELIMITER);
+                                String position = arr[1];
+                                throw new XsdValidatorException(error, arr[0], position, position.split(PATH_DELIMITER).length);
+                            }
                         }
                     }
-                    throw new XsdValidatorException(error, rootElement, "1", 1);
                 } else if (msg.startsWith("cvc-enumeration-valid") && currentElementValue != null) {
                     // ignore white spaces issue
                     try {
@@ -166,13 +170,19 @@ public class XsdValidatorHandler extends DefaultHandler {
                     }
                 }
             }
-            String elementName = "XML";
+            String elementName = null;
+            String position = null;
+            int depth = 1;
             try {
                 elementName = currentElement.peek();
+                position = getCurrentElementPosition();
+                depth = currentDepth;
             } catch (Throwable e) {
+                elementName = rootElement == null ? "XML" : rootElement;
+                position = "1";
             }
 
-            throw new XsdValidatorException(error, elementName, getCurrentElementPosition(), currentDepth);
+            throw new XsdValidatorException(error, elementName, position, depth);
         }
     }
 
