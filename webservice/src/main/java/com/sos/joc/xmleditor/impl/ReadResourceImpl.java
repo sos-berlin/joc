@@ -174,7 +174,7 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             answer.getConfiguration().getState().setMessage(new AnswerMessage());
             answer.getConfiguration().getState().setDeployed(false);
             answer.getConfiguration().getState().getMessage().setMessage(JocXmlEditor.MESSAGE_LIVE_NOT_EXIST);
-            answer.getConfiguration().getState().getMessage().setCode(JocXmlEditor.MESSAGE_CODE_LIVE_NOT_EXIST);
+            answer.getConfiguration().getState().getMessage().setCode(JocXmlEditor.CODE_OBJECT_TYPE_OTHER);
             answer.getConfiguration().getState().setVersionState(ObjectVersionState.LIVE_NOT_EXIST);
 
             answer.getConfiguration().setModified(item.getModified());
