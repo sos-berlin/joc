@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -27,6 +28,7 @@ import com.sos.joc.classes.JobVolatileJson;
 import com.sos.joc.classes.JobsVCallable;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.db.audit.AuditLogDBLayer;
+import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.Folder;
@@ -164,14 +166,27 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
                 listOfJobs = new ArrayList<JobV>(listJobs.values());
             }
+            
+            // criticality
+            if (listOfJobs != null && (jobs == null || jobs.isEmpty()) && jobsFilter.getCriticality() != null && !jobsFilter.getCriticality()
+                    .isEmpty()) {
+                if (connection == null) {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                }
+                List<String> criticalities = jobsFilter.getCriticality().stream().map(c -> c.value().toLowerCase()).collect(Collectors.toList());
+                final InventoryJobsDBLayer dbInventoryLayer = new InventoryJobsDBLayer(connection);
+                listOfJobs = listOfJobs.stream().filter(j -> dbInventoryLayer.hasCriticality(dbItemInventoryInstance.getId(), criticalities, j.getPath())).collect(Collectors.toList());
+            }
 
             // JOC-678
             if (listOfJobs != null && listOfJobs.stream().filter(j -> j.getState() != null && j.getState().get_text() == JobStateText.STOPPED)
                     .findAny().isPresent()) {
-                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-                final AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
+                if (connection == null) {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                }
+                final AuditLogDBLayer dbAuditLayer = new AuditLogDBLayer(connection);
                 listOfJobs.stream().filter(j -> j.getState() != null && j.getState().get_text() == JobStateText.STOPPED).forEach(j -> j.getState()
-                        .setManually(dbLayer.isManuallyStopped(jobsFilter.getJobschedulerId(), j.getPath())));
+                        .setManually(dbAuditLayer.isManuallyStopped(jobsFilter.getJobschedulerId(), j.getPath())));
             }
             entity.setJobs(listOfJobs);
             entity.setDeliveryDate(new Date());

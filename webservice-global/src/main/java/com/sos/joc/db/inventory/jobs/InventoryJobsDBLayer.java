@@ -349,4 +349,20 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
 
+    public boolean hasCriticality(Long instanceId, List<String> criticalities, String path) {
+        try {
+            DBItemInventoryJob dbJob = getInventoryJobByName(path, instanceId);
+            if (dbJob == null) {
+                return false;
+            }
+            String criticality = dbJob.getCriticality();
+            if (criticality == null) {
+                criticality = "normal";
+            }
+            return criticalities.contains(criticality);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
