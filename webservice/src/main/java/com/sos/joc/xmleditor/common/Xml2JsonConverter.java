@@ -37,6 +37,7 @@ import org.xml.sax.InputSource;
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.model.xmleditor.common.ObjectType;
+import com.sos.joc.xmleditor.exceptions.XmlNotMatchSchemaException;
 
 public class Xml2JsonConverter {
 
@@ -70,6 +71,9 @@ public class Xml2JsonConverter {
             init(new InputSource(Files.newInputStream(schema)), new InputSource(new ByteArrayInputStream(xml.getBytes(JocXmlEditor.CHARSET))));
         } catch (ConnectException e) {
             throw new Exception(String.format("[%s][cant't get schema]%s", schema.toString(), e.toString()), e);
+        } catch (XmlNotMatchSchemaException e) {
+            LOGGER.error(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
+            throw new Exception(String.format("XML does not match xsd schema: %s", e.getMessage()));
         } catch (Exception e) {
             LOGGER.error(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
             throw new Exception(String.format("XML can't be loaded: %s", e.getMessage()));
@@ -113,7 +117,7 @@ public class Xml2JsonConverter {
         XPathExpression xmlExpression = xpathXml.compile("/" + rootElementNameXml);
         rootXml = (Node) xmlExpression.evaluate(xmlDoc, XPathConstants.NODE);
         if (rootXml == null) {
-            throw new Exception(String.format("Root element \"%s\" not found", rootElementNameXml));
+            throw new XmlNotMatchSchemaException(String.format("Root element \"%s\" not found", rootElementNameXml));
         }
     }
 
