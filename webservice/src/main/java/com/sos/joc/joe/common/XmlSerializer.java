@@ -194,6 +194,9 @@ public class XmlSerializer {
         if (job.getLoadUserProfile() != null && falseValues.contains(job.getLoadUserProfile())) {
             job.setLoadUserProfile(null);
         }
+        if (job.getCriticality() != null && "normal".equals(job.getCriticality())) {
+            job.setCriticality(null);
+        }
         if (job.getRunTime() == null) {
             job.setRunTime(new RunTime());
         } else {
