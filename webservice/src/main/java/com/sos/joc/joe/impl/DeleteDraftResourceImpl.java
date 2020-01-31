@@ -45,7 +45,7 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
             checkRequiredParameter("folder", body.getFolder());
 
             body.setFolder(normalizeFolder(body.getFolder()));
-            if (!folderPermissions.isPermittedForFolder(getParent(body.getFolder()))) {
+            if (!folderPermissions.isPermittedForFolder(body.getFolder())) {
                 return accessDeniedResponse();
             }
 
