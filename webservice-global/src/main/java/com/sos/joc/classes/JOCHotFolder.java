@@ -2,6 +2,7 @@ package com.sos.joc.classes;
 
 import java.io.StringReader;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -60,11 +61,27 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     
     public void putFolder(String path) throws JocException {
         path = (path + "/").replaceAll("//+", "/");
-        put(getURI(path), (String) null, false);
+        put(getURI(path), (String) null, null);
     }
 
+    /**
+     * The bytes of the body get the charset ISO_8859_1
+     * @param path
+     * @param body
+     * @throws JocException
+     */
     public void putFile(String path, String body) throws JocException {
-        put(getURI(path), body, true);
+        putFile(path, body, StandardCharsets.ISO_8859_1);
+    }
+    
+    public void putFile(String path, String body, Charset charset) throws JocException {
+        if (body == null || body.isEmpty()) {
+            JocError jocError = new JocError();
+            jocError.appendMetaInfo("JS-URL: " + (path == null ? "null" : path.toString()));
+            jocError.setMessage("body is missing");
+            throw new JobSchedulerBadRequestException(jocError);
+        }
+        put(getURI(path), body, charset);
     }
 
     public void putFile(String path, byte[] body) throws JocException {
@@ -130,23 +147,19 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
         return uriBuilder.buildFromEncoded(path);
     }
 
-    private void put(URI uri, String body, boolean bodyExpected) throws JocException {
+    private void put(URI uri, String body, Charset charset) throws JocException {
         setAccept("text/plain");
         JocError jocError = new JocError();
-        if (bodyExpected) {
+        if (body != null) {
             addHeader("Content-Type", "application/octet-stream");
             jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()), "JS-PutBody: " + body);
-            if (body == null || body.isEmpty()) {
-                jocError.setMessage("body is missing");
-                throw new JobSchedulerBadRequestException(jocError);
-            }
         } else {
             jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         }
         try {
             String response = null;
             if (body != null) {
-                response = putByteArrayRestService(uri, body.getBytes(StandardCharsets.ISO_8859_1));
+                response = putByteArrayRestService(uri, body.getBytes(charset));
             } else {
                 response = putByteArrayRestService(uri, null);
             }
@@ -180,7 +193,7 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
         setAccept("text/plain");
         addHeader("Content-Type", "application/octet-stream");
         JocError jocError = new JocError();
-        jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()), "JS-PutBody: " + body);
+        jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         if (body == null || body.length == 0) {
             jocError.setMessage("body is missing");
             throw new JobSchedulerBadRequestException(jocError);
