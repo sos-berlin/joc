@@ -346,15 +346,15 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
                                 if (regExMatcherJob != null) {
                                     regExMatcherJob.reset(dailyPlanDBItem.getJob());
-                                    add = add && regExMatcherJob.find();
+                                    add = add && regExMatcherJob.matches();
                                 }
                                 if (regExMatcherJobChain != null) {
                                     regExMatcherJobChain.reset(dailyPlanDBItem.getJobChain());
-                                    add = add && regExMatcherJobChain.find();
+                                    add = add && regExMatcherJobChain.matches();
                                 }
                                 if (regExMatcherOrderId != null) {
                                     regExMatcherOrderId.reset(dailyPlanDBItem.getOrderId());
-                                    add = add && regExMatcherOrderId.find();
+                                    add = add && regExMatcherOrderId.matches();
                                 }
 
                                 add = add && (dailyPlanDBLayer.getFilter().containsFolder(path));
