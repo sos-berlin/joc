@@ -41,7 +41,9 @@ import com.sos.schema.JsonValidator;
 @Path("plan")
 public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlanImpl.class);
+    private static final int MAX_PLAN_ENTRIED = 2000;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PlanImpl.class);
 
     private static final int SUCCESSFUL = 0;
     private static final int SUCCESSFUL_LATE = 1;
@@ -170,7 +172,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             Plan entity = new Plan();
 
             if (hasPermission) {
-                List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(2000);
+                List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(MAX_PLAN_ENTRIED);
                 List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(
                 		2000);
                 List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(2000);
