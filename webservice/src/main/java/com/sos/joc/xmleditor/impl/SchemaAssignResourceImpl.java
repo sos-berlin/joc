@@ -1,6 +1,7 @@
 package com.sos.joc.xmleditor.impl;
 
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.ws.rs.Path;
 
@@ -27,7 +28,7 @@ public class SchemaAssignResourceImpl extends JOCResourceImpl implements ISchema
         try {
             JsonValidator.validateFailFast(filterBytes, SchemaAssignConfiguration.class);
             SchemaAssignConfiguration in = Globals.objectMapper.readValue(filterBytes, SchemaAssignConfiguration.class);
-            
+
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
@@ -69,16 +70,27 @@ public class SchemaAssignResourceImpl extends JOCResourceImpl implements ISchema
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             SchemaHandler h = new SchemaHandler();
             h.process(in.getUri(), in.getFileName(), in.getFileContent());
-            if (Files.exists(h.getTarget())) {
-                String schema = JocXmlEditor.getFileContent(h.getTarget());
-                JocXmlEditor.parseXml(schema);
+            if (Files.exists(h.getTargetTemp())) {
+                boolean equals = h.getTargetTemp().equals(h.getTarget());
+                try {
+                    String schema = JocXmlEditor.getFileContent(h.getTargetTemp());
+                    JocXmlEditor.parseXml(schema);
 
-                SchemaAssignConfigurationAnswer answer = new SchemaAssignConfigurationAnswer();
-                answer.setSchema(schema);
-                answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(h.getSource()));
-                return answer;
+                    if (!equals) {
+                        Files.move(h.getTargetTemp(), h.getTarget(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+
+                    SchemaAssignConfigurationAnswer answer = new SchemaAssignConfigurationAnswer();
+                    answer.setSchema(schema);
+                    answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(h.getSource()));
+                    return answer;
+                } catch (Exception e) {
+                    h.onError(!equals);
+                    throw e;
+                }
             } else {
-                throw new Exception(String.format("[%s][target=%s]target file not found", h.getSource(), h.getTarget()));
+                throw new Exception(String.format("[%s][targetTemp=%s][target=%s]target file not found", h.getSource(), h.getTargetTemp(), h
+                        .getTarget()));
             }
         } else {
             throw new Exception(String.format("[%s]not supported", in.getObjectType().name()));

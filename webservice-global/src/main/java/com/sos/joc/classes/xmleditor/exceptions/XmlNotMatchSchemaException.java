@@ -1,4 +1,4 @@
-package com.sos.joc.xmleditor.exceptions;
+package com.sos.joc.classes.xmleditor.exceptions;
 
 import com.sos.exception.SOSException;
 

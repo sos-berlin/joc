@@ -1,6 +1,7 @@
 package com.sos.joc.xmleditor.impl;
 
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.ws.rs.Path;
 
@@ -71,20 +72,30 @@ public class SchemaReassignResourceImpl extends JOCResourceImpl implements ISche
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             SchemaHandler h = new SchemaHandler();
             h.process(in.getUri(), in.getFileName(), in.getFileContent());
-            if (Files.exists(h.getTarget())) {
-                JocXmlEditor.parseXml(in.getConfiguration());
-                String schema = JocXmlEditor.getFileContent(h.getTarget());
-                JocXmlEditor.parseXml(schema);
+            if (Files.exists(h.getTargetTemp())) {
+                boolean equals = h.getTargetTemp().equals(h.getTarget());
+                try {
+                    JocXmlEditor.parseXml(in.getConfiguration());
+                    String schema = JocXmlEditor.getFileContent(h.getTargetTemp());
+                    JocXmlEditor.parseXml(schema);
 
-                Xml2JsonConverter converter = new Xml2JsonConverter();
-                String configurationJson = converter.convert(in.getObjectType(), h.getTarget(), in.getConfiguration());
+                    if (!equals) {
+                        Files.move(h.getTargetTemp(), h.getTarget(), StandardCopyOption.REPLACE_EXISTING);
+                    }
 
-                SchemaReassignConfigurationAnswer answer = new SchemaReassignConfigurationAnswer();
-                answer.setSchema(schema);
-                answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(h.getSource()));
-                answer.setConfigurationJson(configurationJson);
-                answer.setRecreateJson(true);
-                return answer;
+                    Xml2JsonConverter converter = new Xml2JsonConverter();
+                    String configurationJson = converter.convert(in.getObjectType(), h.getTarget(), in.getConfiguration());
+
+                    SchemaReassignConfigurationAnswer answer = new SchemaReassignConfigurationAnswer();
+                    answer.setSchema(schema);
+                    answer.setSchemaIdentifier(JocXmlEditor.getOthersSchemaIdentifier(h.getSource()));
+                    answer.setConfigurationJson(configurationJson);
+                    answer.setRecreateJson(true);
+                    return answer;
+                } catch (Exception e) {
+                    h.onError(!equals);
+                    throw e;
+                }
             } else {
                 throw new Exception(String.format("[%s][target=%s]target file not found", h.getSource(), h.getTarget()));
             }

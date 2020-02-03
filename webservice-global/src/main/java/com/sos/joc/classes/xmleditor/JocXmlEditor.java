@@ -3,6 +3,7 @@ package com.sos.joc.classes.xmleditor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.xmleditor.exceptions.AssignSchemaException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.xml.XMLBuilder;
@@ -130,7 +132,8 @@ public class JocXmlEditor {
         if (isHttp(path)) {
             if (downloadIfHttp) {
                 try {
-                    file = downloadOthersSchema(toURI(path));
+                    URI uri = toURI(path);
+                    file = downloadOthersSchema(uri, getFileName(uri));
                 } catch (Throwable e) {
                     LOGGER.error(String.format("[%s]can't download file, try to find in the %s location ..", path,
                             getOthersRelativeHttpSchemaLocation()));
@@ -155,14 +158,51 @@ public class JocXmlEditor {
         }
     }
 
-    public static Path downloadOthersSchema(URI uri) throws Exception {
-        String name = getFileName(uri);
-        Path target = getOthersHttpSchema(name);
+    public static Path downloadOthersSchemaX(URI uri, String targetName) throws Exception {
+        Path target = getOthersHttpSchema(targetName);
         try (InputStream inputStream = uri.toURL().openStream()) {
             Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (Throwable ex) {
             LOGGER.error(ex.toString(), ex);
             throw ex;
+        }
+        return target;
+    }
+
+    public static Path downloadOthersSchema(URI uri, String targetName) throws Exception {
+        Path target = getOthersHttpSchema(targetName);
+
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setReadTimeout(5_000);
+            conn.setConnectTimeout(5_000);
+            int responseCode = conn.getResponseCode();
+            if (responseCode > 299) {
+                String msg = null;
+                String add = "";
+                if (responseCode == 302) {
+                    add = " URL redirection";
+                }
+                try {
+                    msg = String.format("[%s][Response code %s] %s%s", uri, responseCode, conn.getResponseMessage(), add);
+                } catch (Throwable e) {
+                    msg = String.format("[%s] Response code %s%s", uri, responseCode, add);
+                }
+                throw new AssignSchemaException(msg);
+            }
+            try (InputStream inputStream = uri.toURL().openStream()) {
+                Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+            } catch (Throwable ex) {
+                LOGGER.error(ex.toString(), ex);
+                throw ex;
+            }
+        } catch (Throwable e) {
+            throw e;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
         return target;
     }

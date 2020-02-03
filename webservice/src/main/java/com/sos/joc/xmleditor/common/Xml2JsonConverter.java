@@ -36,8 +36,8 @@ import org.xml.sax.InputSource;
 
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.exceptions.XmlNotMatchSchemaException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
-import com.sos.joc.xmleditor.exceptions.XmlNotMatchSchemaException;
 
 public class Xml2JsonConverter {
 
