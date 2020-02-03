@@ -191,7 +191,7 @@ public class JocXmlEditor {
                 }
                 throw new AssignSchemaException(msg);
             }
-            try (InputStream inputStream = uri.toURL().openStream()) {
+            try (InputStream inputStream = conn.getInputStream()) {
                 Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
             } catch (Throwable ex) {
                 LOGGER.error(ex.toString(), ex);
