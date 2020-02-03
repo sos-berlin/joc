@@ -105,10 +105,6 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
         if (in.getId() == null || in.getId() <= 0) {
             ArrayList<String> schemas = new ArrayList<String>();
-            // https locations
-            schemas.add(JobSchedulerXmlEditor.SCHEMA_URI_NOTIFICATION);
-            schemas.add(JobSchedulerXmlEditor.SCHEMA_URI_YADE);
-
             List<Map<String, Object>> items = getOtherProperties(in, "id,name,schemaLocation", "order by created");
             if (items != null && items.size() > 0) {
                 ArrayList<AnswerConfiguration> configurations = new ArrayList<AnswerConfiguration>();
