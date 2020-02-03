@@ -175,16 +175,18 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 					history.setPath(dbItemReportTrigger.getFullOrderQualifier());
 					history.setStartTime(dbItemReportTrigger.getStartTime());
 					HistoryState state = new HistoryState();
+					
+					boolean resultError = dbItemReportTrigger.getResultError() && !dbItemReportTrigger.getState().toLowerCase().contains("success");
 
 					if (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null) {
 						state.setSeverity(1);
 						state.set_text(HistoryStateText.INCOMPLETE);
 					} else {
-						if (dbItemReportTrigger.getResultError()) {
+						if (resultError) {
 							state.setSeverity(2);
 							state.set_text(HistoryStateText.FAILED);
 						} else {
-							if (dbItemReportTrigger.getEndTime() != null && !dbItemReportTrigger.getResultError()) {
+							if (dbItemReportTrigger.getEndTime() != null && !resultError) {
 								state.setSeverity(0);
 								state.set_text(HistoryStateText.SUCCESSFUL);
 							}

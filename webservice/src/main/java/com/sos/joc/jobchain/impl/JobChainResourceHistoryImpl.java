@@ -205,6 +205,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 		List<DBItemReportTrigger> listOfReportTriggerDBItems = reportTriggerDBLayer
 				.getSchedulerOrderHistoryListFromTo();
 		DBItemReportTrigger dbItemReportTrigger = null;
+
 		if (listOfReportTriggerDBItems.size() > 0) {
 			dbItemReportTrigger = listOfReportTriggerDBItems.get(0);
 		} else {
@@ -226,7 +227,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 			// } else {
 			// return HistoryStateText.FAILED;
 			// }
-		} else if (dbItemReportTrigger.getResultError()) {
+		} else if (dbItemReportTrigger.getResultError() && !dbItemReportTrigger.getState().toLowerCase().contains("success")) {
 			return HistoryStateText.FAILED;
 		} else {
 			return HistoryStateText.SUCCESSFUL;
