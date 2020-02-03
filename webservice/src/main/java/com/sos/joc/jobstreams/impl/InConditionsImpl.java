@@ -109,6 +109,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 }
 
                 EventHandlerSettings settings = new EventHandlerSettings();
+                settings.setSchedulerId(jobFilterSchema.getJobschedulerId());
                 JSJobInConditions jsJobInConditions = new JSJobInConditions(settings);
                 jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfInConditions);
                 JSJobConditionKey jsJobConditionKey = new JSJobConditionKey();
