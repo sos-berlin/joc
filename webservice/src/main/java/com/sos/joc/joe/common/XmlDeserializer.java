@@ -45,7 +45,7 @@ public class XmlDeserializer {
         case "Config": // NODEPARAMS
             return clazz.cast(deserializeNodeParams(XMLBuilder.parse(xml)));
         default:
-            return Globals.xmlMapper.readValue(stripWhitespaceText(xml), clazz);
+            return Globals.xmlMapper.readValue(stripWhitespaceTextAndComments(xml), clazz);
         }
     }
 
@@ -62,21 +62,21 @@ public class XmlDeserializer {
     }
 
     private static String domToString(Document doc) {
-        return stripWhitespaceText(doc.asXML());
+        return stripWhitespaceTextAndComments(doc.asXML());
     }
     
     private static String bytesToString(byte[] xml) {
-        return stripWhitespaceText(new String(xml));
+        return stripWhitespaceTextAndComments(new String(xml));
     }
     
-    private static String stripWhitespaceText(String xml) {
+    private static String stripWhitespaceTextAndComments(String xml) {
         // converts a pair of open and close tag to a closed tag if the content is empty
         // e.g. <params>   </params> -> <params/>
         // otherwise Jackson's xmlMapper raises 
         // com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot construct instance of 
         // `com.sos.joc.model.joe.XXX` (although at least one Creator exists): no String-argument 
         // constructor/factory method to deserialize from String value ...
-        return xml.replaceAll("<([a-zA-Z_]+\\b)([^>]*)>\\s*</\\1>", "<$1$2/>");
+        return xml.replaceAll("\\s*<!--[\\s\\S]*?-->\\s*", "").replaceAll("<([a-zA-Z_]+\\b)([^>]*)>\\s*</\\1>", "<$1$2/>");
     }
     
     private static Job deserializeJob(Document doc) throws JsonParseException, JsonMappingException, IOException {
