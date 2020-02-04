@@ -60,7 +60,7 @@ public class JobChainsVCallable implements Callable<Map<String, JobChainVolatile
         this.folder = null;
         this.compact = filter.getCompact();
         this.compactView = filter.getCompactView();
-        this.withOrders = compact != Boolean.TRUE;
+        this.withOrders = compact != Boolean.TRUE || compactView != Boolean.TRUE;
         this.maxOrders = filter.getMaxOrders();
         this.jobChainsFilter = new JobChainsFilter();
         ;
@@ -79,7 +79,7 @@ public class JobChainsVCallable implements Callable<Map<String, JobChainVolatile
         this.folder = null;
         this.compact = filter.getCompact();
         this.compactView = filter.getCompactView();
-        this.withOrders = compact != Boolean.TRUE;
+        this.withOrders = compact != Boolean.TRUE || compactView != Boolean.TRUE;
         this.maxOrders = filter.getMaxOrders();
         this.jobChainsFilter = filter;
         this.jocJsonCommand = jocJsonCommand;
@@ -178,6 +178,8 @@ public class JobChainsVCallable implements Callable<Map<String, JobChainVolatile
             } else {
                 jobChainV.setDetailedFields(null, orders, maxOrders);
             }
+        } else if (compactView != Boolean.TRUE) {
+            jobChainV.setOrdersSummary(orders);
         }
         return jobChainV;
     }

@@ -114,12 +114,17 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
                 Map<String, String> jobDocs = null;
                 Map<String, String> jobChainDocs = null;
                 Map<String, List<OrderVolatile>> orders = null;
+                
                 if (jobChainsFilter.getCompact() != Boolean.TRUE) {
                     session = Globals.createSosHibernateStatelessConnection(API_CALL);
                     DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(session);
-                    orderDocs = dbDocLayer.getDocumentationPaths(jobChainsFilter.getJobschedulerId(), JobSchedulerObjectType.ORDER);
+                
                     jobDocs = dbDocLayer.getDocumentationPaths(jobChainsFilter.getJobschedulerId(), JobSchedulerObjectType.JOB);
                     jobChainDocs = dbDocLayer.getDocumentationPaths(jobChainsFilter.getJobschedulerId(), JobSchedulerObjectType.JOBCHAIN);
+                    orderDocs = dbDocLayer.getDocumentationPaths(jobChainsFilter.getJobschedulerId(), JobSchedulerObjectType.ORDER);
+                }
+                
+                if (jobChainsFilter.getCompact() != Boolean.TRUE || jobChainsFilter.getCompactView() != Boolean.TRUE) {
 
                     Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
                     List<OrdersVCallable> orderTasks = new ArrayList<OrdersVCallable>();

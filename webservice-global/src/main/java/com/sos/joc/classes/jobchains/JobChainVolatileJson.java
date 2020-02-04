@@ -217,7 +217,7 @@ public class JobChainVolatileJson extends JobChainV {
                         confStatus.setSeverity(2);
                         confStatus.setMessage(ConfigurationStateText.RESOURCE_IS_MISSING.toString());
                         job.setConfigurationStatus(confStatus);
-                    } else {
+                    } else if (listJobs != null) {
                         JobVolatileJson jobV = listJobs.get(job.getPath());
                         // JOC-89
                         jobV.setState(hasRunningOrWaitingOrder(currentOrders));
@@ -389,7 +389,7 @@ public class JobChainVolatileJson extends JobChainV {
         }
     }
 
-    private void setOrdersSummary(Collection<OrderVolatile> orders) {
+    public void setOrdersSummary(Collection<OrderVolatile> orders) {
         OrdersSummary summary = null;
         if (compactView != Boolean.TRUE) {
             summary = setInitialOrdersSummary();
