@@ -3,6 +3,7 @@ package com.sos.joc.plan.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -151,9 +152,15 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             }
             if (planFilter.getDateTo() != null) {
                 toDate = JobSchedulerDate.getDateTo(planFilter.getDateTo(), planFilter.getTimeZone());
+                GregorianCalendar calendar = new GregorianCalendar();
+                calendar.setTime(fromDate);
+                calendar.add(GregorianCalendar.DAY_OF_MONTH, MAX_PLAN_ENTRIED);
+                Date max = calendar.getTime();  
+                if (max.before(toDate)) {
+                    toDate = max;
+                }
                 dailyPlanDBLayer.getFilter().setPlannedStartTo(toDate);
-            }
-            dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
+            }            dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
 
             for (PlanStateText state : planFilter.getStates()) {
                 dailyPlanDBLayer.getFilter().addState(state.name());
@@ -175,11 +182,10 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             Plan entity = new Plan();
 
             if (hasPermission) {
-                List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(MAX_PLAN_ENTRIED);
-                List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(
-                		2000);
-                List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(2000);
-                List<DailyPlanWithReportExecutionDBItem> listOfDailyPlanStandaloneDBItems = dailyPlanDBLayer.getDailyPlanListStandalone(2000);
+                List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(0);
+                List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(0);
+                List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(0);
+                List<DailyPlanWithReportExecutionDBItem> listOfDailyPlanStandaloneDBItems = dailyPlanDBLayer.getDailyPlanListStandalone(0);
 
                 for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfWaitingDailyPlanStandaloneDBItems) {
 
