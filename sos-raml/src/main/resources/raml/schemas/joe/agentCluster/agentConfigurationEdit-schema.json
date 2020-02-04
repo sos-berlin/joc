@@ -6,8 +6,7 @@
     "description": "old version from 1.13.0",
     "required": [
         "jobschedulerId",
-        "processClass",
-        "configuration"
+        "processClass"
     ],
     "properties": {
         "deliveryDate": {
