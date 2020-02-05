@@ -1,0 +1,26 @@
+{
+	"title": "JobStream Filter",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Job Stream filter",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreamFilter",
+	"type": "object",
+	"required": [
+	  "jobschedulerId"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"limit": {
+			"type": "integer",
+			"default": 10000
+		}
+	}
+}
+      

@@ -1,0 +1,15 @@
+{
+  "title": "include",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.Include",
+  "type": "object",
+  "description": "usage of file and liveFile are exclusive",
+  "properties": {
+    "file": {
+      "type": "string"
+    },
+    "liveFile": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "title": "ProcessClassDocuFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.processClass.ProcessClassDocuFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "processClass"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "processClass": {
+      "$ref": "../common/path-schema.json"
+    },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

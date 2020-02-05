@@ -1,0 +1,29 @@
+{
+  "title": "schedule",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.schedule.ScheduleV",
+  "type": "object",
+  "required": [
+    "surveyDate",
+    "path",
+    "name",
+    "state"
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "name": {
+      "type": "string"
+    },
+    "state": {
+      "$ref": "scheduleState-schema.json"
+    },
+    "configurationStatus": {
+      "$ref": "../common/configurationStatus-schema.json"
+    }
+  }
+}

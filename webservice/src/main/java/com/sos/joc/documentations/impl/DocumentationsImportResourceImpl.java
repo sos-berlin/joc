@@ -21,6 +21,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -54,6 +56,7 @@ import com.sos.joc.model.common.JobSchedulerObject;
 import com.sos.joc.model.docu.DeployDocumentation;
 import com.sos.joc.model.docu.DeployDocumentations;
 import com.sos.joc.model.docu.DocumentationImport;
+import com.sos.schema.JsonValidator;
 
 @Path("documentations")
 public class DocumentationsImportResourceImpl extends JOCResourceImpl implements IDocumentationsImportResource {
@@ -69,13 +72,23 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
     @Override
     public JOCDefaultResponse postImportDocumentations(String xAccessToken, String accessToken, String jobschedulerId, String directory,
             FormDataBodyPart body, String timeSpent, String ticketLink, String comment) throws Exception {
-        AuditParams auditLog = new AuditParams();
-        auditLog.setComment(comment);
-        auditLog.setTicketLink(ticketLink);
-        try {
-            auditLog.setTimeSpent(Integer.valueOf(timeSpent));
-        } catch (Exception e) {
+        
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (comment != null) {
+            builder.add("comment", comment);
         }
+        if (ticketLink != null) {
+            builder.add("ticketLink", ticketLink);
+        }
+        if (timeSpent != null) {
+            try {
+                builder.add("timeSpent", Integer.valueOf(timeSpent));
+            } catch (Exception e) {
+            }
+        }
+        String json = builder.build().toString();
+        JsonValidator.validateFailFast(json.getBytes(), AuditParams.class);
+        AuditParams auditLog = Globals.objectMapper.readValue(json, AuditParams.class);
         return postImportDocumentations(getAccessToken(xAccessToken, accessToken), jobschedulerId, directory, body, auditLog);
     }
 
@@ -84,15 +97,30 @@ public class DocumentationsImportResourceImpl extends JOCResourceImpl implements
 
         InputStream stream = null;
         try {
-            DocumentationImport filter = new DocumentationImport();
-            filter.setJobschedulerId(jobschedulerId);
             if (directory == null || directory.isEmpty()) {
                 directory = "/";
+            } else {
+                directory = normalizeFolder(directory.replace('\\', '/'));
             }
-            filter.setFolder(normalizeFolder(directory.replace('\\', '/')));
+            
+            String file = "";
             if (body != null) {
-                filter.setFile(URLDecoder.decode(body.getContentDisposition().getFileName(), "UTF-8"));
+                file = URLDecoder.decode(body.getContentDisposition().getFileName(), "UTF-8");
             }
+            //String json = String.format("{\"jobschedulerId\": \"%s\", \"folder\": \"%s\", \"file\": \"%s\"}", jobschedulerId, directory, file);
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            if(jobschedulerId != null) {
+                builder.add("jobschedulerId", jobschedulerId);
+            }
+            if (directory != null) {
+                builder.add("folder", directory);
+            }
+            if (file != null) {
+                builder.add("file", file);
+            }
+            String json = builder.build().toString();
+            JsonValidator.validateFailFast(json.getBytes(), DocumentationImport.class);
+            DocumentationImport filter = Globals.objectMapper.readValue(json, DocumentationImport.class);
             filter.setAuditLog(auditLog);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, jobschedulerId, getPermissonsJocCockpit(filter

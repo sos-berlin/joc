@@ -3,6 +3,7 @@ package com.sos.joc.plan.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -36,11 +37,14 @@ import com.sos.joc.model.plan.PlanItem;
 import com.sos.joc.model.plan.PlanState;
 import com.sos.joc.model.plan.PlanStateText;
 import com.sos.joc.plan.resource.IPlanResource;
+import com.sos.schema.JsonValidator;
 
 @Path("plan")
 public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlanImpl.class);
+    private static final int MAX_PLAN_ENTRIED = 2000;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PlanImpl.class);
 
     private static final int SUCCESSFUL = 0;
     private static final int SUCCESSFUL_LATE = 1;
@@ -110,14 +114,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
     }
 
     @Override
-    public JOCDefaultResponse postPlan(String xAccessToken, String accessToken, PlanFilter planFilter) throws Exception {
-        return postPlan(getAccessToken(xAccessToken, accessToken), planFilter);
-    }
-
-    public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
+    public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
             LOGGER.debug("Reading the daily plan");
+            JsonValidator.validateFailFast(planFilterBytes, PlanFilter.class);
+            PlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, PlanFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     planFilter.getJobschedulerId(), accessToken).getDailyPlan().getView().isStatus());
 
@@ -139,6 +142,9 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             dailyPlanDBLayer.getFilter().setSchedulerId(planFilter.getJobschedulerId());
             dailyPlanDBLayer.getFilter().setJob(planFilter.getJob());
             dailyPlanDBLayer.getFilter().setJobChain(planFilter.getJobChain());
+            dailyPlanDBLayer.getFilter().setJobStream(planFilter.getJobStream());
+            dailyPlanDBLayer.getFilter().setIsJobStream(planFilter.getIsJobStream());
+            
             dailyPlanDBLayer.getFilter().setOrderId(planFilter.getOrderId());
             if (planFilter.getDateFrom() != null) {
                 fromDate = JobSchedulerDate.getDateFrom(planFilter.getDateFrom(), planFilter.getTimeZone());
@@ -146,9 +152,15 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             }
             if (planFilter.getDateTo() != null) {
                 toDate = JobSchedulerDate.getDateTo(planFilter.getDateTo(), planFilter.getTimeZone());
+                GregorianCalendar calendar = new GregorianCalendar();
+                calendar.setTime(fromDate);
+                calendar.add(GregorianCalendar.DAY_OF_MONTH, MAX_PLAN_ENTRIED);
+                Date max = calendar.getTime();  
+                if (max.before(toDate)) {
+                    toDate = max;
+                }
                 dailyPlanDBLayer.getFilter().setPlannedStartTo(toDate);
-            }
-            dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
+            }            dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
 
             for (PlanStateText state : planFilter.getStates()) {
                 dailyPlanDBLayer.getFilter().addState(state.name());
@@ -171,8 +183,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             if (hasPermission) {
                 List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(0);
-                List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(
-                        0);
+                List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(0);
                 List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(0);
                 List<DailyPlanWithReportExecutionDBItem> listOfDailyPlanStandaloneDBItems = dailyPlanDBLayer.getDailyPlanListStandalone(0);
 
@@ -187,6 +198,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         add = regExMatcher.find();
                     }
                     p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
+                    p.setJobStream(dailyPlanDBItem.getDailyPlanDbItem().getJobStream());
 
                     if (dailyPlanDBItem.getDbItemReportTask() != null) {
                         p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
@@ -344,15 +356,15 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
                                 if (regExMatcherJob != null) {
                                     regExMatcherJob.reset(dailyPlanDBItem.getJob());
-                                    add = add && regExMatcherJob.find();
+                                    add = add && regExMatcherJob.matches();
                                 }
                                 if (regExMatcherJobChain != null) {
                                     regExMatcherJobChain.reset(dailyPlanDBItem.getJobChain());
-                                    add = add && regExMatcherJobChain.find();
+                                    add = add && regExMatcherJobChain.matches();
                                 }
                                 if (regExMatcherOrderId != null) {
                                     regExMatcherOrderId.reset(dailyPlanDBItem.getOrderId());
-                                    add = add && regExMatcherOrderId.find();
+                                    add = add && regExMatcherOrderId.matches();
                                 }
 
                                 add = add && (dailyPlanDBLayer.getFilter().containsFolder(path));

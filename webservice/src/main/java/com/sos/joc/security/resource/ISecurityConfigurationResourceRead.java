@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.security.SecurityConfiguration;
 
 public interface ISecurityConfigurationResourceRead
 {
@@ -16,11 +15,11 @@ public interface ISecurityConfigurationResourceRead
     @POST
     @Path("read")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postSecurityConfigurationRead(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken) throws Exception;
+    public JOCDefaultResponse postSecurityConfigurationRead(@HeaderParam("X-Access-Token") String accessToken);
     
     @POST
     @Path("write")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postSecurityConfigurationWrite(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, SecurityConfiguration securityConfiguration) throws Exception;
+    public JOCDefaultResponse postSecurityConfigurationWrite(@HeaderParam("X-Access-Token") String accessToken, byte[] securityConfiguration);
 
 }

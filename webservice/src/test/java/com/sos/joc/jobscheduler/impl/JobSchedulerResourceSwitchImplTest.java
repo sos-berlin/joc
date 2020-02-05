@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -24,7 +26,8 @@ public class JobSchedulerResourceSwitchImplTest {
         JobSchedulerId jobSchedulerFilterSchema = new JobSchedulerId();
         jobSchedulerFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceSwitchImpl jobSchedulerResourceSwitchImpl = new JobSchedulerResourceSwitchImpl();
-        JOCDefaultResponse jobschedulerClusterResponse = jobSchedulerResourceSwitchImpl.postJobschedulerSwitch(accessToken, jobSchedulerFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobSchedulerFilterSchema);
+        JOCDefaultResponse jobschedulerClusterResponse = jobSchedulerResourceSwitchImpl.postJobschedulerSwitch(accessToken, b);
         Ok okSchema = (Ok) jobschedulerClusterResponse.getEntity();
         assertEquals("postjobschedulerSwitchTest", true, okSchema.getOk());
     }

@@ -15,6 +15,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.yade.TransferFilesSummary;
 import com.sos.joc.model.yade.TransferFilter;
 import com.sos.joc.yade.resource.IYadeOverviewSummaryResource;
+import com.sos.schema.JsonValidator;
 
 @Path("yade")
 public class YadeOverviewSummaryResourceImpl extends JOCResourceImpl implements IYadeOverviewSummaryResource {
@@ -22,9 +23,12 @@ public class YadeOverviewSummaryResourceImpl extends JOCResourceImpl implements 
     private static final String API_CALL = "./yade/overview/summary";
 
     @Override
-    public JOCDefaultResponse postYadeOverviewSummary(String accessToken, TransferFilter filterBody) throws Exception {
+    public JOCDefaultResponse postYadeOverviewSummary(String accessToken, byte[] filterBytes) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, TransferFilter.class);
+            TransferFilter filterBody = Globals.objectMapper.readValue(filterBytes, TransferFilter.class);
+            
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(filterBody.getJobschedulerId(), accessToken);
             // JobSchedulerId has to be "" to prevent exception to be thrown
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), sosPermission.getYADE()

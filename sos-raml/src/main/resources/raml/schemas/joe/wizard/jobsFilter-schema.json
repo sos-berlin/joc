@@ -1,0 +1,17 @@
+{
+  "title": "jobs filter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.wizard.JobsWizardFilter",
+  "type": "object",
+  "required" : [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../../common/filename100-schema.json"
+    },
+    "isOrderJob": {
+      "type": "boolean"
+    }
+  }
+}

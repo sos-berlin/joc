@@ -1,0 +1,18 @@
+{
+  "title": "List of deployables",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.Deployables",
+  "type": "object",
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../../common/deliveryDate-schema.json"
+    },
+    "deployables": {
+       "type": "array",
+       "items": {
+         "$ref": "deployable-schema.json"
+       },
+       "uniqueItems": true
+	 }
+   }
+}

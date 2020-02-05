@@ -1,0 +1,18 @@
+{
+  "title": "calendarPathFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.CalendarPath",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "path"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    }
+  }
+}

@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.jobChain.JobChainPath;
@@ -33,7 +35,8 @@ public class JobChainsResourceImplTest {
         jobChains.add(jobChainPath);
         jobChainsFilterSchema.setJobChains(jobChains);
         JobChainsResourceImpl jobChainsImpl = new JobChainsResourceImpl();
-        JOCDefaultResponse jobsResponse = jobChainsImpl.postJobChains(accessToken, jobChainsFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobChainsFilterSchema);
+        JOCDefaultResponse jobsResponse = jobChainsImpl.postJobChains(accessToken, b);
         JobChainsV jobChainsVSchema = (JobChainsV) jobsResponse.getEntity();
         assertEquals("postJobChainsTest", TestEnvWebserviceTest.JOB_CHAIN, jobChainsVSchema.getJobChains().get(0).getPath());
     }

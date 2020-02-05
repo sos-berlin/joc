@@ -1,0 +1,24 @@
+{
+  "title": "JobChainDocuFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainDocuFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "jobChain"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

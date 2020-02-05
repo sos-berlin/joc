@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.order.OrderV200;
@@ -26,7 +28,8 @@ public class OrderResourceImplTest {
         orderBody.setJobChain(TestEnvWebserviceTest.JOB_CHAIN);
         orderBody.setOrderId(TestEnvWebserviceTest.ORDER);
         OrderResourceImpl orderImpl = new OrderResourceImpl();
-        JOCDefaultResponse ordersResponse = orderImpl.postOrder(accessToken, orderBody);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(orderBody);
+        JOCDefaultResponse ordersResponse = orderImpl.postOrder(accessToken, b);
         OrderV200 order200VSchema = (OrderV200) ordersResponse.getEntity();
         // System.out.println(order200VSchema.getOrder().toString());
         assertEquals("postOrderTest", TestEnvWebserviceTest.JOB_CHAIN, order200VSchema.getOrder().getJobChain());

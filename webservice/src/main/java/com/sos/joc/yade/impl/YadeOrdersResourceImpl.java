@@ -31,6 +31,7 @@ import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersV;
 import com.sos.joc.yade.resource.IYadeOrdersResource;
+import com.sos.schema.JsonValidator;
 
 @Path("yade")
 public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrdersResource {
@@ -38,9 +39,12 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
     private static final String API_CALL = "./yade/orders";
 
     @Override
-    public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
+    public JOCDefaultResponse postOrders(String accessToken, byte[] ordersFilterBytes) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(ordersFilterBytes, OrdersFilter.class);
+            OrdersFilter ordersBody = Globals.objectMapper.readValue(ordersFilterBytes, OrdersFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersBody, accessToken, ordersBody.getJobschedulerId(), getPermissonsJocCockpit(
                     ordersBody.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {

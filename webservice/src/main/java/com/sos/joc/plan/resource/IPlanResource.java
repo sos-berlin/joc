@@ -7,13 +7,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.plan.PlanFilter;
  
  
 public interface IPlanResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postPlan(            
-            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, PlanFilter planFilter) throws Exception;
+    public JOCDefaultResponse postPlan(@HeaderParam("X-Access-Token") String accessToken,  byte[] planFilter);
 }

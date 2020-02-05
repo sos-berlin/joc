@@ -7,6 +7,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -15,6 +16,7 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobDescriptionResource;
 import com.sos.joc.model.job.JobFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("job")
 public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobDescriptionResource {
@@ -23,18 +25,12 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
     private static final String XSL_FILE = "scheduler_job_documentation_v1.1.xsl";
 
     @Override
-    public JOCDefaultResponse getJobDescription(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String job)
-            throws Exception {
-        // TODO Auto-generated method stub
-        return getJobDescription(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, job);
-    }
-    
-    public JOCDefaultResponse getJobDescription(String accessToken, String queryAccessToken, String jobschedulerId, String job) throws Exception {
-        JobFilter jobFilter = new JobFilter();
+    public JOCDefaultResponse getJobDescription(String accessToken, String queryAccessToken, String jobschedulerId, String job) {
 
         try {
-            jobFilter.setJob(normalizePath(job));
-            jobFilter.setJobschedulerId(jobschedulerId);
+            String jsonStr = String.format("{\"jobschedulerId\": \"%s\", \"job\": \"%s\"}", jobschedulerId, job);
+            JsonValidator.validateFailFast(jsonStr.getBytes(), JobFilter.class);
+            JobFilter jobFilter = Globals.objectMapper.readValue(jsonStr, JobFilter.class);
             jobFilter.setCompact(null);
 
             if (accessToken == null) {

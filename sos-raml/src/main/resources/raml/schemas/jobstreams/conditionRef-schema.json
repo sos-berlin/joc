@@ -1,0 +1,18 @@
+{
+	"title": "ConditionRef",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "In Condition",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionRef",
+	"type": "object",
+	"properties": {
+		"job": {
+			"$ref": "../common/path-schema.json"
+		},
+		"expressions": {
+			"type": "array",
+			"items": {
+				"$ref": "../common/noScript-schema.json"
+			}
+		}
+	}
+}

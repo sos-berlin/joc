@@ -1,0 +1,13 @@
+{
+  "title": "JobScheduler id",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.common.JobSchedulerId",
+  "type": "object",
+  "properties": {
+    "jobschedulerId": {
+      "type": "string",
+      "pattern": "^[^<>]*$",
+      "maxLength": 100
+    }
+  }
+}

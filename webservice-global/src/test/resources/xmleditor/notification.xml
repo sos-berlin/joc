@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SystemMonitorNotification
+	system_id="MonitorSystem">
+	<Notification>
+		<NotificationMonitor>
+			<NotificationCommand>
+			<![CDATA[test
+line 2
+
+line4]]>
+		</NotificationCommand>
+		</NotificationMonitor>
+		<NotificationObjects>
+			<TimerRef notifications="1" ref="xxx" notify_on_error="false" />
+		</NotificationObjects>
+	</Notification>
+	<!-- Timer name="yyy"></Timer-->
+</SystemMonitorNotification>

@@ -1,0 +1,24 @@
+{
+	"title": "jobStreamFolders",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "List of all jobStreams and their folders",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreams",
+	"type": "object",
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"jobStreamFilter": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"jobStreamFolders": {
+			"type": "array",
+			"items": {
+				"$ref": "folders2jobStream-schema.json"
+			}
+		}
+	}
+}

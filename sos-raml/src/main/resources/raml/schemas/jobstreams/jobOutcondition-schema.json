@@ -1,0 +1,18 @@
+{
+	"title": "job Out-Condition",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "job Out Condition",
+	"javaType": "com.sos.joc.model.jobstreams.JobOutCondition",
+	"type": "object",
+	"properties": {
+		"job": {
+			"$ref": "../common/path-schema.json"
+		},
+		"outconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "outcondition-schema.json"
+			}
+		}
+	}
+}

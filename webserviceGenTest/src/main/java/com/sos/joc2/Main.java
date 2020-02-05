@@ -4,6 +4,9 @@ package com.sos.joc2;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
@@ -14,7 +17,7 @@ import org.glassfish.jersey.server.ResourceConfig;
  
 public class Main {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://localhost:8080/rest/";
+    public static final String BASE_URI = "http://localhost:8081/rest/";
 
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
@@ -30,8 +33,18 @@ public class Main {
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
+    
+    public  static void setLogger() {
+        Logger l = Logger.getLogger("org.glassfish.grizzly.http.server.HttpHandler");
+        l.setLevel(Level.FINE);
+        l.setUseParentHandlers(false);
+        ConsoleHandler ch = new ConsoleHandler();
+        ch.setLevel(Level.ALL);
+        l.addHandler(ch);
+    }
  
     public static void main(String[] args) throws IOException {
+        setLogger();
         final HttpServer server = startServer();
         StaticHttpHandler staticHttpHandler = new StaticHttpHandler("src/main/resources");
         server.getServerConfiguration().addHttpHandler(staticHttpHandler, "/");
@@ -40,6 +53,7 @@ public class Main {
         System.in.read();
         server.shutdownNow();
     }
+       
 }
 
 

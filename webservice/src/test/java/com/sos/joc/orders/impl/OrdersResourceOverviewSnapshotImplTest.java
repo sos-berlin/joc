@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.jobChain.JobChainsFilter;
@@ -24,7 +26,8 @@ public class OrdersResourceOverviewSnapshotImplTest {
         JobChainsFilter filterSchema = new JobChainsFilter();
         filterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceOverviewSnapshotImpl ordersResourceOverviewSnapshotImpl = new OrdersResourceOverviewSnapshotImpl();
-        JOCDefaultResponse ordersResponse = ordersResourceOverviewSnapshotImpl.postOrdersOverviewSnapshot(accessToken, filterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(filterSchema);
+        JOCDefaultResponse ordersResponse = ordersResourceOverviewSnapshotImpl.postOrdersOverviewSnapshot(accessToken, b);
         OrdersSnapshot snapshotSchema = (OrdersSnapshot) ordersResponse.getEntity();
         assertEquals("postOrdersOverviewSnapshot", 0, snapshotSchema.getOrders().getRunning().intValue());
     }

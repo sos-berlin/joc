@@ -1,0 +1,279 @@
+{
+  "title": "job without name, temporary, spooler_id, log_append, separate_process, mail_xslt_stylesheet, replace attributes",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.job.Job",
+  "javaInterfaces" : [
+    "com.sos.joc.model.joe.common.IJSObject"
+  ],
+  "type": "object",
+  "properties": {
+    "priority": {
+      "description": "possible values windows: idle, below_normal, normal, above_normal, high; possible values unix: integer from -20 to 20",
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "isOrderJob": {
+      "xmlElement": "order",
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string",
+      "default": "false"
+    },
+    "criticality": {
+      "xmlElement": "criticality",
+      "description": "possible values: normal, minor, major",
+      "type": "string",
+      "default": "normal"
+    },
+    "enabled": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string",
+      "default": "true"
+    },
+    "maxTasks": {
+      "xmlElement": "tasks",
+      "type": "integer",
+      "minimum": 0,
+      "default": 1
+    },
+    "minTasks": {
+      "$ref": "../../common/nonNegativeInteger-schema.json"
+    },
+    "timeout": {
+      "type": "string"
+    },
+    "idleTimeout": {
+      "type": "string"
+    },
+    "forceIdleTimeout": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string",
+      "default": "false"
+    },
+    "processClass": {
+      "description": "path of a process class object",
+      "type": "string"
+    },
+    "javaOptions": {
+      "type": "string"
+    },
+    "stopOnError": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string",
+      "default": "true"
+    },
+    "ignoreSignals": {
+      "description": "possible values: positive Integer or SIGHUP, SIGINT, SIGQUIT, SIGILL, SIGTRAP, SIGABRT, SIGIOT, SIGBUS, SIGFPE, SIGKILL, SIGUSR1, SIGSEGV, SIGUSR2, SIGPIPE, SIGALRM, SIGTERM, SIGSTKFLT, SIGCHLD, SIGCONT, SIGSTOP, SIGTSTP, SIGTTIN, SIGTTOU, SIGURG, SIGXCPU, SIGXFSZ, SIGVTALRM, SIGPROF, SIGWINCH, SIGPOLL, SIGIO, SIGPWR, SIGSYS",
+      "type": "string"
+    },
+    "warnIfLongerThan": {
+      "type": "string"
+    },
+    "warnIfShorterThan": {
+      "type": "string"
+    },
+    "stderrLogLevel": {
+      "description": "possible values: error and info",
+      "type": "string",
+      "default": "info"
+    },
+    "credentialsKey": {
+      "type": "string"
+    },
+    "loadUserProfile": {
+      "description": "possible values: yes, no, 1, 0, true, false",
+      "type": "string",
+      "default": "false"
+    },
+    "settings": {
+      "$ref": "settings-schema.json"
+    },
+    "documentation": {
+      "xmlElement": "description",
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.job.Description",
+      "properties": {
+        "includes": {
+          "$ref": "../common/includes-schema.json"
+        },
+    	"content": {
+      		"description": "cdata embedded docu",
+      		"type": "string"
+    	}
+      }
+    },
+    "lockUses": {
+      "type": "array",
+      "xmlElement": "lock.use",
+      "items": {
+        "xmlElement": "lock.use",
+        "type": "object",
+        "javaType": "com.sos.joc.model.joe.job.LockUse",
+        "required": [
+          "lock"
+        ],
+        "properties": {
+          "lock": {
+            "description": "path to a lock object",
+            "type": "string"
+          },
+          "exclusive": {
+            "description": "possible values: yes, no, 1, 0, true, false",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "params": {
+      "$ref": "../common/params-schema.json"
+    },
+    "environment": {
+      "$ref": "environment-schema.json"
+    },
+    "login": {
+      "type": "object",
+      "javaType": "com.sos.joc.model.joe.job.Login",
+      "required": [
+        "user",
+        "password"
+      ],
+      "properties": {
+        "user": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string",
+          "xmlElement": "password.plain",
+          "isXmlCData": true
+        }
+      }
+    },
+    "script": {
+      "$ref": "script-schema.json"
+    },
+    "monitors": {
+      "type": "array",
+      "xmlElement": "monitor",
+      "items": {
+        "$ref": "monitor-schema.json"
+      }
+    },
+    "monitorUses": {
+      "type": "array",
+      "xmlElement": "monitor.use",
+      "items": {
+        "xmlElement": "monitor.use",
+        "type": "object",
+        "javaType": "com.sos.joc.model.joe.job.MonitorUse",
+        "required": [
+          "monitor"
+        ],
+        "properties": {
+          "monitor": {
+            "description": "path to a monitor object",
+            "type": "string"
+          },
+          "ordering": {
+            "$ref": "../../common/nonNegativeInteger-schema.json"
+          }
+        }
+      }
+    },
+    "startWhenDirectoriesChanged": {
+      "type": "array",
+      "xmlElement": "start_when_directory_changed",
+      "items": {
+		"type": "object",
+        "javaType": "com.sos.joc.model.joe.job.StartWhenDirectoryChanged",
+        "required": [
+          "directory"
+        ],
+        "properties": {
+          "directory": {
+            "type": "string"
+          },
+          "regex": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "delayAfterErrors": {
+      "type": "array",
+      "xmlElement": "delay_after_error",
+      "items": {
+		"type": "object",
+        "javaType": "com.sos.joc.model.joe.job.DelayAfterError",
+        "required": [
+          "errorCount",
+          "delay"
+        ],
+        "properties": {
+          "errorCount": {
+            "$ref": "../../common/nonNegativeInteger-schema.json"
+          },
+          "delay": {
+            "description": "possible values: stop or a delay in the format [hh:mm:]ss",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "delayOrderAfterSetbacks": {
+      "type": "array",
+      "xmlElement": "delay_order_after_setback",
+      "items": {
+		"type": "object",
+        "javaType": "com.sos.joc.model.joe.job.DelayOrderAfterSetback",
+        "description": "Only one item of this array can have isMaximum=true",
+        "required": [
+          "setbackCount"
+        ],
+        "properties": {
+          "setbackCount": {
+            "$ref": "../../common/nonNegativeInteger-schema.json"
+          },
+          "delay": {
+            "type": "string"
+          },
+          "isMaximum": {
+            "description": "possible values: yes, no, 1, 0, true, false",
+            "type": "string",
+            "default": "false"
+          }
+        }
+      }
+    },
+    "runTime": {
+      "$ref": "../schedule/runTime-schema.json"
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "javaType": "com.sos.joc.model.joe.job.Commands",
+        "properties": {
+          "onExitCode": {
+            "description": "possible values: success, error or space separated collection of numbers or a unix signal",
+            "type": "string"
+          },
+          "addOrders": {
+            "type": "array",
+            "xmlElement": "add_order",
+            "items": {
+              "$ref": "../order/addOrder-schema.json"
+            }
+          },
+          "startJobs": {
+            "type": "array",
+            "xmlElement": "start_job",
+            "items": {
+              "$ref": "startJob-schema.json"
+            }
+          }
+        }
+      }
+    }
+  }
+}

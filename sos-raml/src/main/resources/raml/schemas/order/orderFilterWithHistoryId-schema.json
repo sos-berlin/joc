@@ -1,0 +1,30 @@
+{
+  "title": "order filter with history id",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderHistoryFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "historyId": {
+      "type": "string",
+      "pattern": "^\\d+$"
+    },
+    "filename": {
+      "$ref": "../common/filename255-schema.json"
+    },
+    "mime": {
+      "$ref": "../common/logMimeFilter-schema.json"
+    }
+  }
+}

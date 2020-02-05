@@ -7,12 +7,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.docu.DocumentationsFilter;
 
 public interface IDocumentationsDeleteResource {
 
     @POST
     @Path("delete")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse deleteDocumentations(@HeaderParam("X-Access-Token") String xAccessToken, DocumentationsFilter filter) throws Exception;
+    public JOCDefaultResponse deleteDocumentations(@HeaderParam("X-Access-Token") String xAccessToken, byte[] filterBytes);
 }

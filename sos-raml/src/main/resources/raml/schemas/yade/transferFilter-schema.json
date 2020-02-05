@@ -1,0 +1,97 @@
+{
+  "title": "yade filter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.yade.TransferFilter",
+  "type": "object",
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "transferIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeLong-schema.json"
+      }
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[^<>]*$",
+        "maxLength": 100
+      }
+    },
+    "mandator": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "$ref": "transferStateText-schema.json"
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "$ref": "operation-schema.json"
+      }
+    },
+    "dateFrom": {
+      "$ref": "../common/dateFromTo-schema.json"
+    },
+    "dateTo": {
+      "$ref": "../common/dateFromTo-schema.json"
+    },
+    "timeZone": {
+      "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+      "$ref": "../common/string255-schema.json"
+    },
+    "limit": {
+      "description": "only for db history urls to restrict the number of responsed records; -1=unlimited",
+      "type": "integer",
+      "default": 10000
+    },
+    "hasIntervention": {
+      "type": "boolean"
+    },
+    "isIntervention": {
+      "type": "boolean"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "protocolFragment-schema.json"
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "$ref": "protocolFragment-schema.json"
+      }
+    },
+    "sourceFilesRegex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "targetFilesRegex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "sourceFiles": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/clob-schema.json"
+      }
+    },
+    "targetFiles": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/clob-schema.json"
+      }
+    }
+  }
+}

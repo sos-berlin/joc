@@ -30,6 +30,7 @@ import com.sos.joc.model.order.OrderHistoryItem;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.orders.resource.IOrdersResourceHistory;
+import com.sos.schema.JsonValidator;
 
 @Path("orders")
 public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrdersResourceHistory {
@@ -38,15 +39,13 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 	private static final String CHILD_ORDER_PATTERN = "-\\+(\\d+)\\+-";
 
 	@Override
-	public JOCDefaultResponse postOrdersHistory(String xAccessToken, String accessToken, OrdersFilter ordersFilter)
-			throws Exception {
-		return postOrdersHistory(getAccessToken(xAccessToken, accessToken), ordersFilter);
-	}
-
-	public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilter ordersFilter) throws Exception {
+	public JOCDefaultResponse postOrdersHistory(String accessToken, byte[] ordersFilterBytes) {
 		SOSHibernateSession connection = null;
 
 		try {
+		    JsonValidator.validateFailFast(ordersFilterBytes, OrdersFilter.class);
+		    OrdersFilter ordersFilter = Globals.objectMapper.readValue(ordersFilterBytes, OrdersFilter.class);
+            
 			if (ordersFilter.getJobschedulerId() == null) {
 				ordersFilter.setJobschedulerId("");
 			}
@@ -176,16 +175,18 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 					history.setPath(dbItemReportTrigger.getFullOrderQualifier());
 					history.setStartTime(dbItemReportTrigger.getStartTime());
 					HistoryState state = new HistoryState();
+					
+					boolean resultError = dbItemReportTrigger.getResultError() && !dbItemReportTrigger.getState().toLowerCase().contains("success");
 
 					if (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null) {
 						state.setSeverity(1);
 						state.set_text(HistoryStateText.INCOMPLETE);
 					} else {
-						if (dbItemReportTrigger.getResultError()) {
+						if (resultError) {
 							state.setSeverity(2);
 							state.set_text(HistoryStateText.FAILED);
 						} else {
-							if (dbItemReportTrigger.getEndTime() != null && !dbItemReportTrigger.getResultError()) {
+							if (dbItemReportTrigger.getEndTime() != null && !resultError) {
 								state.setSeverity(0);
 								state.set_text(HistoryStateText.SUCCESSFUL);
 							}

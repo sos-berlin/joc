@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.processClass.ProcessClassesFilter;
@@ -24,7 +26,8 @@ public class ProcessClassesResourceImplTest {
         ProcessClassesFilter processesClassFilterSchema = new ProcessClassesFilter();
         processesClassFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         ProcessClassesResourceImpl processClassesResourceImpl = new ProcessClassesResourceImpl();
-        JOCDefaultResponse jobsResponse = processClassesResourceImpl.postProcessClasses(accessToken, processesClassFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(processesClassFilterSchema);
+        JOCDefaultResponse jobsResponse = processClassesResourceImpl.postProcessClasses(accessToken, b);
         ProcessClassesV processClassesVSchema = (ProcessClassesV) jobsResponse.getEntity();
         assertEquals("postProcessClassesTest", "win7", processClassesVSchema.getProcessClasses().get(0).getName());
     }

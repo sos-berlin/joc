@@ -29,6 +29,7 @@ import com.sos.joc.model.schedule.ScheduleV;
 import com.sos.joc.model.schedule.SchedulesFilter;
 import com.sos.joc.model.schedule.SchedulesV;
 import com.sos.joc.schedules.resource.ISchedulesResource;
+import com.sos.schema.JsonValidator;
 
 @Path("schedules")
 public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedulesResource {
@@ -36,14 +37,13 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
     private static final String API_CALL = "./schedules";
 
     @Override
-    public JOCDefaultResponse postSchedules(String xAccessToken, String accessToken, SchedulesFilter schedulesFilter) throws Exception {
-        return postSchedules(getAccessToken(xAccessToken, accessToken), schedulesFilter);
-    }
-
-    public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
+    public JOCDefaultResponse postSchedules(String accessToken, byte[] schedulesFilterBytes) {
         SOSHibernateSession connection = null;
 
 		try {
+		    JsonValidator.validateFailFast(schedulesFilterBytes, SchedulesFilter.class);
+		    SchedulesFilter schedulesFilter = Globals.objectMapper.readValue(schedulesFilterBytes, SchedulesFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, schedulesFilter, accessToken,
 					schedulesFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(schedulesFilter.getJobschedulerId(), accessToken).getSchedule().getView()

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
@@ -13,6 +14,7 @@ import com.sos.joc.model.jobscheduler.DB;
 import com.sos.joc.model.jobscheduler.DBState;
 import com.sos.joc.model.jobscheduler.DBStateText;
 import com.sos.joc.model.jobscheduler.Database;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobSchedulerResourceDb {
@@ -20,15 +22,13 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
 	private static final String API_CALL = "./jobscheduler/db";
 
 	@Override
-	public JOCDefaultResponse postJobschedulerDb(String xAccessToken, String accessToken,
-			JobSchedulerId jobSchedulerFilter) {
-		return postJobschedulerDb(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
-	}
-
-	public JOCDefaultResponse postJobschedulerDb(String accessToken, JobSchedulerId jobSchedulerFilter) {
+	public JOCDefaultResponse postJobschedulerDb(String accessToken, byte[] filterBytes) {
 
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken,
+		    JsonValidator.validateFailFast(filterBytes, JobSchedulerId.class);
+            JobSchedulerId jobSchedulerFilter = Globals.objectMapper.readValue(filterBytes, JobSchedulerId.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken,
 					jobSchedulerFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(jobSchedulerFilter.getJobschedulerId(), accessToken).getJobschedulerMaster()
 							.getView().isStatus());

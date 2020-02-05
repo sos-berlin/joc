@@ -1,6 +1,7 @@
 package com.sos.joc;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,12 +12,17 @@ import java.util.TimeZone;
 
 import javax.json.Json;
 import javax.json.JsonReader;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -52,7 +58,7 @@ public class Globals {
     public static int httpSocketTimeout = 2000;
     public static boolean withHostnameVerification = false;
     public static boolean auditLogCommentsAreRequired = false;
-    public static long maxSizeOfLogsToDisplay = 1024 * 1024 * 10L; //10MB
+    public static long maxSizeOfLogsToDisplay = 1024 * 1024 * 10L; // 10MB
     public static JocWebserviceDataContainer jocWebserviceDataContainer = JocWebserviceDataContainer.getInstance();
     public static JocCockpitProperties jocConfigurationProperties;
     public static IniSecurityManagerFactory factory = null;
@@ -60,7 +66,13 @@ public class Globals {
     public static TimeZone jocTimeZone = TimeZone.getDefault();
     public static boolean rollbackJobHistoryWithJSON = false;
     public static boolean rollbackJobChainWithJSON = false;
-
+    public static ObjectMapper xmlMapper = new XmlMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).configure(
+            SerializationFeature.INDENT_OUTPUT, true);
+    public static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    public static String servletContextContextPath = null; // /joc
+    public static Path servletContextRealPath = null;
+    public static URI servletBaseUri = null;
+    
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {
             try {
@@ -69,7 +81,6 @@ public class Globals {
                 sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getYadeClassMapping());
-                sosHibernateFactory.addClassMapping(com.sos.eventhandlerservice.classes.Constants.getConditionsClassMapping());
                 sosHibernateFactory.setAutoCommit(true);
                 sosHibernateFactory.build();
             } catch (SOSHibernateConfigurationException | SOSHibernateFactoryBuildException e) {
@@ -167,7 +178,7 @@ public class Globals {
         setTrustStore();
         setTrustStoreType();
         setTrustStorePassword();
-        //setMaxSizeOfLogsToDisplay();
+        // setMaxSizeOfLogsToDisplay();
         setTimeoutForTempFiles();
         setConfigurationProperties();
     }
@@ -321,7 +332,7 @@ public class Globals {
                     }
                 }
             } else {
-                if(trustStoreLocationDefault == null) {
+                if (trustStoreLocationDefault == null) {
                     System.clearProperty("javax.net.ssl.trustStore");
                 } else {
                     System.setProperty("javax.net.ssl.trustStore", trustStoreLocationDefault);
@@ -329,14 +340,14 @@ public class Globals {
             }
         }
     }
-    
+
     private static void setTrustStoreType() throws JocException {
         if (sosShiroProperties != null) {
             String truststoreType = sosShiroProperties.getProperty("truststore_type", KeyStore.getDefaultType());
             System.setProperty("javax.net.ssl.trustStoreType", truststoreType);
         }
     }
-    
+
     private static void setTrustStorePassword() throws JocException {
         if ("?????".equals(trustStorePasswordDefault)) {
             trustStorePasswordDefault = System.getProperty("javax.net.ssl.trustStorePassword");
@@ -346,7 +357,7 @@ public class Globals {
             if (truststorePassw != null) {
                 System.setProperty("javax.net.ssl.trustStorePassword", truststorePassw);
             } else {
-                if(trustStorePasswordDefault == null) {
+                if (trustStorePasswordDefault == null) {
                     System.clearProperty("javax.net.ssl.trustStorePassword");
                 } else {
                     System.setProperty("javax.net.ssl.trustStorePassword", trustStorePasswordDefault);
@@ -381,16 +392,16 @@ public class Globals {
             LOGGER.info("force comments for audit log = " + auditLogCommentsAreRequired);
         }
     }
-    
-    //rollback option for JS-1802; see https://sourceforge.net/p/jobscheduler/bugs/145/
+
+    // rollback option for JS-1802; see https://sourceforge.net/p/jobscheduler/bugs/145/
     private static void setRollbackJobHistoryWithJSON() {
         boolean defaultRollbackJobHistoryWithJSON = false;
         if (sosShiroProperties != null) {
             rollbackJobHistoryWithJSON = sosShiroProperties.getProperty("disable_job_history_with_json", defaultRollbackJobHistoryWithJSON);
         }
     }
-    
-    //rollback option for JS-1795
+
+    // rollback option for JS-1795
     private static void setRollbackJobChainyWithJSON() {
         boolean defaultRollbackJobChainWithJSON = false;
         if (sosShiroProperties != null) {
@@ -398,20 +409,20 @@ public class Globals {
         }
     }
 
-// for JOC-483 cancelled but should be implement for 2.0
-//    private static void setMaxSizeOfLogsToDisplay() {
-//        long defaultMaxSizeOfLogsToDisplay = 1024 * 1024 * 10L;
-//        if (sosShiroProperties != null) {
-//            maxSizeOfLogsToDisplay = sosShiroProperties.getFileSizeProperty("max_size_of_logs_for_display", defaultMaxSizeOfLogsToDisplay);
-//            LOGGER.info("max size of logs to display = " + maxSizeOfLogsToDisplay);
-//        }
-//    }
-    
+    // for JOC-483 cancelled but should be implement for 2.0
+    // private static void setMaxSizeOfLogsToDisplay() {
+    // long defaultMaxSizeOfLogsToDisplay = 1024 * 1024 * 10L;
+    // if (sosShiroProperties != null) {
+    // maxSizeOfLogsToDisplay = sosShiroProperties.getFileSizeProperty("max_size_of_logs_for_display", defaultMaxSizeOfLogsToDisplay);
+    // LOGGER.info("max size of logs to display = " + maxSizeOfLogsToDisplay);
+    // }
+    // }
+
     private static void setTimeoutForTempFiles() {
         long defaultTimeout = 1000 * 60 * 3L;
         if (sosShiroProperties != null) {
             timeoutToDeleteTempFiles = sosShiroProperties.getProperty("timeout_to_delete_temp_files", defaultTimeout);
-            //LOGGER.info("timeout to delete temp files = " + TIMEOUT_TO_DELETE_TEMP_FILES);
+            // LOGGER.info("timeout to delete temp files = " + TIMEOUT_TO_DELETE_TEMP_FILES);
         }
     }
 
@@ -430,7 +441,7 @@ public class Globals {
             sosHibernateFactory = null;
         }
     }
-    
+
     public static String normalizePath(String path) {
         if (path == null) {
             return null;
@@ -438,17 +449,58 @@ public class Globals {
         return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
 
-     public static String getParent(String path) {
-		Path p = Paths.get(path).getParent();
-		if (p == null) {
-			return null;
-		} else {
-			return p.toString().replace('\\', '/');
-		}
-	}
+    public static String getParent(String path) {
+        Path p = Paths.get(path).getParent();
+        if (p == null) {
+            return null;
+        } else {
+            return p.toString().replace('\\', '/');
+        }
+    }
 
+    public static void setServletBaseUri(UriInfo uriInfo) {
+        // request.getServletPath=/api
+        // request.getPathInfo=/xmleditor/validate
+        // [JOC unzipped]request.getPathTranslated=D:\joc\data\webapps\joc\xmleditor\validate
+        // [JOC as war] request.getPathTranslated=D:\joc\data\temp\jetty-0.0.0.0-4446-joc.war-_joc-any-7137785786755971224.dir\webapp\xmleditor\validate
+        // request.getRequestURL=http://localhost:4446/joc/api/xmleditor/validate
+        // request.getRequestURI=/joc/api/xmleditor/validate
+        // request.getServletContext()=/joc
+        //
+        // JocXmlEditor.getBaseUri=http://localhost:4446/joc
+        // return request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
 
+        // uriInfo.getAbsolutePath().toString()=http://localhost:4446/joc/api/xmleditor/validate
+        // uriInfo.getAbsolutePath().getPath()=/joc/api/xmleditor/validate
+        // uriInfo.getPath()= xmleditor/validate
+        // uriInfo.getBaseUri().toString()=http://localhost:4446/joc/api/
+        // uriInfo.getBaseUri().getPath()=/joc/api/
+        // uriInfo.getRequestUri().getPath()=/joc/api/xmleditor/validate
+        // uriInfo.getRequestUri().toString()=http://localhost:4446/joc/api/xmleditor/validate
 
-	
+        if (uriInfo == null) {
+            return;
+        }
+        try {
+            if (servletBaseUri == null) {
+                if (servletContextContextPath == null) {
+                    servletBaseUri = uriInfo.getBaseUri();
+                } else {
+                    String baseUri = uriInfo.getBaseUri().toString();
+                    // baseUri = http://localhost:4446/joc/api/
+                    // Globals.servletContextContextPath = /joc
+                    LOGGER.debug(String.format("servletContextContextPath=%s, baseUri=%s", servletContextContextPath, baseUri));
+                    int indx = baseUri.indexOf(servletContextContextPath);
+                    if (indx > -1) {
+                        baseUri = baseUri.substring(0, indx + servletContextContextPath.length());
+                    }
+                    servletBaseUri = new URI(baseUri + "/");
+                }
+                LOGGER.info("servletBaseUri=" + servletBaseUri);
+            }
+        } catch (Throwable e) {
+            LOGGER.error(String.format("can't evaluate the base url: %s", e.toString()), e);
+        }
+    }
 
 }

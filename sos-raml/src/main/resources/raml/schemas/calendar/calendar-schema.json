@@ -1,0 +1,53 @@
+{
+  "title": "calendar",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Calendar",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "name": {
+      "$ref": "../common/filename255-schema.json"
+    },
+    "basedOn": {
+      "$ref": "../common/path-schema.json"
+    },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
+    },
+    "type": {
+      "$ref": "calendarType-schema.json"
+    },
+    "category": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "title": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "from": {
+      "$ref": "../common/date-schema.json"
+    },
+    "to": {
+      "$ref": "../common/date-schema.json"
+    },
+    "periods": {
+      "type": "array",
+      "items": {
+        "$ref": "period-schema.json"
+      }
+    },
+    "includes": {
+      "$ref": "frequencies-schema.json"
+    },
+    "excludes": {
+      "$ref": "frequencies-schema.json"
+    },
+    "usedBy": {
+      "$ref": "usedBy-schema.json"
+    }
+  }
+}

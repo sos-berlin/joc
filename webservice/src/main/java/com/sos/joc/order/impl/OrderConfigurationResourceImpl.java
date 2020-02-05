@@ -2,6 +2,7 @@ package com.sos.joc.order.impl;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.configuration.JSObjectConfiguration;
@@ -10,6 +11,7 @@ import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.order.OrderConfigurationFilter;
 import com.sos.joc.order.resource.IOrderConfigurationResource;
+import com.sos.schema.JsonValidator;
 
 @Path("order")
 public class OrderConfigurationResourceImpl extends JOCResourceImpl implements IOrderConfigurationResource {
@@ -17,14 +19,11 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
 	private static final String API_CALL = "./order/configuration";
 
 	@Override
-	public JOCDefaultResponse postOrderConfiguration(String xAccessToken, String accessToken,
-			OrderConfigurationFilter orderBody) throws Exception {
-		return postOrderConfiguration(getAccessToken(xAccessToken, accessToken), orderBody);
-	}
-
-	public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilter orderBody)
-			throws Exception {
+	public JOCDefaultResponse postOrderConfiguration(String accessToken, byte[] orderFilterBytes) {
 		try {
+		    JsonValidator.validateFailFast(orderFilterBytes, OrderConfigurationFilter.class);
+		    OrderConfigurationFilter orderBody = Globals.objectMapper.readValue(orderFilterBytes, OrderConfigurationFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderBody, accessToken,
 					orderBody.getJobschedulerId(), getPermissonsJocCockpit(orderBody.getJobschedulerId(), accessToken)
 							.getOrder().getView().isStatus());
@@ -35,7 +34,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
 			Configuration200 entity = new Configuration200();
 			if (checkRequiredParameter("orderId", orderBody.getOrderId())
 					&& checkRequiredParameter("jobChain", orderBody.getJobChain())) {
-				JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(accessToken);
+				JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(accessToken, versionIsOlderThan("1.13.1"));
 				boolean responseInHtml = orderBody.getMime() == ConfigurationMime.HTML;
 				entity = jocConfiguration.getOrderConfiguration(this, orderBody.getJobChain(), orderBody.getOrderId(),
 						responseInHtml);

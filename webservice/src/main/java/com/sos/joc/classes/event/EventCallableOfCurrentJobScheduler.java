@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
-import com.sos.eventhandlerservice.servlet.JobSchedulerConditionsEventHandler;
+import com.sos.jobstreams.plugins.JobSchedulerJobStreamsEventHandler;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -313,16 +313,21 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setEventType(eventKey); // YADETransferStarted, YADETransferUpdated, YADEFileStateChanged
                         }
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
-                        //eventSnapshot.setPath(variables.getString("fileId", null));
+                        // eventSnapshot.setPath(variables.getString("fileId", null));
                         eventSnapshot.setPath(variables.getString("transferId", null));
-                    } else if (eventKey.equals("JobSchedulerConditionsEventHandler")) {
-                        String eventCreated = variables.getString(JobSchedulerConditionsEventHandler.CustomEventType.EventCreated.name(), null);
-                        String inconditionValidated = variables.getString(JobSchedulerConditionsEventHandler.CustomEventType.InconditionValidated.name(), null);
+                    } else if (eventKey.equals("JobSchedulerJobStreamsEventHandler")) {
+                        String eventCreated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name(), null);
+                        String eventRemoved = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name(), null);
+                        String inconditionValidated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated
+                                .name(), null);
                         if (eventCreated != null) {
-                            eventSnapshot.setEventType(JobSchedulerConditionsEventHandler.CustomEventType.EventCreated.name());
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name());
                             eventSnapshot.setPath(eventCreated);
+                        } else if (eventRemoved != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name());
+                            eventSnapshot.setPath(eventRemoved);
                         } else if (inconditionValidated != null) {
-                            eventSnapshot.setEventType(JobSchedulerConditionsEventHandler.CustomEventType.InconditionValidated.name());
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated.name());
                             eventSnapshot.setPath(inconditionValidated);
                         }
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
@@ -331,6 +336,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setPath(variables.getString("path", null));
                         eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
                         eventSnapshots.put(createJobChainEventOfOrder(eventSnapshot));
+                    } else if (eventKey.equals("JoeUpdated")) {
+                        eventSnapshot.setEventType(eventKey);
+                        eventSnapshot.setPath(variables.getString("path", null));
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(variables.getString("objectType", JobSchedulerObjectType.FOLDER
+                                .value())));
                     } else {
                         continue;
                     }
@@ -542,10 +552,10 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             if (connection == null) {
                 connection = Globals.createSosHibernateStatelessConnection("eventCallable-" + jobSchedulerEvent.getJobschedulerId());
             }
-            
+
             Date from = new Date();
             from.setTime(Long.parseLong(eventId) / 1000);
-           
+
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
             Globals.beginTransaction(connection);
             AuditLogDBFilter auditLogDBFilter = new AuditLogDBFilter();

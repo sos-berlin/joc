@@ -1,8 +1,10 @@
 package com.sos.joc.jobchain.impl;
 
-import java.sql.Date;
 import java.time.Instant;
+import java.util.Date;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -19,6 +21,7 @@ import com.sos.joc.jobchain.resource.IJobChainResourceDocumentation;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.docu.DocumentationShowFilter;
 import com.sos.joc.model.jobChain.JobChainDocuFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("job_chain")
 public class JobChainResourceDocumentationImpl extends JOCResourceImpl implements IJobChainResourceDocumentation {
@@ -28,16 +31,24 @@ public class JobChainResourceDocumentationImpl extends JOCResourceImpl implement
     private static final String API_CALL_UNASSIGN = API_CALL + "/unassign";
 
     @Override
-    public JOCDefaultResponse postDocumentation(String xAccessToken, String accessToken, String jobschedulerId, String path) throws Exception {
+    public JOCDefaultResponse postDocumentation(String xAccessToken, String accessToken, String jobschedulerId, String path) {
         return postDocumentation(getAccessToken(xAccessToken, accessToken), jobschedulerId, path);
     }
 
-    public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) throws Exception {
+    public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) {
         SOSHibernateSession connection = null;
         try {
-            DocumentationShowFilter documentationFilter = new DocumentationShowFilter();
-            documentationFilter.setJobschedulerId(jobschedulerId);
-            documentationFilter.setPath(path);
+            //String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            if(jobschedulerId != null) {
+                builder.add("jobschedulerId", jobschedulerId);
+            }
+            if(path != null) {
+                builder.add("path", path);
+            }
+            String json = builder.build().toString();
+            JsonValidator.validateFailFast(json.getBytes(), DocumentationShowFilter.class);
+            DocumentationShowFilter documentationFilter = Globals.objectMapper.readValue(json, DocumentationShowFilter.class);
             documentationFilter.setType(JobSchedulerObjectType.JOBCHAIN);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
@@ -58,7 +69,7 @@ public class JobChainResourceDocumentationImpl extends JOCResourceImpl implement
             }
 
             String entity = String.format(
-                    "<!DOCTYPE html>%n<html>\n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='../documentation/%s/%s%s'\" />%n</head>%n<body>%n</body>%n</html>",
+                    "<!DOCTYPE html>%n<html>%n<head>%n  <meta http-equiv=\"refresh\" content=\"0;URL='../documentation/%s/%s%s'\" />%n</head>%n<body>%n</body>%n</html>",
                     documentationFilter.getJobschedulerId(), xAccessToken, JOCJsonCommand.urlEncodedPath(docPath));
 
             return JOCDefaultResponse.responseHtmlStatus200(entity);
@@ -73,8 +84,11 @@ public class JobChainResourceDocumentationImpl extends JOCResourceImpl implement
     }
 
     @Override
-    public JOCDefaultResponse assignDocu(String xAccessToken, JobChainDocuFilter filter) throws Exception {
+    public JOCDefaultResponse assignDocu(String xAccessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, JobChainDocuFilter.class);
+            JobChainDocuFilter filter = Globals.objectMapper.readValue(filterBytes, JobChainDocuFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getJobChain().isAssignDocumentation());
             if (jocDefaultResponse != null) {
@@ -96,8 +110,11 @@ public class JobChainResourceDocumentationImpl extends JOCResourceImpl implement
     }
 
     @Override
-    public JOCDefaultResponse unassignDocu(String xAccessToken, JobChainDocuFilter filter) throws Exception {
+    public JOCDefaultResponse unassignDocu(String xAccessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, JobChainDocuFilter.class);
+            JobChainDocuFilter filter = Globals.objectMapper.readValue(filterBytes, JobChainDocuFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_UNASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getJobChain().isAssignDocumentation());
             if (jocDefaultResponse != null) {

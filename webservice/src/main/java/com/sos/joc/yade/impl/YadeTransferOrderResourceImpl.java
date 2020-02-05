@@ -1,7 +1,7 @@
 package com.sos.joc.yade.impl;
 
-import java.sql.Date;
 import java.time.Instant;
+import java.util.Date;
 
 import javax.ws.rs.Path;
 
@@ -15,6 +15,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderV200;
 import com.sos.joc.model.yade.ModifyTransfer;
 import com.sos.joc.yade.resource.IYadeTransferOrderResource;
+import com.sos.schema.JsonValidator;
 
 @Path("yade")
 public class YadeTransferOrderResourceImpl extends JOCResourceImpl implements IYadeTransferOrderResource {
@@ -22,10 +23,13 @@ public class YadeTransferOrderResourceImpl extends JOCResourceImpl implements IY
 	private static final String API_CALL = "./yade/transfer/order";
 
 	@Override
-	public JOCDefaultResponse postYadeTransferOrder(String accessToken, ModifyTransfer filterBody) throws Exception {
+	public JOCDefaultResponse postYadeTransferOrder(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
 		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
+		    JsonValidator.validateFailFast(filterBytes, ModifyTransfer.class);
+		    ModifyTransfer filterBody = Globals.objectMapper.readValue(filterBytes, ModifyTransfer.class);
+            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
 					filterBody.getJobschedulerId(), getPermissonsJocCockpit(filterBody.getJobschedulerId(), accessToken)
 							.getYADE().getExecute().isTransferStart());
 			if (jocDefaultResponse != null) {

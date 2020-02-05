@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configurations>
+  <Fragments>
+    <ProtocolFragments>
+      <FTPFragment name="my_server">
+        <BasicConnection>
+          <Hostname><![CDATA[cs://yade/FTP/ftp_server@url]]></Hostname>
+        </BasicConnection>
+        <BasicAuthentication>
+          <Account><![CDATA[cs://yade/FTP/ftp_server@user]]></Account>
+          <Password><![CDATA[cs://yade/FTP/ftp_server@password]]></Password>
+        </BasicAuthentication>
+        <CredentialStoreFragmentRef ref="yade_credential_store" />
+        <PassiveMode>true</PassiveMode>
+      </FTPFragment>
+      <SFTPFragment name="my_server">
+        <BasicConnection>
+          <Hostname><![CDATA[cs://yade/SFTP/sftp_server@url]]></Hostname>
+        </BasicConnection>
+        <SSHAuthentication>
+          <Account><![CDATA[cs://yade/SFTP/sftp_server@user]]></Account>
+          <AuthenticationMethodPassword>
+            <Password><![CDATA[cs://yade/SFTP/sftp_server@password]]></Password>
+          </AuthenticationMethodPassword>
+        </SSHAuthentication>
+        <CredentialStoreFragmentRef ref="yade_credential_store" />
+      </SFTPFragment>
+      <SMBFragment name="my_smb_server">
+        <Hostname><![CDATA[cs://yade/SMB/file_server@url]]></Hostname>
+        <SMBAuthentication>
+          <Account><![CDATA[cs://yade/SMB/file_server@user]]></Account>
+          <Password><![CDATA[cs://yade/SMB/file_server@password]]></Password>
+        </SMBAuthentication>
+        <CredentialStoreFragmentRef ref="yade_credential_store" />
+      </SMBFragment>
+    </ProtocolFragments>
+    <CredentialStoreFragments>
+      <CredentialStoreFragment name="yade_credential_store">
+        <CSFile><![CDATA[C:\Program Files\yade\yade.kdbx]]></CSFile>
+        <CSAuthentication>
+          <KeyFileAuthentication>
+            <CSKeyFile><![CDATA[C:\Program Files\yade\yade.key]]></CSKeyFile>
+          </KeyFileAuthentication>
+        </CSAuthentication>
+      </CredentialStoreFragment>
+    </CredentialStoreFragments>
+  </Fragments>
+  <Profiles>
+    <Profile profile_id="from_smb">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <SMBFragmentRef ref="my_smb_server" />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FileSpecSelection>
+                  <FileSpec><![CDATA[^.+\.csv$]]></FileSpec>
+                  <Directory><![CDATA[/tmp/files]]></Directory>
+                </FileSpecSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <LocalTarget />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[c:\temp]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="from_sftp">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FileSpecSelection>
+                  <FileSpec><![CDATA[\.txt$]]></FileSpec>
+                  <Directory><![CDATA[/tmp/to_product_demo]]></Directory>
+                </FileSpecSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <LocalTarget />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[c:/tmp/jobscheduler/file/product_demo/success]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="to_sftp">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <LocalSource />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FilePathSelection>
+                  <FilePath><![CDATA[${scheduler_file_path}]]></FilePath>
+                </FilePathSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SFTPFragmentRef ref="my_server">
+                <SFTPPreProcessing>
+                  <CommandBeforeFile enable_for_skipped_transfer="false"><![CDATA[xxx]]></CommandBeforeFile>
+                </SFTPPreProcessing>
+              </SFTPFragmentRef>
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/home/test/data/from_product_demo]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="to_sftp1">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <LocalSource />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FilePathSelection>
+                  <FilePath><![CDATA[${scheduler_file_path}]]></FilePath>
+                </FilePathSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/home/test/data/from_product_demo]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="to_sftp2">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <LocalSource />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FilePathSelection>
+                  <FilePath><![CDATA[${scheduler_file_path}]]></FilePath>
+                </FilePathSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/home/test/data/from_product_demo]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="to_sftp3">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <LocalSource />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FilePathSelection>
+                  <FilePath><![CDATA[${scheduler_file_path}]]></FilePath>
+                </FilePathSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/home/test/data/from_product_demo]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="to_sftp4">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <LocalSource />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FilePathSelection>
+                  <FilePath><![CDATA[${scheduler_file_path}]]></FilePath>
+                </FilePathSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/home/test/data/from_product_demo]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="to_sftp5">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <LocalSource />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FilePathSelection>
+                  <FilePath><![CDATA[${scheduler_file_path}]]></FilePath>
+                </FilePathSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/home/test/data/from_product_demo]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="to_sftp6">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <LocalSource />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FilePathSelection>
+                  <FilePath><![CDATA[${scheduler_file_path}]]></FilePath>
+                </FilePathSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/home/test/data/from_product_demo]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="to_smb">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <LocalSource />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FilePathSelection>
+                  <FilePath><![CDATA[${scheduler_file_path}]]></FilePath>
+                </FilePathSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SMBFragmentRef ref="my_smb_server" />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/share/nobackup/users/files]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="from_ftp_to_sftp">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <FTPFragmentRef ref="my_server" />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FileSpecSelection>
+                  <FileSpec><![CDATA[.*]]></FileSpec>
+                  <Directory><![CDATA[/home/test/data/from_product_demo/ftp]]></Directory>
+                </FileSpecSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/home/test/data/from_product_demo/sftp]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="test">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FileSpecSelection>
+                  <FileSpec><![CDATA[.*\.txt$]]></FileSpec>
+                  <Directory><![CDATA[/home/test/tmp/test]]></Directory>
+                </FileSpecSelection>
+              </Selection>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <SFTPFragmentRef ref="my_server" />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[/tmp]]></Directory>
+          </CopyTarget>
+          <TransferOptions>
+            <Transactional>true</Transactional>
+          </TransferOptions>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="smb_test_copy">
+      <Operation>
+        <Copy>
+          <CopySource>
+            <CopySourceFragmentRef>
+              <SMBFragmentRef ref="my_smb_server" />
+            </CopySourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FileSpecSelection>
+                  <FileSpec><![CDATA[.+\.csv$]]></FileSpec>
+                  <Directory><![CDATA[/tmp/polling]]></Directory>
+                </FileSpecSelection>
+              </Selection>
+              <Polling>
+                <PollInterval>60</PollInterval>
+                <PollTimeout>0</PollTimeout>
+                <WaitForSourceFolder>true</WaitForSourceFolder>
+                <PollingServer>true</PollingServer>
+                <PollForever>true</PollForever>
+              </Polling>
+            </SourceFileOptions>
+          </CopySource>
+          <CopyTarget>
+            <CopyTargetFragmentRef>
+              <LocalTarget />
+            </CopyTargetFragmentRef>
+            <Directory><![CDATA[C:\tmp\jobscheduler\file\polling]]></Directory>
+          </CopyTarget>
+        </Copy>
+      </Operation>
+    </Profile>
+    <Profile profile_id="smb_test_move">
+      <Operation>
+        <Move>
+          <MoveSource>
+            <MoveSourceFragmentRef>
+              <SMBFragmentRef ref="my_smb_server" />
+            </MoveSourceFragmentRef>
+            <SourceFileOptions>
+              <Selection>
+                <FileSpecSelection>
+                  <FileSpec><![CDATA[.+\.csv$]]></FileSpec>
+                  <Directory><![CDATA[/tmp/polling]]></Directory>
+                </FileSpecSelection>
+              </Selection>
+              <Polling>
+                <PollInterval>15</PollInterval>
+                <PollTimeout>0</PollTimeout>
+                <WaitForSourceFolder>true</WaitForSourceFolder>
+                <PollingServer>true</PollingServer>
+                <PollForever>true</PollForever>
+              </Polling>
+            </SourceFileOptions>
+          </MoveSource>
+          <MoveTarget>
+            <MoveTargetFragmentRef>
+              <LocalTarget />
+            </MoveTargetFragmentRef>
+            <Directory><![CDATA[C:\tmp\jobscheduler\file\polling]]></Directory>
+          </MoveTarget>
+        </Move>
+      </Operation>
+    </Profile>
+  </Profiles>
+</Configurations>

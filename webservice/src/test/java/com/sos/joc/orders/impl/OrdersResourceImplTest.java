@@ -10,6 +10,8 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Folder;
@@ -115,7 +117,8 @@ public class OrdersResourceImplTest {
     private OrdersV TestHelper(OrdersFilter ordersBody) throws Exception {
         ordersBody.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrdersResourceImpl ordersImpl = new OrdersResourceImpl();
-        JOCDefaultResponse ordersResponse = ordersImpl.postOrders(accessToken, ordersBody);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(ordersImpl);
+        JOCDefaultResponse ordersResponse = ordersImpl.postOrders(accessToken, b);
         OrdersV ordersVSchema = (OrdersV) ordersResponse.getEntity();
         return ordersVSchema;
     }

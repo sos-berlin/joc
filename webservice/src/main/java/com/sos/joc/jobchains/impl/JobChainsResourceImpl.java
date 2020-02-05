@@ -37,6 +37,7 @@ import com.sos.joc.model.jobChain.JobChainPath;
 import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.jobChain.JobChainsV;
+import com.sos.schema.JsonValidator;
 
 @Path("job_chains")
 public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChainsResource {
@@ -44,13 +45,12 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
     private static final String API_CALL = "./job_chains";
 
     @Override
-    public JOCDefaultResponse postJobChains(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-        return postJobChains(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
-    }
-
-    public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
+    public JOCDefaultResponse postJobChains(String accessToken, byte[] jobChainsFilterBytes) {
         SOSHibernateSession session = null;
         try {
+            JsonValidator.validateFailFast(jobChainsFilterBytes, JobChainsFilter.class);
+            JobChainsFilter jobChainsFilter = Globals.objectMapper.readValue(jobChainsFilterBytes, JobChainsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(jobChainsFilter.getJobschedulerId(), accessToken).getJobChain().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -114,12 +114,17 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
                 Map<String, String> jobDocs = null;
                 Map<String, String> jobChainDocs = null;
                 Map<String, List<OrderVolatile>> orders = null;
+                
                 if (jobChainsFilter.getCompact() != Boolean.TRUE) {
                     session = Globals.createSosHibernateStatelessConnection(API_CALL);
                     DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(session);
-                    orderDocs = dbDocLayer.getDocumentationPaths(jobChainsFilter.getJobschedulerId(), JobSchedulerObjectType.ORDER);
+                
                     jobDocs = dbDocLayer.getDocumentationPaths(jobChainsFilter.getJobschedulerId(), JobSchedulerObjectType.JOB);
                     jobChainDocs = dbDocLayer.getDocumentationPaths(jobChainsFilter.getJobschedulerId(), JobSchedulerObjectType.JOBCHAIN);
+                    orderDocs = dbDocLayer.getDocumentationPaths(jobChainsFilter.getJobschedulerId(), JobSchedulerObjectType.ORDER);
+                }
+                
+                if (jobChainsFilter.getCompact() != Boolean.TRUE || jobChainsFilter.getCompactView() != Boolean.TRUE) {
 
                     Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
                     List<OrdersVCallable> orderTasks = new ArrayList<OrdersVCallable>();

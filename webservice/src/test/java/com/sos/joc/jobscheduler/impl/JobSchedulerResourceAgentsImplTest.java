@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceAgentsImpl;
@@ -33,7 +35,8 @@ public class JobSchedulerResourceAgentsImplTest {
         agentFilterSchema.setAgents(agents);
         agentFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobSchedulerResourceAgentsImpl jobschedulerResourceAgentsImpl = new JobSchedulerResourceAgentsImpl();
-        JOCDefaultResponse jobschedulerAgentsResponse = jobschedulerResourceAgentsImpl.postJobschedulerAgents(accessToken, agentFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(agentFilterSchema);
+        JOCDefaultResponse jobschedulerAgentsResponse = jobschedulerResourceAgentsImpl.postJobschedulerAgents(accessToken, b);
         AgentsV agentsVSchema = (AgentsV) jobschedulerAgentsResponse.getEntity();
         assertEquals("postjobschedulerAgentsTest", "http://galadriel:4445", agentsVSchema.getAgents().get(0).getUrl());
     }

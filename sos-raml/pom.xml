@@ -1,0 +1,358 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.sos-berlin</groupId>
+		<artifactId>joc</artifactId>
+		<version>1.13.4-SNAPSHOT</version>
+	</parent>
+
+	<groupId>com.sos-berlin.joc</groupId>
+	<artifactId>sos-raml</artifactId>
+	<name>sos-raml</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>raml/schemas/**</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<exclude>com/sos/jobscheduler/**</exclude>
+								<exclude>com/sos/joc/**</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jsonschema2pojo</groupId>
+				<artifactId>jsonschema2pojo-maven-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>com.sos-berlin</groupId>
+						<artifactId>sos-annotator</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>com.fasterxml.jackson.dataformat</groupId>
+						<artifactId>jackson-dataformat-xml</artifactId>
+						<version>${jackson.version}</version>
+						<exclusions>
+							<exclusion>
+								<groupId>javax.servlet</groupId>
+								<artifactId>servlet-api</artifactId>
+							</exclusion>
+							<exclusion>
+								<groupId>com.fasterxml.woodstox</groupId>
+								<artifactId>woodstox-core</artifactId>
+							</exclusion>
+							<exclusion>
+								<groupId>org.codehaus.woodstox</groupId>
+								<artifactId>stax2-api</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>com.fasterxml.woodstox</groupId>
+						<artifactId>woodstox-core</artifactId>
+						<version>${woodstox.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.codehaus.woodstox</groupId>
+						<artifactId>stax2-api</artifactId>
+						<version>${stax2.version}</version>
+					</dependency>
+				</dependencies>
+
+				<executions>
+					<execution>
+						<id>generate-joc-model</id>
+						<phase>process-classes</phase>
+						<configuration>
+							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
+							<targetPackage>com.sos.joc.model</targetPackage>
+							<removeOldOutput>true</removeOldOutput>
+							<annotationStyle>jackson2</annotationStyle>
+							<propertyWordDelimiters>- </propertyWordDelimiters>
+							<includeAdditionalProperties>false</includeAdditionalProperties>
+							<includes>
+								<include>**/*.json</include>
+							</includes>
+							<excludes>
+								<exclude>user/*.json</exclude>
+								<exclude>jobschedulerEvent/*.json</exclude>
+								<exclude>calendar/*.json</exclude>
+								<exclude>agentCluster/*.json</exclude>
+								<exclude>joe/**/*.json</exclude>
+							</excludes>
+						</configuration>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>generate-calendar-model</id>
+						<phase>process-classes</phase>
+						<configuration>
+							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
+							<targetPackage>com.sos.joc.model</targetPackage>
+							<removeOldOutput>false</removeOldOutput>
+							<annotationStyle>jackson2</annotationStyle>
+							<propertyWordDelimiters>- </propertyWordDelimiters>
+							<includeAdditionalProperties>false</includeAdditionalProperties>
+							<initializeCollections>false</initializeCollections>
+							<includes>
+								<include>calendar/*.json</include>
+							</includes>
+						</configuration>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>generate-event-model</id>
+						<phase>process-classes</phase>
+						<configuration>
+							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
+							<targetPackage>com.sos.jobscheduler.model</targetPackage>
+							<removeOldOutput>false</removeOldOutput>
+							<annotationStyle>jackson2</annotationStyle>
+							<propertyWordDelimiters>- </propertyWordDelimiters>
+							<includeAdditionalProperties>true</includeAdditionalProperties>
+							<includes>
+								<include>jobschedulerEvent/*.json</include>
+							</includes>
+						</configuration>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>generate-joe-model</id>
+						<phase>process-classes</phase>
+						<configuration>
+							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
+							<targetPackage>com.sos.joc.model</targetPackage>
+							<removeOldOutput>false</removeOldOutput>
+							<annotationStyle>jackson2</annotationStyle>
+							<customAnnotator>com.sos.annotator.JacksonXMLJoeConfigurationAnnotator</customAnnotator>
+							<inclusionLevel>NON_EMPTY</inclusionLevel><!-- no empty strings in 
+								xml representation -->
+							<propertyWordDelimiters>- </propertyWordDelimiters>
+							<initializeCollections>false</initializeCollections>
+							<includeAdditionalProperties>false</includeAdditionalProperties>
+							<!-- includeConstructors>true</includeConstructors -->
+							<includes>
+								<include>joe/**/*.json</include>
+							</includes>
+						</configuration>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>generate-joe-model2</id>
+						<configuration>
+							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
+							<targetPackage>com.sos.joc.model</targetPackage>
+							<removeOldOutput>false</removeOldOutput>
+							<annotationStyle>jackson2</annotationStyle>
+							<customAnnotator>com.sos.annotator.JacksonXMLJoeConfigurationAnnotator</customAnnotator>
+							<propertyWordDelimiters>- </propertyWordDelimiters>
+							<initializeCollections>false</initializeCollections>
+							<includeAdditionalProperties>false</includeAdditionalProperties>
+							<!-- includeConstructors>true</includeConstructors -->
+							<includes>
+								<include>joe/common/param-schema.json</include>
+								<include>joe/jobChain/nodeParams-schema.json</include>
+								<include>joe/job/envvar-schema.json</include>
+							</includes>
+						</configuration>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-interfaces-and-abstract-classes</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/java-gen/com/sos/joc</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/resources/com/sos/joc</directory>
+									<includes>
+										<include>**/*.java</include>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+							<overwrite>true</overwrite>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>modify some pojos</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target description="modify initial values">
+								<!-- to provide that at least an empty run_time is created at job -->
+								<replaceregexp flags="ig" byline="true"
+									match="(private RunTime runTime)( = null)?;" replace="\1 = new RunTime();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/job/Job.java"
+									preserveLastModified="true" />
+								<!-- to provide that at least an empty run_time is created at order -->
+								<replaceregexp flags="ig" byline="true"
+									match="(private RunTime runTime)( = null)?;" replace="\1 = new RunTime();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/order/Order.java"
+									preserveLastModified="true" />
+								<!-- makes AbstractSchedule.java abstract -->
+								<replaceregexp flags="ig" byline="true"
+									match="(public )(class AbstractSchedule)" replace="\1abstract \2"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/schedule/AbstractSchedule.java"
+									preserveLastModified="true" />
+								<!-- change hashcode and equals -->
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new HashCodeBuilder).*" replace="\1().append(name).toHashCode();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/other/FolderItem.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new EqualsBuilder).*" replace="\1().append(name, rhs.name).isEquals();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/other/FolderItem.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new HashCodeBuilder).*"
+									replace="\1().append(folder).append(objectName).append(jobschedulerId).append(objectType).toHashCode();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/common/Deployable.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new EqualsBuilder).*"
+									replace="\1().append(folder, rhs.folder).append(objectName, rhs.objectName).append(jobschedulerId, rhs.jobschedulerId).append(objectType, rhs.objectType).isEquals();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/common/Deployable.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new HashCodeBuilder).*" replace="\1().append(path).toHashCode();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/Tree.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new EqualsBuilder).*" replace="\1().append(path, rhs.path).isEquals();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/Tree.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new HashCodeBuilder).*" replace="\1().appendSuper(super.hashCode()).toHashCode();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/JoeTree.java"
+									preserveLastModified="true" />
+								<replaceregexp flags="ig" byline="true"
+									match="(\s*return new EqualsBuilder).*" replace="\1().appendSuper(super.equals(other)).isEquals();"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/JoeTree.java"
+									preserveLastModified="true" />
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.sos-berlin</groupId>
+			<artifactId>sos-annotator</artifactId>
+			<scope>compile</scope>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sos-berlin.commons</groupId>
+			<artifactId>sos-exceptions</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		 
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.woodstox</groupId>
+			<artifactId>woodstox-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>stax2-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-multipart</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.networknt</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>1.0.29</version>
+		</dependency>
+	</dependencies>
+</project>

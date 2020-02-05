@@ -1,0 +1,26 @@
+{
+	"title": "lock filter",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.joe.lock.LockFilter",
+	"type": "object",
+	"required": [
+	  "jobschedulerId"
+	],
+	"properties": {
+		"jobschedulerId": {
+      		"$ref": "../../common/filename100-schema.json"
+    	},
+    	"folder": {
+    		"description": "path of the a folder",
+      		"$ref": "../../common/path-schema.json"
+    	},
+    	"path": {
+    		"description": "alias of folder",
+      		"$ref": "../../common/path-schema.json"
+    	},
+    	"forceLock": {
+       		"type": "boolean",
+       		"default": false
+	 	}
+	}
+}

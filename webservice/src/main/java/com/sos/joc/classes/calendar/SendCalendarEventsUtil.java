@@ -107,13 +107,15 @@ public abstract class SendCalendarEventsUtil {
         }
     }
 
-    public static void sendEvent(CustomEvent calEvt, DBItemInventoryInstance dbItemInventoryInstance, String accessToken) throws JocException,
-            JsonProcessingException {
-        try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            jocXmlCommand.executePostWithRetry(addEvent(calEvt), accessToken);
-        } catch (JobSchedulerConnectionRefusedException e) {
-        } catch (JobSchedulerConnectionResetException e) {
+    public static void sendEvent(CustomEvent calEvt, DBItemInventoryInstance dbItemInventoryInstance, String accessToken)
+            throws JsonProcessingException, JocException  {
+        if (calEvt != null) {
+            try {
+                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+                jocXmlCommand.executePostWithRetry(addEvent(calEvt), accessToken);
+            } catch (JobSchedulerConnectionRefusedException e) {
+            } catch (JobSchedulerConnectionResetException e) {
+            }
         }
     }
 }

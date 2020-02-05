@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.configuration.Configuration;
@@ -35,7 +36,8 @@ public class JocConfigurationResourceTest {
         configuration.setShared(true);
 
         JocConfigurationResourceImpl jocConfigurationResourceImpl = new JocConfigurationResourceImpl();
-        JOCDefaultResponse jocResponse = jocConfigurationResourceImpl.postSaveConfiguration(accessToken, configuration);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(configuration);
+        JOCDefaultResponse jocResponse = jocConfigurationResourceImpl.postSaveConfiguration(accessToken, b);
         ConfigurationOk configurationSchema = (ConfigurationOk) jocResponse.getEntity();
         assertEquals("saveJocConfigurationsTest",String.valueOf(2L), String.valueOf(configurationSchema.getId()));
     }
@@ -46,7 +48,8 @@ public class JocConfigurationResourceTest {
         configuration.setId(2L);
         configuration.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JocConfigurationResourceImpl jocConfigurationResourceImpl = new JocConfigurationResourceImpl();
-        JOCDefaultResponse jocResponse = jocConfigurationResourceImpl.postReadConfiguration(accessToken, configuration);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(configuration);
+        JOCDefaultResponse jocResponse = jocConfigurationResourceImpl.postReadConfiguration(accessToken, b);
         Configuration200 configurationSchema = (Configuration200) jocResponse.getEntity();
         assertEquals("postJobConfigurationTest","root", configurationSchema.getConfiguration().getAccount());
     }
@@ -61,7 +64,8 @@ public class JocConfigurationResourceTest {
         configuration.setJobschedulerId("scheduler.1.12");
 
         JocConfigurationResourceImpl jocConfigurationResourceImpl = new JocConfigurationResourceImpl();
-        JOCDefaultResponse jocResponse = jocConfigurationResourceImpl.postMakePrivate(accessToken, configuration);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(configuration);
+        JOCDefaultResponse jocResponse = jocConfigurationResourceImpl.postMakePrivate(accessToken, b);
         ConfigurationOk configurationSchema = (ConfigurationOk) jocResponse.getEntity();
         assertEquals("makePrivateJocConfigurationsTest",String.valueOf(2L), String.valueOf(configurationSchema.getId()));
      }
@@ -73,7 +77,8 @@ public class JocConfigurationResourceTest {
         configuration.setJobschedulerId("scheduler.1.12");
 
         JocConfigurationResourceImpl jocConfigurationResourceImpl = new JocConfigurationResourceImpl();
-        JOCDefaultResponse jocResponse = jocConfigurationResourceImpl.postShareConfiguration(accessToken, configuration);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(configuration);
+        JOCDefaultResponse jocResponse = jocConfigurationResourceImpl.postShareConfiguration(accessToken, b);
         ConfigurationOk configurationSchema = (ConfigurationOk) jocResponse.getEntity();
         assertEquals("postJobConfigurationTest",String.valueOf(2L), String.valueOf(configurationSchema.getId()));
      }

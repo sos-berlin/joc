@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.schedule.ScheduleP200;
@@ -25,7 +26,8 @@ public class ScheduleResourcePImplTest {
         scheduleFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         scheduleFilterSchema.setSchedule(TestEnvWebserviceTest.SCHEDULE);
         ScheduleResourcePImpl scheduleResourcePImpl = new ScheduleResourcePImpl();
-        JOCDefaultResponse jobsResponse = scheduleResourcePImpl.postScheduleP(accessToken, scheduleFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(scheduleFilterSchema);
+        JOCDefaultResponse jobsResponse = scheduleResourcePImpl.postScheduleP(accessToken, b);
         ScheduleP200 schedulePSchema = (ScheduleP200) jobsResponse.getEntity();
         assertEquals("postschedulePTest", TestEnvWebserviceTest.JOB_USED, schedulePSchema.getSchedule().getUsedByJobs().get(0).getJob());
     }

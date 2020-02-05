@@ -14,6 +14,7 @@ import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Categories;
 import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.schema.JsonValidator;
 
 @Path("calendars")
 public class CategoriesResourceImpl extends JOCResourceImpl implements ICategoriesResource {
@@ -21,9 +22,12 @@ public class CategoriesResourceImpl extends JOCResourceImpl implements ICategori
 	private static final String API_CALL = "./calendars/categories";
 
 	@Override
-	public JOCDefaultResponse postCategories(String accessToken, JobSchedulerId jobschedulerId) throws Exception {
+	public JOCDefaultResponse postCategories(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(filterBytes, JobSchedulerId.class);
+		    JobSchedulerId jobschedulerId = Globals.objectMapper.readValue(filterBytes, JobSchedulerId.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken,
 					jobschedulerId.getJobschedulerId(),
 					getPermissonsJocCockpit(jobschedulerId.getJobschedulerId(), accessToken).getCalendar().getView()

@@ -1,0 +1,21 @@
+{
+  "title": "jobChainFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainHistoryFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "jobChain"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "maxLastHistoryItems": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

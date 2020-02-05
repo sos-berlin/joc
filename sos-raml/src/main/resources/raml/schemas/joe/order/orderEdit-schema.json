@@ -1,0 +1,17 @@
+{
+  "title": "edit order configuration",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.order.OrderEdit",
+  "type": "object",
+  "required": [
+    "configuration"
+  ],
+  "extends": {
+    "javaType": "com.sos.joc.model.joe.common.JSObjectEdit"
+  },
+  "properties": {
+    "configuration": {
+      "$ref": "order-schema.json"
+    }
+  }
+}

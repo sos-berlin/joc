@@ -1,0 +1,23 @@
+{
+  "title": "hostPortParam",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.HostPortParameter",
+  "type": "object",
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "host": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "port": {
+      "$ref": "../common/port-schema.json"
+    },
+    "filename": {
+      "$ref": "../common/filename255-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+	"title": "Out-Conditions",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "List of all Out Conditions",
+	"javaType": "com.sos.joc.model.jobstreams.OutConditions",
+	"type": "object",
+	"required": [
+		"jobschedulerId"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"jobsOutconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "jobOutcondition-schema.json"
+			}
+		}
+	}
+}

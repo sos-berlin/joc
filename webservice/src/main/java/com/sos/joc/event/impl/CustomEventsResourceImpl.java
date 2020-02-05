@@ -20,7 +20,6 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.event.resource.ICustomEventsResource;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
@@ -28,6 +27,8 @@ import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.event.custom.Event;
 import com.sos.joc.model.event.custom.Events;
 import com.sos.joc.model.event.custom.EventsFilter;
+import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("events")
 public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustomEventsResource {
@@ -43,10 +44,12 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
     }
 
     @Override
-    public JOCDefaultResponse postCustomEvents(String accessToken, EventsFilter eventFilter) {
+    public JOCDefaultResponse postCustomEvents(String accessToken, byte[] eventFilterBytes) {
 
         SOSHibernateSession session = null;
         try {
+            JsonValidator.validateFailFast(eventFilterBytes, EventsFilter.class);
+            EventsFilter eventFilter = Globals.objectMapper.readValue(eventFilterBytes, EventsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, eventFilter, accessToken, eventFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     eventFilter.getJobschedulerId(), accessToken).getEvent().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -105,7 +108,7 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 if (item.getParameters() != null && !item.getParameters().isEmpty()) {
                     try {
-                        Element elem = XMLBuilder.parse(item.getParameters());
+                        Element elem = XMLBuilder.parse(item.getParameters()).getRootElement();
                         @SuppressWarnings("unchecked")
                         List<Element> paramNodes = elem.elements("param");
                         if (paramNodes != null) {

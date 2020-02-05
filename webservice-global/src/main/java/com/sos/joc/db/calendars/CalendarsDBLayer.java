@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.query.Query;
 
@@ -21,6 +22,7 @@ import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.UsedBy;
+import com.sos.joc.model.tree.Tree;
 
 public class CalendarsDBLayer extends DBLayer {
 
@@ -308,7 +310,7 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public List<String> getFoldersByFolder(String schedulerId, String folderName, Set<String> types) throws DBConnectionRefusedException, DBInvalidDataException {
+    public Set<Tree> getFoldersByFolder(String schedulerId, String folderName, Set<String> types) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             if (types == null) {
                 types = new HashSet<String>();
@@ -340,7 +342,15 @@ public class CalendarsDBLayer extends DBLayer {
                 query.setParameter("folderName", folderName);
                 query.setParameter("likeFolderName", folderName + "/%");
             }
-            return getSession().getResultList(query);
+            List<String> result = getSession().getResultList(query);
+            if (result != null && !result.isEmpty()) {
+                return result.stream().map(s -> {
+                    Tree tree = new Tree();
+                    tree.setPath(s);
+                    return tree;
+                }).collect(Collectors.toSet());
+            }
+            return null;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

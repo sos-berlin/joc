@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -24,6 +25,7 @@ import com.sos.joc.model.job.TaskState;
 import com.sos.joc.model.job.TaskStateText;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.task.resource.ITaskResource;
+import com.sos.schema.JsonValidator;
 
 @Path("task")
 public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
@@ -31,13 +33,11 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
 	private static final String API_CALL = "./task";
 
 	@Override
-	public JOCDefaultResponse postTask(String xAccessToken, String accessToken, TaskFilter taskFilter)
-			throws Exception {
-		return postTask(getAccessToken(xAccessToken, accessToken), taskFilter);
-	}
-
-	public JOCDefaultResponse postTask(String accessToken, TaskFilter taskFilter) throws Exception {
+	public JOCDefaultResponse postTask(String accessToken, byte[] taskFilterBytes) {
 		try {
+		    JsonValidator.validateFailFast(taskFilterBytes, TaskFilter.class);
+            TaskFilter taskFilter = Globals.objectMapper.readValue(taskFilterBytes, TaskFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskFilter, accessToken,
 					taskFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(taskFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());

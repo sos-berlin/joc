@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Path;
 
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -25,7 +26,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.calendar.SendEventScheduled;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
@@ -39,13 +39,17 @@ import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
+import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
+import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.order.AddedOrders;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.model.order.OrderPath200;
 import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
+import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("orders")
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
@@ -57,12 +61,11 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     private DBLayerReporting dbLayerReporting = null;
 
     @Override
-    public JOCDefaultResponse postOrdersAdd(String xAccessToken, String accessToken, ModifyOrders modifyOrders) throws Exception {
-        return postOrdersAdd(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersAdd(String accessToken, ModifyOrders modifyOrders) throws Exception {
+    public JOCDefaultResponse postOrdersAdd(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getJobChain().getExecute().isAddOrder());
             if (jocDefaultResponse != null) {
@@ -149,14 +152,18 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 xml.addAttribute("priority", order.getPriority().toString());
             }
             xml.add(getParams(order.getParams()));
-            if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
+            if (order.getRunTime() != null) {
                 try {
-                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
-                    xml.add(XMLBuilder.parse(order.getRunTime()));
+                    RunTime runTime = XmlSerializer.serializeAbstractSchedule(order.getRunTime());
+                    order.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
+                    Document doc = ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTimeXml());
+                    if (doc != null) {
+                        xml.add(doc.getRootElement());                        
+                    }
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
+                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime().toString());
                 }
             }
             

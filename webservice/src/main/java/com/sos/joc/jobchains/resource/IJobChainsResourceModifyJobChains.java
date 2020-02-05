@@ -8,20 +8,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobChain.ModifyJobChains;
 
 public interface IJobChainsResourceModifyJobChains {
 
     @POST
     @Path("stop")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobChainsStop(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
-            ModifyJobChains modifyJobChains) throws Exception;
+    public JOCDefaultResponse postJobChainsStop(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobChains);
 
     @POST
     @Path("unstop")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobChainsUnStop(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
-            ModifyJobChains modifyJobChains) throws Exception;
+    public JOCDefaultResponse postJobChainsUnStop(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyJobChains);
 
 }

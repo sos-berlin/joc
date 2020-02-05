@@ -1,0 +1,35 @@
+{
+	"title": "conditionEvent",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionEvent",
+	"type": "object",
+	"required": [
+	  "jobschedulerId",
+	  "jobStream",
+	  "outConditionId",
+	  "event"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"event": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"globalEvent": {
+			"type": "boolean"
+		},
+		"path": {
+			"$ref": "../common/path-schema.json"
+		},
+		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"session": {
+			"$ref": "../common/string100-schema.json"
+		},
+		"outConditionId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		}
+	}
+}

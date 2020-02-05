@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.calendar.CalendarsFilter;
 
  
 public interface ICalendarsDeleteResource {
@@ -16,5 +15,5 @@ public interface ICalendarsDeleteResource {
     @POST
     @Path("delete")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postDeleteCalendars(@HeaderParam("X-Access-Token") String xAccessToken, CalendarsFilter calendarsFilter) throws Exception;
+    public JOCDefaultResponse postDeleteCalendars(@HeaderParam("X-Access-Token") String xAccessToken, byte[] calendarsFilter);
 }

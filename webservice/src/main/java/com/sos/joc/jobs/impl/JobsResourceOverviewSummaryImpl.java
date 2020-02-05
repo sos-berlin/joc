@@ -20,6 +20,7 @@ import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.JobsHistoricSummary;
 import com.sos.joc.model.job.JobsOverView;
+import com.sos.schema.JsonValidator;
 
 @Path("jobs")
 public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements IJobsResourceOverviewSummary {
@@ -27,10 +28,13 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
     private static final String API_CALL = "./jobs/overview/summary";
 
     @Override
-    public JOCDefaultResponse postJobsOverviewSummary(String accessToken, JobsFilter jobsFilter) throws Exception {
+    public JOCDefaultResponse postJobsOverviewSummary(String accessToken, byte[] jobsFilterBytes) {
         SOSHibernateSession connection = null;
 
         try {
+            JsonValidator.validateFailFast(jobsFilterBytes, JobsFilter.class);
+            JobsFilter jobsFilter = Globals.objectMapper.readValue(jobsFilterBytes, JobsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     jobsFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
 

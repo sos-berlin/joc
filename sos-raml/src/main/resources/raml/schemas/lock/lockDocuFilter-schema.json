@@ -1,0 +1,24 @@
+{
+  "title": "LockDocuFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.lock.LockDocuFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "lock"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "lock": {
+      "$ref": "../common/path-schema.json"
+    },
+    "documentation": {
+      "$ref": "../common/path-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

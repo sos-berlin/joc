@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.schedule.SchedulesFilter;
@@ -26,7 +28,8 @@ public class SchedulesResourceImplTest {
         SchedulesFilter schedulesFilterSchema = new SchedulesFilter();
         schedulesFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         SchedulesResourceImpl schedulesResourceImpl = new SchedulesResourceImpl();
-        JOCDefaultResponse jobsResponse = schedulesResourceImpl.postSchedules(accessToken, schedulesFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(schedulesFilterSchema);
+        JOCDefaultResponse jobsResponse = schedulesResourceImpl.postSchedules(accessToken, b);
         SchedulesV schedulesVSchema = (SchedulesV) jobsResponse.getEntity();
         assertEquals("postSchedulesTest", TestEnvWebserviceTest.SCHEDULE, schedulesVSchema.getSchedules().get(0).getPath());
         LOGGER.info(jobsResponse.toString());

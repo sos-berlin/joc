@@ -17,6 +17,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.yade.FileFilter;
 import com.sos.joc.model.yade.TransferFile200;
 import com.sos.joc.yade.resource.IYadeFileResource;
+import com.sos.schema.JsonValidator;
 
 @Path("yade")
 public class YadeFileResourceImpl extends JOCResourceImpl implements IYadeFileResource {
@@ -24,9 +25,12 @@ public class YadeFileResourceImpl extends JOCResourceImpl implements IYadeFileRe
 	private static final String API_CALL = "./yade/file";
 
 	@Override
-	public JOCDefaultResponse postYadeFile(String accessToken, FileFilter filterBody) throws Exception {
+	public JOCDefaultResponse postYadeFile(String accessToken, byte[] filterBytes) {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(filterBytes, FileFilter.class);
+		    FileFilter filterBody = Globals.objectMapper.readValue(filterBytes, FileFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
 					filterBody.getJobschedulerId(),
 					getPermissonsJocCockpit(filterBody.getJobschedulerId(), accessToken).getYADE().getView().isFiles());

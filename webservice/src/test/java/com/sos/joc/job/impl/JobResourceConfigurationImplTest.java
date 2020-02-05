@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.ConfigurationMime;
@@ -29,7 +30,8 @@ public class JobResourceConfigurationImplTest {
         jobConfigurationFilterSchema.setJob(TestEnvWebserviceTest.JOB);
         jobConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         JobResourceConfigurationImpl jobConfigurationImpl = new JobResourceConfigurationImpl();
-        JOCDefaultResponse jobsResponse = jobConfigurationImpl.postJobConfiguration(accessToken, jobConfigurationFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobConfigurationFilterSchema);
+        JOCDefaultResponse jobsResponse = jobConfigurationImpl.postJobConfiguration(accessToken, b);
         Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertEquals("postJobConfigurationTest",TestEnvWebserviceTest.JOB, configurationSchema.getConfiguration().getPath());
      }
@@ -41,7 +43,8 @@ public class JobResourceConfigurationImplTest {
         jobConfigurationFilterSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         jobConfigurationFilterSchema.setMime(ConfigurationMime.HTML);
         JobResourceConfigurationImpl jobConfigurationImpl = new JobResourceConfigurationImpl();
-        JOCDefaultResponse jobsResponse = jobConfigurationImpl.postJobConfiguration(accessToken, jobConfigurationFilterSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(jobConfigurationFilterSchema);
+        JOCDefaultResponse jobsResponse = jobConfigurationImpl.postJobConfiguration(accessToken, b);
         Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertNotNull("postJobConfigurationTest", configurationSchema.getConfiguration().getContent().getHtml());
         LOGGER.info(configurationSchema.getConfiguration().getContent().getHtml());

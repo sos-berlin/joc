@@ -27,6 +27,7 @@ import com.sos.joc.model.jobscheduler.AgentClusterStateText;
 import com.sos.joc.model.jobscheduler.AgentClusters;
 import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
+import com.sos.schema.JsonValidator;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl
@@ -35,17 +36,14 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl
 	private static final String API_CALL = "./jobscheduler/agent_clusters/p";
 
 	@Override
-	public JOCDefaultResponse postJobschedulerAgentClustersP(String xAccessToken, String accessToken,
-			AgentClusterFilter jobSchedulerAgentClustersBody) {
-		return postJobschedulerAgentClustersP(getAccessToken(xAccessToken, accessToken), jobSchedulerAgentClustersBody);
-	}
-
-	public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken,
-			AgentClusterFilter jobSchedulerAgentClustersBody) {
+	public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, byte[] filterBytes) {
 
 		SOSHibernateSession connection = null;
 
 		try {
+		    JsonValidator.validateFailFast(filterBytes, AgentClusterFilter.class);
+            AgentClusterFilter jobSchedulerAgentClustersBody = Globals.objectMapper.readValue(filterBytes, AgentClusterFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerAgentClustersBody, accessToken,
 					jobSchedulerAgentClustersBody.getJobschedulerId(),
 					getPermissonsJocCockpit(jobSchedulerAgentClustersBody.getJobschedulerId(), accessToken)

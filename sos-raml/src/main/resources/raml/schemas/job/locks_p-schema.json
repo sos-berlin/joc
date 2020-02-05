@@ -1,0 +1,17 @@
+{
+  "title": "job locks (permanent)",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "javaType": "com.sos.joc.model.job.LockUseP",
+    "type": "object",
+    "required": [
+      "path"
+    ],
+    "properties": {
+      "path": {
+        "$ref": "../common/path-schema.json"
+      }
+    }
+  }
+}

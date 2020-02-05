@@ -1,0 +1,323 @@
+{
+    "deliveryDate": "2019-11-07T12:19:12.105Z",
+    "folders": [
+        {
+            "folders": [
+                {
+                    "lockedBy": "root",
+                    "lockedSince": "2019-11-06T13:24:26Z",
+                    "name": "Jobs",
+                    "path": "/Jobs",
+                    "jobs": [
+                        {
+                            "deleted": false,
+                            "deployed": true,
+                            "isOrderJob": false,
+                            "name": "job1"
+                        }
+                    ]
+                },
+                {
+                    "folders": [
+                        {
+                            "name": "dailyplan",
+                            "path": "/sos/dailyplan",
+                            "jobChains": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "name": "CreateDailyPlan"
+                                }
+                            ],
+                            "jobs": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "CreateDailyPlan",
+                                    "title": "Creating a daily plan depending on actual Runtimes"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "housekeeping",
+                            "path": "/sos/housekeeping",
+                            "jobs": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": false,
+                                    "name": "scheduler_cleanup_files",
+                                    "title": "Remove temporary files"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": false,
+                                    "name": "scheduler_dequeue_mail",
+                                    "title": "Send buffered mails from mail queue"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": false,
+                                    "name": "scheduler_restart",
+                                    "title": "Restart Job Scheduler"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": false,
+                                    "name": "scheduler_rotate_log",
+                                    "title": "Rotate and compress logfiles"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "jitl",
+                            "path": "/sos/jitl",
+                            "jobs": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "JobChainEnd",
+                                    "title": "Job chain end node"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "JobChainSplitter",
+                                    "title": "Start a parallel processing in a jobchain"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "JobChainStart",
+                                    "title": "Job chain start node to load configuration monitor"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "notification",
+                            "path": "/sos/notification",
+                            "jobChains": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "name": "CleanupNotifications"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "name": "ResetNotifications"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "name": "SystemNotifier"
+                                }
+                            ],
+                            "jobs": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "CleanupNotifications",
+                                    "title": "Cleanup Notifications"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "ResetNotifications",
+                                    "title": "Reset notifications"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "SystemNotifier",
+                                    "title": "System notifier"
+                                }
+                            ]
+                        },
+                        {
+                            "folders": [
+                                {
+                                    "name": "criticalpath",
+                                    "path": "/sos/operations/criticalpath",
+                                    "jobChains": [
+                                        {
+                                            "deleted": false,
+                                            "deployed": true,
+                                            "name": "UncriticalJobNodes",
+                                            "title": "Critical path for uncritical job nodes"
+                                        }
+                                    ],
+                                    "jobs": [
+                                        {
+                                            "deleted": false,
+                                            "deployed": true,
+                                            "isOrderJob": true,
+                                            "name": "UncriticalJobNodes",
+                                            "title": "Critical path handler for uncritical job nodes"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "name": "operations",
+                            "path": "/sos/operations"
+                        },
+                        {
+                            "name": "reporting",
+                            "path": "/sos/reporting",
+                            "jobChains": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "name": "Reporting-Export2CSV",
+                                    "title": "Export data into a CSV file"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "name": "Reporting",
+                                    "title": "Aggregation of facts"
+                                }
+                            ],
+                            "jobs": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "Reporting-Export2CSV",
+                                    "title": "Export data into a CSV file"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "ReportingAggregation",
+                                    "title": "Create aggregations from the Reporting fact tables"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "rest",
+                            "path": "/sos/rest",
+                            "jobChains": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "name": "createApiAccessToken"
+                                }
+                            ],
+                            "jobs": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "createApiAccessToken"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "sendMail",
+                            "path": "/sos/sendMail",
+                            "jobChains": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "name": "sendMail"
+                                }
+                            ],
+                            "jobs": [
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "sendMail",
+                                    "title": "Send Mails from JobScheduler"
+                                },
+                                {
+                                    "deleted": false,
+                                    "deployed": true,
+                                    "isOrderJob": true,
+                                    "name": "wait",
+                                    "title": "wait until the file is completed"
+                                }
+                            ]
+                        }
+                    ],
+                    "name": "sos",
+                    "path": "/sos"
+                },
+                {
+                    "deleted": true,
+                    "lockedBy": "test",
+                    "lockedSince": "2019-11-06T13:18:01Z",
+                    "name": "testtest",
+                    "path": "/testtest",
+                    "jobs": [
+                        {
+                            "deleted": false,
+                            "deployed": false,
+                            "isOrderJob": false,
+                            "name": "job1"
+                        }
+                    ]
+                }
+            ],
+            "lockedBy": "root",
+            "lockedSince": "2019-11-04T15:11:01Z",
+            "name": "",
+            "path": "/",
+            "agentClusters": [
+                {
+                    "deleted": false,
+                    "deployed": true,
+                    "maxProcesses": 30,
+                    "name": "agent_oh_4445"
+                }
+            ],
+            "jobChains": [
+                {
+                    "deleted": false,
+                    "deployed": true,
+                    "name": "job_chain2"
+                }
+            ],
+            "jobs": [
+                {
+                    "deleted": false,
+                    "deployed": false,
+                    "isOrderJob": false,
+                    "name": "job1"
+                },
+                {
+                    "deleted": false,
+                    "deployed": false,
+                    "name": "job2"
+                }
+            ],
+            "processClasses": [
+                {
+                    "deleted": false,
+                    "deployed": true,
+                    "maxProcesses": 1,
+                    "name": "p1"
+                }
+            ],
+            "schedules": [
+                {
+                    "deleted": false,
+                    "deployed": false,
+                    "name": "schedule1"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,24 @@
+{
+	"title": "Expression",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Expression for Condition",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionExpression",
+	"type": "object",
+	"properties": {
+		"expression": {
+			"$ref": "../common/noScript-schema.json"
+		},
+		"validatedExpression": {
+			"$ref": "../common/noScript-schema.json"
+		},
+		"value": {
+			"type": "boolean"
+		},
+		"jobStreamEvents": {
+			"type": "array",
+			"items": {
+				"$ref": "../common/string255-schema.json"
+			}
+		}
+	}
+}

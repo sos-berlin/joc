@@ -9,10 +9,10 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyTaskAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
@@ -21,6 +21,8 @@ import com.sos.joc.model.job.ModifyTasks;
 import com.sos.joc.model.job.TaskId;
 import com.sos.joc.model.job.TasksFilter;
 import com.sos.joc.tasks.resource.ITasksResourceKill;
+import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("tasks")
 public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksResourceKill {
@@ -33,12 +35,11 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 	private List<Err419> listOfErrors = new ArrayList<Err419>();
 
 	@Override
-	public JOCDefaultResponse postTasksTerminate(String xAccessToken, String accessToken, ModifyTasks modifyTasks) {
-		return postTasksTerminate(getAccessToken(xAccessToken, accessToken), modifyTasks);
-	}
-
-	public JOCDefaultResponse postTasksTerminate(String accessToken, ModifyTasks modifyTasks) {
+	public JOCDefaultResponse postTasksTerminate(String accessToken, byte[] modifyTasksBytes) {
 		try {
+		    JsonValidator.validateFailFast(modifyTasksBytes, ModifyTasks.class);
+		    ModifyTasks modifyTasks = Globals.objectMapper.readValue(modifyTasksBytes, ModifyTasks.class);
+            
 			return postTasksCommand(accessToken, TERMINATE,
 					getPermissonsJocCockpit(modifyTasks.getJobschedulerId(), accessToken).getJob().getExecute()
 							.isTerminate(),
@@ -52,13 +53,11 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 	}
 
 	@Override
-	public JOCDefaultResponse postTasksTerminateWithin(String xAccessToken, String accessToken,
-			ModifyTasks modifyTasks) {
-		return postTasksTerminateWithin(getAccessToken(xAccessToken, accessToken), modifyTasks);
-	}
-
-	public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasks modifyTasks) {
+	public JOCDefaultResponse postTasksTerminateWithin(String accessToken, byte[] modifyTasksBytes) {
 		try {
+		    JsonValidator.validateFailFast(modifyTasksBytes, ModifyTasks.class);
+            ModifyTasks modifyTasks = Globals.objectMapper.readValue(modifyTasksBytes, ModifyTasks.class);
+            
 			return postTasksCommand(accessToken, TERMINATE_WITHIN,
 					getPermissonsJocCockpit(modifyTasks.getJobschedulerId(), accessToken).getJob().getExecute()
 							.isTerminate(),
@@ -72,12 +71,11 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 	}
 
 	@Override
-	public JOCDefaultResponse postTasksKill(String xAccessToken, String accessToken, ModifyTasks modifyTasks) {
-		return postTasksKill(getAccessToken(xAccessToken, accessToken), modifyTasks);
-	}
-
-	public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasks modifyTasks) {
+	public JOCDefaultResponse postTasksKill(String accessToken, byte[] modifyTasksBytes) {
 		try {
+		    JsonValidator.validateFailFast(modifyTasksBytes, ModifyTasks.class);
+            ModifyTasks modifyTasks = Globals.objectMapper.readValue(modifyTasksBytes, ModifyTasks.class);
+            
 			return postTasksCommand(accessToken, KILL,
 					getPermissonsJocCockpit(modifyTasks.getJobschedulerId(), accessToken).getJob().getExecute()
 							.isKill(),
@@ -91,12 +89,11 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 	}
 
 	@Override
-	public JOCDefaultResponse postTasksEnd(String xAccessToken, String accessToken, ModifyTasks modifyTasks) {
-		return postTasksEnd(getAccessToken(xAccessToken, accessToken), modifyTasks);
-	}
-
-	public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasks modifyTasks) {
+	public JOCDefaultResponse postTasksEnd(String accessToken, byte[] modifyTasksBytes) {
 		try {
+		    JsonValidator.validateFailFast(modifyTasksBytes, ModifyTasks.class);
+            ModifyTasks modifyTasks = Globals.objectMapper.readValue(modifyTasksBytes, ModifyTasks.class);
+            
 			return postTasksCommand(accessToken, END,
 					getPermissonsJocCockpit(modifyTasks.getJobschedulerId(), accessToken).getJob().getExecute()
 							.isKill(),

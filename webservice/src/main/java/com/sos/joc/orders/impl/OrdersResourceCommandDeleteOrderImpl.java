@@ -6,10 +6,10 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
@@ -18,6 +18,8 @@ import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandDeleteOrder;
+import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("orders")
 public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandDeleteOrder {
@@ -26,12 +28,11 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
-    public JOCDefaultResponse postOrdersDelete(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersDelete(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrders modifyOrders) {
+    public JOCDefaultResponse postOrdersDelete(String accessToken, byte[] modifyOrdersBytes) {
         try {
+            JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
+            ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder().getDelete().isTemporary());
             if (jocDefaultResponse != null) {

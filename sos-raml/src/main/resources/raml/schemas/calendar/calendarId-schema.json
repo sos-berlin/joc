@@ -1,0 +1,21 @@
+{
+  "title": "calendarId",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.CalendarId",
+  "type": "object",
+  "description": "one of the fields calendar and path is required.",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    }
+  }
+}

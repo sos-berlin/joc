@@ -1,0 +1,23 @@
+{
+  "title": "customDeleteEventsFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.custom.EventIdsFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeLong-schema.json" 
+      }
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

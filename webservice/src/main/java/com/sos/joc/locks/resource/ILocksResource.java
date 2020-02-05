@@ -7,17 +7,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.lock.LocksFilter;
 
  
 public interface ILocksResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postLocks(            
-            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, LocksFilter locksFilter) throws Exception;
+    public JOCDefaultResponse postLocks(@HeaderParam("X-Access-Token") String accessToken, byte[] locksFilter);
 
-
- 
-    
 }

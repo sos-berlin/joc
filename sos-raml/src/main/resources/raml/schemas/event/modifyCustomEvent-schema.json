@@ -1,0 +1,48 @@
+{
+  "title": "modify custom event",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.custom.ModifyEvent",
+  "type": "object",
+  "properties": {
+    "eventjobChain": {
+      "$ref": "../common/path-schema.json",
+      "default":"/sos/events/scheduler_event_service"
+    },
+    "orderId": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "eventClass": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "eventId": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "exitCode": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "expires": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "expirationPeriod": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "expirationCycle": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "params": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

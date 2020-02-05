@@ -20,6 +20,8 @@ public class SOSShiroCurrentUserAnswer {
     private String message;
     private Long sessionTimeout;
     private boolean enableTouch = true;
+    private String callerIpAddress;
+    private String callerHostName;
 
     public SOSShiroCurrentUserAnswer() {
     }
@@ -138,5 +140,27 @@ public class SOSShiroCurrentUserAnswer {
     public String toString() {
         return String.format("User: %s Role: %s hasRole: %s Permission: %s isPermitted: %s -- AccessToken=%s", this.user, this.role, this.hasRole, this.permission,
                 this.isPermittet, this.accessToken);
+    }
+
+    
+    public String getCallerIpAddress() {
+        return callerIpAddress;
+    }
+
+    
+    @XmlElement
+    public void setCallerIpAddress(String callerIpAddress) {
+        this.callerIpAddress = callerIpAddress;
+    }
+
+    
+    public String getCallerHostName() {
+        return callerHostName;
+    }
+
+    
+    @XmlElement
+    public void setCallerHostName(String callerHostName) {
+        this.callerHostName = callerHostName;
     }
 }

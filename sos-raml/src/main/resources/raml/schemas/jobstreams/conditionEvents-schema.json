@@ -1,0 +1,24 @@
+{
+	"title": "ConditionEvents",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionEvents",
+	"type": "object",
+	"required": [
+		"deliveryDate",
+		"conditionEvents"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+	     },
+	     "session": {
+			"$ref": "../common/string100-schema.json"
+		 },
+         "conditionEvents": {
+           "type": "array",
+           "items": {
+              "$ref": "conditionEvent-schema.json"
+            }
+        } 
+    }
+}

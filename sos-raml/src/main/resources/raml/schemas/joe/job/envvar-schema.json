@@ -1,0 +1,15 @@
+{
+  "title": "environment variable",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "javaType": "com.sos.joc.model.joe.job.EnviromentVariable",
+  "xmlElement": "variable",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "value": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "title": "string in latin1",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "string",
+  "description": "latin1 chars without <>",
+  "pattern": "^[\u0020-\u003b=\u003f\u007e\u00a0-\u00ff]*$"
+}

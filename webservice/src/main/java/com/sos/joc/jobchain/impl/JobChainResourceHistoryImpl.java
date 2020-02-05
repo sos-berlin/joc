@@ -27,6 +27,7 @@ import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.jobChain.JobChainHistoryFilter;
 import com.sos.joc.model.order.OrderHistory;
 import com.sos.joc.model.order.OrderHistoryItem;
+import com.sos.schema.JsonValidator;
 
 @Path("job_chain")
 public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJobChainResourceHistory {
@@ -102,16 +103,13 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 	}
 
 	@Override
-	public JOCDefaultResponse postJobChainHistory(String xAccessToken, String accessToken,
-			JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
-		return postJobChainHistory(getAccessToken(xAccessToken, accessToken), jobChainHistoryFilter);
-	}
-
-	public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilter jobChainHistoryFilter)
-			throws Exception {
+	public JOCDefaultResponse postJobChainHistory(String accessToken, byte[] jobChainHistoryFilterBytes) {
 
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(jobChainHistoryFilterBytes, JobChainHistoryFilter.class);
+		    JobChainHistoryFilter jobChainHistoryFilter = Globals.objectMapper.readValue(jobChainHistoryFilterBytes, JobChainHistoryFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainHistoryFilter, accessToken,
 					jobChainHistoryFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(jobChainHistoryFilter.getJobschedulerId(), accessToken).getJobChain()
@@ -207,6 +205,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 		List<DBItemReportTrigger> listOfReportTriggerDBItems = reportTriggerDBLayer
 				.getSchedulerOrderHistoryListFromTo();
 		DBItemReportTrigger dbItemReportTrigger = null;
+
 		if (listOfReportTriggerDBItems.size() > 0) {
 			dbItemReportTrigger = listOfReportTriggerDBItems.get(0);
 		} else {
@@ -228,7 +227,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 			// } else {
 			// return HistoryStateText.FAILED;
 			// }
-		} else if (dbItemReportTrigger.getResultError()) {
+		} else if (dbItemReportTrigger.getResultError() && !dbItemReportTrigger.getState().toLowerCase().contains("success")) {
 			return HistoryStateText.FAILED;
 		} else {
 			return HistoryStateText.SUCCESSFUL;

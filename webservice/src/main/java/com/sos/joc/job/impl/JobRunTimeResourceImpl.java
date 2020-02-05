@@ -18,6 +18,7 @@ import com.sos.joc.job.resource.IJobRunTimeResource;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.job.JobFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("job")
 public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTimeResource {
@@ -25,14 +26,12 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 	private static final String API_CALL = "./job/run_time";
 
 	@Override
-	public JOCDefaultResponse postJobRunTime(String xAccessToken, String accessToken, JobFilter jobFilter)
-			throws Exception {
-		return postJobRunTime(getAccessToken(xAccessToken, accessToken), jobFilter);
-	}
-
-	public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) throws Exception {
+	public JOCDefaultResponse postJobRunTime(String accessToken, byte[] jobFilterBytes) {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(jobFilterBytes, JobFilter.class);
+            JobFilter jobFilter = Globals.objectMapper.readValue(jobFilterBytes, JobFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
 					jobFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
@@ -44,7 +43,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 			String jobPath = normalizePath(jobFilter.getJob());
 			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 			String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
-			runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken);
+			runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, false);
 
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
@@ -60,7 +59,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
                 runTimeAnswer.getRunTime().setCalendars(calendars);
             }
 
-			return JOCDefaultResponse.responseStatus200(runTimeAnswer);
+			return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(runTimeAnswer));
 		} catch (JocException e) {
 			e.addErrorMetaInfo(getJocError());
 			return JOCDefaultResponse.responseStatusJSError(e);
@@ -69,6 +68,5 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 		} finally {
 			Globals.disconnect(connection);
 		}
-
 	}
 }

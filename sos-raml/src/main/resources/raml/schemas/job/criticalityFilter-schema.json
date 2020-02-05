@@ -1,0 +1,12 @@
+{
+  "title": "job criticality filter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.JobCriticalityFilter",
+  "type": "string",
+  "description" : "Criticality of a job",
+  "enum": [
+    "NORMAL",
+    "MINOR",
+    "MAJOR"
+  ]
+}

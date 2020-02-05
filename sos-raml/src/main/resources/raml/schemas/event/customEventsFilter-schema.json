@@ -1,0 +1,87 @@
+{
+  "title": "customEventsFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.custom.EventsFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "eventIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/string255-schema.json"
+      }
+    },
+    "eventClasses": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/string255-schema.json"
+      }
+    },
+    "exitCodes": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeInteger-schema.json" 
+      }
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.job.JobPath",
+        "type": "object",
+        "required": [
+          "job"
+        ],
+        "properties": {
+          "job": {
+            "$ref": "../common/path-schema.json"
+          }
+        }
+      }
+    },
+    "orders": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.order.OrderPath",
+        "type": "object",
+        "required": [
+          "jobChain"
+        ],
+        "properties": {
+          "jobChain": {
+            "$ref": "../common/path-schema.json"
+          },
+          "orderId": {
+            "description": "if orderId undefined or empty then all orders of specified job chain are requested",
+            "$ref": "../common/string255-schema.json"
+          }
+        }
+      }
+    },
+    "folders": {
+      "$ref": "../common/folders-schema.json"
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "dateFrom": {
+      "$ref": "../common/dateFromTo-schema.json"
+    },
+    "dateTo": {
+      "$ref": "../common/dateFromTo-schema.json"
+    },
+    "timeZone": {
+      "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+      "$ref": "../common/string255-schema.json"
+    },
+    "limit": {
+      "description": "restricts the number of responsed records; -1=unlimited",
+      "type": "integer",
+      "default": 10000
+    }
+  }
+}

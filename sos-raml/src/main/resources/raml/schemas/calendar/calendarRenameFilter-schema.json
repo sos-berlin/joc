@@ -1,0 +1,25 @@
+{
+  "title": "calendar rename filter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.CalendarRenameFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "path",
+    "newPath"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "newPath": {
+      "$ref": "../common/path-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

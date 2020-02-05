@@ -1,0 +1,57 @@
+{
+  "title": "task in history collection",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.TaskHistoryItem",
+  "type": "object",
+  "required": [
+    "surveyDate",
+    "job",
+    "startTime",
+    "state",
+    "taskId"
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "job": {
+      "type": "string"
+    },
+    "startTime": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "endTime": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "state": {
+      "$ref": "../common/historyState-schema.json"
+    },
+    "taskId": {
+      "type": "string"
+    },
+	"criticality": {
+      "type": "string",
+      "default": "normal"
+    },    
+    "clusterMember": {
+      "type": "string"
+    },
+    "steps": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "exitCode": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "error": {
+      "description": "Only defined iff exitCode > 0",
+      "$ref": "../common/error-schema.json"
+    },
+    "agent": {
+      "description": "agent url",
+      "type": "string"
+    }
+  }
+}

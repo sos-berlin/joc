@@ -6,10 +6,10 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyJobChainAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
@@ -18,6 +18,8 @@ import com.sos.joc.jobchains.resource.IJobChainsResourceModifyJobChains;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.jobChain.ModifyJobChain;
 import com.sos.joc.model.jobChain.ModifyJobChains;
+import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("job_chains")
 public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implements IJobChainsResourceModifyJobChains {
@@ -28,20 +30,12 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 	private List<Err419> listOfErrors = new ArrayList<Err419>();
 
 	@Override
-	public JOCDefaultResponse postJobChainsStop(String xAccessToken, String accessToken,
-			ModifyJobChains modifyJobChains) throws Exception {
-		return postJobChainsStop(getAccessToken(xAccessToken, accessToken), modifyJobChains);
-	}
-
-	@Override
-	public JOCDefaultResponse postJobChainsUnStop(String xAccessToken, String accessToken,
-			ModifyJobChains modifyJobChains) throws Exception {
-		return postJobChainsUnStop(getAccessToken(xAccessToken, accessToken), modifyJobChains);
-	}
-
-	public JOCDefaultResponse postJobChainsStop(String accessToken, ModifyJobChains modifyJobChains) {
+    public JOCDefaultResponse postJobChainsStop(String accessToken,  byte[] modifyJobChainsBytes) {
 		try {
-			return postJobChainsCommand(STOP, accessToken,
+		    JsonValidator.validateFailFast(modifyJobChainsBytes, ModifyJobChains.class);
+		    ModifyJobChains modifyJobChains = Globals.objectMapper.readValue(modifyJobChainsBytes, ModifyJobChains.class);
+            
+            return postJobChainsCommand(STOP, accessToken,
 					getPermissonsJocCockpit(modifyJobChains.getJobschedulerId(), accessToken).getJobChain().getExecute()
 							.isStop(),
 					modifyJobChains);
@@ -53,9 +47,13 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 		}
 	}
 
-	public JOCDefaultResponse postJobChainsUnStop(String accessToken, ModifyJobChains modifyJobChains) {
+	@Override
+    public JOCDefaultResponse postJobChainsUnStop(String accessToken, byte[] modifyJobChainsBytes) {
 		try {
-			return postJobChainsCommand(UNSTOP, accessToken,
+		    JsonValidator.validateFailFast(modifyJobChainsBytes, ModifyJobChains.class);
+            ModifyJobChains modifyJobChains = Globals.objectMapper.readValue(modifyJobChainsBytes, ModifyJobChains.class);
+            
+            return postJobChainsCommand(UNSTOP, accessToken,
 					getPermissonsJocCockpit(modifyJobChains.getJobschedulerId(), accessToken).getJobChain().getExecute()
 							.isUnstop(),
 					modifyJobChains);

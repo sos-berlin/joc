@@ -1,0 +1,33 @@
+{
+  "title": "Filter Deploy",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.joe.common.FilterDeploy",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "folder"
+  ],
+  "properties": {
+  	"jobschedulerId": {
+      	"$ref": "../../common/filename100-schema.json"
+    },
+    "folder": {
+      	"$ref": "../../common/path-schema.json"
+    },
+  	"recursive": {
+      	"type": "boolean"
+    },
+    "objectName": {
+      	"$ref": "../../common/filename255-schema.json"
+    },
+    "objectType": {
+      	"$ref": "../../common/type-schema.json"
+    },   
+    "account": {
+      	"$ref": "../../common/string255-schema.json"
+    },
+    "auditLog": {
+    	"$ref": "../../audit/auditParams-schema.json"
+    }
+  }
+}

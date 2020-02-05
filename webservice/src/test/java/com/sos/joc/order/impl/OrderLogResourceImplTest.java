@@ -1,10 +1,10 @@
 package com.sos.joc.order.impl;
  
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.sos.joc.Globals;
 import com.sos.joc.TestEnvWebserviceTest;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.LogContent200;
@@ -29,7 +29,8 @@ public class OrderLogResourceImplTest {
         orderFilterWithHistoryIdSchema.setHistoryId("1320022");
         orderFilterWithHistoryIdSchema.setJobschedulerId(TestEnvWebserviceTest.SCHEDULER_ID);
         OrderLogResourceImpl orderLogImpl = new OrderLogResourceImpl();
-        JOCDefaultResponse ordersResponse = orderLogImpl.postOrderLog(accessToken, orderFilterWithHistoryIdSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(orderFilterWithHistoryIdSchema);
+        JOCDefaultResponse ordersResponse = orderLogImpl.postOrderLog(accessToken, b);
         LogContent200 logContentSchema = (LogContent200) ordersResponse.getEntity();
         //assertEquals("postOrderHistoryTest","<!DOCT", logContentSchema.getLog().getHtml().substring(0, 6));
      }

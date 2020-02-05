@@ -18,21 +18,21 @@ import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.order.resource.IOrderRunTimeResource;
+import com.sos.schema.JsonValidator;
 
 @Path("order")
 public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderRunTimeResource {
 
-	private static final String API_CALL = "./order/run_time";
+    private static final String API_CALL = "./order/run_time";
 
-	@Override
-	public JOCDefaultResponse postOrderRunTime(String xAccessToken, String accessToken, OrderFilter orderFilter)
-			throws Exception {
-		return postOrderRunTime(getAccessToken(xAccessToken, accessToken), orderFilter);
-	}
-
-	public JOCDefaultResponse postOrderRunTime(String accessToken, OrderFilter orderFilter) throws Exception {
-		SOSHibernateSession connection = null;
-		try {
+    // old school with JOC-730
+    @Override
+	public JOCDefaultResponse postOrderRunTime(String accessToken, byte[] filterBytes) {
+        SOSHibernateSession connection = null;
+        try {
+		    JsonValidator.validateFailFast(filterBytes, OrderFilter.class);
+		    OrderFilter orderFilter = Globals.objectMapper.readValue(filterBytes, OrderFilter.class);
+            
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken,
 					orderFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(orderFilter.getJobschedulerId(), accessToken).getOrder().getView()
@@ -41,19 +41,19 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
 				return jocDefaultResponse;
 			}
 
-			RunTime200 runTimeAnswer = new RunTime200();
-			checkRequiredParameter("orderId", orderFilter.getOrderId());
-			checkRequiredParameter("jobChain", orderFilter.getJobChain());
+            RunTime200 runTimeAnswer = new RunTime200();
+            checkRequiredParameter("orderId", orderFilter.getOrderId());
+            checkRequiredParameter("jobChain", orderFilter.getJobChain());
 
-			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-			String jobChainPath = normalizePath(orderFilter.getJobChain());
-			String orderCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, orderFilter.getOrderId(), "run_time");
-			runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken);
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+            String jobChainPath = normalizePath(orderFilter.getJobChain());
+            String orderCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, orderFilter.getOrderId(), "run_time");
+            runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken, false);
 
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-			CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
-            List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(), "ORDER",
-                    jobChainPath + "," + orderFilter.getOrderId());
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
+            List<CalendarUsageConfiguration> dbCalendars = calendarUsageDBLayer.getConfigurationsOfAnObject(dbItemInventoryInstance.getSchedulerId(),
+                    "ORDER", jobChainPath + "," + orderFilter.getOrderId());
             if (dbCalendars != null && !dbCalendars.isEmpty()) {
                 List<Calendar> calendars = new ArrayList<Calendar>();
                 for (CalendarUsageConfiguration dbCalendar : dbCalendars) {
@@ -63,14 +63,15 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
                 }
                 runTimeAnswer.getRunTime().setCalendars(calendars);
             }
-			return JOCDefaultResponse.responseStatus200(runTimeAnswer);
-		} catch (JocException e) {
-			e.addErrorMetaInfo(getJocError());
-			return JOCDefaultResponse.responseStatusJSError(e);
-		} catch (Exception e) {
-			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		} finally {
-			Globals.disconnect(connection);
-		}
-	}
+            
+            return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(runTimeAnswer));
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
+        }
+    }
 }

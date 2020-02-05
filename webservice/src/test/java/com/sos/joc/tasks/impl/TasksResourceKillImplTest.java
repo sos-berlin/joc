@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.Ok;
@@ -25,7 +26,7 @@ public class TasksResourceKillImplTest {
         //Preparation: Start the jobs on JobScheduler assigned to scheduler_id and put the task id in the list.
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"", LDAP_USER, LDAP_PASSWORD).getEntity();
         ModifyTasks modifyTasksSchema = new ModifyTasks();
         List<TasksFilter> listOfJobs = new ArrayList<TasksFilter>();
         TasksFilter jobKill1 = new TasksFilter();
@@ -62,7 +63,8 @@ public class TasksResourceKillImplTest {
         modifyTasksSchema.setJobschedulerId("scheduler_current");
         //modifyTasksSchema.setComment("myComment1");
         TasksResourceKillImpl tasksHistoryImpl = new TasksResourceKillImpl();
-        JOCDefaultResponse taskKillResponse = tasksHistoryImpl.postTasksKill(sosShiroCurrentUserAnswer.getAccessToken(), modifyTasksSchema);
+        byte[] b = Globals.objectMapper.writeValueAsBytes(modifyTasksSchema);
+        JOCDefaultResponse taskKillResponse = tasksHistoryImpl.postTasksKill(sosShiroCurrentUserAnswer.getAccessToken(), b);
         Ok okSchema = (Ok) taskKillResponse.getEntity();
         assertEquals("postTasksHistoryTest",true, okSchema.getOk());
      }

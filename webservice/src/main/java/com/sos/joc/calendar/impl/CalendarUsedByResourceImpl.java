@@ -18,6 +18,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.CalendarId;
 import com.sos.joc.model.calendar.UsedBy;
+import com.sos.schema.JsonValidator;
 
 @Path("calendar")
 public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICalendarUsedByResource {
@@ -25,9 +26,11 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
 	private static final String API_CALL = "./calendar/used";
 
 	@Override
-	public JOCDefaultResponse postUsedBy(String accessToken, CalendarId calendarFilter) throws Exception {
+	public JOCDefaultResponse postUsedBy(String accessToken, byte[] calendarFilterBytes) {
 		SOSHibernateSession connection = null;
 		try {
+		    JsonValidator.validateFailFast(calendarFilterBytes, CalendarId.class);
+            CalendarId calendarFilter = Globals.objectMapper.readValue(calendarFilterBytes, CalendarId.class);
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken,
 					calendarFilter.getJobschedulerId(),
 					getPermissonsJocCockpit(calendarFilter.getJobschedulerId(), accessToken).getCalendar().getView()

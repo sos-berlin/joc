@@ -2,15 +2,17 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyJobSchedulerClusterAudit;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
 import com.sos.joc.model.jobscheduler.TimeoutParameter;
+import com.sos.schema.JsonValidator;
+import com.sos.xml.XMLBuilder;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobSchedulerCluster {
@@ -22,12 +24,11 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     private static String API_CALL = "./jobscheduler/cluster/";
 
     @Override
-    public JOCDefaultResponse postJobschedulerTerminate(String xAccessToken, String accessToken, TimeoutParameter timeoutParameter) throws Exception {
-        return postJobschedulerTerminate(getAccessToken(xAccessToken, accessToken), timeoutParameter);
-    }
-
-    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
+    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, TimeoutParameter.class);
+            TimeoutParameter timeoutParameter = Globals.objectMapper.readValue(filterBytes, TimeoutParameter.class);
+            
             boolean permission = getPermissonsJocCockpit(timeoutParameter.getJobschedulerId(), accessToken).getJobschedulerMasterCluster()
                     .getExecute().isTerminate();
             return executeModifyJobSchedulerClusterCommand(TERMINATE, timeoutParameter, accessToken, permission);
@@ -40,13 +41,11 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerRestartTerminate(String xAccessToken, String accessToken, TimeoutParameter timeoutParameter)
-            throws Exception {
-        return postJobschedulerRestartTerminate(getAccessToken(xAccessToken, accessToken), timeoutParameter);
-    }
-
-    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
+   public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, TimeoutParameter.class);
+            TimeoutParameter timeoutParameter = Globals.objectMapper.readValue(filterBytes, TimeoutParameter.class);
+            
             boolean permission = getPermissonsJocCockpit(timeoutParameter.getJobschedulerId(), accessToken).getJobschedulerMasterCluster()
                     .getExecute().isRestart();
             return executeModifyJobSchedulerClusterCommand(RESTART, timeoutParameter, accessToken, permission);
@@ -59,13 +58,11 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerReactivate(String xAccessToken, String accessToken, TimeoutParameter timeoutParameter)
-            throws Exception {
-        return postJobschedulerReactivate(getAccessToken(xAccessToken, accessToken), timeoutParameter);
-    }
-
-    public JOCDefaultResponse postJobschedulerReactivate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
+    public JOCDefaultResponse postJobschedulerReactivate(String accessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, TimeoutParameter.class);
+            TimeoutParameter timeoutParameter = Globals.objectMapper.readValue(filterBytes, TimeoutParameter.class);
+            
             boolean permission = getPermissonsJocCockpit(timeoutParameter.getJobschedulerId(), accessToken).getJobschedulerMasterCluster()
                     .getExecute().isRestart();
             return executeModifyJobSchedulerClusterCommand(REACTIVATE, timeoutParameter, accessToken, permission);
@@ -78,13 +75,11 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String xAccessToken, String accessToken, TimeoutParameter timeoutParameter)
-            throws Exception {
-        return postJobschedulerTerminateFailSafe(getAccessToken(xAccessToken, accessToken), timeoutParameter);
-    }
-
-    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
+    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, byte[] filterBytes) {
         try {
+            JsonValidator.validateFailFast(filterBytes, TimeoutParameter.class);
+            TimeoutParameter timeoutParameter = Globals.objectMapper.readValue(filterBytes, TimeoutParameter.class);
+            
             boolean permission = getPermissonsJocCockpit(timeoutParameter.getJobschedulerId(), accessToken).getJobschedulerMasterCluster()
                     .getExecute().isTerminateFailSafe();
             return executeModifyJobSchedulerClusterCommand(TERMINATE_FAILSAFE, timeoutParameter, accessToken, permission);

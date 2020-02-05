@@ -1,0 +1,22 @@
+{
+	"title": "lock info",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.joe.lock.LockInfo",
+	"type": "object",
+	"properties": {
+		"deliveryDate": {
+      		"$ref": "../../common/deliveryDate-schema.json"
+    	},
+    	"isLocked": {
+       		"type": "boolean",
+       		"default": false
+	 	},
+    	"lockedBy": {
+       		"type": "string"
+	 	},
+    	"lockedSince": {
+       		"type": "string",
+  			"format": "date-time"
+	 	}
+	}
+}

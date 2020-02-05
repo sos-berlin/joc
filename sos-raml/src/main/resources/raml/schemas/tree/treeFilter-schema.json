@@ -1,0 +1,41 @@
+{
+	"title": "treeFilter",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.tree.TreeFilter",
+	"type": "object",
+	"required": ["jobschedulerId"],
+
+	"properties": {
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+
+		"types": {
+			"$ref": "../common/types-schema.json"
+		},
+
+		"compact": {
+			"$ref": "../common/compactParam-schema.json"
+		},
+
+		"force": {
+			"title": "force full tree",
+			"description": "controls whether the folder permissions are use. If true the full tree will be returned",
+			"type": "boolean",
+			"default": false
+		},
+
+		"regex": {
+			"$ref": "../common/regexFilter-schema.json"
+		},
+
+		"folders": {
+			"$ref": "../common/folders-schema.json"
+		},
+
+		"forJoe": {
+			"type": "boolean",
+			"default": false
+		}
+	}
+}

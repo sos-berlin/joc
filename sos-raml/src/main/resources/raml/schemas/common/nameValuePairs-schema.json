@@ -1,0 +1,21 @@
+{
+  "title": "params or environment variables",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "javaType": "com.sos.joc.model.common.NameValuePair",
+    "type": "object",
+    "required": [
+      "name",
+      "value"
+    ],
+    "properties": {
+      "name": {
+        "$ref": "string255-schema.json"
+      },
+      "value": {
+        "$ref": "noScript-schema.json"
+      }
+    }
+  }
+}

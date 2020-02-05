@@ -23,12 +23,14 @@ import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
 import com.sos.joc.model.common.HistoryStateText;
+import com.sos.joc.model.job.JobCriticalityFilter;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.OrderPath;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
 import com.sos.joc.tasks.resource.ITasksResourceHistory;
+import com.sos.schema.JsonValidator;
 
 @Path("tasks")
 public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksResourceHistory {
@@ -36,14 +38,13 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
     private static final String API_CALL = "./tasks/history";
 
     @Override
-    public JOCDefaultResponse postTasksHistory(String xAccessToken, String accessToken, JobsFilter jobsFilter) throws Exception {
-        return postTasksHistory(getAccessToken(xAccessToken, accessToken), jobsFilter);
-    }
-
-    public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
+    public JOCDefaultResponse postTasksHistory(String accessToken, byte[] jobsFilterBytes) {
         SOSHibernateSession connection = null;
 
         try {
+            JsonValidator.validateFailFast(jobsFilterBytes, JobsFilter.class);
+            JobsFilter jobsFilter = Globals.objectMapper.readValue(jobsFilterBytes, JobsFilter.class);
+            
             if (jobsFilter.getJobschedulerId() == null) {
                 jobsFilter.setJobschedulerId("");
             }
@@ -93,6 +94,12 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                     if (jobsFilter.getHistoryStates().size() > 0) {
                         for (HistoryStateText historyStateText : jobsFilter.getHistoryStates()) {
                             reportTaskExecutionsDBLayer.getFilter().addState(historyStateText.toString());
+                        }
+                    }
+
+                    if (jobsFilter.getCriticality().size() > 0) {
+                        for (JobCriticalityFilter criticality : jobsFilter.getCriticality()) {
+                            reportTaskExecutionsDBLayer.getFilter().addCriticality(criticality.value().toLowerCase());
                         }
                     }
 
@@ -164,6 +171,8 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                         taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
                         taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
                         taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
+                        taskHistoryItem.setCriticality(dbItemReportTask.getCriticality());
+                        
                         if (dbItemReportTask.getError()) {
                             Err error = new Err();
                             error.setCode(dbItemReportTask.getErrorCode());

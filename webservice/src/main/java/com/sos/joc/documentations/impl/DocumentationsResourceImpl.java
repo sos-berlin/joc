@@ -25,6 +25,7 @@ import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.docu.Documentation;
 import com.sos.joc.model.docu.Documentations;
 import com.sos.joc.model.docu.DocumentationsFilter;
+import com.sos.schema.JsonValidator;
 
 @Path("documentations")
 public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocumentationsResource {
@@ -33,10 +34,12 @@ public class DocumentationsResourceImpl extends JOCResourceImpl implements IDocu
     private static final Set<String> ASSIGN_TYPES = new HashSet<String>(Arrays.asList("html", "xml", "pdf", "markdown"));
 
     @Override
-    public JOCDefaultResponse postDocumentations(String xAccessToken, DocumentationsFilter filter) throws Exception {
+    public JOCDefaultResponse postDocumentations(String xAccessToken, byte[] filterBytes) {
         
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(filterBytes, DocumentationsFilter.class);
+            DocumentationsFilter filter = Globals.objectMapper.readValue(filterBytes, DocumentationsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(filter
                     .getJobschedulerId(), xAccessToken).getDocumentation().isView());
             if (jocDefaultResponse != null) {

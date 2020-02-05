@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.order.ModifyOrders;
 
 public interface IOrdersResourceCommandAddOrder {
 
@@ -16,5 +15,5 @@ public interface IOrdersResourceCommandAddOrder {
     @Path("add")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersAdd(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    public JOCDefaultResponse postOrdersAdd(@HeaderParam("X-Access-Token") String accessToken, byte[] modifyOrders);
 }

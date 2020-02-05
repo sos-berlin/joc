@@ -18,11 +18,14 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocConfigurationException;
@@ -30,6 +33,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.joc.resource.ILogResource;
 import com.sos.joc.model.JOClog;
 import com.sos.joc.model.JOClogs;
+import com.sos.schema.JsonValidator;
 
 @javax.ws.rs.Path("")
 public class LogImpl extends JOCResourceImpl implements ILogResource {
@@ -40,8 +44,11 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
     private String logTimezone = "GMT";
 
     @Override
-    public JOCDefaultResponse postLog(String accessToken, JOClog jocLog) {
+    public JOCDefaultResponse postLog(String accessToken, byte[] jocLogBytes) {
         try {
+            JsonValidator.validateFailFast(jocLogBytes, JOClog.class);
+            JOClog jocLog = Globals.objectMapper.readValue(jocLogBytes, JOClog.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jocLog, accessToken, "", getPermissonsJocCockpit("", accessToken).getJoc()
                     .getView().isLog());
             if (jocDefaultResponse != null) {
@@ -162,9 +169,11 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
-        JOClog jocLog = new JOClog();
-        jocLog.setFilename(filename);
-        return postLog(accessToken, jocLog);
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if(filename != null) {
+            builder.add("filename", filename);
+        }
+        return postLog(accessToken, builder.build().toString().getBytes());
     }
 
     private static DirectoryStream<Path> getFileListStream(final Path folder, final String regexp) throws IOException {
@@ -193,7 +202,7 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
     private void readJettyLoggingProperties() {
         InputStream stream = null;
         Properties properties = new Properties();
-        Path jettyLoggingConf = Paths.get("start.d/logging.ini");
+        Path jettyLoggingConf = Paths.get("start.d/console-capture.ini");
         if (!Files.exists(jettyLoggingConf)) {
             jettyLoggingConf = Paths.get("start.ini");
         }
@@ -203,11 +212,11 @@ public class LogImpl extends JOCResourceImpl implements ILogResource {
                 if (stream != null) {
                     properties.load(stream);
                 }
-                if (properties.containsKey("jetty.logging.dir")) {
-                    logDirectory = properties.getProperty("jetty.logging.dir");
+                if (properties.containsKey("jetty.console-capture.dir")) {
+                    logDirectory = properties.getProperty("jetty.console-capture.dir");
                 }
-                if (properties.containsKey("jetty.logging.timezone")) {
-                    logTimezone = properties.getProperty("jetty.logging.timezone");
+                if (properties.containsKey("jetty.console-capture.timezone")) {
+                    logTimezone = properties.getProperty("jetty.console-capture.timezone");
                 }
             } catch (Exception e) {
                 LOGGER.warn(String.format("Error while reading %1$s:", jettyLoggingConf.toString()), e);

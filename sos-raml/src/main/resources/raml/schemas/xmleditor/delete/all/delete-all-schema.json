@@ -1,0 +1,22 @@
+{
+	"title": "xmleditor delete all configurations in",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"javaType": "com.sos.joc.model.xmleditor.delete.all.DeleteAll",
+	"type": "object",
+	"description": "",
+	"required": [
+		"jobschedulerId",
+		"objectTypes"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"$ref": "../../../common/filename100-schema.json"
+		},
+		"objectTypes": {
+		    "type": "array",
+			"items": {
+        		"$ref": "../../common/object-type-schema.json"
+      		}
+		}	
+	}
+}

@@ -1,7 +1,9 @@
 package com.sos.joc.classes;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -10,6 +12,10 @@ import javax.ws.rs.core.UriBuilder;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.junit.Test;
+import org.xml.sax.SAXException;
+import com.sos.xml.XMLBuilder;
+
+import com.sos.exception.SOSDoctypeException;
 
 public class XMLBuilderTest {
 
@@ -34,15 +40,28 @@ public class XMLBuilderTest {
     }
     
     @Test
-    public void testAddOrderWithParams2() throws DocumentException {
+    public void testAddOrderWithParams2() throws SOSDoctypeException, DocumentException, SAXException, IOException {
         Element params = XMLBuilder.create("params");
         params.addElement("param").addAttribute("name", "hallo").addAttribute("value", "welt").addElement("param").addAttribute("name", "hello").addAttribute("value", "world");
         System.out.println(params.asXML());
         XMLBuilder addOrder = new XMLBuilder("add_order");
         addOrder.addAttribute("id", "hallo").addAttribute("job_chain", "/a/b/jobChain1").add(params);
-        addOrder.add(XMLBuilder.parse("<run_time/>"));
+        addOrder.add(XMLBuilder.parse("<run_time/>").getRootElement());
         System.out.println(addOrder.asXML());
         assertEquals("<add_order id=\"hallo\" job_chain=\"/a/b/jobChain1\"><params><param name=\"hallo\" value=\"welt\"><param name=\"hello\" value=\"world\"/></param></params><run_time/></add_order>", addOrder.asXML());
+    }
+    
+    @Test
+    public void xxeTest() {
+        String xml = "<?xml version=\"1.0\"?><!DOCTYPE root [ <!ENTITY % remote SYSTEM \" http://localhost:4446 \">%remote; ]><run_time/>";
+        boolean check = false;
+        try {
+            XMLBuilder.parse(xml);
+            check = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        assertFalse(check);
     }
     
     @Test

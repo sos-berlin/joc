@@ -1,0 +1,18 @@
+{
+	"title": "job In-Condition",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "job In Condition",
+	"javaType": "com.sos.joc.model.jobstreams.JobInCondition",
+	"type": "object",
+	"properties": {
+		"job": {
+			"$ref": "../common/path-schema.json"
+		},
+		"inconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "incondition-schema.json"
+			}
+		}
+	}
+}

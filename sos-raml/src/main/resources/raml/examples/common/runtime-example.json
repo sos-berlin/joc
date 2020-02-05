@@ -1,0 +1,22 @@
+{
+  "deliveryDate": "2020-01-06T20:34:51Z",
+  "runTime": {
+    "letRun": "false",
+    "runOnce": "false",
+    "monthdays": {
+        "days": [
+            {
+                "day": "20",
+                "periods": [
+                    {
+                        "singleStart": "10:00",
+                        "letRun": "false",
+                        "runOnce": "false",
+                        "whenHoliday": "suppress"
+                    }
+                ]
+            }
+        ]
+    }
+  }
+}

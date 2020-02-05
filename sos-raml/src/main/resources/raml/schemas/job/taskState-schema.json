@@ -1,0 +1,19 @@
+{
+  "title": "task state",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.TaskState",
+  "type": "object",
+  "required": [
+    "severity",
+    "_text"
+  ],
+  "properties": {
+    "severity": {
+      "description": "0=running*/ending/closed; 1=loading/starting; 3=waiting*/none/suspended",
+      "type": "integer"
+    },
+    "_text": {
+      "$ref": "taskStateText-schema.json"
+    }
+  }
+}

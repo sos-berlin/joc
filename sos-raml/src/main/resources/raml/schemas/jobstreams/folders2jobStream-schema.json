@@ -1,0 +1,18 @@
+{
+	"title": "folders2Jobstream",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "List of all In Conditions",
+	"javaType": "com.sos.joc.model.jobstreams.Folders2Jobstream",
+	"type": "object",
+	"properties": {
+		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"folders": {
+			"type": "array",
+			"items": {
+				"$ref": "../common/path-schema.json"
+			}
+		}
+	}
+}

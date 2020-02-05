@@ -1,7 +1,9 @@
 package com.sos.joc.db.configuration;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.query.Query;
 
@@ -17,7 +19,7 @@ import com.sos.joc.model.configuration.Profile;
 /** @author Uwe Risse */
 public class JocConfigurationDbLayer extends DBLayer {
 
-    private static final String JOC_CONFIGURATION_DB_ITEM = JocConfigurationDbItem.class.getName();
+    private static final String JOC_CONFIGURATION_DB_ITEM = JocConfigurationDbItem.class.getSimpleName();
     private static final String CONFIGURATION_PROFILE = ConfigurationProfile.class.getName();
     private JocConfigurationFilter filter = null;
 
@@ -27,7 +29,7 @@ public class JocConfigurationDbLayer extends DBLayer {
     }
 
     public JocConfigurationDbItem getJocConfigurationDbItem(final Long id) throws SOSHibernateException {
-        return (JocConfigurationDbItem) (this.getSession().get(JocConfigurationDbItem.class, id));
+        return this.getSession().get(JocConfigurationDbItem.class, id);
     }
 
     public void resetFilter() {
@@ -87,7 +89,7 @@ public class JocConfigurationDbLayer extends DBLayer {
             and = " and ";
         }
         if (filter.getAccount() != null && !"".equals(filter.getAccount())) {
-            where += and + " account = :account";
+            where += and + " lower(account) = :account";
             and = " and ";
         }
         if (filter.isShared() != null) {
@@ -135,32 +137,26 @@ public class JocConfigurationDbLayer extends DBLayer {
         return this.getSession().getResultList(query);
 
     }
-
+ 
     public List<Profile> getJocConfigurationProfiles() throws SOSHibernateException {
-        StringBuilder sql = new StringBuilder();
-        sql.append("select new ").append(CONFIGURATION_PROFILE);
-        sql.append("(jc.account, max(al.created)) from ").append(JOC_CONFIGURATION_DB_ITEM).append(" jc, ").append(DBITEM_AUDIT_LOG).append(" al ");
-        sql.append("where jc.account=al.account and jc.configurationType='PROFILE' and al.request='./login' group by jc.account");
-        Query<Profile> query = this.getSession().createQuery(sql.toString());
-        return this.getSession().getResultList(query);
+        this.resetFilter();
+        this.filter.setConfigurationType("PROFILE");
+ 
+        String sql = "select new "  + CONFIGURATION_PROFILE + "(c.account, c.modified) from " + JOC_CONFIGURATION_DB_ITEM + " c " + getWhere() + filter.getOrderCriteria() + filter.getSortMode();
+        Query<ConfigurationProfile> query = this.getSession().createQuery(sql);
+        query.setParameter("configurationType", filter.getConfigurationType());
+        List<ConfigurationProfile> profiles = this.getSession().getResultList(query);
+         
+        if (profiles == null) {
+            return null;
+        }
+        return profiles.stream().distinct().collect(Collectors.toList());
     }
 
     public JocConfigurationDbItem getJocConfiguration(Long id) throws SOSHibernateException {
         return this.getSession().get(JocConfigurationDbItem.class, id);
     }
-
-    public List<JocConfigurationDbItem> getJocConfigurations(final int limit) throws SOSHibernateException {
-        StringBuilder sql = new StringBuilder();
-        sql.append("from ").append(JOC_CONFIGURATION_DB_ITEM).append(" ").append(getWhere()).append(filter.getOrderCriteria()).append(filter
-                .getSortMode());
-        Query<JocConfigurationDbItem> query = this.getSession().createQuery(sql.toString());
-        bindParameters(query);
-        if (limit > 0) {
-            query.setMaxResults(limit);
-        }
-        return this.getSession().getResultList(query);
-    }
-
+ 
     public Long saveOrUpdateConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws SOSHibernateException {
         jocConfigurationDbItem.setModified(new Date());
         if (jocConfigurationDbItem.getId() == null) {
@@ -183,12 +179,12 @@ public class JocConfigurationDbLayer extends DBLayer {
     public void deleteConfiguration(JocConfigurationDbItem dbItem) throws SOSHibernateException {
         this.getSession().delete(dbItem);
     }
-    
-    public int deleteConfigurations(List<String> accounts) throws DBConnectionRefusedException, DBInvalidDataException {
+
+    public int deleteConfigurations(Collection<String> accounts) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            String hql = "delete from " + JOC_CONFIGURATION_DB_ITEM + " where account in (:accounts)";
+            String hql = "delete from " + JOC_CONFIGURATION_DB_ITEM + " where lower(account) in (:accounts)";
             Query<Integer> query = this.getSession().createQuery(hql);
-            query.setParameterList("accounts", accounts);
+            query.setParameterList("accounts", accounts.stream().map(String::toLowerCase).collect(Collectors.toSet()));
             return this.getSession().executeUpdate(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

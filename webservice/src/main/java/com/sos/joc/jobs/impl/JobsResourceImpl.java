@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -23,10 +24,11 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JobVolatileJson;
+import com.sos.joc.classes.JobsVCallable;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
-import com.sos.joc.classes.jobs.JobVolatileJson;
-import com.sos.joc.classes.jobs.JobsVCallable;
 import com.sos.joc.db.audit.AuditLogDBLayer;
+import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.Folder;
@@ -35,6 +37,7 @@ import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.JobsV;
+import com.sos.schema.JsonValidator;
 
 @Path("jobs")
 public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
@@ -42,13 +45,12 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
     private static final String API_CALL = "./jobs";
 
     @Override
-    public JOCDefaultResponse postJobs(String xAccessToken, String accessToken, JobsFilter jobsFilter) throws Exception {
-        return postJobs(getAccessToken(xAccessToken, accessToken), jobsFilter);
-    }
-
-    public JOCDefaultResponse postJobs(String accessToken, JobsFilter jobsFilter) throws Exception {
+    public JOCDefaultResponse postJobs(String accessToken, byte[] jobsFilterBytes) {
         SOSHibernateSession connection = null;
         try {
+            JsonValidator.validateFailFast(jobsFilterBytes, JobsFilter.class);
+            JobsFilter jobsFilter = Globals.objectMapper.readValue(jobsFilterBytes, JobsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     jobsFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -119,8 +121,10 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                                 jobPaths.add(job.getJob());
                             }
                         }
-                        JobsVCallable callable = new JobsVCallable(jobPaths, jobsFilter, command, accessToken, summary);
-                        listJobs.putAll(callable.call());
+                        if (!jobPaths.isEmpty()) {
+                            JobsVCallable callable = new JobsVCallable(jobPaths, jobsFilter, command, accessToken, summary);
+                            listJobs.putAll(callable.call());
+                        }
                     }
                 } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                     // no permission
@@ -162,14 +166,27 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
                 listOfJobs = new ArrayList<JobV>(listJobs.values());
             }
+            
+            // criticality
+            if (listOfJobs != null && (jobs == null || jobs.isEmpty()) && jobsFilter.getCriticality() != null && !jobsFilter.getCriticality()
+                    .isEmpty()) {
+                if (connection == null) {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                }
+                List<String> criticalities = jobsFilter.getCriticality().stream().map(c -> c.value().toLowerCase()).collect(Collectors.toList());
+                final InventoryJobsDBLayer dbInventoryLayer = new InventoryJobsDBLayer(connection);
+                listOfJobs = listOfJobs.stream().filter(j -> dbInventoryLayer.hasCriticality(dbItemInventoryInstance.getId(), criticalities, j.getPath())).collect(Collectors.toList());
+            }
 
             // JOC-678
             if (listOfJobs != null && listOfJobs.stream().filter(j -> j.getState() != null && j.getState().get_text() == JobStateText.STOPPED)
                     .findAny().isPresent()) {
-                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-                final AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
+                if (connection == null) {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                }
+                final AuditLogDBLayer dbAuditLayer = new AuditLogDBLayer(connection);
                 listOfJobs.stream().filter(j -> j.getState() != null && j.getState().get_text() == JobStateText.STOPPED).forEach(j -> j.getState()
-                        .setManually(dbLayer.isManuallyStopped(jobsFilter.getJobschedulerId(), j.getPath())));
+                        .setManually(dbAuditLayer.isManuallyStopped(jobsFilter.getJobschedulerId(), j.getPath())));
             }
             entity.setJobs(listOfJobs);
             entity.setDeliveryDate(new Date());

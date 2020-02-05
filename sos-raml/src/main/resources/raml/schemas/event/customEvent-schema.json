@@ -1,0 +1,50 @@
+{
+  "title": "customEvent",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.custom.Event",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "$ref": "../common/filename100-schema.json"
+    },
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
+    "eventId": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "eventClass": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "exitCode": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "created": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "expires": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "remoteJobSchedulerHost": {
+      "$ref": "../common/string255-schema.json"
+    },
+    "remoteJobSchedulerPort": {
+      "$ref": "../common/port-schema.json"
+    },
+    "params": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    }
+  }
+}

@@ -10,6 +10,8 @@ import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Date;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -24,6 +26,7 @@ import com.sos.joc.model.common.LogInfo200;
 import com.sos.joc.model.common.LogMime;
 import com.sos.joc.model.job.TaskFilter;
 import com.sos.joc.task.resource.ITaskLogResource;
+import com.sos.schema.JsonValidator;
 
 @Path("task")
 public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogResource {
@@ -31,23 +34,13 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
     private static final String API_CALL = "./task/log";
 
     @Override
-    public JOCDefaultResponse postTaskLog(String xAccessToken, String accessToken, TaskFilter taskFilter) throws Exception {
-        return postTaskLog(getAccessToken(xAccessToken, accessToken), taskFilter);
-    }
-
-    public JOCDefaultResponse postTaskLog(String accessToken, TaskFilter taskFilter) throws Exception {
+    public JOCDefaultResponse postTaskLog(String accessToken, byte[] taskFilter) {
         return execute(API_CALL, accessToken, taskFilter);
     }
 
     @Override
-    public JOCDefaultResponse getTaskLogHtml(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String taskId,
-            String filename) throws Exception {
-        return getTaskLogHtml(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, taskId, filename);
-    }
-
-    public JOCDefaultResponse getTaskLogHtml(String accessToken, String queryAccessToken, String jobschedulerId, String taskId, String filename)
-            throws Exception {
-        TaskFilter taskFilter = setTaskFilter(jobschedulerId, taskId, filename, LogMime.HTML);
+    public JOCDefaultResponse getTaskLogHtml(String accessToken, String queryAccessToken, String jobschedulerId, String taskId, String filename) {
+        byte[] taskFilter = setTaskFilter(jobschedulerId, taskId, filename, LogMime.HTML);
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
@@ -55,14 +48,8 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
     }
 
     @Override
-    public JOCDefaultResponse downloadTaskLog(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String taskId,
-            String filename) throws Exception {
-        return downloadTaskLog(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, taskId, filename);
-    }
-
-    public JOCDefaultResponse downloadTaskLog(String accessToken, String queryAccessToken, String jobschedulerId, String taskId, String filename)
-            throws Exception {
-        TaskFilter taskFilter = setTaskFilter(jobschedulerId, taskId, filename, LogMime.PLAIN);
+    public JOCDefaultResponse downloadTaskLog(String accessToken, String queryAccessToken, String jobschedulerId, String taskId, String filename) {
+        byte[] taskFilter = setTaskFilter(jobschedulerId, taskId, filename, LogMime.PLAIN);
         if (accessToken == null) {
             accessToken = queryAccessToken;
         }
@@ -70,21 +57,16 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
     }
 
     @Override
-    public JOCDefaultResponse downloadTaskLog(String xAccessToken, String accessToken, TaskFilter taskFilter) throws Exception {
-        return downloadTaskLog(getAccessToken(xAccessToken, accessToken), taskFilter);
-    }
-
-    public JOCDefaultResponse downloadTaskLog(String accessToken, TaskFilter taskFilter) throws Exception {
+    public JOCDefaultResponse downloadTaskLog(String accessToken, byte[] taskFilter) {
         return execute(API_CALL + "/download", accessToken, taskFilter);
     }
 
     @Override
-    public JOCDefaultResponse getLogInfo(String xAccessToken, String accessToken, TaskFilter taskFilter) throws Exception {
-        return getLogInfo(getAccessToken(xAccessToken, accessToken), taskFilter);
-    }
-
-    public JOCDefaultResponse getLogInfo(String accessToken, TaskFilter taskFilter) throws Exception {
+    public JOCDefaultResponse getLogInfo(String accessToken, byte[] taskFilterBytes) {
         try {
+            JsonValidator.validateFailFast(taskFilterBytes, TaskFilter.class);
+            TaskFilter taskFilter = Globals.objectMapper.readValue(taskFilterBytes, TaskFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + "/info", taskFilter, accessToken, taskFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(taskFilter.getJobschedulerId(), accessToken).getJob().getView().isTaskLog());
             if (jocDefaultResponse != null) {
@@ -122,9 +104,12 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
         }
     }
 
-    public JOCDefaultResponse execute(String apiCall, String accessToken, TaskFilter taskFilter) {
+    public JOCDefaultResponse execute(String apiCall, String accessToken, byte[] taskFilterBytes) {
 
         try {
+            JsonValidator.validateFailFast(taskFilterBytes, TaskFilter.class);
+            TaskFilter taskFilter = Globals.objectMapper.readValue(taskFilterBytes, TaskFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(apiCall, taskFilter, accessToken, taskFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     taskFilter.getJobschedulerId(), accessToken).getJob().getView().isTaskLog());
             if (jocDefaultResponse != null) {
@@ -242,13 +227,22 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
         }
     }
 
-    private TaskFilter setTaskFilter(String jobschedulerId, String taskId, String filename, LogMime mime) {
-        TaskFilter taskFilter = new TaskFilter();
-        taskFilter.setTaskId(taskId);
-        taskFilter.setJobschedulerId(jobschedulerId);
-        taskFilter.setMime(mime);
-        taskFilter.setFilename(filename);
-        return taskFilter;
+    private byte[] setTaskFilter(String jobschedulerId, String taskId, String filename, LogMime mime) {
+        
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if(jobschedulerId != null) {
+            builder.add("jobschedulerId", jobschedulerId);
+        }
+        if (taskId != null) {
+            builder.add("taskId", taskId);
+        }
+        if (filename != null) {
+            builder.add("filename", filename);
+        }
+        if (mime != null) {
+            builder.add("mime", mime.name());
+        }
+        return builder.build().toString().getBytes();
     }
 
     private String getFileName(java.nio.file.Path path) {

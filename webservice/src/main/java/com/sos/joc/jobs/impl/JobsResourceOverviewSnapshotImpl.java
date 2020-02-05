@@ -18,6 +18,7 @@ import javax.ws.rs.Path;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -34,6 +35,7 @@ import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobsSnapshot;
 import com.sos.joc.model.job.JobsSummary;
+import com.sos.schema.JsonValidator;
 
 @Path("jobs")
 public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements IJobsResourceOverviewSnapshot {
@@ -65,8 +67,11 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
     }
 
     @Override
-    public JOCDefaultResponse postJobsOverviewSnapshot(String accessToken, JobSchedulerId jobScheduler) throws Exception {
+    public JOCDefaultResponse postJobsOverviewSnapshot(String accessToken, byte[] jobSchedulerBytes) {
         try {
+            JsonValidator.validateFailFast(jobSchedulerBytes, JobSchedulerId.class);
+            JobSchedulerId jobScheduler = Globals.objectMapper.readValue(jobSchedulerBytes, JobSchedulerId.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobScheduler, accessToken, jobScheduler.getJobschedulerId(),
                     getPermissonsJocCockpit(jobScheduler.getJobschedulerId(), accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {

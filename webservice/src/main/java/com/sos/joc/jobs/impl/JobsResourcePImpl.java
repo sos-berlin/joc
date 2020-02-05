@@ -27,6 +27,7 @@ import com.sos.joc.model.job.JobP;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.JobsP;
+import com.sos.schema.JsonValidator;
 
 @Path("jobs")
 public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP {
@@ -34,15 +35,14 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
     private static final String API_CALL = "./jobs/p";
 
     @Override
-    public JOCDefaultResponse postJobsP(String xAccessToken, String accessToken, JobsFilter jobsFilter) {
-        return postJobsP(getAccessToken(xAccessToken, accessToken), jobsFilter);
-    }
-
-    public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilter) {
+    public JOCDefaultResponse postJobsP(String accessToken, byte[] jobsFilterBytes) {
 
         SOSHibernateSession session = null;
 
         try {
+            JsonValidator.validateFailFast(jobsFilterBytes, JobsFilter.class);
+            JobsFilter jobsFilter = Globals.objectMapper.readValue(jobsFilterBytes, JobsFilter.class);
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     jobsFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -108,7 +108,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             for (JobPath job : jobs) {
                 if (job != null && canAdd(job.getJob(), permittedFolders)) {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePath(job.getJob()), jobsFilter.getIsOrderJob(),
+                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePath(job.getJob()), jobsFilter.getIsOrderJob(),jobsFilter.getCriticality(),
                             dbItemInventoryInstance.getId());
                     if (filteredJobs != null) {
                         listOfJobs.addAll(filteredJobs);
@@ -121,7 +121,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;
             for (Folder folderFilter : folders) {
-                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(normalizeFolder(folderFilter.getFolder()), jobsFilter.getIsOrderJob(),
+                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(normalizeFolder(folderFilter.getFolder()), jobsFilter.getIsOrderJob(),jobsFilter.getCriticality(),
                         folderFilter.getRecursive(), dbItemInventoryInstance.getId());
                 if (filteredJobs != null && !filteredJobs.isEmpty()) {
                     if (regex != null && !regex.isEmpty()) {
@@ -137,7 +137,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         } else {
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> unfilteredJobs = null;
-            unfilteredJobs = dbLayer.getInventoryJobs(jobsFilter.getIsOrderJob(), dbItemInventoryInstance.getId());
+            unfilteredJobs = dbLayer.getInventoryJobs(jobsFilter.getIsOrderJob(), jobsFilter.getCriticality(), dbItemInventoryInstance.getId());
             if (unfilteredJobs != null && !unfilteredJobs.isEmpty()) {
                 if (regex != null && !regex.isEmpty()) {
                     List<DBItemInventoryJob> jobsFilteredByRegex = filterByRegex(unfilteredJobs, regex);
