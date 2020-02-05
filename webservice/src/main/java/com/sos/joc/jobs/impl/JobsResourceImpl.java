@@ -173,7 +173,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 if (connection == null) {
                     connection = Globals.createSosHibernateStatelessConnection(API_CALL);
                 }
-                List<String> criticalities = jobsFilter.getCriticality().stream().map(c -> c.value().toLowerCase()).collect(Collectors.toList());
+                Set<String> criticalities = jobsFilter.getCriticality().stream().map(c -> c.value().toLowerCase()).collect(Collectors.toSet());
                 final InventoryJobsDBLayer dbInventoryLayer = new InventoryJobsDBLayer(connection);
                 listOfJobs = listOfJobs.stream().filter(j -> dbInventoryLayer.hasCriticality(dbItemInventoryInstance.getId(), criticalities, j.getPath())).collect(Collectors.toList());
             }

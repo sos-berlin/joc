@@ -91,19 +91,19 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                         jobsFilter.setRegex("");
                     }
 
-                    if (jobsFilter.getHistoryStates().size() > 0) {
+                    if (jobsFilter.getHistoryStates() != null && !jobsFilter.getHistoryStates().isEmpty()) {
                         for (HistoryStateText historyStateText : jobsFilter.getHistoryStates()) {
                             reportTaskExecutionsDBLayer.getFilter().addState(historyStateText.toString());
                         }
                     }
 
-                    if (jobsFilter.getCriticality().size() > 0) {
+                    if (jobsFilter.getCriticality() != null && !jobsFilter.getCriticality().isEmpty()) {
                         for (JobCriticalityFilter criticality : jobsFilter.getCriticality()) {
                             reportTaskExecutionsDBLayer.getFilter().addCriticality(criticality.value().toLowerCase());
                         }
                     }
 
-                    if (jobsFilter.getJobs().size() > 0) {
+                    if (jobsFilter.getJobs() != null && !jobsFilter.getJobs().isEmpty()) {
                         Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                         for (JobPath jobPath : jobsFilter.getJobs()) {
                             if (jobPath != null && canAdd(jobPath.getJob(), permittedFolders)) {
@@ -112,7 +112,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                         }
                         jobsFilter.setRegex("");
                     } else {
-                        if (jobsFilter.getExcludeJobs().size() > 0) {
+                        if (jobsFilter.getExcludeJobs() != null && !jobsFilter.getExcludeJobs().isEmpty()) {
                             for (JobPath jobPath : jobsFilter.getExcludeJobs()) {
                                 reportTaskExecutionsDBLayer.getFilter().addExcludedJob(jobPath.getJob());
                             }

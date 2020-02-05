@@ -1,10 +1,12 @@
 package com.sos.joc.db.inventory.jobs;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.query.Query;
@@ -58,8 +60,16 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+    
+    public List<DBItemInventoryJob> getInventoryJobs(Boolean isOrderJob, List<JobCriticalityFilter> criticalities, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+        Set<String> criticalitiesAsString = null;
+        if (criticalities != null && !criticalities.isEmpty()) {
+            criticalitiesAsString = criticalities.stream().map(c -> c.value().toLowerCase()).collect(Collectors.toSet());
+        }
+        return getInventoryJobs(isOrderJob, criticalitiesAsString, instanceId);
+    }
 
-    public List<DBItemInventoryJob> getInventoryJobs(Boolean isOrderJob, List<JobCriticalityFilter> criticality, Long instanceId)
+    public List<DBItemInventoryJob> getInventoryJobs(Boolean isOrderJob, Collection<String> criticalities, Long instanceId)
             throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -69,19 +79,16 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");
             }
-            if (criticality != null && criticality.size() > 0) {
-                sql.append( " and (");
-                for (JobCriticalityFilter criticalityEntry : criticality) {
-                    sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or ");
-                }
-                sql.append("1=0) ");
+            if (criticalities != null && !criticalities.isEmpty()) {
+                sql.append(" and criticality in (:criticalities)");
             }
-
             Query<DBItemInventoryJob> query = getSession().createQuery(sql.toString());
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);
             }
-            
+            if (criticalities != null && !criticalities.isEmpty()) {
+                query.setParameterList("criticalities", criticalities);
+            }
             query.setParameter("instanceId", instanceId);
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
@@ -199,8 +206,17 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+    
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByJobPath(String jobPath, Boolean isOrderJob, List<JobCriticalityFilter> criticalities,
+            Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+        Set<String> criticalitiesAsString = null;
+        if (criticalities != null && !criticalities.isEmpty()) {
+            criticalitiesAsString = criticalities.stream().map(c -> c.value().toLowerCase()).collect(Collectors.toSet());
+        }
+        return getInventoryJobsFilteredByJobPath(jobPath, isOrderJob, criticalitiesAsString, instanceId);
+    }
 
-    public List<DBItemInventoryJob> getInventoryJobsFilteredByJobPath(String jobPath, Boolean isOrderJob, List<JobCriticalityFilter> criticality,
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByJobPath(String jobPath, Boolean isOrderJob, Collection<String> criticalities,
             Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -209,21 +225,18 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");
             }
-            if (criticality != null && criticality.size() > 0) {
-                sql.append( " and (");
-                for (JobCriticalityFilter criticalityEntry : criticality) {
-                    sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or ");
-                }
-                sql.append("1=0) ");
+            if (criticalities != null && !criticalities.isEmpty()) {
+                sql.append(" and criticality in (:criticalities)");
             }
-
             sql.append(" and instanceId = :instanceId");
             Query<DBItemInventoryJob> query = getSession().createQuery(sql.toString());
             query.setParameter("jobPath", jobPath);
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);
             }
-
+            if (criticalities != null && !criticalities.isEmpty()) {
+                query.setParameterList("criticalities", criticalities);
+            }
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJob> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
@@ -236,8 +249,17 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+    
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob, List<JobCriticalityFilter> criticalities,
+            boolean recursive, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+        Set<String> criticalitiesAsString = null;
+        if (criticalities != null && !criticalities.isEmpty()) {
+            criticalitiesAsString = criticalities.stream().map(c -> c.value().toLowerCase()).collect(Collectors.toSet());
+        }
+        return getInventoryJobsFilteredByFolder(folderName, isOrderJob, criticalitiesAsString, recursive, instanceId);
+    }
 
-    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob, List<JobCriticalityFilter> criticality,
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob, Collection<String> criticalities,
             boolean recursive, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -248,30 +270,22 @@ public class InventoryJobsDBLayer extends DBLayer {
                 if (isOrderJob != null) {
                     sql.append(" and isOrderJob = :isOrderJob");
                 }
-                if (criticality != null && criticality.size() > 0) {
-                    sql.append( " and (");
-                    for (JobCriticalityFilter criticalityEntry : criticality) {
-                        sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or ");
-                    }
-                    sql.append("1=0) ");
+                if (criticalities != null && !criticalities.isEmpty()) {
+                    sql.append(" and criticality in (:criticalities)");
                 }
 
             } else {
                 sql.append("select ij from ");
                 sql.append(DBITEM_INVENTORY_JOBS).append(" ij, ");
-                sql.append(DBITEM_INVENTORY_FILES).append(" ifile ");
+                sql.append(DBITEM_INVENTORY_FILES).append(" ifile");
                 sql.append(" where ij.fileId = ifile.id");
                 sql.append(" and ifile.fileDirectory = :folderName");
                 sql.append(" and ij.instanceId = :instanceId");
                 if (isOrderJob != null) {
                     sql.append(" and ij.isOrderJob = :isOrderJob");
                 }
-                if (criticality != null && criticality.size() > 0) {
-                    sql.append( " and (");
-                    for (JobCriticalityFilter criticalityEntry : criticality) {
-                        sql.append( "criticality='" + criticalityEntry.value().toLowerCase() + "' or ");
-                    }
-                    sql.append("1=0) ");
+                if (criticalities != null && !criticalities.isEmpty()) {
+                    sql.append(" and ij.criticality in (:criticalities)");
                 }
 
             }
@@ -285,7 +299,9 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);
             }
-            
+            if (criticalities != null && !criticalities.isEmpty()) {
+                query.setParameterList("criticalities", criticalities);
+            }
             List<DBItemInventoryJob> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
@@ -349,7 +365,7 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
 
-    public boolean hasCriticality(Long instanceId, List<String> criticalities, String path) {
+    public boolean hasCriticality(Long instanceId, Collection<String> criticalities, String path) {
         try {
             DBItemInventoryJob dbJob = getInventoryJobByName(path, instanceId);
             if (dbJob == null) {
