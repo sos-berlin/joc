@@ -31,8 +31,7 @@ public class TestExecutePatch {
     private static final String ARCHIVES_DIR= "archivesDir";
     private static final String WEBAPP_DIR= "webappDir";
     private static final String TEMP_DIR= "tempDir";
-    private static CopyOption[] COPYOPTIONS = new StandardCopyOption[] { 
-        StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING };
+    private static CopyOption[] COPYOPTIONS = new StandardCopyOption[] {StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING};
 
     @Ignore
     @Test
@@ -45,7 +44,6 @@ public class TestExecutePatch {
             Path copiedPath = Files.copy(warFilePath, tempDir.resolve("joc.war"), REPLACE_EXISTING);
             System.out.println("copiedPath = " + copiedPath);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -95,7 +93,6 @@ public class TestExecutePatch {
                 }
             });
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -145,10 +142,8 @@ public class TestExecutePatch {
                 }
             });
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
     }
     
     @Ignore
@@ -180,4 +175,15 @@ public class TestExecutePatch {
             }
         });
     }
+    
+    @Ignore
+    @Test
+    public void testExecutePatch () throws Exception {
+        String[] args = {
+                "--patches-dir=C:/sp/jobschedulers/approvals/joc/1.12.12-SNAPSHOT/patches",
+                "--archives-dir=C:/sp/jobschedulers/approvals/joc/1.12.12-SNAPSHOT/archive", 
+                "--webapp-dir=C:/sp/jobschedulers/approvals/joc/1.12.12-SNAPSHOT/webapps"};
+        ExecutePatch.main(args);
+    }
+
 }

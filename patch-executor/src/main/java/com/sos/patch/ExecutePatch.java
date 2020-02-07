@@ -1,7 +1,5 @@
 package com.sos.patch;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryNotEmptyException;
@@ -17,7 +15,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 
 public class ExecutePatch {
@@ -29,6 +28,7 @@ public class ExecutePatch {
     private static final String WEBAPP_DIR= "--webapp-dir";
     private static final String TEMP_DIR= "--temp-dir";
     private static final String ROLLBACK= "--rollback";
+    private static final String WEB_INF_LIB_PATH = "WEB-INF/lib";
     private static CopyOption[] COPYOPTIONS = new StandardCopyOption[] { 
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING };
 
@@ -89,41 +89,23 @@ public class ExecutePatch {
 
         // Target
         FileSystem targetFileSystem = FileSystems.newFileSystem(copiedPath, null);
+
+        // filter to read only patches which are zip files starting with a date (YYYYMMDD)
+        Predicate<Path> fileNameFilter = filePath -> !Files.isDirectory(filePath) && filePath.getFileName().toString().matches(".*\\d{8}.*\\.zip$"); 
         // sort the patches ascending
-        File[] files = patchDir.toFile().listFiles(new FileFilter() {
-            
-            @Override
-            public boolean accept(File pathname) {
-                return !pathname.isDirectory() && pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$");
-            }
-        });
-
-        Comparator<File> fileNameComparator = new Comparator<File>() {
-            
-            @Override
-            public int compare(File o1, File o2) {
-                String timestamp1 = o1.getName().replaceFirst("(\\d{8})", "$1");
-                String timestamp2 = o2.getName().replaceFirst("(\\d{8})", "$1");
-                return timestamp1.compareTo(timestamp2);
-            }
-        };
-
-        Set<File> patchFiles = new TreeSet<File>(fileNameComparator);
-        
-        for(int i = 0; i < files.length; i++) {
-            patchFiles.add(files[i]);
-        }
-        
+        Comparator<Path> filePathComparator = Comparator.comparing(filePath -> filePath.getFileName().toString().replaceFirst("(\\d{8})", "$1"));
+        // create a set of Path objects, sorted and filtered
+        Set<Path> patchFilePaths = Files.list(patchDir).filter(fileNameFilter).sorted(filePathComparator).collect(Collectors.toSet());
+        System.out.println(String.format("%1$d patches found in patches folder!", patchFilePaths.size()));
         // process a new zip-file-system for each zip-file in patches folder
         try {
-            if ((patchFiles.isEmpty() && Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME)))
-                    || rollback) {
+            if ((patchFilePaths.isEmpty() && Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME))) || rollback) {
                 rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
             } else {
-                for (File patchFile : patchFiles) {
-                    System.out.println(patchFile.getAbsolutePath());
+                for (Path patchFile : patchFilePaths) {
+                    System.out.println(patchFile.toString());
                     FileSystem sourceFileSystem = null;
-                    sourceFileSystem = FileSystems.newFileSystem(patchFile.toPath(), null);
+                    sourceFileSystem = FileSystems.newFileSystem(patchFile, null);
                     processPatchZipFile(sourceFileSystem, targetFileSystem);
                 }
                 // After everything from patches folder is processed, copy back from temp directory
@@ -182,6 +164,21 @@ public class ExecutePatch {
                     alreadyExists = true;
                 }
                 try {
+                    if((file.toString().contains(WEB_INF_LIB_PATH) || file.toString().contains(WEB_INF_LIB_PATH)) && Files.isRegularFile(file)) {
+                        Path filename = file.getFileName();
+                        String fileNamePartToMatch = filename.toString().split("-\\d+\\.")[0]; 
+                        Set<Path> pathsToDelete = Files.walk(targetFile.getParent())
+                                .filter(path -> path.getFileName().toString().startsWith(fileNamePartToMatch) 
+                                        && path.getFileName().toString().endsWith(".jar")
+                                        && !path.equals(targetFile))
+                                .collect(Collectors.toSet());
+                        for (Path toDelete : pathsToDelete) {
+                            if (!toDelete.equals(targetFile)) {
+                                Files.deleteIfExists(toDelete);
+                                System.out.println(String.format("file '%1$s removed from %2$s'", toDelete.toString(), JOC_WAR_FILE_NAME));
+                            }
+                        }
+                    }
                     Path p = Files.copy(file, targetFile, COPYOPTIONS);
                     if (alreadyExists) {
                         System.out.println(String.format("file '%1$s updated in %2$s'", p.toString(), JOC_WAR_FILE_NAME));
