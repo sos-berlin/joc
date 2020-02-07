@@ -35,6 +35,8 @@ public class LoginConfigurationResourceImpl extends JOCResourceImpl implements I
             //if (Globals.sosShiroProperties == null) {
                 Globals.sosShiroProperties = new JocCockpitProperties();
             //}
+                
+            login.setEnableRememberMe(Globals.sosShiroProperties.getProperty("enable_remember_me", true));
             String logoName = Globals.sosShiroProperties.getProperty("custom_logo_name", "").trim();
             if (!logoName.isEmpty()) {
                 java.nio.file.Path p = Paths.get(LOGO_LOCATION + logoName);
