@@ -99,8 +99,14 @@ public class ExecutePatch {
         System.out.println(String.format("%1$d patches found in patches folder!", patchFilePaths.size()));
         // process a new zip-file-system for each zip-file in patches folder
         try {
-            if ((patchFilePaths.isEmpty() && Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME))) || rollback) {
+            if (patchFilePaths.isEmpty() && Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME))) {
+                System.out.println("No patches were found in patches folder. Archive of original joc.war exists. Automatic rollback will be processed!");
                 rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
+            } else if (rollback) {
+                System.out.println("Rollback will be processed!");
+                rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
+            } else if (patchFilePaths.isEmpty() && !Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME))) {
+                System.out.println("No patches were found in patches folder. No Archive of original joc.war exists. Nothing to do!");
             } else {
                 for (Path patchFile : patchFilePaths) {
                     System.out.println(patchFile.toString());
