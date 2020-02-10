@@ -176,7 +176,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 					history.setStartTime(dbItemReportTrigger.getStartTime());
 					HistoryState state = new HistoryState();
 					
-					boolean resultError = dbItemReportTrigger.getResultError() && !dbItemReportTrigger.getState().toLowerCase().contains("success");
+					boolean resultError = dbItemReportTrigger.getResultError() && (dbItemReportTrigger.getState() == null || !dbItemReportTrigger.getState().toLowerCase().contains("success"));
 
 					if (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null) {
 						state.setSeverity(1);

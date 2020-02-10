@@ -227,10 +227,11 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 			// } else {
 			// return HistoryStateText.FAILED;
 			// }
-		} else if (dbItemReportTrigger.getResultError() && !dbItemReportTrigger.getState().toLowerCase().contains("success")) {
-			return HistoryStateText.FAILED;
-		} else {
-			return HistoryStateText.SUCCESSFUL;
-		}
+        } else if (dbItemReportTrigger.getResultError() && (dbItemReportTrigger.getState() == null || !dbItemReportTrigger.getState().toLowerCase()
+                .contains("success"))) {
+            return HistoryStateText.FAILED;
+        } else {
+            return HistoryStateText.SUCCESSFUL;
+        }
 	}
 }
