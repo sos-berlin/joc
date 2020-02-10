@@ -16,7 +16,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.exception.SOSDoctypeException;
 import com.sos.joc.Globals;
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.model.joe.job.Description;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.job.Script;
@@ -26,7 +25,7 @@ import com.sos.xml.XMLBuilder;
 public class XmlDeserializer {
 
     public static <T> T deserialize(byte[] xml, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException,
-            IOException, JobSchedulerBadRequestException, DocumentException, SAXException {
+            IOException, DocumentException, SAXException {
         switch (clazz.getSimpleName()) {
         case "Job":
             return clazz.cast(deserializeJob(XMLBuilder.parse(new ByteArrayInputStream(xml))));
@@ -38,7 +37,7 @@ public class XmlDeserializer {
     }
     
     public static <T> T deserialize(String xml, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException,
-            JobSchedulerBadRequestException, DocumentException, SAXException, SOSDoctypeException {
+            DocumentException, SAXException, SOSDoctypeException {
         switch (clazz.getSimpleName()) {
         case "Job":
             return clazz.cast(deserializeJob(XMLBuilder.parse(xml)));
@@ -50,7 +49,7 @@ public class XmlDeserializer {
     }
 
     public static <T> T deserialize(Document doc, Class<T> clazz) throws JsonParseException, JsonMappingException, JsonProcessingException,
-            IOException, JobSchedulerBadRequestException, DocumentException {
+            IOException, DocumentException {
         switch (clazz.getSimpleName()) {
         case "Job":
             return clazz.cast(deserializeJob(doc));

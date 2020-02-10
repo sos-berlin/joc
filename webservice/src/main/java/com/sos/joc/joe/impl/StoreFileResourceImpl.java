@@ -14,7 +14,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
-import com.sos.joc.classes.documentation.Documentation;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
