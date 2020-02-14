@@ -177,7 +177,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             deployAnswer.setObjectType(body.getObjectType());
             deployAnswer.setRecursive(filterJoeObjects.isRecursive());
             
-            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance,  API_CALL);
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance);
 
             Set<String> touchedFolders = new HashSet<String>();
             Set<String> deletedFolders = new HashSet<String>();
@@ -477,7 +477,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 }
             }
             
-            clusterMemberHandler.executeHandlerCalls();
+            clusterMemberHandler.executeHandlerCalls(sosHibernateSession);
 
             return JOCDefaultResponse.responseStatus200(deployAnswer);
 
