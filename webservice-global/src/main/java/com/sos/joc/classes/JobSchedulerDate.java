@@ -123,7 +123,9 @@ public class JobSchedulerDate {
     }
     
     public static String getAtWithNowInUTCISO8601(String at, String userTimezone) throws JobSchedulerBadRequestException {
-        if (at == null || !at.trim().toLowerCase().matches("now|now\\s*\\+\\s*(\\d+|\\d{2}:\\d{2}(:\\d{2})?)")) {
+        if (at == null || at.isEmpty()) {
+            at = "now";
+        } else if (!at.trim().toLowerCase().matches("now|now\\s*\\+\\s*(\\d+|\\d{2}:\\d{2}(:\\d{2})?)")) {
             throw new JobSchedulerBadRequestException(String.format("formats 'now', 'now + HH:mm:[ss]' or 'now + SECONDS' expected for \"Start time\": %1$s", at));
         }
         
