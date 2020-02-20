@@ -4,9 +4,7 @@
   "javaType": "com.sos.joc.model.report.AgentsFilter",
   "type": "object",
   "required": [
-    "jobschedulerId",
-    "dateFrom",
-    "dateTo"
+    "jobschedulerId"
   ],
   "properties": {
     "jobschedulerId": {
