@@ -89,6 +89,18 @@ public class ExecutePatch {
 
         // Target
         FileSystem targetFileSystem = FileSystems.newFileSystem(copiedPath, null);
+        // sort the patches ascending
+        File[] files = patchDir.toFile().listFiles(new FileFilter() {
+            
+            @Override
+            public boolean accept(File pathname) {
+                if (!pathname.isDirectory() && !pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$")) {
+                    System.out.println("File found in patches folder which does not meet the expected file name format of patch-YYYYMMDD-PATCHNAME.zip. \n File will not be applied as a patch.");
+                    return false;
+                } else {
+                    return !pathname.isDirectory() && pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$");
+                }
+            }
 
         // filter to read only patches which are zip files starting with a date (YYYYMMDD)
         Predicate<Path> fileNameFilter = filePath -> !Files.isDirectory(filePath) && filePath.getFileName().toString().matches(".*\\d{8}.*\\.zip$"); 
@@ -99,14 +111,10 @@ public class ExecutePatch {
         System.out.println(String.format("%1$d patches found in patches folder!", patchFilePaths.size()));
         // process a new zip-file-system for each zip-file in patches folder
         try {
-            if (patchFilePaths.isEmpty() && Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME))) {
-                System.out.println("No patches were found in patches folder. Archive of original joc.war exists. Automatic rollback will be processed!");
+            if (rollback) {
                 rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
-            } else if (rollback) {
-                System.out.println("Rollback will be processed!");
-                rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
-            } else if (patchFilePaths.isEmpty() && !Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME))) {
-                System.out.println("No patches were found in patches folder. No Archive of original joc.war exists. Nothing to do!");
+            } else if (patchFiles.isEmpty()) {
+                System.out.println("No patches found, nothing to do!");
             } else {
                 for (Path patchFile : patchFilePaths) {
                     System.out.println(patchFile.toString());
