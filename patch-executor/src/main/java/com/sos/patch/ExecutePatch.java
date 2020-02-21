@@ -95,7 +95,9 @@ public class ExecutePatch {
             @Override
             public boolean accept(File pathname) {
                 if (!pathname.isDirectory() && !pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$")) {
-                    System.out.println("File found in patches folder which does not meet the expected file name format of patch-YYYYMMDD-PATCHNAME.zip. \n File will not be applied as a patch.");
+                    System.out.println(
+                            String.format("File found in patches folder which does not meet the expected file name format of patch-YYYYMMDD-PATCHNAME.zip."
+                                    + "\nFile %1$s will not be applied as a patch.", pathname.getName()));
                     return false;
                 } else {
                     return !pathname.isDirectory() && pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$");
