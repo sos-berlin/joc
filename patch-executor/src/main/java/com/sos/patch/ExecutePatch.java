@@ -94,7 +94,12 @@ public class ExecutePatch {
             
             @Override
             public boolean accept(File pathname) {
-                return !pathname.isDirectory() && pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$");
+                if (!pathname.isDirectory() && !pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$")) {
+                    System.out.println("File found in patches folder which does not meet the expected file name format of patch-YYYYMMDD-PATCHNAME.zip. \n File will not be applied as a patch.");
+                    return false;
+                } else {
+                    return !pathname.isDirectory() && pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$");
+                }
             }
         });
 
@@ -116,9 +121,10 @@ public class ExecutePatch {
         
         // process a new zip-file-system for each zip-file in patches folder
         try {
-            if ((patchFiles.isEmpty() && Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME)))
-                    || rollback) {
+            if (rollback) {
                 rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
+            } else if (patchFiles.isEmpty()) {
+                System.out.println("No patches found, nothing to do!");
             } else {
                 for (File patchFile : patchFiles) {
                     System.out.println(patchFile.getAbsolutePath());
