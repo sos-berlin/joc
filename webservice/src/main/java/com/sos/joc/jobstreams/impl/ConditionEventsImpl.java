@@ -29,173 +29,185 @@ import com.sos.schema.JsonValidator;
 @Path("jobstreams")
 public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEventsResource {
 
-    private static final String API_CALL_EVENTLIST = "./conditions/eventlist";
-    private static final String API_CALL_ADD_EVENT = "./conditions/add_event";
-    private static final String API_CALL_DELETE_EVENT = "./conditions/delete_event";
+	private static final String API_CALL_EVENTLIST = "./conditions/eventlist";
+	private static final String API_CALL_ADD_EVENT = "./conditions/add_event";
+	private static final String API_CALL_DELETE_EVENT = "./conditions/delete_event";
 
-    @Override
-    public JOCDefaultResponse getEvents(String accessToken, byte[] filterBytes) {
-        SOSHibernateSession sosHibernateSession = null;
+	@Override
+	public JOCDefaultResponse getEvents(String accessToken, byte[] filterBytes) {
+		SOSHibernateSession sosHibernateSession = null;
 
-        try {
-            JsonValidator.validateFailFast(filterBytes, ConditionEventsFilter.class);
-            ConditionEventsFilter conditionEventsFilter = Globals.objectMapper.readValue(filterBytes, ConditionEventsFilter.class);
-            
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EVENTLIST, conditionEventsFilter, accessToken, conditionEventsFilter
-                    .getJobschedulerId(), getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getJobStream().getView()
-                            .isEventlist());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EVENTLIST);
+		try {
+			JsonValidator.validateFailFast(filterBytes, ConditionEventsFilter.class);
+			ConditionEventsFilter conditionEventsFilter = Globals.objectMapper.readValue(filterBytes,
+					ConditionEventsFilter.class);
 
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
-            FilterEvents filter = new FilterEvents();
-            filter.setIncludingGlobalEvent(true);
-            filter.setSchedulerId(conditionEventsFilter.getJobschedulerId());
-            filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL_EVENTLIST, conditionEventsFilter, accessToken,
+					conditionEventsFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getJobStream()
+							.getView().isEventlist());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EVENTLIST);
 
-            if (conditionEventsFilter.getSession() == null || conditionEventsFilter.getSession().isEmpty()) {
-                filter.setSession(com.sos.jitl.jobstreams.Constants.getSession());
-            } else {
-                filter.setSession(conditionEventsFilter.getSession());
+			DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+			DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+			FilterEvents filter = new FilterEvents();
+			filter.setIncludingGlobalEvent(true);
+			filter.setSchedulerId(conditionEventsFilter.getJobschedulerId());
+			filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
 
-            }
+			if (conditionEventsFilter.getSession() == null || conditionEventsFilter.getSession().isEmpty()) {
+				filter.setSession(com.sos.jitl.jobstreams.Constants.getSession());
+			} else {
+				filter.setSession(conditionEventsFilter.getSession());
 
-            filter.setJobStream(conditionEventsFilter.getJobStream());
-            List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
-            ConditionEvents conditionEvents = new ConditionEvents();
-            conditionEvents.setDeliveryDate(new Date());
-            conditionEvents.setSession(filter.getSession());
+			}
 
-            for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
-                DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
-                ConditionEvent conditionEvent = new ConditionEvent();
-                DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
-                if (dbItemOutCondition != null) {
-                    conditionEvent.setEvent(dbItemEvent.getEvent());
-                    conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
-                    conditionEvent.setSession(dbItemEvent.getSession());
-                    conditionEvent.setJobStream(dbItemEvent.getJobStream());
-                    conditionEvent.setPath(dbItemOutCondition.getPath());
-                    conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
+			filter.setJobStream(conditionEventsFilter.getJobStream());
+			List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filter,
+					conditionEventsFilter.getLimit());
+			ConditionEvents conditionEvents = new ConditionEvents();
+			conditionEvents.setDeliveryDate(new Date());
+			conditionEvents.setSession(filter.getSession());
 
-                    if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getPath().equals(
-                            conditionEventsFilter.getPath())) {
-                        conditionEvents.getConditionEvents().add(conditionEvent);
-                    }
-                }
-            }
-            return JOCDefaultResponse.responseStatus200(conditionEvents);
+			for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
+				DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
+				ConditionEvent conditionEvent = new ConditionEvent();
+				if (dbItemEvent != null) {
+					DBItemOutCondition dbItemOutCondition = dbLayerOutConditions
+							.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
+					if (dbItemOutCondition != null) {
+						conditionEvent.setEvent(dbItemEvent.getEvent());
+						conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
+						conditionEvent.setSession(dbItemEvent.getSession());
+						conditionEvent.setJobStream(dbItemEvent.getJobStream());
+						conditionEvent.setPath(dbItemOutCondition.getPath());
+						conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
 
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(sosHibernateSession);
-        }
-    }
+						if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty()
+								|| dbItemOutCondition.getPath().equals(conditionEventsFilter.getPath())) {
+							conditionEvents.getConditionEvents().add(conditionEvent);
+						}
+					}
+				}
+			}
+			return JOCDefaultResponse.responseStatus200(conditionEvents);
 
-    @Override
-    public JOCDefaultResponse addEvent(String accessToken, byte[] filterBytes) {
-        SOSHibernateSession sosHibernateSession = null;
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(sosHibernateSession);
+		}
+	}
 
-        try {
-            JsonValidator.validateFailFast(filterBytes, ConditionEvent.class);
-            ConditionEvent conditionEvent = Globals.objectMapper.readValue(filterBytes, ConditionEvent.class);
-            
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(),
-                    getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+	@Override
+	public JOCDefaultResponse addEvent(String accessToken, byte[] filterBytes) {
+		SOSHibernateSession sosHibernateSession = null;
 
-            if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());
-            } else {
-                conditionEvent.setSession(conditionEvent.getSession());
-            }
+		try {
+			JsonValidator.validateFailFast(filterBytes, ConditionEvent.class);
+			ConditionEvent conditionEvent = Globals.objectMapper.readValue(filterBytes, ConditionEvent.class);
 
-            this.checkRequiredParameter("jobStream", conditionEvent.getJobStream());
-            this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
-            this.checkRequiredParameter("event", conditionEvent.getEvent());
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_EVENT, conditionEvent, accessToken,
+					conditionEvent.getJobschedulerId(),
+					getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange()
+							.getEvents().isAdd());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            FilterEvents filter = new FilterEvents();
-            filter.setEvent(conditionEvent.getEvent());
-            filter.setSession(conditionEvent.getSession());
-            filter.setJobStream(conditionEvent.getJobStream());
-            filter.setOutConditionId(conditionEvent.getOutConditionId());
-            if (conditionEvent.getGlobalEvent() != null) {
-                filter.setGlobalEvent(conditionEvent.getGlobalEvent());
-            } else {
-                filter.setGlobalEvent(false);
-            }
+			if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
+				conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());
+			} else {
+				conditionEvent.setSession(conditionEvent.getSession());
+			}
 
-            notifyEventHandler(accessToken, "AddEvent", filter);
-            return JOCDefaultResponse.responseStatus200(conditionEvent);
+			this.checkRequiredParameter("jobStream", conditionEvent.getJobStream());
+			this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
+			this.checkRequiredParameter("event", conditionEvent.getEvent());
 
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(sosHibernateSession);
-        }
-    }
+			FilterEvents filter = new FilterEvents();
+			filter.setEvent(conditionEvent.getEvent());
+			filter.setSession(conditionEvent.getSession());
+			filter.setJobStream(conditionEvent.getJobStream());
+			filter.setOutConditionId(conditionEvent.getOutConditionId());
+			if (conditionEvent.getGlobalEvent() != null) {
+				filter.setGlobalEvent(conditionEvent.getGlobalEvent());
+			} else {
+				filter.setGlobalEvent(false);
+			}
 
-    @Override
-    public JOCDefaultResponse deleteEvent(String accessToken, byte[] filterBytes) {
-        SOSHibernateSession sosHibernateSession = null;
+			notifyEventHandler(accessToken, "AddEvent", filter);
+			return JOCDefaultResponse.responseStatus200(conditionEvent);
 
-        try {
-            JsonValidator.validateFailFast(filterBytes, ConditionEvent.class);
-            ConditionEvent conditionEvent = Globals.objectMapper.readValue(filterBytes, ConditionEvent.class);
-            
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(),
-                    getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(sosHibernateSession);
+		}
+	}
 
-            this.checkRequiredParameter("event", conditionEvent.getEvent());
+	@Override
+	public JOCDefaultResponse deleteEvent(String accessToken, byte[] filterBytes) {
+		SOSHibernateSession sosHibernateSession = null;
 
-            if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());
-            } else {
-                conditionEvent.setSession(conditionEvent.getSession());
-            }
+		try {
+			JsonValidator.validateFailFast(filterBytes, ConditionEvent.class);
+			ConditionEvent conditionEvent = Globals.objectMapper.readValue(filterBytes, ConditionEvent.class);
 
-            FilterEvents filter = new FilterEvents();
-            filter.setEvent(conditionEvent.getEvent());
-            filter.setSession(conditionEvent.getSession());
-            filter.setJobStream(conditionEvent.getJobStream());
-            filter.setGlobalEvent(conditionEvent.getGlobalEvent());
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE_EVENT, conditionEvent, accessToken,
+					conditionEvent.getJobschedulerId(),
+					getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange()
+							.getEvents().isAdd());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            notifyEventHandler(accessToken, "RemoveEvent", filter);
-            return JOCDefaultResponse.responseStatus200(conditionEvent);
+			this.checkRequiredParameter("event", conditionEvent.getEvent());
 
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(sosHibernateSession);
-        }
-    }
+			if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
+				conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());
+			} else {
+				conditionEvent.setSession(conditionEvent.getSession());
+			}
 
-    private void notifyEventHandler(String accessToken, String eventKey, FilterEvents filter) throws JsonProcessingException, JocException {
-        CustomEventsUtil customEventsUtil = new CustomEventsUtil(ConditionEventsImpl.class.getName());
-        Map<String, String> parameters = new HashMap<String, String>();
-        if (filter != null) {
-            parameters.put("event", filter.getEvent());
-            parameters.put("session", filter.getSession());
-            if (filter.getOutConditionId() != null) {
-                parameters.put("outConditionId", String.valueOf(filter.getOutConditionId()));
-            }
-            if (filter.getJobStream() != null) {
-                parameters.put("jobStream", filter.getJobStream());
-            }
-            parameters.put("globalEvent", filter.getGlobalEventAsString());
-        }
-        customEventsUtil.addEvent(eventKey, parameters);
-        String notifyCommand = customEventsUtil.getEventCommandAsXml();
-        com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
-        jocXmlCommand.executePost(notifyCommand, accessToken);
-    }
+			FilterEvents filter = new FilterEvents();
+			filter.setEvent(conditionEvent.getEvent());
+			filter.setSession(conditionEvent.getSession());
+			filter.setJobStream(conditionEvent.getJobStream());
+			filter.setGlobalEvent(conditionEvent.getGlobalEvent());
+
+			notifyEventHandler(accessToken, "RemoveEvent", filter);
+			return JOCDefaultResponse.responseStatus200(conditionEvent);
+
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(sosHibernateSession);
+		}
+	}
+
+	private void notifyEventHandler(String accessToken, String eventKey, FilterEvents filter)
+			throws JsonProcessingException, JocException {
+		CustomEventsUtil customEventsUtil = new CustomEventsUtil(ConditionEventsImpl.class.getName());
+		Map<String, String> parameters = new HashMap<String, String>();
+		if (filter != null) {
+			parameters.put("event", filter.getEvent());
+			parameters.put("session", filter.getSession());
+			if (filter.getOutConditionId() != null) {
+				parameters.put("outConditionId", String.valueOf(filter.getOutConditionId()));
+			}
+			if (filter.getJobStream() != null) {
+				parameters.put("jobStream", filter.getJobStream());
+			}
+			parameters.put("globalEvent", filter.getGlobalEventAsString());
+		}
+		customEventsUtil.addEvent(eventKey, parameters);
+		String notifyCommand = customEventsUtil.getEventCommandAsXml();
+		com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(
+				dbItemInventoryInstance);
+		jocXmlCommand.executePost(notifyCommand, accessToken);
+	}
 }
