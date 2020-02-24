@@ -89,37 +89,42 @@ public class ExecutePatch {
 
         // Target
         FileSystem targetFileSystem = FileSystems.newFileSystem(copiedPath, null);
-        // sort the patches ascending
-        File[] files = patchDir.toFile().listFiles(new FileFilter() {
-            
-            @Override
-            public boolean accept(File pathname) {
-                if (!pathname.isDirectory() && !pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$")) {
-                    System.out.println(
-                            String.format("File found in patches folder which does not meet the expected file name format of patch-YYYYMMDD-PATCHNAME.zip."
-                                    + "\nFile %1$s will not be applied as a patch.", pathname.getName()));
-                    return false;
-                } else {
-                    return !pathname.isDirectory() && pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$");
-                }
-            }
-
         // filter to read only patches which are zip files starting with a date (YYYYMMDD)
-        Predicate<Path> fileNameFilter = filePath -> !Files.isDirectory(filePath) && filePath.getFileName().toString().matches(".*\\d{8}.*\\.zip$"); 
+        Predicate<Path> fileNameFilterAccepted = filePath -> !Files.isDirectory(filePath) && filePath.getFileName().toString().matches(".*\\d{8}.*\\.zip$"); 
+        Predicate<Path> fileNameFilterNotAccepted = filePath -> !Files.isDirectory(filePath) && !filePath.getFileName().toString().matches(".*\\d{8}.*\\.zip$"); 
         // sort the patches ascending
         Comparator<Path> filePathComparator = Comparator.comparing(filePath -> filePath.getFileName().toString().replaceFirst("(\\d{8})", "$1"));
-        // create a set of Path objects, sorted and filtered
-        Set<Path> patchFilePaths = Files.list(patchDir).filter(fileNameFilter).sorted(filePathComparator).collect(Collectors.toSet());
+        // create a set of Path objects of not accepted patch files, sorted and filtered
+        Set<Path> notAcceptedFiles = Files.list(patchDir).filter(fileNameFilterNotAccepted).collect(Collectors.toSet());
+        // create a set of Path objects of accepted patch files, sorted and filtered
+        Set<Path> patchFilePaths = Files.list(patchDir).filter(fileNameFilterAccepted).sorted(filePathComparator).collect(Collectors.toSet());
         System.out.println(String.format("%1$d patches found in patches folder!", patchFilePaths.size()));
         // process a new zip-file-system for each zip-file in patches folder
         try {
             if (rollback) {
+                System.out.println("Rollback will be processed!");
                 rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
-            } else if (patchFiles.isEmpty()) {
+            } else if (patchFilePaths.isEmpty()) {
                 System.out.println("No patches found, nothing to do!");
-            } else {
+                if (!notAcceptedFiles.isEmpty()) {
+                    for (Path patchFile : notAcceptedFiles) {
+                        System.out.println(
+                                String.format("File %1$s found, but does not meet the expected file name format of patch-YYYYMMDD-PATCHNAME.zip.\n"
+                                        + "File %1$s will not be applied as a patch.", patchFile.getFileName().toString()));
+                    }
+                    
+                }
+            } else if (!patchFilePaths.isEmpty()) {
+                if (!notAcceptedFiles.isEmpty()) {
+                    for (Path patchFile : notAcceptedFiles) {
+                        System.out.println(
+                                String.format("File %1$s found, but does not meet the expected file name format of patch-YYYYMMDD-PATCHNAME.zip.\n"
+                                        + "File %1$s will not be applied as a patch.", patchFile.getFileName().toString()));
+                    }
+                    
+                }
                 for (Path patchFile : patchFilePaths) {
-                    System.out.println(patchFile.toString());
+                    System.out.println(String.format("File %1$s found. Patching JOC Cockpit ...", patchFile.getFileName().toString()));
                     FileSystem sourceFileSystem = null;
                     sourceFileSystem = FileSystems.newFileSystem(patchFile, null);
                     processPatchZipFile(sourceFileSystem, targetFileSystem);
