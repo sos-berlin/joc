@@ -325,7 +325,7 @@ public class SOSShiroCurrentUser {
     public DBItemInventoryInstance getSchedulerInstanceByKey(Long id) {
         for (Map.Entry<String, DBItemInventoryInstance> entry : listOfSchedulerInstances.entrySet()) {
             DBItemInventoryInstance instance = entry.getValue();
-            if (instance.getId() == id) {
+            if (instance.getId().equals(id)) {
                 return instance;
             }
         }

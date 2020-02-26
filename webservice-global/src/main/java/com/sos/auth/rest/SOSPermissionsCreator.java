@@ -1,6 +1,7 @@
 package com.sos.auth.rest;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +29,20 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMasters;
 import com.sos.auth.rest.permission.model.SOSPermissionRoles;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JocCockpitProperties;
+import com.sos.joc.db.configuration.JocConfigurationDbLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
 
+import sos.util.SOSSerializerUtil;
+
 public class SOSPermissionsCreator {
 
+    private static final String SHIRO_SESSION = "SHIRO_SESSION";
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSPermissionsCreator.class);
     private SOSShiroCurrentUser currentUser;
     private SOSPermissionRoles roles;
@@ -44,6 +51,46 @@ public class SOSPermissionsCreator {
     public SOSPermissionsCreator(SOSShiroCurrentUser currentUser) {
         super();
         this.currentUser = currentUser;
+    }
+
+    private Session readSessionFromDb(Serializable sessionId) {
+        SOSHibernateSession sosHibernateSession = null;
+        try {
+
+            String sessionIdString = "";
+            if (sessionId != null) {
+                sessionIdString = sessionId.toString();
+            }
+            LOGGER.debug("SOSDistributedSessionDAO: readSessionFromDb: " + sessionIdString);
+
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+
+            sosHibernateSession.setAutoCommit(false);
+            Globals.beginTransaction(sosHibernateSession);
+
+            JocConfigurationDbItem jocConfigurationDbItem;
+            JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
+            jocConfigurationDBLayer.getFilter().setAccount(".");
+            jocConfigurationDBLayer.getFilter().setName(sessionId.toString());
+            jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
+            Globals.commit(sosHibernateSession);
+            sosHibernateSession.close();
+
+            if (listOfConfigurtions.size() > 0) {
+                jocConfigurationDbItem = listOfConfigurtions.get(0);
+                return (Session) SOSSerializerUtil.fromString(jocConfigurationDbItem.getConfigurationItem());
+            } else {
+                return null;
+            }
+        } catch (SOSHibernateException e) {
+            throw new RuntimeException(e);
+
+        } catch (JocException e) {
+            throw new RuntimeException(e);
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+        }
     }
 
     public void loginFromAccessToken(String accessToken) throws JocException {
@@ -75,40 +122,43 @@ public class SOSPermissionsCreator {
                 SecurityUtils.setSecurityManager(securityManager);
                 LOGGER.debug("loginFromAccessToken --> securityManager created");
 
-                Subject subject = new Subject.Builder().sessionId(accessToken).buildSubject();
-                LOGGER.debug("loginFromAccessToken --> subject created");
-                if (subject.isAuthenticated()) {
-                    LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject is authenticated");
-                    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-                    currentUser = new SOSShiroCurrentUser((String) subject.getPrincipals().getPrimaryPrincipal(), "", "");
+                Session session = readSessionFromDb(accessToken);
+                if (session != null) {
+                    Subject subject = new Subject.Builder(securityManager).sessionId(accessToken).session(session).buildSubject();
+                    LOGGER.debug("loginFromAccessToken --> subject created");
+                    if (subject.isAuthenticated()) {
+                        LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject is authenticated");
+                        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+                        currentUser = new SOSShiroCurrentUser((String) subject.getPrincipals().getPrimaryPrincipal(), "", "");
 
-                    if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
-                        Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
-                    }
-
-                    LOGGER.debug("loginFromAccessToken --> removeTimedOutUser");
-                    Globals.jocWebserviceDataContainer.getCurrentUsersList().removeTimedOutUser(currentUser.getUsername());
-
-                    currentUser.setCurrentSubject(subject);
-                    currentUser.setAccessToken(accessToken);
-
-                    SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(accessToken);
-                    LOGGER.debug("loginFromAccessToken --> JocCockpitPermissionMasterObjectList created");
-                    currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
-                    currentUser.initFolders();
-                    LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> folders initialized");
-
-                    Section section = getIni().getSection("folders");
-                    if (section != null) {
-                        for (String role : section.keySet()) {
-                            currentUser.addFolder(role, section.get(role));
+                        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
+                            Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
                         }
-                    }
-                    SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(accessToken);
-                    LOGGER.debug("loginFromAccessToken --> CommandsPermissionMasterObjectList created");
 
-                    currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
-                    Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
+                        LOGGER.debug("loginFromAccessToken --> removeTimedOutUser");
+                        Globals.jocWebserviceDataContainer.getCurrentUsersList().removeTimedOutUser(currentUser.getUsername());
+
+                        currentUser.setCurrentSubject(subject);
+                        currentUser.setAccessToken(accessToken);
+
+                        SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(accessToken);
+                        LOGGER.debug("loginFromAccessToken --> JocCockpitPermissionMasterObjectList created");
+                        currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
+                        currentUser.initFolders();
+                        LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> folders initialized");
+
+                        Section section = getIni().getSection("folders");
+                        if (section != null) {
+                            for (String role : section.keySet()) {
+                                currentUser.addFolder(role, section.get(role));
+                            }
+                        }
+                        SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(accessToken);
+                        LOGGER.debug("loginFromAccessToken --> CommandsPermissionMasterObjectList created");
+
+                        currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
+                        Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
+                    }
                 }
             }
         } finally {
@@ -146,7 +196,7 @@ public class SOSPermissionsCreator {
             SOSPermissionRoles sosPermissionRoles = sosPermissionsCreator.getRoles(true);
 
             addSosPermissionJocCockpit("", sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
-           
+
             for (DBItemInventoryInstance instance : listOfInstances) {
                 addSosPermissionJocCockpit(instance.getSchedulerId(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
             }
@@ -242,9 +292,11 @@ public class SOSPermissionsCreator {
 
             sosPermissionJocCockpit.getJobschedulerMaster().setView(o.createSOSPermissionJocCockpitJobschedulerMasterView());
             sosPermissionJocCockpit.getJobschedulerMaster().setAdministration(o.createSOSPermissionJocCockpitJobschedulerMasterAdministration());
-            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().setConfigurations(o.createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurations());
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().setConfigurations(o
+                    .createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurations());
             sosPermissionJocCockpit.getJobschedulerMaster().setExecute(o.createSOSPermissionJocCockpitJobschedulerMasterExecute());
-            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setDeploy(o.createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurationsDeploy());
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setDeploy(o
+                    .createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurationsDeploy());
 
             sosPermissionJocCockpit.getJobschedulerMaster().getExecute().setRestart(o
                     .createSOSPermissionJocCockpitJobschedulerMasterExecuteRestart());
@@ -338,7 +390,7 @@ public class SOSPermissionsCreator {
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:schedule"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().setXmlEditor(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:xml_editor"));
-            
+
             sosPermissionJocCockpit.getJobschedulerMasterCluster().getView().setStatus(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status"));
             sosPermissionJocCockpit.getJobschedulerMasterCluster().getExecute().setTerminateFailSafe(haveRight(masterId,
