@@ -2,12 +2,13 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.12.02 um 04:55:18 PM CET 
+// Generiert: 2020.03.03 um 12:06:46 PM CET 
 //
 
 
 package com.sos.auth.rest.permission.model;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -46,8 +47,11 @@ import javax.xml.bind.annotation.XmlType;
     "sosPermissions"
 })
 @XmlRootElement(name = "SOSPermissionShiro")
-public class SOSPermissionShiro {
+public class SOSPermissionShiro
+    implements Serializable
+{
 
+    private final static long serialVersionUID = 12343L;
     @XmlElement(name = "SOSPermissionRoles", required = true)
     protected SOSPermissionRoles sosPermissionRoles;
     @XmlElement(name = "SOSPermissions", required = true)
@@ -85,6 +89,10 @@ public class SOSPermissionShiro {
         this.sosPermissionRoles = value;
     }
 
+    public boolean isSetSOSPermissionRoles() {
+        return (this.sosPermissionRoles!= null);
+    }
+
     /**
      * Ruft den Wert der sosPermissions-Eigenschaft ab.
      * 
@@ -109,6 +117,10 @@ public class SOSPermissionShiro {
         this.sosPermissions = value;
     }
 
+    public boolean isSetSOSPermissions() {
+        return (this.sosPermissions!= null);
+    }
+
     /**
      * Ruft den Wert der authenticated-Eigenschaft ab.
      * 
@@ -117,7 +129,7 @@ public class SOSPermissionShiro {
      *     {@link Boolean }
      *     
      */
-    public Boolean isAuthenticated() {
+    public boolean isAuthenticated() {
         return authenticated;
     }
 
@@ -129,8 +141,16 @@ public class SOSPermissionShiro {
      *     {@link Boolean }
      *     
      */
-    public void setAuthenticated(Boolean value) {
+    public void setAuthenticated(boolean value) {
         this.authenticated = value;
+    }
+
+    public boolean isSetAuthenticated() {
+        return (this.authenticated!= null);
+    }
+
+    public void unsetAuthenticated() {
+        this.authenticated = null;
     }
 
     /**
@@ -157,6 +177,10 @@ public class SOSPermissionShiro {
         this.user = value;
     }
 
+    public boolean isSetUser() {
+        return (this.user!= null);
+    }
+
     /**
      * Ruft den Wert der accessToken-Eigenschaft ab.
      * 
@@ -181,6 +205,10 @@ public class SOSPermissionShiro {
         this.accessToken = value;
     }
 
+    public boolean isSetAccessToken() {
+        return (this.accessToken!= null);
+    }
+
     /**
      * Ruft den Wert der securityServerUrl-Eigenschaft ab.
      * 
@@ -203,6 +231,10 @@ public class SOSPermissionShiro {
      */
     public void setSecurityServerUrl(String value) {
         this.securityServerUrl = value;
+    }
+
+    public boolean isSetSecurityServerUrl() {
+        return (this.securityServerUrl!= null);
     }
 
 }

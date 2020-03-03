@@ -2,12 +2,13 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.12.02 um 04:55:18 PM CET 
+// Generiert: 2020.03.03 um 12:06:46 PM CET 
 //
 
 
 package com.sos.auth.rest.permission.model;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -41,8 +42,11 @@ import javax.xml.bind.annotation.XmlType;
     "sosPermissionListJoc"
 })
 @XmlRootElement(name = "SOSPermissions")
-public class SOSPermissions {
+public class SOSPermissions
+    implements Serializable
+{
 
+    private final static long serialVersionUID = 12343L;
     @XmlElement(name = "SOSPermissionListCommands", required = true)
     protected SOSPermissionListCommands sosPermissionListCommands;
     @XmlElement(name = "SOSPermissionListJoc", required = true)
@@ -72,6 +76,10 @@ public class SOSPermissions {
         this.sosPermissionListCommands = value;
     }
 
+    public boolean isSetSOSPermissionListCommands() {
+        return (this.sosPermissionListCommands!= null);
+    }
+
     /**
      * Ruft den Wert der sosPermissionListJoc-Eigenschaft ab.
      * 
@@ -94,6 +102,10 @@ public class SOSPermissions {
      */
     public void setSOSPermissionListJoc(SOSPermissionListJoc value) {
         this.sosPermissionListJoc = value;
+    }
+
+    public boolean isSetSOSPermissionListJoc() {
+        return (this.sosPermissionListJoc!= null);
     }
 
 }

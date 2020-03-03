@@ -2,12 +2,13 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.12.02 um 04:55:18 PM CET 
+// Generiert: 2020.03.03 um 12:06:46 PM CET 
 //
 
 
 package com.sos.auth.rest.permission.model;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -423,8 +424,11 @@ import javax.xml.bind.annotation.XmlType;
     "lock"
 })
 @XmlRootElement(name = "SOSPermissionCommands")
-public class SOSPermissionCommands {
+public class SOSPermissionCommands
+    implements Serializable
+{
 
+    private final static long serialVersionUID = 12343L;
     @XmlElement(name = "JobschedulerMaster", required = true)
     protected SOSPermissionCommands.JobschedulerMaster jobschedulerMaster;
     @XmlElement(name = "JobschedulerMasterCluster", required = true)
@@ -476,6 +480,10 @@ public class SOSPermissionCommands {
         this.jobschedulerMaster = value;
     }
 
+    public boolean isSetJobschedulerMaster() {
+        return (this.jobschedulerMaster!= null);
+    }
+
     /**
      * Ruft den Wert der jobschedulerMasterCluster-Eigenschaft ab.
      * 
@@ -498,6 +506,10 @@ public class SOSPermissionCommands {
      */
     public void setJobschedulerMasterCluster(SOSPermissionCommands.JobschedulerMasterCluster value) {
         this.jobschedulerMasterCluster = value;
+    }
+
+    public boolean isSetJobschedulerMasterCluster() {
+        return (this.jobschedulerMasterCluster!= null);
     }
 
     /**
@@ -524,6 +536,10 @@ public class SOSPermissionCommands {
         this.dailyPlan = value;
     }
 
+    public boolean isSetDailyPlan() {
+        return (this.dailyPlan!= null);
+    }
+
     /**
      * Ruft den Wert der history-Eigenschaft ab.
      * 
@@ -546,6 +562,10 @@ public class SOSPermissionCommands {
      */
     public void setHistory(SOSPermissionCommands.History value) {
         this.history = value;
+    }
+
+    public boolean isSetHistory() {
+        return (this.history!= null);
     }
 
     /**
@@ -572,6 +592,10 @@ public class SOSPermissionCommands {
         this.order = value;
     }
 
+    public boolean isSetOrder() {
+        return (this.order!= null);
+    }
+
     /**
      * Ruft den Wert der jobChain-Eigenschaft ab.
      * 
@@ -594,6 +618,10 @@ public class SOSPermissionCommands {
      */
     public void setJobChain(SOSPermissionCommands.JobChain value) {
         this.jobChain = value;
+    }
+
+    public boolean isSetJobChain() {
+        return (this.jobChain!= null);
     }
 
     /**
@@ -620,6 +648,10 @@ public class SOSPermissionCommands {
         this.job = value;
     }
 
+    public boolean isSetJob() {
+        return (this.job!= null);
+    }
+
     /**
      * Ruft den Wert der processClass-Eigenschaft ab.
      * 
@@ -642,6 +674,10 @@ public class SOSPermissionCommands {
      */
     public void setProcessClass(SOSPermissionCommands.ProcessClass value) {
         this.processClass = value;
+    }
+
+    public boolean isSetProcessClass() {
+        return (this.processClass!= null);
     }
 
     /**
@@ -668,6 +704,10 @@ public class SOSPermissionCommands {
         this.schedule = value;
     }
 
+    public boolean isSetSchedule() {
+        return (this.schedule!= null);
+    }
+
     /**
      * Ruft den Wert der lock-Eigenschaft ab.
      * 
@@ -692,6 +732,10 @@ public class SOSPermissionCommands {
         this.lock = value;
     }
 
+    public boolean isSetLock() {
+        return (this.lock!= null);
+    }
+
     /**
      * Ruft den Wert der isAuthenticated-Eigenschaft ab.
      * 
@@ -700,7 +744,7 @@ public class SOSPermissionCommands {
      *     {@link Boolean }
      *     
      */
-    public Boolean isIsAuthenticated() {
+    public boolean isIsAuthenticated() {
         return isAuthenticated;
     }
 
@@ -712,8 +756,16 @@ public class SOSPermissionCommands {
      *     {@link Boolean }
      *     
      */
-    public void setIsAuthenticated(Boolean value) {
+    public void setIsAuthenticated(boolean value) {
         this.isAuthenticated = value;
+    }
+
+    public boolean isSetIsAuthenticated() {
+        return (this.isAuthenticated!= null);
+    }
+
+    public void unsetIsAuthenticated() {
+        this.isAuthenticated = null;
     }
 
     /**
@@ -740,6 +792,10 @@ public class SOSPermissionCommands {
         this.user = value;
     }
 
+    public boolean isSetUser() {
+        return (this.user!= null);
+    }
+
     /**
      * Ruft den Wert der accessToken-Eigenschaft ab.
      * 
@@ -762,6 +818,10 @@ public class SOSPermissionCommands {
      */
     public void setAccessToken(String value) {
         this.accessToken = value;
+    }
+
+    public boolean isSetAccessToken() {
+        return (this.accessToken!= null);
     }
 
 
@@ -798,8 +858,11 @@ public class SOSPermissionCommands {
     @XmlType(name = "", propOrder = {
         "view"
     })
-    public static class DailyPlan {
+    public static class DailyPlan
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         @XmlElement(required = true)
         protected SOSPermissionCommands.DailyPlan.View view;
 
@@ -827,6 +890,10 @@ public class SOSPermissionCommands {
             this.view = value;
         }
 
+        public boolean isSetView() {
+            return (this.view!= null);
+        }
+
 
         /**
          * <p>Java-Klasse für anonymous complex type.
@@ -851,8 +918,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "status"
         })
-        public static class View {
+        public static class View
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean status;
 
             /**
@@ -869,6 +939,10 @@ public class SOSPermissionCommands {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+            public boolean isSetStatus() {
+                return true;
             }
 
         }
@@ -899,8 +973,11 @@ public class SOSPermissionCommands {
     @XmlType(name = "", propOrder = {
         "view"
     })
-    public static class History {
+    public static class History
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         protected boolean view;
 
         /**
@@ -917,6 +994,10 @@ public class SOSPermissionCommands {
          */
         public void setView(boolean value) {
             this.view = value;
+        }
+
+        public boolean isSetView() {
+            return true;
         }
 
     }
@@ -987,8 +1068,11 @@ public class SOSPermissionCommands {
         "execute",
         "change"
     })
-    public static class Job {
+    public static class Job
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         @XmlElement(required = true)
         protected SOSPermissionCommands.Job.View view;
         @XmlElement(required = true)
@@ -1020,6 +1104,10 @@ public class SOSPermissionCommands {
             this.view = value;
         }
 
+        public boolean isSetView() {
+            return (this.view!= null);
+        }
+
         /**
          * Ruft den Wert der execute-Eigenschaft ab.
          * 
@@ -1044,6 +1132,10 @@ public class SOSPermissionCommands {
             this.execute = value;
         }
 
+        public boolean isSetExecute() {
+            return (this.execute!= null);
+        }
+
         /**
          * Ruft den Wert der change-Eigenschaft ab.
          * 
@@ -1066,6 +1158,10 @@ public class SOSPermissionCommands {
          */
         public void setChange(SOSPermissionCommands.Job.Change value) {
             this.change = value;
+        }
+
+        public boolean isSetChange() {
+            return (this.change!= null);
         }
 
 
@@ -1094,8 +1190,11 @@ public class SOSPermissionCommands {
             "runTime",
             "hotFolder"
         })
-        public static class Change {
+        public static class Change
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean runTime;
             protected boolean hotFolder;
 
@@ -1115,6 +1214,10 @@ public class SOSPermissionCommands {
                 this.runTime = value;
             }
 
+            public boolean isSetRunTime() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der hotFolder-Eigenschaft ab.
              * 
@@ -1129,6 +1232,10 @@ public class SOSPermissionCommands {
              */
             public void setHotFolder(boolean value) {
                 this.hotFolder = value;
+            }
+
+            public boolean isSetHotFolder() {
+                return true;
             }
 
         }
@@ -1171,8 +1278,11 @@ public class SOSPermissionCommands {
             "terminate",
             "kill"
         })
-        public static class Execute {
+        public static class Execute
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean start;
             protected boolean stop;
             protected boolean unstop;
@@ -1198,6 +1308,10 @@ public class SOSPermissionCommands {
                 this.start = value;
             }
 
+            public boolean isSetStart() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der stop-Eigenschaft ab.
              * 
@@ -1212,6 +1326,10 @@ public class SOSPermissionCommands {
              */
             public void setStop(boolean value) {
                 this.stop = value;
+            }
+
+            public boolean isSetStop() {
+                return true;
             }
 
             /**
@@ -1230,6 +1348,10 @@ public class SOSPermissionCommands {
                 this.unstop = value;
             }
 
+            public boolean isSetUnstop() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der suspendAllTasks-Eigenschaft ab.
              * 
@@ -1244,6 +1366,10 @@ public class SOSPermissionCommands {
              */
             public void setSuspendAllTasks(boolean value) {
                 this.suspendAllTasks = value;
+            }
+
+            public boolean isSetSuspendAllTasks() {
+                return true;
             }
 
             /**
@@ -1262,6 +1388,10 @@ public class SOSPermissionCommands {
                 this.endAllTasks = value;
             }
 
+            public boolean isSetEndAllTasks() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der continueAllTasks-Eigenschaft ab.
              * 
@@ -1276,6 +1406,10 @@ public class SOSPermissionCommands {
              */
             public void setContinueAllTasks(boolean value) {
                 this.continueAllTasks = value;
+            }
+
+            public boolean isSetContinueAllTasks() {
+                return true;
             }
 
             /**
@@ -1294,6 +1428,10 @@ public class SOSPermissionCommands {
                 this.terminate = value;
             }
 
+            public boolean isSetTerminate() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der kill-Eigenschaft ab.
              * 
@@ -1308,6 +1446,10 @@ public class SOSPermissionCommands {
              */
             public void setKill(boolean value) {
                 this.kill = value;
+            }
+
+            public boolean isSetKill() {
+                return true;
             }
 
         }
@@ -1336,8 +1478,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "status"
         })
-        public static class View {
+        public static class View
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean status;
 
             /**
@@ -1354,6 +1499,10 @@ public class SOSPermissionCommands {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+            public boolean isSetStatus() {
+                return true;
             }
 
         }
@@ -1424,8 +1573,11 @@ public class SOSPermissionCommands {
         "execute",
         "change"
     })
-    public static class JobChain {
+    public static class JobChain
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         @XmlElement(required = true)
         protected SOSPermissionCommands.JobChain.View view;
         @XmlElement(required = true)
@@ -1457,6 +1609,10 @@ public class SOSPermissionCommands {
             this.view = value;
         }
 
+        public boolean isSetView() {
+            return (this.view!= null);
+        }
+
         /**
          * Ruft den Wert der execute-Eigenschaft ab.
          * 
@@ -1479,6 +1635,10 @@ public class SOSPermissionCommands {
          */
         public void setExecute(SOSPermissionCommands.JobChain.Execute value) {
             this.execute = value;
+        }
+
+        public boolean isSetExecute() {
+            return (this.execute!= null);
         }
 
         /**
@@ -1505,6 +1665,10 @@ public class SOSPermissionCommands {
             this.change = value;
         }
 
+        public boolean isSetChange() {
+            return (this.change!= null);
+        }
+
 
         /**
          * <p>Java-Klasse für anonymous complex type.
@@ -1529,8 +1693,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "hotFolder"
         })
-        public static class Change {
+        public static class Change
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean hotFolder;
 
             /**
@@ -1547,6 +1714,10 @@ public class SOSPermissionCommands {
              */
             public void setHotFolder(boolean value) {
                 this.hotFolder = value;
+            }
+
+            public boolean isSetHotFolder() {
+                return true;
             }
 
         }
@@ -1587,8 +1758,11 @@ public class SOSPermissionCommands {
             "addOrder",
             "remove"
         })
-        public static class Execute {
+        public static class Execute
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean stop;
             protected boolean unstop;
             protected boolean skipJobChainNode;
@@ -1613,6 +1787,10 @@ public class SOSPermissionCommands {
                 this.stop = value;
             }
 
+            public boolean isSetStop() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der unstop-Eigenschaft ab.
              * 
@@ -1627,6 +1805,10 @@ public class SOSPermissionCommands {
              */
             public void setUnstop(boolean value) {
                 this.unstop = value;
+            }
+
+            public boolean isSetUnstop() {
+                return true;
             }
 
             /**
@@ -1645,6 +1827,10 @@ public class SOSPermissionCommands {
                 this.skipJobChainNode = value;
             }
 
+            public boolean isSetSkipJobChainNode() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der stopJobChainNode-Eigenschaft ab.
              * 
@@ -1659,6 +1845,10 @@ public class SOSPermissionCommands {
              */
             public void setStopJobChainNode(boolean value) {
                 this.stopJobChainNode = value;
+            }
+
+            public boolean isSetStopJobChainNode() {
+                return true;
             }
 
             /**
@@ -1677,6 +1867,10 @@ public class SOSPermissionCommands {
                 this.processJobChainNode = value;
             }
 
+            public boolean isSetProcessJobChainNode() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der addOrder-Eigenschaft ab.
              * 
@@ -1693,6 +1887,10 @@ public class SOSPermissionCommands {
                 this.addOrder = value;
             }
 
+            public boolean isSetAddOrder() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der remove-Eigenschaft ab.
              * 
@@ -1707,6 +1905,10 @@ public class SOSPermissionCommands {
              */
             public void setRemove(boolean value) {
                 this.remove = value;
+            }
+
+            public boolean isSetRemove() {
+                return true;
             }
 
         }
@@ -1735,8 +1937,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "status"
         })
-        public static class View {
+        public static class View
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean status;
 
             /**
@@ -1753,6 +1958,10 @@ public class SOSPermissionCommands {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+            public boolean isSetStatus() {
+                return true;
             }
 
         }
@@ -1835,8 +2044,11 @@ public class SOSPermissionCommands {
         "execute",
         "administration"
     })
-    public static class JobschedulerMaster {
+    public static class JobschedulerMaster
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         @XmlElement(required = true)
         protected SOSPermissionCommands.JobschedulerMaster.View view;
         @XmlElement(required = true)
@@ -1868,6 +2080,10 @@ public class SOSPermissionCommands {
             this.view = value;
         }
 
+        public boolean isSetView() {
+            return (this.view!= null);
+        }
+
         /**
          * Ruft den Wert der execute-Eigenschaft ab.
          * 
@@ -1890,6 +2106,10 @@ public class SOSPermissionCommands {
          */
         public void setExecute(SOSPermissionCommands.JobschedulerMaster.Execute value) {
             this.execute = value;
+        }
+
+        public boolean isSetExecute() {
+            return (this.execute!= null);
         }
 
         /**
@@ -1916,6 +2136,10 @@ public class SOSPermissionCommands {
             this.administration = value;
         }
 
+        public boolean isSetAdministration() {
+            return (this.administration!= null);
+        }
+
 
         /**
          * <p>Java-Klasse für anonymous complex type.
@@ -1940,8 +2164,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "manageCategories"
         })
-        public static class Administration {
+        public static class Administration
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean manageCategories;
 
             /**
@@ -1958,6 +2185,10 @@ public class SOSPermissionCommands {
              */
             public void setManageCategories(boolean value) {
                 this.manageCategories = value;
+            }
+
+            public boolean isSetManageCategories() {
+                return true;
             }
 
         }
@@ -2009,8 +2240,11 @@ public class SOSPermissionCommands {
             "reload",
             "restart"
         })
-        public static class Execute {
+        public static class Execute
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean stop;
             @XmlElement(name = "continue")
             protected boolean _continue;
@@ -2037,6 +2271,10 @@ public class SOSPermissionCommands {
                 this.stop = value;
             }
 
+            public boolean isSetStop() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der continue-Eigenschaft ab.
              * 
@@ -2051,6 +2289,10 @@ public class SOSPermissionCommands {
              */
             public void setContinue(boolean value) {
                 this._continue = value;
+            }
+
+            public boolean isSetContinue() {
+                return true;
             }
 
             /**
@@ -2069,6 +2311,10 @@ public class SOSPermissionCommands {
                 this.pause = value;
             }
 
+            public boolean isSetPause() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der terminate-Eigenschaft ab.
              * 
@@ -2083,6 +2329,10 @@ public class SOSPermissionCommands {
              */
             public void setTerminate(boolean value) {
                 this.terminate = value;
+            }
+
+            public boolean isSetTerminate() {
+                return true;
             }
 
             /**
@@ -2101,6 +2351,10 @@ public class SOSPermissionCommands {
                 this.abort = value;
             }
 
+            public boolean isSetAbort() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der reload-Eigenschaft ab.
              * 
@@ -2115,6 +2369,10 @@ public class SOSPermissionCommands {
              */
             public void setReload(boolean value) {
                 this.reload = value;
+            }
+
+            public boolean isSetReload() {
+                return true;
             }
 
             /**
@@ -2139,6 +2397,10 @@ public class SOSPermissionCommands {
              */
             public void setRestart(SOSPermissionCommands.JobschedulerMaster.Execute.Restart value) {
                 this.restart = value;
+            }
+
+            public boolean isSetRestart() {
+                return (this.restart!= null);
             }
 
 
@@ -2167,8 +2429,11 @@ public class SOSPermissionCommands {
                 "terminate",
                 "abort"
             })
-            public static class Restart {
+            public static class Restart
+                implements Serializable
+            {
 
+                private final static long serialVersionUID = 12343L;
                 protected boolean terminate;
                 protected boolean abort;
 
@@ -2188,6 +2453,10 @@ public class SOSPermissionCommands {
                     this.terminate = value;
                 }
 
+                public boolean isSetTerminate() {
+                    return true;
+                }
+
                 /**
                  * Ruft den Wert der abort-Eigenschaft ab.
                  * 
@@ -2202,6 +2471,10 @@ public class SOSPermissionCommands {
                  */
                 public void setAbort(boolean value) {
                     this.abort = value;
+                }
+
+                public boolean isSetAbort() {
+                    return true;
                 }
 
             }
@@ -2234,8 +2507,11 @@ public class SOSPermissionCommands {
             "status",
             "parameter"
         })
-        public static class View {
+        public static class View
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean status;
             protected boolean parameter;
 
@@ -2255,6 +2531,10 @@ public class SOSPermissionCommands {
                 this.status = value;
             }
 
+            public boolean isSetStatus() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der parameter-Eigenschaft ab.
              * 
@@ -2269,6 +2549,10 @@ public class SOSPermissionCommands {
              */
             public void setParameter(boolean value) {
                 this.parameter = value;
+            }
+
+            public boolean isSetParameter() {
+                return true;
             }
 
         }
@@ -2311,8 +2595,11 @@ public class SOSPermissionCommands {
     @XmlType(name = "", propOrder = {
         "execute"
     })
-    public static class JobschedulerMasterCluster {
+    public static class JobschedulerMasterCluster
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         @XmlElement(required = true)
         protected SOSPermissionCommands.JobschedulerMasterCluster.Execute execute;
 
@@ -2338,6 +2625,10 @@ public class SOSPermissionCommands {
          */
         public void setExecute(SOSPermissionCommands.JobschedulerMasterCluster.Execute value) {
             this.execute = value;
+        }
+
+        public boolean isSetExecute() {
+            return (this.execute!= null);
         }
 
 
@@ -2368,8 +2659,11 @@ public class SOSPermissionCommands {
             "terminate",
             "restart"
         })
-        public static class Execute {
+        public static class Execute
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean terminateFailSafe;
             protected boolean terminate;
             protected boolean restart;
@@ -2390,6 +2684,10 @@ public class SOSPermissionCommands {
                 this.terminateFailSafe = value;
             }
 
+            public boolean isSetTerminateFailSafe() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der terminate-Eigenschaft ab.
              * 
@@ -2406,6 +2704,10 @@ public class SOSPermissionCommands {
                 this.terminate = value;
             }
 
+            public boolean isSetTerminate() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der restart-Eigenschaft ab.
              * 
@@ -2420,6 +2722,10 @@ public class SOSPermissionCommands {
              */
             public void setRestart(boolean value) {
                 this.restart = value;
+            }
+
+            public boolean isSetRestart() {
+                return true;
             }
 
         }
@@ -2474,8 +2780,11 @@ public class SOSPermissionCommands {
         "remove",
         "change"
     })
-    public static class Lock {
+    public static class Lock
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         @XmlElement(required = true)
         protected SOSPermissionCommands.Lock.View view;
         protected boolean remove;
@@ -2506,6 +2815,10 @@ public class SOSPermissionCommands {
             this.view = value;
         }
 
+        public boolean isSetView() {
+            return (this.view!= null);
+        }
+
         /**
          * Ruft den Wert der remove-Eigenschaft ab.
          * 
@@ -2520,6 +2833,10 @@ public class SOSPermissionCommands {
          */
         public void setRemove(boolean value) {
             this.remove = value;
+        }
+
+        public boolean isSetRemove() {
+            return true;
         }
 
         /**
@@ -2546,6 +2863,10 @@ public class SOSPermissionCommands {
             this.change = value;
         }
 
+        public boolean isSetChange() {
+            return (this.change!= null);
+        }
+
 
         /**
          * <p>Java-Klasse für anonymous complex type.
@@ -2570,8 +2891,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "hotFolder"
         })
-        public static class Change {
+        public static class Change
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean hotFolder;
 
             /**
@@ -2588,6 +2912,10 @@ public class SOSPermissionCommands {
              */
             public void setHotFolder(boolean value) {
                 this.hotFolder = value;
+            }
+
+            public boolean isSetHotFolder() {
+                return true;
             }
 
         }
@@ -2616,8 +2944,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "status"
         })
-        public static class View {
+        public static class View
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean status;
 
             /**
@@ -2634,6 +2965,10 @@ public class SOSPermissionCommands {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+            public boolean isSetStatus() {
+                return true;
             }
 
         }
@@ -2711,8 +3046,11 @@ public class SOSPermissionCommands {
         "execute",
         "change"
     })
-    public static class Order {
+    public static class Order
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         @XmlElement(required = true)
         protected SOSPermissionCommands.Order.View view;
         protected boolean delete;
@@ -2745,6 +3083,10 @@ public class SOSPermissionCommands {
             this.view = value;
         }
 
+        public boolean isSetView() {
+            return (this.view!= null);
+        }
+
         /**
          * Ruft den Wert der delete-Eigenschaft ab.
          * 
@@ -2759,6 +3101,10 @@ public class SOSPermissionCommands {
          */
         public void setDelete(boolean value) {
             this.delete = value;
+        }
+
+        public boolean isSetDelete() {
+            return true;
         }
 
         /**
@@ -2785,6 +3131,10 @@ public class SOSPermissionCommands {
             this.execute = value;
         }
 
+        public boolean isSetExecute() {
+            return (this.execute!= null);
+        }
+
         /**
          * Ruft den Wert der change-Eigenschaft ab.
          * 
@@ -2807,6 +3157,10 @@ public class SOSPermissionCommands {
          */
         public void setChange(SOSPermissionCommands.Order.Change value) {
             this.change = value;
+        }
+
+        public boolean isSetChange() {
+            return (this.change!= null);
         }
 
 
@@ -2845,8 +3199,11 @@ public class SOSPermissionCommands {
             "hotFolder",
             "other"
         })
-        public static class Change {
+        public static class Change
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean parameter;
             protected boolean state;
             protected boolean runTime;
@@ -2871,6 +3228,10 @@ public class SOSPermissionCommands {
                 this.parameter = value;
             }
 
+            public boolean isSetParameter() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der state-Eigenschaft ab.
              * 
@@ -2885,6 +3246,10 @@ public class SOSPermissionCommands {
              */
             public void setState(boolean value) {
                 this.state = value;
+            }
+
+            public boolean isSetState() {
+                return true;
             }
 
             /**
@@ -2903,6 +3268,10 @@ public class SOSPermissionCommands {
                 this.runTime = value;
             }
 
+            public boolean isSetRunTime() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der timeForAdhocOrder-Eigenschaft ab.
              * 
@@ -2917,6 +3286,10 @@ public class SOSPermissionCommands {
              */
             public void setTimeForAdhocOrder(boolean value) {
                 this.timeForAdhocOrder = value;
+            }
+
+            public boolean isSetTimeForAdhocOrder() {
+                return true;
             }
 
             /**
@@ -2935,6 +3308,10 @@ public class SOSPermissionCommands {
                 this.startAndEndNode = value;
             }
 
+            public boolean isSetStartAndEndNode() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der hotFolder-Eigenschaft ab.
              * 
@@ -2951,6 +3328,10 @@ public class SOSPermissionCommands {
                 this.hotFolder = value;
             }
 
+            public boolean isSetHotFolder() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der other-Eigenschaft ab.
              * 
@@ -2965,6 +3346,10 @@ public class SOSPermissionCommands {
              */
             public void setOther(boolean value) {
                 this.other = value;
+            }
+
+            public boolean isSetOther() {
+                return true;
             }
 
         }
@@ -3003,8 +3388,11 @@ public class SOSPermissionCommands {
             "update",
             "start"
         })
-        public static class Execute {
+        public static class Execute
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean reset;
             protected boolean removeSetback;
             protected boolean resume;
@@ -3028,6 +3416,10 @@ public class SOSPermissionCommands {
                 this.reset = value;
             }
 
+            public boolean isSetReset() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der removeSetback-Eigenschaft ab.
              * 
@@ -3042,6 +3434,10 @@ public class SOSPermissionCommands {
              */
             public void setRemoveSetback(boolean value) {
                 this.removeSetback = value;
+            }
+
+            public boolean isSetRemoveSetback() {
+                return true;
             }
 
             /**
@@ -3060,6 +3456,10 @@ public class SOSPermissionCommands {
                 this.resume = value;
             }
 
+            public boolean isSetResume() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der suspend-Eigenschaft ab.
              * 
@@ -3074,6 +3474,10 @@ public class SOSPermissionCommands {
              */
             public void setSuspend(boolean value) {
                 this.suspend = value;
+            }
+
+            public boolean isSetSuspend() {
+                return true;
             }
 
             /**
@@ -3092,6 +3496,10 @@ public class SOSPermissionCommands {
                 this.update = value;
             }
 
+            public boolean isSetUpdate() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der start-Eigenschaft ab.
              * 
@@ -3106,6 +3514,10 @@ public class SOSPermissionCommands {
              */
             public void setStart(boolean value) {
                 this.start = value;
+            }
+
+            public boolean isSetStart() {
+                return true;
             }
 
         }
@@ -3134,8 +3546,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "status"
         })
-        public static class View {
+        public static class View
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean status;
 
             /**
@@ -3152,6 +3567,10 @@ public class SOSPermissionCommands {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+            public boolean isSetStatus() {
+                return true;
             }
 
         }
@@ -3207,8 +3626,11 @@ public class SOSPermissionCommands {
         "remove",
         "change"
     })
-    public static class ProcessClass {
+    public static class ProcessClass
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         @XmlElement(required = true)
         protected SOSPermissionCommands.ProcessClass.View view;
         protected boolean remove;
@@ -3239,6 +3661,10 @@ public class SOSPermissionCommands {
             this.view = value;
         }
 
+        public boolean isSetView() {
+            return (this.view!= null);
+        }
+
         /**
          * Ruft den Wert der remove-Eigenschaft ab.
          * 
@@ -3253,6 +3679,10 @@ public class SOSPermissionCommands {
          */
         public void setRemove(boolean value) {
             this.remove = value;
+        }
+
+        public boolean isSetRemove() {
+            return true;
         }
 
         /**
@@ -3277,6 +3707,10 @@ public class SOSPermissionCommands {
          */
         public void setChange(SOSPermissionCommands.ProcessClass.Change value) {
             this.change = value;
+        }
+
+        public boolean isSetChange() {
+            return (this.change!= null);
         }
 
 
@@ -3305,8 +3739,11 @@ public class SOSPermissionCommands {
             "editContent",
             "hotFolder"
         })
-        public static class Change {
+        public static class Change
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             @XmlElement(required = true)
             protected Object editContent;
             protected boolean hotFolder;
@@ -3335,6 +3772,10 @@ public class SOSPermissionCommands {
                 this.editContent = value;
             }
 
+            public boolean isSetEditContent() {
+                return (this.editContent!= null);
+            }
+
             /**
              * Ruft den Wert der hotFolder-Eigenschaft ab.
              * 
@@ -3349,6 +3790,10 @@ public class SOSPermissionCommands {
              */
             public void setHotFolder(boolean value) {
                 this.hotFolder = value;
+            }
+
+            public boolean isSetHotFolder() {
+                return true;
             }
 
         }
@@ -3377,8 +3822,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "status"
         })
-        public static class View {
+        public static class View
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean status;
 
             /**
@@ -3395,6 +3843,10 @@ public class SOSPermissionCommands {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+            public boolean isSetStatus() {
+                return true;
             }
 
         }
@@ -3450,8 +3902,11 @@ public class SOSPermissionCommands {
         "remove",
         "change"
     })
-    public static class Schedule {
+    public static class Schedule
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 12343L;
         @XmlElement(required = true)
         protected SOSPermissionCommands.Schedule.View view;
         protected boolean remove;
@@ -3482,6 +3937,10 @@ public class SOSPermissionCommands {
             this.view = value;
         }
 
+        public boolean isSetView() {
+            return (this.view!= null);
+        }
+
         /**
          * Ruft den Wert der remove-Eigenschaft ab.
          * 
@@ -3496,6 +3955,10 @@ public class SOSPermissionCommands {
          */
         public void setRemove(boolean value) {
             this.remove = value;
+        }
+
+        public boolean isSetRemove() {
+            return true;
         }
 
         /**
@@ -3520,6 +3983,10 @@ public class SOSPermissionCommands {
          */
         public void setChange(SOSPermissionCommands.Schedule.Change value) {
             this.change = value;
+        }
+
+        public boolean isSetChange() {
+            return (this.change!= null);
         }
 
 
@@ -3548,8 +4015,11 @@ public class SOSPermissionCommands {
             "addSubstitute",
             "hotFolder"
         })
-        public static class Change {
+        public static class Change
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean addSubstitute;
             protected boolean hotFolder;
 
@@ -3569,6 +4039,10 @@ public class SOSPermissionCommands {
                 this.addSubstitute = value;
             }
 
+            public boolean isSetAddSubstitute() {
+                return true;
+            }
+
             /**
              * Ruft den Wert der hotFolder-Eigenschaft ab.
              * 
@@ -3583,6 +4057,10 @@ public class SOSPermissionCommands {
              */
             public void setHotFolder(boolean value) {
                 this.hotFolder = value;
+            }
+
+            public boolean isSetHotFolder() {
+                return true;
             }
 
         }
@@ -3611,8 +4089,11 @@ public class SOSPermissionCommands {
         @XmlType(name = "", propOrder = {
             "status"
         })
-        public static class View {
+        public static class View
+            implements Serializable
+        {
 
+            private final static long serialVersionUID = 12343L;
             protected boolean status;
 
             /**
@@ -3629,6 +4110,10 @@ public class SOSPermissionCommands {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+            public boolean isSetStatus() {
+                return true;
             }
 
         }

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.config.IniSecurityManagerFactory;
@@ -125,8 +126,11 @@ public class SOSPermissionsCreator {
                 Session session = readSessionFromDb(accessToken);
                 if (session != null) {
                     Subject subject = new Subject.Builder(securityManager).sessionId(accessToken).session(session).buildSubject();
-                    LOGGER.debug("loginFromAccessToken --> subject created");
+                     LOGGER.debug("loginFromAccessToken --> subject created");
                     if (subject.isAuthenticated()) {
+                        
+                    
+
                         LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject is authenticated");
                         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
                         currentUser = new SOSShiroCurrentUser((String) subject.getPrincipals().getPrimaryPrincipal(), "", "");
@@ -141,7 +145,9 @@ public class SOSPermissionsCreator {
                         currentUser.setCurrentSubject(subject);
                         currentUser.setAccessToken(accessToken);
 
-                        SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(accessToken);
+                        //SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(accessToken);
+                        SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = (SOSPermissionJocCockpitMasters) SOSSerializerUtil.fromString(subject.getSession().getAttribute("username_joc_permissions").toString());
+
                         LOGGER.debug("loginFromAccessToken --> JocCockpitPermissionMasterObjectList created");
                         currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
                         currentUser.initFolders();
@@ -153,7 +159,8 @@ public class SOSPermissionsCreator {
                                 currentUser.addFolder(role, section.get(role));
                             }
                         }
-                        SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(accessToken);
+                        //SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(accessToken);
+                        SOSPermissionCommandsMasters sosPermissionCommandsMasters = (SOSPermissionCommandsMasters) SOSSerializerUtil.fromString(subject.getSession().getAttribute("username_command_permissions").toString());
                         LOGGER.debug("loginFromAccessToken --> CommandsPermissionMasterObjectList created");
 
                         currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
@@ -252,7 +259,8 @@ public class SOSPermissionsCreator {
         SOSPermissionJocCockpit sosPermissionJocCockpit = o.createSOSPermissionJocCockpit();
 
         if (currentUser != null && currentUser.getCurrentSubject() != null) {
-
+            
+ 
             sosPermissionJocCockpit.setIsAuthenticated(currentUser.isAuthenticated());
             sosPermissionJocCockpit.setAccessToken(currentUser.getAccessToken());
             sosPermissionJocCockpit.setUser(currentUser.getUsername());
