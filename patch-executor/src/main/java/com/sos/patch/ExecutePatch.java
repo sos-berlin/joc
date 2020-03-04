@@ -80,10 +80,10 @@ public class ExecutePatch {
         // archive only once if the original file not already exists in archive directory
         if (Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME))) {
             copiedPath = Files.copy(archivePath.resolve(JOC_WAR_FILE_NAME), tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
-            System.out.println("joc.war not archived, because an archive file of the original joc.war already exists!");
+            System.out.println("joc.war has not been archived again, because an archive file of the original joc.war already exists.");
         } else {
             Path copiedArchivePath = Files.copy(webAppJocWarPath, archivePath.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS); 
-            System.out.println("joc.war was archived before processing the patch(es)!");
+            System.out.println("joc.war has been successfully archived before processing the patch(es).");
             copiedPath = Files.copy(copiedArchivePath, tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
         }
 
