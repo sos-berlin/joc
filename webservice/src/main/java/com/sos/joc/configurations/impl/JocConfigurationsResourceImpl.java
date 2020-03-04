@@ -39,6 +39,7 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
         try {
             JsonValidator.validateFailFast(configurationsFilterBytes, ConfigurationsFilter.class);
             ConfigurationsFilter configurationsFilter = Globals.objectMapper.readValue(configurationsFilterBytes, ConfigurationsFilter.class);
+            initGetPermissions(accessToken);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, configurationsFilter, accessToken, configurationsFilter.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

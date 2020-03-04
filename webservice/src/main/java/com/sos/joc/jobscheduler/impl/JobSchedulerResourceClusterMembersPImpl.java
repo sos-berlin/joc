@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.auth.rest.SOSPermissionsCreator;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
@@ -44,12 +45,16 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl
 				jobSchedulerFilter.setJobschedulerId("");
 			}
 
+           
 			boolean isPermitted = true;
 			String curJobSchedulerId = jobSchedulerFilter.getJobschedulerId();
 
             if (!curJobSchedulerId.isEmpty()) {
                 isPermitted = getPermissonsJocCockpit(curJobSchedulerId, accessToken).getJobschedulerMasterCluster().getView().isStatus()
                         || getPermissonsJocCockpit(curJobSchedulerId, accessToken).getJobschedulerMaster().getView().isStatus();
+            }else {
+                SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
+                sosPermissionsCreator.loginFromAccessToken(accessToken);
             }
 
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, curJobSchedulerId,
