@@ -42,6 +42,9 @@
         "jobs": {
           "type": "boolean"
         },
+        "jobStreams": {
+          "type": "boolean"
+        },
         "fileTransfers": {
           "type": "boolean"
         },
@@ -55,6 +58,9 @@
           "type": "boolean"
         },
         "conditions": {
+          "type": "boolean"
+        },
+        "configuration": {
           "type": "boolean"
         }
       }
