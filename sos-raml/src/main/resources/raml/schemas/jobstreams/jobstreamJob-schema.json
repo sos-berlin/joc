@@ -13,9 +13,6 @@
 		},
 		"startDelay": {
 			"$ref": "../common/nonNegativeLong-schema.json"
-		},
-		"params": {
-			"$ref": "../common/nameValuePairs-schema.json"
 		}
 	}
 }

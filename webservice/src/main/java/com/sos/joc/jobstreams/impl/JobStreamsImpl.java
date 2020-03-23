@@ -9,11 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
-import com.sos.jitl.jobstreams.db.DBItemJobStreamJobParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
-import com.sos.jitl.jobstreams.db.DBLayerJobStreamJobParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreams;
@@ -63,7 +61,6 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
             DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
             DBLayerJobStreamParameters dbLayerJobStreamParameters = new DBLayerJobStreamParameters(sosHibernateSession);
-            DBLayerJobStreamJobParameters dbLayerJobStreamJobParameters = new DBLayerJobStreamJobParameters(sosHibernateSession);
 
             FilterJobStreams filterJobStreams = new FilterJobStreams();
             FilterJobStreamStarters filterJobStreamStarters = new FilterJobStreamStarters();
@@ -104,13 +101,6 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                         JobStreamJob jobStreamJob = new JobStreamJob();
                         jobStreamJob.setJob(dbItemJobStreamStarterJobs.getJob());
                         jobStreamJob.setStartDelay(dbItemJobStreamStarterJobs.getDelay());
-                        for (DBItemJobStreamJobParameter dbItemJobStreamJobParameter : dbLayerJobStreamJobParameters.getJobStreamParametersList(
-                                filterJobStreamJobParameters, 0)) {
-                            NameValuePair param = new NameValuePair();
-                            param.setName(dbItemJobStreamJobParameter.getName());
-                            param.setValue(dbItemJobStreamJobParameter.getValue());
-                            jobStreamJob.getParams().add(param);
-                        }
                         jobstreamStarter.getJobs().add(jobStreamJob);
                     }
                     for (DBItemJobStreamParameter dbItemJobStreamParameter : dbLayerJobStreamParameters.getJobStreamParametersList(
@@ -157,7 +147,6 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
             DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
             DBLayerJobStreamParameters dbLayerJobStreamParameters = new DBLayerJobStreamParameters(sosHibernateSession);
-            DBLayerJobStreamJobParameters dbLayerJobStreamJobParameters = new DBLayerJobStreamJobParameters(sosHibernateSession);
 
             DBItemJobStream dbItemJobStream = new DBItemJobStream();
             dbItemJobStream.setCreated(new Date());
@@ -186,14 +175,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                     dbItemJobStreamStarterJob.setJobStreamStarter(newStarterId);
                     Long newJobId = dbLayerJobStreamsStarterJobs.store(dbItemJobStreamStarterJob);
                     jobStreamJob.setJobId(newJobId);
-                    for (NameValuePair param : jobStreamJob.getParams()) {
-                        DBItemJobStreamJobParameter dbItemJobStreamJobParameter = new DBItemJobStreamJobParameter();
-                        dbItemJobStreamJobParameter.setCreated(new Date());
-                        dbItemJobStreamJobParameter.setJobStreamJob(newJobId);
-                        dbItemJobStreamJobParameter.setName(param.getName());
-                        dbItemJobStreamJobParameter.setValue(param.getValue());
-                        dbLayerJobStreamJobParameters.save(dbItemJobStreamJobParameter);
-                    }
+                   
                 }
                 for (NameValuePair param : jobstreamStarter.getParams()) {
 
