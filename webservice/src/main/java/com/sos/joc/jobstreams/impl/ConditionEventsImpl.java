@@ -29,9 +29,9 @@ import com.sos.schema.JsonValidator;
 @Path("jobstreams")
 public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEventsResource {
 
-    private static final String API_CALL_EVENTLIST = "./conditions/eventlist";
-    private static final String API_CALL_ADD_EVENT = "./conditions/add_event";
-    private static final String API_CALL_DELETE_EVENT = "./conditions/delete_event";
+    private static final String API_CALL_EVENTLIST = "./jobstreams/eventlist";
+    private static final String API_CALL_ADD_EVENT = "./jobstreams/add_event";
+    private static final String API_CALL_DELETE_EVENT = "./jobstreams/delete_event";
 
     @Override
     public JOCDefaultResponse getEvents(String accessToken, byte[] filterBytes) {
@@ -40,7 +40,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         try {
             JsonValidator.validateFailFast(filterBytes, ConditionEventsFilter.class);
             ConditionEventsFilter conditionEventsFilter = Globals.objectMapper.readValue(filterBytes, ConditionEventsFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_EVENTLIST, conditionEventsFilter, accessToken, conditionEventsFilter
                     .getJobschedulerId(), getPermissonsJocCockpit(conditionEventsFilter.getJobschedulerId(), accessToken).getJobStream().getView()
                             .isEventlist());
@@ -72,18 +72,21 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
                 DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
                 ConditionEvent conditionEvent = new ConditionEvent();
-                DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
-                if (dbItemOutCondition != null) {
-                    conditionEvent.setEvent(dbItemEvent.getEvent());
-                    conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
-                    conditionEvent.setSession(dbItemEvent.getSession());
-                    conditionEvent.setJobStream(dbItemEvent.getJobStream());
-                    conditionEvent.setPath(dbItemOutCondition.getPath());
-                    conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
+                if (dbItemEvent != null) {
+                    DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
+                    if (dbItemOutCondition != null) {
+                        conditionEvent.setEvent(dbItemEvent.getEvent());
+                        conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
+                        conditionEvent.setSession(dbItemEvent.getSession());
+                        conditionEvent.setJobStream(dbItemEvent.getJobStream());
+                        conditionEvent.setPath(dbItemOutCondition.getPath());
+                        conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
 
-                    if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getPath().equals(
-                            conditionEventsFilter.getPath())) {
-                        conditionEvents.getConditionEvents().add(conditionEvent);
+                        if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getPath()
+                                .equals(conditionEventsFilter.getPath())) {
+                            conditionEvents.getConditionEvents().add(conditionEvent);
+
+                        }
                     }
                 }
             }
@@ -103,7 +106,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         try {
             JsonValidator.validateFailFast(filterBytes, ConditionEvent.class);
             ConditionEvent conditionEvent = Globals.objectMapper.readValue(filterBytes, ConditionEvent.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(),
                     getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
@@ -148,7 +151,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         try {
             JsonValidator.validateFailFast(filterBytes, ConditionEvent.class);
             ConditionEvent conditionEvent = Globals.objectMapper.readValue(filterBytes, ConditionEvent.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE_EVENT, conditionEvent, accessToken, conditionEvent.getJobschedulerId(),
                     getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {

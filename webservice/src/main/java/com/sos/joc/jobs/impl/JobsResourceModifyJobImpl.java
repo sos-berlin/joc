@@ -10,6 +10,8 @@ import javax.ws.rs.Path;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
+import com.sos.joe.common.XmlDeserializer;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jobscheduler.model.event.CalendarEvent;
@@ -30,8 +32,6 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
-import com.sos.joc.joe.common.XmlDeserializer;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
@@ -40,6 +40,8 @@ import com.sos.schema.JsonValidator;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.xml.XMLBuilder;
+
+ 
 
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {

@@ -1,20 +1,23 @@
 {
-	"title": "JobStream Filter",
+	"title": "JobStreamStarters Filter",
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"description": "Job Stream filter",
-	"javaType": "com.sos.joc.model.jobstreams.JobStreamFilter",
+	"description": "Reset Workflow, unconsume expressions",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreamStartersFilter",
 	"type": "object",
 	"required": [
-	  "jobschedulerId"
+		"jobschedulerId"
 	],
 	"properties": {
-		"deliveryDate": {
-			"$ref": "../common/deliveryDate-schema.json"
-		},
 		"jobschedulerId": {
 			"$ref": "../common/filename100-schema.json"
 		},
+		"jobStreamId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
 		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"state": {
 			"$ref": "../common/string255-schema.json"
 		},
 		"limit": {

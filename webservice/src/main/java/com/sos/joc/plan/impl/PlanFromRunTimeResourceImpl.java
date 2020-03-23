@@ -4,6 +4,7 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
+import com.sos.joe.common.XmlSerializer;
 import com.sos.jobscheduler.RuntimeResolver;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -11,7 +12,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.plan.RunTime;
 import com.sos.joc.model.plan.RunTimePlanFilter;
 import com.sos.joc.plan.resource.IPlanFromRunTimeResource;

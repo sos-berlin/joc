@@ -136,7 +136,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         inCondition.setConditionExpression(conditionExpression);
                         inCondition.setJobStream(jsInCondition.getJobStream());
                         inCondition.setId(jsInCondition.getId());
-                        inCondition.setConsumed(jsInCondition.isConsumed());
+                       // TODO: inCondition.setConsumed(jsInCondition.isConsumed());
                         inCondition.setMarkExpression(jsInCondition.isMarkExpression());
                         inCondition.setSkipOutCondition(jsInCondition.isSkipOutCondition());
                         inCondition.setNextPeriod(jsInCondition.getNextPeriod());

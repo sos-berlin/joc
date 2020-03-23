@@ -12,6 +12,8 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joe.common.XmlDeserializer;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jobscheduler.model.event.CalendarEvent;
@@ -29,14 +31,14 @@ import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.joe.common.XmlDeserializer;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.joe.schedule.Schedule;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
 import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
+
+ 
 
 @Path("schedule")
 public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements IScheduleResourceSetRunTime {

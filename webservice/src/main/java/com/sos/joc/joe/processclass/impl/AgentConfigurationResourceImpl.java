@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.joe.common.XmlDeserializer;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.ClusterMemberHandler;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -14,14 +16,13 @@ import com.sos.joc.classes.audit.ModifyProcessClassAudit;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.joe.common.XmlDeserializer;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.processclass.resource.IAgentConfigurationResource;
 import com.sos.joc.model.joe.processclass.ProcessClass;
 import com.sos.joc.model.joe.processclass.ProcessClassEdit;
 import com.sos.joc.model.processClass.ConfigurationEdit;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 import com.sos.schema.JsonValidator;
+ 
 
 @Path("process_class")
 public class AgentConfigurationResourceImpl extends JOCResourceImpl implements IAgentConfigurationResource {

@@ -16,7 +16,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobstreams.resource.IResetJobStreamResource;
-import com.sos.joc.model.jobstreams.ResetJobStream;
+import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
@@ -28,8 +28,8 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
     @Override
     public JOCDefaultResponse resetJobStream(String accessToken, byte[] filterBytes) {
         try {
-            JsonValidator.validateFailFast(filterBytes, ResetJobStream.class);
-            ResetJobStream resetJobStream = Globals.objectMapper.readValue(filterBytes, ResetJobStream.class);
+            JsonValidator.validateFailFast(filterBytes, JobStreamsFilter.class);
+            JobStreamsFilter resetJobStream = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
             
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetJobStream, accessToken, resetJobStream.getJobschedulerId(),
                     getPermissonsJocCockpit(resetJobStream.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
@@ -53,7 +53,7 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
         }
     }
 
-    private String notifyEventHandler(String accessToken, ResetJobStream resetJobStream) throws JsonProcessingException, JocException {
+    private String notifyEventHandler(String accessToken, JobStreamsFilter resetJobStream) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();

@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.joe.common.XmlSerializer;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
@@ -20,12 +21,12 @@ import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IStoreFileResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.JSObjectEdit;
 import com.sos.schema.JsonValidator;
 
+ 
 @Path("joe")
 public class StoreFileResourceImpl extends JOCResourceImpl implements IStoreFileResource {
 

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
+import com.sos.joe.common.XmlDeserializer;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -19,7 +20,6 @@ import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.configuration.CalendarUsageConfiguration;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.Configuration;
 import com.sos.joc.model.common.ConfigurationMime;
@@ -31,6 +31,7 @@ import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
 import com.sos.schema.JsonValidator;
 
+ 
 @Path("schedule")
 public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implements IScheduleResourceConfiguration {
 

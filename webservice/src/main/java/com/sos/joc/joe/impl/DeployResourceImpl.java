@@ -50,7 +50,7 @@ import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeConfigurationException;
 import com.sos.joc.joe.common.ConfigurationMonitor;
-import com.sos.joc.joe.common.XmlSerializer;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IDeployResource;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendars;

@@ -126,10 +126,8 @@ public class SOSPermissionsCreator {
                 Session session = readSessionFromDb(accessToken);
                 if (session != null) {
                     Subject subject = new Subject.Builder(securityManager).sessionId(accessToken).session(session).buildSubject();
-                     LOGGER.debug("loginFromAccessToken --> subject created");
+                    LOGGER.debug("loginFromAccessToken --> subject created");
                     if (subject.isAuthenticated()) {
-                        
-                    
 
                         LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject is authenticated");
                         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
@@ -145,8 +143,15 @@ public class SOSPermissionsCreator {
                         currentUser.setCurrentSubject(subject);
                         currentUser.setAccessToken(accessToken);
 
-                        //SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(accessToken);
-                        SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = (SOSPermissionJocCockpitMasters) SOSSerializerUtil.fromString(subject.getSession().getAttribute("username_joc_permissions").toString());
+                        // SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(accessToken);
+                        SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = null;
+                        if (subject.getSession().getAttribute("username_joc_permissions") != null) {
+                            sosPermissionJocCockpitMasters = (SOSPermissionJocCockpitMasters) SOSSerializerUtil.fromString(subject.getSession()
+                                    .getAttribute("username_joc_permissions").toString());
+                        } else {
+                            LOGGER.warn("Could not read username_joc_permissions after fail over in the session object for access token "
+                                    + accessToken);
+                        }
 
                         LOGGER.debug("loginFromAccessToken --> JocCockpitPermissionMasterObjectList created");
                         currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
@@ -159,8 +164,9 @@ public class SOSPermissionsCreator {
                                 currentUser.addFolder(role, section.get(role));
                             }
                         }
-                        //SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(accessToken);
-                        SOSPermissionCommandsMasters sosPermissionCommandsMasters = (SOSPermissionCommandsMasters) SOSSerializerUtil.fromString(subject.getSession().getAttribute("username_command_permissions").toString());
+                        // SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(accessToken);
+                        SOSPermissionCommandsMasters sosPermissionCommandsMasters = (SOSPermissionCommandsMasters) SOSSerializerUtil.fromString(
+                                subject.getSession().getAttribute("username_command_permissions").toString());
                         LOGGER.debug("loginFromAccessToken --> CommandsPermissionMasterObjectList created");
 
                         currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
@@ -259,8 +265,7 @@ public class SOSPermissionsCreator {
         SOSPermissionJocCockpit sosPermissionJocCockpit = o.createSOSPermissionJocCockpit();
 
         if (currentUser != null && currentUser.getCurrentSubject() != null) {
-            
- 
+
             sosPermissionJocCockpit.setIsAuthenticated(currentUser.isAuthenticated());
             sosPermissionJocCockpit.setAccessToken(currentUser.getAccessToken());
             sosPermissionJocCockpit.setUser(currentUser.getUsername());

@@ -23,6 +23,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobstreams.resource.IJobStreamFoldersResource;
 import com.sos.joc.model.jobstreams.Folders2Jobstream;
+import com.sos.joc.model.jobstreams.JobStreamFolders;
 import com.sos.joc.model.jobstreams.JobStreams;
 import com.sos.schema.JsonValidator;
 
@@ -37,10 +38,10 @@ public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamF
         SOSHibernateSession sosHibernateSession = null;
         try {
             JsonValidator.validateFailFast(filterBytes, JobStreams.class);
-            JobStreams jobStreams = Globals.objectMapper.readValue(filterBytes, JobStreams.class);
+            JobStreamFolders jobStreamFolders = Globals.objectMapper.readValue(filterBytes, JobStreamFolders.class);
             
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobStreams, accessToken, jobStreams.getJobschedulerId(), getPermissonsJocCockpit(
-                    jobStreams.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobStreamFolders, accessToken, jobStreamFolders.getJobschedulerId(), getPermissonsJocCockpit(
+                    jobStreamFolders.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -49,8 +50,8 @@ public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamF
             Map<String, Set<String>> mapOfJobStream2Folders = new HashMap<String, Set<String>>();
             DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
             FilterInConditions filterInConditions = new FilterInConditions();
-            filterInConditions.setJobStream(jobStreams.getJobStreamFilter());
-            filterInConditions.setJobSchedulerId(jobStreams.getJobschedulerId());
+            filterInConditions.setJobStream(jobStreamFolders.getJobStreamFilter());
+            filterInConditions.setJobSchedulerId(jobStreamFolders.getJobschedulerId());
             List<DBItemInCondition> listOfInConditions = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
 
             for (DBItemInCondition dbItemInCondition : listOfInConditions) {
@@ -64,8 +65,8 @@ public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamF
 
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             FilterOutConditions filterOutConditions = new FilterOutConditions();
-            filterOutConditions.setJobSchedulerId(jobStreams.getJobschedulerId());
-            filterOutConditions.setJobStream(jobStreams.getJobStreamFilter());
+            filterOutConditions.setJobSchedulerId(jobStreamFolders.getJobschedulerId());
+            filterOutConditions.setJobStream(jobStreamFolders.getJobStreamFilter());
             List<DBItemOutCondition> listOfOutConditions = dbLayerOutConditions.getSimpleOutConditionsList(filterOutConditions, 0);
             for (DBItemOutCondition dbItemOutCondition : listOfOutConditions) {
                 String jobStream = dbItemOutCondition.getJobStream();
@@ -82,11 +83,11 @@ public class JobStreamFoldersImpl extends JOCResourceImpl implements IJobStreamF
                 mapOfJobStream2Folders.get(jobStream).forEach(folder -> {
                     folders2Jobstream.getFolders().add(folder.replaceAll("\\\\", "/"));
                 });
-                jobStreams.getJobStreamFolders().add(folders2Jobstream);
+                jobStreamFolders.getJobStreams().add(folders2Jobstream);
             });
 
-            jobStreams.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(jobStreams);
+            jobStreamFolders.setDeliveryDate(Date.from(Instant.now()));
+            return JOCDefaultResponse.responseStatus200(jobStreamFolders);
 
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
