@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.ws.rs.Path;
 
@@ -36,6 +37,7 @@ import com.sos.joc.jobstreams.resource.IOutConditionsResource;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.jobstreams.ConditionExpression;
+import com.sos.joc.model.jobstreams.ConditionJobsFilter;
 import com.sos.joc.model.jobstreams.ConditionRef;
 import com.sos.joc.model.jobstreams.JobOutCondition;
 import com.sos.joc.model.jobstreams.JobstreamConditions;
@@ -55,34 +57,34 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
         SOSHibernateSession sosHibernateSession = null;
         try {
             JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
-            JobsFilter jobFilterSchema = Globals.objectMapper.readValue(filterBytes, JobsFilter.class);
-            
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilterSchema, accessToken, jobFilterSchema.getJobschedulerId(),
-                    getPermissonsJocCockpit(jobFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
+            ConditionJobsFilter conditionJobsFilterSchema = Globals.objectMapper.readValue(filterBytes, ConditionJobsFilter.class);
+            UUID contextId = UUID.fromString(conditionJobsFilterSchema.getContext());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionJobsFilterSchema, accessToken, conditionJobsFilterSchema.getJobschedulerId(),
+                    getPermissonsJocCockpit(conditionJobsFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            checkRequiredParameter("job", jobFilterSchema.getJobs());
+            checkRequiredParameter("job", conditionJobsFilterSchema.getJobs());
 
             OutConditions outConditions = new OutConditions();
-            outConditions.setJobschedulerId(jobFilterSchema.getJobschedulerId());
+            outConditions.setJobschedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
             DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
             FilterInConditions filterInConditions = new FilterInConditions();
-            filterInConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
+            filterInConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
             List<DBItemInCondition> listOfInConditionsItems = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
 
-            for (JobPath job : jobFilterSchema.getJobs()) {
+            for (JobPath job : conditionJobsFilterSchema.getJobs()) {
 
                 JobOutCondition jobOutCondition = new JobOutCondition();
                 ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(sosHibernateSession);
                 reportTaskExecutionsDBLayer.getFilter().setSortMode("desc");
                 reportTaskExecutionsDBLayer.getFilter().setOrderCriteria("endTime");
                 reportTaskExecutionsDBLayer.getFilter().addJobPath(job.getJob());
-                reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobFilterSchema.getJobschedulerId());
+                reportTaskExecutionsDBLayer.getFilter().setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                 DBItemReportTask dbItemReportTask = reportTaskExecutionsDBLayer.getHistoryItem();
                 Integer exit = null;
                 if (dbItemReportTask != null) {
@@ -92,9 +94,9 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
                 FilterOutConditions filterOutConditions = new FilterOutConditions();
                 filterOutConditions.setJob(job.getJob());
-                filterOutConditions.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
+                filterOutConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
-                JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, jobFilterSchema.getJobschedulerId());
+                JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, conditionJobsFilterSchema.getJobschedulerId());
                 jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
                 jsConditionResolver.initEvents(sosHibernateSession);
 
@@ -103,7 +105,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
                 JSJobConditionKey jsJobConditionKey = new JSJobConditionKey();
                 jsJobConditionKey.setJob(job.getJob());
-                jsJobConditionKey.setJobSchedulerId(jobFilterSchema.getJobschedulerId());
+                jsJobConditionKey.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
                 jobOutCondition.setJob(job.getJob());
 
@@ -116,7 +118,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                         OutCondition outCondition = new OutCondition();
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsOutCondition.getExpression());
-                        conditionExpression.setValue(jsConditionResolver.validate(exit, jsOutCondition));
+                        conditionExpression.setValue(jsConditionResolver.validate(exit,contextId, jsOutCondition));
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                         outCondition.setConditionExpression(conditionExpression);
                         outCondition.setJobStream(jsOutCondition.getJobStream());
@@ -129,7 +131,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             outConditionEvent.setGlobalEvent(jsOutConditionEvent.isGlobal());
                             jsEventKey.setEvent(jsOutConditionEvent.getEvent());
                             jsEventKey.setGlobalEvent(jsOutConditionEvent.isGlobal());
-                            jsEventKey.setSchedulerId(jobFilterSchema.getJobschedulerId());
+                            jsEventKey.setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                             if (jsOutConditionEvent.isCreateCommand()) {
                                 jsEventKey.setJobStream(outCondition.getJobStream());
                                 outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey));
