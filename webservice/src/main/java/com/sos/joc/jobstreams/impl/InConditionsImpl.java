@@ -108,7 +108,11 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 }
 
                 for (DBItemInConditionWithCommand dbItemInCondition : listOfInConditions) {
-                    dbItemInCondition.setConsumed((mapOfConsumedInCondition.get(dbItemInCondition.getDbItemInCondition().getId()) != null));
+                    for (DBItemConsumedInCondition dbItemConsumedInCondition : listOfConsumedInConditions) {
+                        mapOfConsumedInCondition.put(dbItemConsumedInCondition.getInConditionId(), dbItemConsumedInCondition);
+                        dbItemInCondition.setConsumed(dbItemConsumedInCondition.getSession());
+                    }
+
                 }
 
                 EventHandlerSettings settings = new EventHandlerSettings();

@@ -16,7 +16,6 @@ import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreams;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamsStarterJobs;
-import com.sos.jitl.jobstreams.db.FilterJobStreamJobParameters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarters;
@@ -66,11 +65,11 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             FilterJobStreamStarters filterJobStreamStarters = new FilterJobStreamStarters();
             FilterJobStreamStarterJobs filterJobStreamStarterJobs = new FilterJobStreamStarterJobs();
             FilterJobStreamParameters filterJobStreamParameters = new FilterJobStreamParameters();
-            FilterJobStreamJobParameters filterJobStreamJobParameters = new FilterJobStreamJobParameters();
 
             filterJobStreams.setJobStream(jobStreamsFilter.getJobStream());
             filterJobStreams.setSchedulerId(jobStreamsFilter.getJobschedulerId());
             filterJobStreams.setStatus(jobStreamsFilter.getStatus());
+            filterJobStreams.setFolder(jobStreamsFilter.getFolder());
 
             List<DBItemJobStream> listOfJobStreams = dbLayerEvents.getJobStreamsList(filterJobStreams, jobStreamsFilter.getLimit());
             JobStreams jobStreams = new JobStreams();
@@ -84,6 +83,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 jobStream.setJobschedulerId(dbItemJobStream.getSchedulerId());
                 jobStream.setJobStream(dbItemJobStream.getJobStream());
                 jobStream.setState(dbItemJobStream.getState());
+                jobStream.setFolder(dbItemJobStream.getFolder());
 
                 filterJobStreamStarters.setJobStreamId(dbItemJobStream.getId());
                 for (DBItemJobStreamStarter dbItemJobStreamStarter : dbLayerJobStreamStarters.getJobStreamStartersList(filterJobStreamStarters, 0)) {
@@ -94,6 +94,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                         jobstreamStarter.setRunTime(runTime);
                     }
                     jobstreamStarter.setState(dbItemJobStreamStarter.getState());
+                    jobstreamStarter.setTitle(dbItemJobStreamStarter.getTitle());
                     filterJobStreamParameters.setJobStreamStarterId(dbItemJobStreamStarter.getId());
                     filterJobStreamStarterJobs.setJobStreamStarter(dbItemJobStreamStarter.getId());
                     for (DBItemJobStreamStarterJob dbItemJobStreamStarterJobs : dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(
@@ -152,6 +153,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             dbItemJobStream.setCreated(new Date());
             dbItemJobStream.setJobStream(jobStream.getJobStream());
             dbItemJobStream.setSchedulerId(jobStream.getJobschedulerId());
+            dbItemJobStream.setFolder(jobStream.getFolder());
             dbItemJobStream.setState(jobStream.getState());
 
             sosHibernateSession.beginTransaction();
@@ -167,6 +169,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 dbItemJobStreamStarter.setState(jobstreamStarter.getState());
                 Long newStarterId = dbLayerJobStreamStarters.store(dbItemJobStreamStarter);
                 jobstreamStarter.setJobStreamStarterId(newStarterId);
+                jobstreamStarter.setTitle(jobstreamStarter.getTitle());
                 for (JobStreamJob jobStreamJob : jobstreamStarter.getJobs()) {
                     DBItemJobStreamStarterJob dbItemJobStreamStarterJob = new DBItemJobStreamStarterJob();
                     dbItemJobStreamStarterJob.setCreated(new Date());
@@ -175,7 +178,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                     dbItemJobStreamStarterJob.setJobStreamStarter(newStarterId);
                     Long newJobId = dbLayerJobStreamsStarterJobs.store(dbItemJobStreamStarterJob);
                     jobStreamJob.setJobId(newJobId);
-                   
+
                 }
                 for (NameValuePair param : jobstreamStarter.getParams()) {
 
@@ -223,6 +226,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             FilterJobStreams filterJobStreams = new FilterJobStreams();
             filterJobStreams.setSchedulerId(jobStream.getJobschedulerId());
             filterJobStreams.setJobStream(jobStream.getJobStream());
+            filterJobStreams.setFolder(jobStream.getFolder());
             dbLayerJobStreams.deleteCascading(filterJobStreams);
 
             sosHibernateSession.commit();

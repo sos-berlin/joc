@@ -10,7 +10,10 @@
 		},
 		"jobStreamStarterId": {
 			"$ref": "../common/nonNegativeLong-schema.json"
-		},	 
+		},
+		"title": {
+			"$ref": "../common/string255-schema.json"
+		},
 		"jobs": {
 			"type": "array",
 			"items": {
