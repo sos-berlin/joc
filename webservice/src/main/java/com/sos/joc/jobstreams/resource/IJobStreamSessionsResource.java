@@ -9,10 +9,10 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
   
-public interface IJobStreamResourceHistory {
+public interface IJobStreamSessionsResource {
 
     @POST
-    @Path("history")
+    @Path("sessions")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobStreamHistory(@HeaderParam("X-Access-Token") String accessToken, byte[] jobStreamFilter);
+    public JOCDefaultResponse postJobStreamSessions(@HeaderParam("X-Access-Token") String accessToken, byte[] jobStreamFilter);
 }

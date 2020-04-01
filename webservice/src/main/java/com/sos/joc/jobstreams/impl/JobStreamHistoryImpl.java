@@ -10,10 +10,13 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemOutCondition;
 import com.sos.jitl.jobstreams.db.DBLayerInConditions;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
 import com.sos.jitl.jobstreams.db.FilterInConditions;
+import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
 import com.sos.jitl.jobstreams.db.FilterOutConditions;
 import com.sos.jitl.reporting.db.DBItemReportTask;
 import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
@@ -23,7 +26,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.jobstreams.resource.IJobStreamResourceHistory;
+import com.sos.joc.jobstreams.resource.IJobStreamHistoryResource;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
@@ -34,7 +37,7 @@ import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
-public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamResourceHistory {
+public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamHistoryResource {
 
     private static final String API_CALL = "./jobstream/history";
 
@@ -45,8 +48,9 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamR
         try {
             JsonValidator.validateFailFast(filterBytes, JobStreamsFilter.class);
             JobStreamsFilter jobStreamFilter = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
-            
+
             Set<String> listOfJobs = new HashSet<String>();
+            Set<Long> listOfTaskIds = new HashSet<Long>();
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobStreamFilter, accessToken, jobStreamFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(jobStreamFilter.getJobschedulerId(), accessToken).getHistory().getView().isStatus());
@@ -67,6 +71,16 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamR
             List<DBItemInCondition> listOfInConditions = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
             for (DBItemInCondition dbItemIncondition : listOfInConditions) {
                 listOfJobs.add(dbItemIncondition.getJob());
+            }
+
+            if (jobStreamFilter.getSession() != null && !jobStreamFilter.getSession().isEmpty()) {
+                DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+                FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+                filterJobStreamHistory.setContextId(jobStreamFilter.getSession());
+                List<DBItemJobStreamHistory> listOfTasks = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
+                for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfTasks) {
+                    listOfTaskIds.add(dbItemJobStreamHistory.getId());
+                }
             }
 
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
@@ -93,6 +107,13 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamR
                     if (jobPath != null && canAdd(jobPath, permittedFolders)) {
                         filter.addJobPath(jobPath);
                     }
+                }
+            }
+
+            if (listOfTaskIds.size() > 0) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                if (jobStreamFilter.getFolder() == null || canAdd(jobStreamFilter.getFolder(), permittedFolders)) {
+                    filter.setTaskIds(listOfTaskIds);
                 }
             }
 

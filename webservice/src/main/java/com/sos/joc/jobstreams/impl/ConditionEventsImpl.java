@@ -113,16 +113,11 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 return jocDefaultResponse;
             }
 
-            if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());
-            } else {
-                conditionEvent.setSession(conditionEvent.getSession());
-            }
-
             this.checkRequiredParameter("jobStream", conditionEvent.getJobStream());
             this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());
-
+            this.checkRequiredParameter("session", conditionEvent.getSession());
+            
             FilterEvents filter = new FilterEvents();
             filter.setEvent(conditionEvent.getEvent());
             filter.setSession(conditionEvent.getSession());
@@ -159,6 +154,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             }
 
             this.checkRequiredParameter("event", conditionEvent.getEvent());
+            this.checkRequiredParameter("session", conditionEvent.getSession());
 
             if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
                 conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());

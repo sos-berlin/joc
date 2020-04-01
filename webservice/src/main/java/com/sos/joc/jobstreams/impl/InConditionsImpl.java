@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -51,11 +53,10 @@ import com.sos.joc.model.jobstreams.JobInCondition;
 import com.sos.joc.model.jobstreams.JobstreamConditions;
 import com.sos.schema.JsonValidator;
 
- 
 @Path("jobstreams")
 public class InConditionsImpl extends JOCResourceImpl implements IInConditionsResource {
 
-    //private static final Logger LOGGER = LoggerFactory.getLogger(InConditionsImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InConditionsImpl.class);
     private static final String API_CALL = "./conditions/in_condition";
     private SOSHibernateSession sosHibernateSession = null;
     private JSConditionResolver jsConditionResolver;
@@ -65,21 +66,30 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
         try {
             JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
-            ConditionJobsFilter conditionsJobFilterSchema = Globals.objectMapper.readValue(filterBytes, ConditionJobsFilter.class);
-            UUID contextId = UUID.fromString(conditionsJobFilterSchema.getContext());
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionsJobFilterSchema, accessToken, conditionsJobFilterSchema.getJobschedulerId(),
-                    getPermissonsJocCockpit(conditionsJobFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
+            ConditionJobsFilter conditionJobsFilterSchema = Globals.objectMapper.readValue(filterBytes, ConditionJobsFilter.class);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionJobsFilterSchema, accessToken, conditionJobsFilterSchema
+                    .getJobschedulerId(), getPermissonsJocCockpit(conditionJobsFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView()
+                            .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            checkRequiredParameter("jobs", conditionsJobFilterSchema.getJobs());
+            checkRequiredParameter("jobs", conditionJobsFilterSchema.getJobs());
+
+            UUID contextId = null;
+            try {
+                if (conditionJobsFilterSchema.getSession() != null && !conditionJobsFilterSchema.getSession().isEmpty()) {
+                    contextId = UUID.fromString(conditionJobsFilterSchema.getSession());
+                }
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Could not get session from: " + conditionJobsFilterSchema.getSession());
+            }
 
             InConditions inConditions = new InConditions();
-            inConditions.setJobschedulerId(conditionsJobFilterSchema.getJobschedulerId());
+            inConditions.setJobschedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
-            for (JobPath job : conditionsJobFilterSchema.getJobs()) {
+            for (JobPath job : conditionJobsFilterSchema.getJobs()) {
                 JobInCondition jobInCondition = new JobInCondition();
 
                 DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
@@ -88,14 +98,14 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 FilterInConditions filterInConditions = new FilterInConditions();
                 FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
 
-                filterConsumedInConditions.setJobSchedulerId(conditionsJobFilterSchema.getJobschedulerId());
+                filterConsumedInConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                 filterConsumedInConditions.setJob(job.getJob());
                 filterConsumedInConditions.setSession(Constants.getSession());
 
-                filterInConditions.setJobSchedulerId(conditionsJobFilterSchema.getJobschedulerId());
+                filterInConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                 filterInConditions.setJob(job.getJob());
 
-                jsConditionResolver = new JSConditionResolver(sosHibernateSession, conditionsJobFilterSchema.getJobschedulerId());
+                jsConditionResolver = new JSConditionResolver(sosHibernateSession, conditionJobsFilterSchema.getJobschedulerId());
                 jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
                 jsConditionResolver.initEvents(sosHibernateSession);
 
@@ -116,12 +126,12 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 }
 
                 EventHandlerSettings settings = new EventHandlerSettings();
-                settings.setSchedulerId(conditionsJobFilterSchema.getJobschedulerId());
+                settings.setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                 JSJobInConditions jsJobInConditions = new JSJobInConditions(settings);
                 jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfInConditions);
                 JSJobConditionKey jsJobConditionKey = new JSJobConditionKey();
                 jsJobConditionKey.setJob(job.getJob());
-                jsJobConditionKey.setJobSchedulerId(conditionsJobFilterSchema.getJobschedulerId());
+                jsJobConditionKey.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
                 jobInCondition.setJob(jsJobConditionKey.getJob());
                 if (jsJobInConditions.getInConditions(jsJobConditionKey) != null) {
@@ -129,7 +139,9 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         InCondition inCondition = new InCondition();
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsInCondition.getExpression());
-                        conditionExpression.setValue(jsConditionResolver.validate(null, contextId,jsInCondition));
+                        if (contextId != null) {
+                            conditionExpression.setValue(jsConditionResolver.validate(null, contextId, jsInCondition));
+                        }
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
                         for (JSCondition jsCondition : listOfConditions) {
@@ -143,12 +155,13 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         inCondition.setConditionExpression(conditionExpression);
                         inCondition.setJobStream(jsInCondition.getJobStream());
                         inCondition.setId(jsInCondition.getId());
-                       // TODO: inCondition.setConsumed(jsInCondition.isConsumed());
+                        // TODO: inCondition.setConsumed(jsInCondition.isConsumed());
                         inCondition.setMarkExpression(jsInCondition.isMarkExpression());
                         inCondition.setSkipOutCondition(jsInCondition.isSkipOutCondition());
                         inCondition.setNextPeriod(jsInCondition.getNextPeriod());
-                        
-                        inCondition.setOutconditions(getOutConditions(jsJobConditionKey, conditionsJobFilterSchema.getJobschedulerId(), jsInCondition));
+
+                        inCondition.setOutconditions(getOutConditions(jsJobConditionKey, conditionJobsFilterSchema.getJobschedulerId(),
+                                jsInCondition));
                         for (JSInConditionCommand jsInConditionCommand : jsInCondition.getListOfInConditionCommand()) {
                             InConditionCommand inConditionCommand = new InConditionCommand();
                             inConditionCommand.setCommand(jsInConditionCommand.getCommand());

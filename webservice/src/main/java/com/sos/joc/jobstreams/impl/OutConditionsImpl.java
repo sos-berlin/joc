@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -49,7 +51,7 @@ import com.sos.schema.JsonValidator;
 @Path("jobstreams")
 public class OutConditionsImpl extends JOCResourceImpl implements IOutConditionsResource {
 
-    //private static final Logger LOGGER = LoggerFactory.getLogger(OutConditionsImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OutConditionsImpl.class);
     private static final String API_CALL = "./conditions/out_conditions";
 
     @Override
@@ -58,7 +60,6 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
         try {
             JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
             ConditionJobsFilter conditionJobsFilterSchema = Globals.objectMapper.readValue(filterBytes, ConditionJobsFilter.class);
-            UUID contextId = UUID.fromString(conditionJobsFilterSchema.getContext());
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionJobsFilterSchema, accessToken, conditionJobsFilterSchema.getJobschedulerId(),
                     getPermissonsJocCockpit(conditionJobsFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -67,7 +68,16 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             checkRequiredParameter("job", conditionJobsFilterSchema.getJobs());
+            checkRequiredParameter("session", conditionJobsFilterSchema.getSession());
 
+            UUID contextId = null;
+            try {
+                if (conditionJobsFilterSchema.getSession() != null && !conditionJobsFilterSchema.getSession().isEmpty()) {
+                    contextId = UUID.fromString(conditionJobsFilterSchema.getSession());
+                }
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Could not get session from: " + conditionJobsFilterSchema.getSession());
+            }
             OutConditions outConditions = new OutConditions();
             outConditions.setJobschedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
@@ -118,7 +128,9 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                         OutCondition outCondition = new OutCondition();
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsOutCondition.getExpression());
-                        conditionExpression.setValue(jsConditionResolver.validate(exit,contextId, jsOutCondition));
+                        if (contextId != null) {
+                            conditionExpression.setValue(jsConditionResolver.validate(exit,contextId, jsOutCondition));
+                        }
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                         outCondition.setConditionExpression(conditionExpression);
                         outCondition.setJobStream(jsOutCondition.getJobStream());
