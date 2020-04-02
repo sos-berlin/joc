@@ -68,7 +68,6 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             checkRequiredParameter("job", conditionJobsFilterSchema.getJobs());
-            checkRequiredParameter("session", conditionJobsFilterSchema.getSession());
 
             UUID contextId = null;
             try {
