@@ -82,9 +82,6 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
-            this.checkRequiredParameter("jobStream", jobStreamStarters.getJobStream());
-
             try {
                 for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
                     notifyEventHandlerStart(accessToken, jobStreamStarter.getJobStreamStarterId());
