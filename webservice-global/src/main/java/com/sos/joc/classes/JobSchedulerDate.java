@@ -116,7 +116,7 @@ public class JobSchedulerDate {
     }
     
     public static String getAtInUTCISO8601(String at, String userTimezone) throws JobSchedulerBadRequestException {
-        if(at == null || at.toLowerCase().contains("now")) {
+        if(at == null || at.isEmpty() || at.toLowerCase().contains("now")) {
             return getAtWithNowInUTCISO8601(at, userTimezone);
         }
         return getAtWithoutNowInUTCISO8601(at, userTimezone);
