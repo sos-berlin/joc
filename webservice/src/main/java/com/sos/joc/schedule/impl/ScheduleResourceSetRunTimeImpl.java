@@ -21,22 +21,29 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.audit.ModifyScheduleAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
+import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.calendar.Calendars;
+import com.sos.joc.model.common.Configuration;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.schedule.Schedule;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
 import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
+
+ 
 
 @Path("schedule")
 public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements IScheduleResourceSetRunTime {
@@ -66,14 +73,44 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
                 throw new JocMissingRequiredParameterException("undefined 'runTime'");
             }
 			
-			Schedule runTime = XmlSerializer.serializeAbstractSchedule(modifyRuntime.getRunTime());
+			String schedulePath = normalizePath(modifyRuntime.getSchedule());
+			String substitutePath = null;
+			boolean addSubstitute = false;
+			Schedule runTime = modifyRuntime.getRunTime();
+			
+			if (runTime.getSubstitute() != null && !runTime.getSubstitute().isEmpty()) {
+			    substitutePath = normalizePath(runTime.getSubstitute());
+			    if (!schedulePath.equalsIgnoreCase(substitutePath)) {
+			        addSubstitute = true; 
+			    }
+			}
+			
+			if (addSubstitute) {
+			    Configuration conf = new Configuration();
+	            if (versionIsOlderThan("1.13.1")) {
+	                conf = getConfiguration(schedulePath);
+	            } else {
+	                try {
+	                    conf = ConfigurationUtils.getConfigurationSchema(new JOCHotFolder(this), schedulePath, JobSchedulerObjectType.SCHEDULE, false);
+	                } catch (JobSchedulerObjectNotExistException e) {
+	                    conf = getConfiguration(schedulePath);
+	                }
+	            }
+	            Schedule s = XmlDeserializer.deserialize(conf.getContent().getXml(), Schedule.class);
+                s.setSubstitute(substitutePath);
+                s.setValidFrom(runTime.getValidFrom());
+                s.setValidTo(runTime.getValidTo());
+                runTime = XmlSerializer.serializeAbstractSchedule(s);
+			} else {
+			    runTime = XmlSerializer.serializeAbstractSchedule(runTime);
+			}
+			
 			modifyRuntime.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
 			Document doc = ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTimeXml());
 
-			String schedulePath = normalizePath(modifyRuntime.getSchedule());
 			
             if (versionIsOlderThan("1.13.1")) {
-
+                
                 XMLBuilder command = new XMLBuilder("modify_hot_folder");
 
                 if (doc != null) {
@@ -87,15 +124,15 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             } else {
 
-                Schedule schedulePojo = XmlDeserializer.deserialize(modifyRuntime.getRunTimeXml(), Schedule.class);
+                JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+
                 if (modifyRuntime.getCalendars() != null && !modifyRuntime.getCalendars().isEmpty()) {
                     Calendars calendars = new Calendars();
                     calendars.setCalendars(modifyRuntime.getCalendars());
-                    schedulePojo.setCalendars(Globals.objectMapper.writeValueAsString(calendars));
+                    runTime.setCalendars(Globals.objectMapper.writeValueAsString(calendars));
                 }
-                schedulePojo = XmlSerializer.serializeAbstractSchedule(schedulePojo);
-                JOCHotFolder jocHotFolder = new JOCHotFolder(this);
-                jocHotFolder.putFile(schedulePath + ".schedule.xml", XmlSerializer.serializeToStringWithHeader(schedulePojo));
+                jocHotFolder.putFile(schedulePath + JOEHelper.getFileExtension(JobSchedulerObjectType.SCHEDULE), XmlSerializer
+                        .serializeToStringWithHeader(runTime));
             }
 
 			session = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -132,5 +169,12 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 			Globals.disconnect(session);
 		}
 	}
+	
+	private Configuration getConfiguration(String path) throws JocException {
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
+        String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", path);
+        String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders no_subfolders source", getParent(path));
+        return ConfigurationUtils.getConfigurationSchema(jocXmlCommand, command, xPath, "schedule", false, getAccessToken());
+    }
 
 }
