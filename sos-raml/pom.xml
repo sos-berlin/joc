@@ -247,6 +247,11 @@
 									match="(public )(class AbstractSchedule)" replace="\1abstract \2"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/schedule/AbstractSchedule.java"
 									preserveLastModified="true" />
+								<!-- add path as json alias for substitute JOC-901 -->
+								<replaceregexp flags="i" byline="false"
+									match="(@JsonProperty\(&quot;substitute&quot;\))(\r?\n\s*)" replace="\1\2@JsonAlias({&quot;substitute&quot;, &quot;path&quot;})\2"
+									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/schedule/Schedule.java"
+									preserveLastModified="true" />
 								<!-- change hashcode and equals -->
 								<replaceregexp flags="ig" byline="true"
 									match="(\s*return new HashCodeBuilder).*" replace="\1().append(name).toHashCode();"
