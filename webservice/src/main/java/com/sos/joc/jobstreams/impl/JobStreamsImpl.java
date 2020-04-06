@@ -144,54 +144,9 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM);
             sosHibernateSession.setAutoCommit(false);
-            DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
-            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
-            DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
-            DBLayerJobStreamParameters dbLayerJobStreamParameters = new DBLayerJobStreamParameters(sosHibernateSession);
-
-            DBItemJobStream dbItemJobStream = new DBItemJobStream();
-            dbItemJobStream.setCreated(new Date());
-            dbItemJobStream.setJobStream(jobStream.getJobStream());
-            dbItemJobStream.setSchedulerId(jobStream.getJobschedulerId());
-            dbItemJobStream.setFolder(jobStream.getFolder());
-            dbItemJobStream.setState(jobStream.getState());
-
             sosHibernateSession.beginTransaction();
-            Long newId = dbLayerJobStreams.store(dbItemJobStream);
-            jobStream.setId(newId);
-            for (JobStreamStarter jobstreamStarter : jobStream.getJobstreamStarters()) {
-                DBItemJobStreamStarter dbItemJobStreamStarter = new DBItemJobStreamStarter();
-                dbItemJobStreamStarter.setCreated(new Date());
-                dbItemJobStreamStarter.setJobStream(newId);
-                dbItemJobStreamStarter.setTitle(jobstreamStarter.getTitle());
-                if (jobstreamStarter.getRunTime() != null) {
-                    dbItemJobStreamStarter.setRunTime(Globals.objectMapper.writeValueAsString(jobstreamStarter.getRunTime()));
-                }
-                dbItemJobStreamStarter.setState(jobstreamStarter.getState());
-                Long newStarterId = dbLayerJobStreamStarters.store(dbItemJobStreamStarter);
-                jobstreamStarter.setJobStreamStarterId(newStarterId);
-                jobstreamStarter.setTitle(jobstreamStarter.getTitle());
-                for (JobStreamJob jobStreamJob : jobstreamStarter.getJobs()) {
-                    DBItemJobStreamStarterJob dbItemJobStreamStarterJob = new DBItemJobStreamStarterJob();
-                    dbItemJobStreamStarterJob.setCreated(new Date());
-                    dbItemJobStreamStarterJob.setDelay(jobStreamJob.getStartDelay());
-                    dbItemJobStreamStarterJob.setJob(jobStreamJob.getJob());
-                    dbItemJobStreamStarterJob.setJobStreamStarter(newStarterId);
-                    Long newJobId = dbLayerJobStreamsStarterJobs.store(dbItemJobStreamStarterJob);
-                    jobStreamJob.setJobId(newJobId);
-
-                }
-                for (NameValuePair param : jobstreamStarter.getParams()) {
-
-                    DBItemJobStreamParameter dbItemParameter = new DBItemJobStreamParameter();
-                    dbItemParameter.setCreated(new Date());
-                    dbItemParameter.setJobStreamStarter(newStarterId);
-                    dbItemParameter.setName(param.getName());
-                    dbItemParameter.setValue(param.getValue());
-                    dbLayerJobStreamParameters.save(dbItemParameter);
-                }
-
-            }
+            DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+            dbLayerJobStreams.deleteInsert(jobStream);
             sosHibernateSession.commit();
 
             notifyEventHandler(accessToken);

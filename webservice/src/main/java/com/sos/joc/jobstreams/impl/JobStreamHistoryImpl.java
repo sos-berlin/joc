@@ -11,12 +11,15 @@ import javax.ws.rs.Path;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamTaskContext;
 import com.sos.jitl.jobstreams.db.DBItemOutCondition;
 import com.sos.jitl.jobstreams.db.DBLayerInConditions;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamsTaskContext;
 import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
 import com.sos.jitl.jobstreams.db.FilterInConditions;
 import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
+import com.sos.jitl.jobstreams.db.FilterJobStreamTaskContext;
 import com.sos.jitl.jobstreams.db.FilterOutConditions;
 import com.sos.jitl.reporting.db.DBItemReportTask;
 import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
@@ -64,32 +67,33 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamH
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(sosHibernateSession);
 
-            DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
-            FilterInConditions filterInConditions = new FilterInConditions();
-            filterInConditions.setJobSchedulerId(jobStreamFilter.getJobschedulerId());
-            filterInConditions.setJobStream(jobStreamFilter.getJobStream());
-            List<DBItemInCondition> listOfInConditions = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
-            for (DBItemInCondition dbItemIncondition : listOfInConditions) {
-                listOfJobs.add(dbItemIncondition.getJob());
-            }
-
-            if (jobStreamFilter.getSession() != null && !jobStreamFilter.getSession().isEmpty()) {
-                DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
-                FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
-                filterJobStreamHistory.setContextId(jobStreamFilter.getSession());
-                List<DBItemJobStreamHistory> listOfTasks = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
-                for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfTasks) {
-                    listOfTaskIds.add(dbItemJobStreamHistory.getId());
+            if (jobStreamFilter.getSession() == null && jobStreamFilter.getSession().isEmpty()) {
+                DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
+                FilterInConditions filterInConditions = new FilterInConditions();
+                filterInConditions.setJobSchedulerId(jobStreamFilter.getJobschedulerId());
+                filterInConditions.setJobStream(jobStreamFilter.getJobStream());
+                List<DBItemInCondition> listOfInConditions = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
+                for (DBItemInCondition dbItemIncondition : listOfInConditions) {
+                    listOfJobs.add(dbItemIncondition.getJob());
                 }
-            }
 
-            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
-            FilterOutConditions filterOutConditions = new FilterOutConditions();
-            filterOutConditions.setJobSchedulerId(jobStreamFilter.getJobschedulerId());
-            filterOutConditions.setJobStream(jobStreamFilter.getJobStream());
-            List<DBItemOutCondition> listOfOutConditions = dbLayerOutConditions.getSimpleOutConditionsList(filterOutConditions, 0);
-            for (DBItemOutCondition dbItemOutcondition : listOfOutConditions) {
-                listOfJobs.add(dbItemOutcondition.getJob());
+                DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+                FilterOutConditions filterOutConditions = new FilterOutConditions();
+                filterOutConditions.setJobSchedulerId(jobStreamFilter.getJobschedulerId());
+                filterOutConditions.setJobStream(jobStreamFilter.getJobStream());
+                List<DBItemOutCondition> listOfOutConditions = dbLayerOutConditions.getSimpleOutConditionsList(filterOutConditions, 0);
+                for (DBItemOutCondition dbItemOutcondition : listOfOutConditions) {
+                    listOfJobs.add(dbItemOutcondition.getJob());
+                }
+            } else {
+                DBLayerJobStreamsTaskContext dbLayerJobStreamsTaskContext = new DBLayerJobStreamsTaskContext(sosHibernateSession);
+                FilterJobStreamTaskContext filterJobStreamTaskContext = new FilterJobStreamTaskContext();
+                filterJobStreamTaskContext.setJobstreamHistoryId(jobStreamFilter.getSession());
+                List<DBItemJobStreamTaskContext> listOfTasks = dbLayerJobStreamsTaskContext.getJobStreamStarterJobsList(filterJobStreamTaskContext,
+                        0);
+                for (DBItemJobStreamTaskContext dbItemJobStreamTaskContext : listOfTasks) {
+                    listOfTaskIds.add(dbItemJobStreamTaskContext.getTaskId());
+                }
             }
 
             List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
