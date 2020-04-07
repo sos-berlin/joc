@@ -143,7 +143,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             jsEventKey.setEvent(jsOutConditionEvent.getEvent());
                             jsEventKey.setGlobalEvent(jsOutConditionEvent.isGlobal());
                             jsEventKey.setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
-                            if (jsOutConditionEvent.isCreateCommand()) {
+                            if (jsOutConditionEvent.isCreateCommand() && jsEventKey.getSession() != null) {
                                 jsEventKey.setJobStream(outCondition.getJobStream());
                                 outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey));
 

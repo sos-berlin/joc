@@ -24,6 +24,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IJobStreamsResource;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.jobstreams.JobStream;
@@ -78,7 +79,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             for (DBItemJobStream dbItemJobStream : listOfJobStreams) {
 
                 JobStream jobStream = new JobStream();
-                jobStream.setId(dbItemJobStream.getId());
+                jobStream.setJobStreamId(dbItemJobStream.getId());
                 jobStream.setDeliveryDate(new Date());
                 jobStream.setJobschedulerId(dbItemJobStream.getSchedulerId());
                 jobStream.setJobStream(dbItemJobStream.getJobStream());
@@ -173,7 +174,11 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("jobStream", jobStream.getJobStream());
+            try {
+                this.checkRequiredParameter("jobStreamId", jobStream.getJobStreamId());
+            } catch (JocMissingRequiredParameterException e) {
+                this.checkRequiredParameter("jobStream", jobStream.getJobStream());
+            }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM);
             sosHibernateSession.setAutoCommit(false);
@@ -181,6 +186,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             sosHibernateSession.beginTransaction();
             FilterJobStreams filterJobStreams = new FilterJobStreams();
             filterJobStreams.setSchedulerId(jobStream.getJobschedulerId());
+            filterJobStreams.setJobStreamId(jobStream.getJobStreamId());
             filterJobStreams.setJobStream(jobStream.getJobStream());
             filterJobStreams.setFolder(jobStream.getFolder());
             dbLayerJobStreams.deleteCascading(filterJobStreams);

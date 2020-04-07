@@ -14,7 +14,7 @@
 		"jobschedulerId": {
 			"$ref": "../common/filename100-schema.json"
 		},
-		"id": {
+		"jobStreamId": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
 		"jobStream": {

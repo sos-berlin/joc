@@ -100,7 +100,9 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
                 filterConsumedInConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                 filterConsumedInConditions.setJob(job.getJob());
-                filterConsumedInConditions.setSession(contextId.toString());
+                if (contextId != null) {
+                    filterConsumedInConditions.setSession(contextId.toString());
+                }
 
                 filterInConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                 filterInConditions.setJob(job.getJob());
@@ -160,8 +162,8 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         inCondition.setSkipOutCondition(jsInCondition.isSkipOutCondition());
                         inCondition.setNextPeriod(jsInCondition.getNextPeriod());
 
-                        inCondition.setOutconditions(getOutConditions(jsJobConditionKey, conditionJobsFilterSchema.getJobschedulerId(),
-                                jsInCondition,conditionJobsFilterSchema.getSession() ));
+                        inCondition.setOutconditions(getOutConditions(jsJobConditionKey, conditionJobsFilterSchema.getJobschedulerId(), jsInCondition,
+                                conditionJobsFilterSchema.getSession()));
                         for (JSInConditionCommand jsInConditionCommand : jsInCondition.getListOfInConditionCommand()) {
                             InConditionCommand inConditionCommand = new InConditionCommand();
                             inConditionCommand.setCommand(jsInConditionCommand.getCommand());
@@ -189,8 +191,8 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
         }
     }
 
-    private List<JobstreamConditions> getOutConditions(JSJobConditionKey jsJobConditionKey, String schedulerId, JSInCondition jsInCondition, String session)
-            throws SOSHibernateException {
+    private List<JobstreamConditions> getOutConditions(JSJobConditionKey jsJobConditionKey, String schedulerId, JSInCondition jsInCondition,
+            String session) throws SOSHibernateException {
         List<JobstreamConditions> listOfJobStreamConditions = new ArrayList<JobstreamConditions>();
         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
         DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
