@@ -47,6 +47,9 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            this.checkRequiredParameter("session", conditionEventsFilter.getSession());
+
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EVENTLIST);
 
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
@@ -56,12 +59,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             filter.setSchedulerId(conditionEventsFilter.getJobschedulerId());
             filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
 
-            if (conditionEventsFilter.getSession() == null || conditionEventsFilter.getSession().isEmpty()) {
-                filter.setSession(com.sos.jitl.jobstreams.Constants.getSession());
-            } else {
-                filter.setSession(conditionEventsFilter.getSession());
-
-            }
+            filter.setSession(conditionEventsFilter.getSession());
 
             filter.setJobStream(conditionEventsFilter.getJobStream());
             List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
@@ -117,7 +115,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             this.checkRequiredParameter("event", conditionEvent.getEvent());
             this.checkRequiredParameter("session", conditionEvent.getSession());
-            
+
             FilterEvents filter = new FilterEvents();
             filter.setEvent(conditionEvent.getEvent());
             filter.setSession(conditionEvent.getSession());
@@ -156,11 +154,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             this.checkRequiredParameter("event", conditionEvent.getEvent());
             this.checkRequiredParameter("session", conditionEvent.getSession());
 
-            if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
-                conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());
-            } else {
-                conditionEvent.setSession(conditionEvent.getSession());
-            }
+            conditionEvent.setSession(conditionEvent.getSession());
 
             FilterEvents filter = new FilterEvents();
             filter.setEvent(conditionEvent.getEvent());

@@ -1,7 +1,6 @@
 package com.sos.joc.jobstreams.impl;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Path;
@@ -22,7 +21,6 @@ import com.sos.joc.jobstreams.resource.IJobStreamStartersResource;
 import com.sos.joc.model.jobstreams.JobStream;
 import com.sos.joc.model.jobstreams.JobStreamStarter;
 import com.sos.joc.model.jobstreams.JobStreamStarters;
-import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")

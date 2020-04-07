@@ -60,7 +60,7 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
         if (resetJobStream.getJob() != null) {
             parameters.put("job", resetJobStream.getJob());
         }
-        parameters.put("session", com.sos.jitl.jobstreams.Constants.getSession());
+        parameters.put("session", resetJobStream.getSession());
         if (resetJobStream.getJobStream() != null) {
             parameters.put("jobStream", resetJobStream.getJobStream());
         }

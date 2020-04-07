@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.Path;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
@@ -121,7 +121,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 if (jsJobOutConditions.getOutConditions(jsJobConditionKey) != null) {
 
                     JSEventKey jsEventKey = new JSEventKey();
-                    jsEventKey.setSession(Constants.getSession());
+                    jsEventKey.setSession(conditionJobsFilterSchema.getSession());
 
                     for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
                         OutCondition outCondition = new OutCondition();
