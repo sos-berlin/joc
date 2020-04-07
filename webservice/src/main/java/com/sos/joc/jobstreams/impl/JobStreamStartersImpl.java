@@ -44,7 +44,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("jobStream", jobStreamStarters.getJobStream());
+            this.checkRequiredParameter("jobStream", jobStreamStarters.getJobStreamId());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM_STARTER);
             sosHibernateSession.setAutoCommit(false);
