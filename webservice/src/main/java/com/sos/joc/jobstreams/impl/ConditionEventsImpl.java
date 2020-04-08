@@ -48,42 +48,44 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("session", conditionEventsFilter.getSession());
-
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EVENTLIST);
-
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
-            FilterEvents filter = new FilterEvents();
-            filter.setIncludingGlobalEvent(true);
-            filter.setSchedulerId(conditionEventsFilter.getJobschedulerId());
-            filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
-
-            filter.setSession(conditionEventsFilter.getSession());
-
-            filter.setJobStream(conditionEventsFilter.getJobStream());
-            List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
             ConditionEvents conditionEvents = new ConditionEvents();
-            conditionEvents.setDeliveryDate(new Date());
-            conditionEvents.setSession(filter.getSession());
 
-            for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
-                DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
-                ConditionEvent conditionEvent = new ConditionEvent();
-                if (dbItemEvent != null) {
-                    DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
-                    if (dbItemOutCondition != null) {
-                        conditionEvent.setEvent(dbItemEvent.getEvent());
-                        conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
-                        conditionEvent.setSession(dbItemEvent.getSession());
-                        conditionEvent.setJobStream(dbItemEvent.getJobStream());
-                        conditionEvent.setPath(dbItemOutCondition.getPath());
-                        conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
+            if (conditionEventsFilter.getSession() != null && !conditionEventsFilter.getSession().isEmpty()) {
 
-                        if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getPath()
-                                .equals(conditionEventsFilter.getPath())) {
-                            conditionEvents.getConditionEvents().add(conditionEvent);
+                sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EVENTLIST);
 
+                DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+                DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+                FilterEvents filter = new FilterEvents();
+                filter.setIncludingGlobalEvent(true);
+                filter.setSchedulerId(conditionEventsFilter.getJobschedulerId());
+                filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
+
+                filter.setSession(conditionEventsFilter.getSession());
+
+                filter.setJobStream(conditionEventsFilter.getJobStream());
+                List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
+                conditionEvents.setDeliveryDate(new Date());
+                conditionEvents.setSession(filter.getSession());
+
+                for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
+                    DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
+                    ConditionEvent conditionEvent = new ConditionEvent();
+                    if (dbItemEvent != null) {
+                        DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
+                        if (dbItemOutCondition != null) {
+                            conditionEvent.setEvent(dbItemEvent.getEvent());
+                            conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
+                            conditionEvent.setSession(dbItemEvent.getSession());
+                            conditionEvent.setJobStream(dbItemEvent.getJobStream());
+                            conditionEvent.setPath(dbItemOutCondition.getPath());
+                            conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
+
+                            if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getPath()
+                                    .equals(conditionEventsFilter.getPath())) {
+                                conditionEvents.getConditionEvents().add(conditionEvent);
+
+                            }
                         }
                     }
                 }
