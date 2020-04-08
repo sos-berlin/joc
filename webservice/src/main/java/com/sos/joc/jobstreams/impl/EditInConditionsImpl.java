@@ -48,6 +48,7 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
                         "Edit In Conditon: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Data are stored in Database");
+                return JOCDefaultResponse.responseStatusJSError(e, getJocError());                
             }
             return JOCDefaultResponse.responseStatus200(inConditions);
 

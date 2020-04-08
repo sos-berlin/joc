@@ -62,12 +62,12 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamH
             }
 
             this.checkRequiredParameter("jobschedulerid", jobStreamFilter.getJobschedulerId());
-            this.checkRequiredParameter("jobStream", jobStreamFilter.getJobStream());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(sosHibernateSession);
 
             if (jobStreamFilter.getSession() == null && jobStreamFilter.getSession().isEmpty()) {
+                this.checkRequiredParameter("jobStream", jobStreamFilter.getJobStream());
                 DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
                 FilterInConditions filterInConditions = new FilterInConditions();
                 filterInConditions.setJobSchedulerId(jobStreamFilter.getJobschedulerId());
@@ -91,6 +91,7 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamH
                 filterJobStreamTaskContext.setJobstreamHistoryId(jobStreamFilter.getSession());
                 List<DBItemJobStreamTaskContext> listOfTasks = dbLayerJobStreamsTaskContext.getJobStreamStarterJobsList(filterJobStreamTaskContext,
                         0);
+
                 for (DBItemJobStreamTaskContext dbItemJobStreamTaskContext : listOfTasks) {
                     listOfTaskIds.add(dbItemJobStreamTaskContext.getTaskId());
                 }

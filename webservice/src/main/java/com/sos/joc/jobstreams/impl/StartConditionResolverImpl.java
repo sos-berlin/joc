@@ -38,7 +38,8 @@ public class StartConditionResolverImpl extends JOCResourceImpl implements IStar
                 notifyEventHandler(accessToken);
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
-                        "Start Condition Resolver: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Conditions not resolved");
+                        "Start Condition Resolver: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Jobstream not started");
+                JOCDefaultResponse.responseStatusJSError(e, getJocError());
             }
 
             return JOCDefaultResponse.responseStatusJSOk(null);

@@ -42,6 +42,8 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
                         "Reset Job Stream: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Job Stream not resetted");
+                return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+
             }
 
             return JOCDefaultResponse.responseStatus200(resetJobStream);
