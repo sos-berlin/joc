@@ -192,7 +192,13 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 if ("create".equals(event.getCommand())) {
                     for (JSCondition jsCondition : listOfConditions) {
                         if (jsCondition.typeIsEvent() && (jsCondition.typeIsGlobalEvent() == event.getGlobalEvent())) {
-                            if (jsCondition.getEventName().equals(event.getEvent()) && ("".equals(jsCondition.getConditionJobStream()) || outCondition
+                            String jsCondtionJobStream="";
+                            if (jsCondition.getConditionJobStream().isEmpty()) {
+                                jsCondtionJobStream = jobStream;
+                            }else {
+                                jsCondtionJobStream = jsCondition.getConditionJobStream();
+                            }
+                            if (jsCondition.getEventName().equals(event.getEvent()) && (jobStream.equals(jsCondtionJobStream) || outCondition
                                     .getJobStream().equals(jsCondition.getConditionJobStream()))) {
                                 eventIsUsedInExpression = true;
                                 continue;

@@ -4,8 +4,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.Path;
@@ -194,6 +196,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
     private List<JobstreamConditions> getOutConditions(JSJobConditionKey jsJobConditionKey, String schedulerId, JSInCondition jsInCondition,
             String session) throws SOSHibernateException {
         List<JobstreamConditions> listOfJobStreamConditions = new ArrayList<JobstreamConditions>();
+        Set<JobstreamConditions> listOfJobStreamConditionsSet = new HashSet<JobstreamConditions>();
         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
         DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
         FilterOutConditions filterOutConditions = new FilterOutConditions();
@@ -251,8 +254,18 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                     conditionRef.setExpressions(expressions);
                     jobstreamConditions.getJobs().add(conditionRef);
                 });
-                listOfJobStreamConditions.add(jobstreamConditions);
+                
+                for (JSCondition jsCondition : listOfConditions) {
+                    if (jobstreamConditions.getJobStream().equals(jsInCondition.getJobStream()) || jobstreamConditions.getJobStream().equals(jsCondition.getConditionJobStream())) {
+                        listOfJobStreamConditionsSet.add(jobstreamConditions);
+                    }
+                }
+
             });
+            for (JobstreamConditions jobstreamConditions:listOfJobStreamConditionsSet) {
+                listOfJobStreamConditions.add(jobstreamConditions);
+            };
+
         }
 
         return listOfJobStreamConditions;
