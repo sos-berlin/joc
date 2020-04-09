@@ -71,7 +71,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
                     DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
                     ConditionEvent conditionEvent = new ConditionEvent();
-                    if (dbItemEvent != null) {
+                    if  (dbItemEvent != null) {
                         DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
                         if (dbItemOutCondition != null) {
                             conditionEvent.setEvent(dbItemEvent.getEvent());
