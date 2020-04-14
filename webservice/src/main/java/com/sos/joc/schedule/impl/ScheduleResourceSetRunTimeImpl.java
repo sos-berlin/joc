@@ -1,10 +1,14 @@
 package com.sos.joc.schedule.impl;
 
+import java.io.ByteArrayInputStream;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.ws.rs.Path;
 
 import org.dom4j.Document;
@@ -78,11 +82,19 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 			boolean addSubstitute = false;
 			Schedule runTime = modifyRuntime.getRunTime();
 			
-			if (runTime.getSubstitute() != null && !runTime.getSubstitute().isEmpty()) {
-			    substitutePath = normalizePath(runTime.getSubstitute());
-			    if (!schedulePath.equalsIgnoreCase(substitutePath)) {
-			        addSubstitute = true; 
-			    }
+			//JOC-901 "substitute" is missing in request but "path" is filled.
+			if (runTime.getValidFrom() != null && !runTime.getValidFrom().isEmpty()) {
+	            JsonReader rdr = Json.createReader(new ByteArrayInputStream(modifyRuntimeBytes));
+	            JsonObject jsonObj = rdr.readObject();
+	            substitutePath = jsonObj.getJsonObject("runTime").getString("path", null);
+	            rdr.close();
+	            if (substitutePath != null) {
+	                substitutePath = normalizePath(substitutePath);
+	                if (!schedulePath.equalsIgnoreCase(substitutePath)) {
+	                    addSubstitute = true;
+	                    runTime.setSubstitute(substitutePath);
+	                }
+	            }
 			}
 			
 			if (addSubstitute) {
