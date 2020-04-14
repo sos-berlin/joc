@@ -84,10 +84,14 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 			
 			//JOC-901 "substitute" is missing in request but "path" is filled.
             if (runTime.getValidFrom() != null && !runTime.getValidFrom().isEmpty()) {
-                JsonReader rdr = Json.createReader(new ByteArrayInputStream(modifyRuntimeBytes));
-                JsonObject jsonObj = rdr.readObject();
-                substitutePath = jsonObj.getJsonObject("runTime").getString("path", null);
-                rdr.close();
+                if (runTime.getSubstitute() == null || runTime.getSubstitute().isEmpty()) {
+                    JsonReader rdr = Json.createReader(new ByteArrayInputStream(modifyRuntimeBytes));
+                    JsonObject jsonObj = rdr.readObject();
+                    substitutePath = jsonObj.getJsonObject("runTime").getString("path", null);
+                    rdr.close();
+                } else {
+                    substitutePath = runTime.getSubstitute();
+                }
                 if (substitutePath != null) {
                     substitutePath = normalizePath(substitutePath);
                     if (!schedulePath.equalsIgnoreCase(substitutePath)) {
