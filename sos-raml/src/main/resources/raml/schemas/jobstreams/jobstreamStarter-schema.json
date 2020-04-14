@@ -15,7 +15,7 @@
 			"$ref": "../common/string255-schema.json"
 		},
 		"nextStart": {
-			"$ref": "../common/string255-schema.json"
+    	    "$ref": "../common/timestamp-schema.json"
 		},
 		"jobs": {
 			"type": "array",
