@@ -190,7 +190,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             filterJobStreams.setJobStreamId(jobStream.getJobStreamId());
             filterJobStreams.setJobStream(jobStream.getJobStream());
             filterJobStreams.setFolder(jobStream.getFolder());
-            dbLayerJobStreams.deleteCascading(filterJobStreams);
+            dbLayerJobStreams.deleteCascading(filterJobStreams,true);
 
             sosHibernateSession.commit();
 
