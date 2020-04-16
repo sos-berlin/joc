@@ -72,7 +72,7 @@ public class SOSPermissionsCreator {
             JocConfigurationDbItem jocConfigurationDbItem;
             JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
             jocConfigurationDBLayer.getFilter().setAccount(".");
-            jocConfigurationDBLayer.getFilter().setName(sessionId.toString());
+            jocConfigurationDBLayer.getFilter().setName(sessionIdString);
             jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
             List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
             Globals.commit(sosHibernateSession);
