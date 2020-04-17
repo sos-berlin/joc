@@ -2,12 +2,13 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.12.02 um 04:55:18 PM CET 
+// Generiert: 2020.03.03 um 05:35:10 PM CET 
 //
 
 
 package com.sos.auth.rest.permission.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -41,8 +42,11 @@ import javax.xml.bind.annotation.XmlType;
     "sosPermissionJocCockpitMaster"
 })
 @XmlRootElement(name = "SOSPermissionJocCockpitMasters")
-public class SOSPermissionJocCockpitMasters {
+public class SOSPermissionJocCockpitMasters
+    implements Serializable
+{
 
+    private final static long serialVersionUID = 12343L;
     @XmlElement(name = "SOSPermissionJocCockpitMaster", required = true)
     protected List<SOSPermissionJocCockpitMaster> sosPermissionJocCockpitMaster;
 
@@ -73,6 +77,14 @@ public class SOSPermissionJocCockpitMasters {
             sosPermissionJocCockpitMaster = new ArrayList<SOSPermissionJocCockpitMaster>();
         }
         return this.sosPermissionJocCockpitMaster;
+    }
+
+    public boolean isSetSOSPermissionJocCockpitMaster() {
+        return ((this.sosPermissionJocCockpitMaster!= null)&&(!this.sosPermissionJocCockpitMaster.isEmpty()));
+    }
+
+    public void unsetSOSPermissionJocCockpitMaster() {
+        this.sosPermissionJocCockpitMaster = null;
     }
 
 }
