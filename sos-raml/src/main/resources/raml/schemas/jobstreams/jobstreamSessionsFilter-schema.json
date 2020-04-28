@@ -20,6 +20,9 @@
 		"jobStreamId": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
+		"jobStreamStarterId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
 		"status": {
 			"$ref": "../common/string255-schema.json"
 		},
