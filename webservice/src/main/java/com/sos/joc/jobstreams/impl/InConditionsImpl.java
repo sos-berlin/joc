@@ -69,6 +69,10 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            readJobSchedulerVariables();
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+            
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             checkRequiredParameter("jobs", jobFilterSchema.getJobs());

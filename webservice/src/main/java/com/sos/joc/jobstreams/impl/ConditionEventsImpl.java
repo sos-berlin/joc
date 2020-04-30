@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.db.DBItemEvent;
 import com.sos.jitl.jobstreams.db.DBItemOutCondition;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
@@ -107,6 +108,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 		SOSHibernateSession sosHibernateSession = null;
 
 		try {
+		
 			JsonValidator.validateFailFast(filterBytes, ConditionEvent.class);
 			ConditionEvent conditionEvent = Globals.objectMapper.readValue(filterBytes, ConditionEvent.class);
 
@@ -118,6 +120,10 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 				return jocDefaultResponse;
 			}
 
+			readJobSchedulerVariables();
+			Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+
+			
 			if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {
 				conditionEvent.setSession(com.sos.jitl.jobstreams.Constants.getSession());
 			} else {
@@ -165,6 +171,9 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 				return jocDefaultResponse;
 			}
 
+			readJobSchedulerVariables();
+			Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+			
 			this.checkRequiredParameter("event", conditionEvent.getEvent());
 
 			if (conditionEvent.getSession() == null || conditionEvent.getSession().isEmpty()) {

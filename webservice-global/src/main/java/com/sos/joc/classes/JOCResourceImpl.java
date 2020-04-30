@@ -476,6 +476,30 @@ public class JOCResourceImpl {
         }
 
     }
+    
+    protected void readJobSchedulerVariables() throws Exception {
+        if (Globals.schedulerVariables == null) {
+            Globals.schedulerVariables = new HashMap<String, String>();
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+            jocXmlCommand.executePostWithThrowBadRequest("<params.get/>", accessToken);
+            org.w3c.dom.NodeList schedulerParameters = jocXmlCommand.selectNodelist("//param");
+            for (int i = 0; i < schedulerParameters.getLength(); i++) {
+            	org.w3c.dom.Node param = schedulerParameters.item(i);
+
+                org.w3c.dom.NamedNodeMap map = param.getAttributes();
+                for (int j = 0; j < map.getLength(); j++) {
+                    String paramName = map.item(j).getNodeValue();
+                    String paramValue = "";
+                    if (map.getLength() > 1) {
+                        j++;
+                        paramValue = map.item(j).getNodeValue();
+                    }
+                    LOGGER.debug(".. parameter: " + paramName + "=" + paramValue);
+                    Globals.schedulerVariables.put(paramName, paramValue);
+                }
+            }
+        }
+    }
 
     protected String getParent(String path) {
         return Globals.getParent(path);

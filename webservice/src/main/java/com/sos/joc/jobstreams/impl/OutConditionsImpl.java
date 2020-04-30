@@ -62,6 +62,10 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            readJobSchedulerVariables();
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             checkRequiredParameter("job", jobFilterSchema.getJobs());
