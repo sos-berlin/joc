@@ -11,8 +11,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.Path;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -41,6 +44,7 @@ import com.sos.jobstreams.resolver.JSOutConditions;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobstreams.resource.IInConditionsResource;
 import com.sos.joc.model.job.JobPath;
@@ -67,6 +71,8 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
     public JOCDefaultResponse getJobInConditions(String accessToken, byte[] filterBytes) {
 
         try {
+
+
             JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
             ConditionJobsFilter conditionJobsFilterSchema = Globals.objectMapper.readValue(filterBytes, ConditionJobsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionJobsFilterSchema, accessToken, conditionJobsFilterSchema
@@ -75,6 +81,10 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            readJobSchedulerVariables();
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             checkRequiredParameter("jobs", conditionJobsFilterSchema.getJobs());
@@ -254,17 +264,19 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                     conditionRef.setExpressions(expressions);
                     jobstreamConditions.getJobs().add(conditionRef);
                 });
-                
+
                 for (JSCondition jsCondition : listOfConditions) {
-                    if (jobstreamConditions.getJobStream().equals(jsInCondition.getJobStream()) || jobstreamConditions.getJobStream().equals(jsCondition.getConditionJobStream())) {
+                    if (jobstreamConditions.getJobStream().equals(jsInCondition.getJobStream()) || jobstreamConditions.getJobStream().equals(
+                            jsCondition.getConditionJobStream())) {
                         listOfJobStreamConditionsSet.add(jobstreamConditions);
                     }
                 }
 
             });
-            for (JobstreamConditions jobstreamConditions:listOfJobStreamConditionsSet) {
+            for (JobstreamConditions jobstreamConditions : listOfJobStreamConditionsSet) {
                 listOfJobStreamConditions.add(jobstreamConditions);
-            };
+            }
+            ;
 
         }
 

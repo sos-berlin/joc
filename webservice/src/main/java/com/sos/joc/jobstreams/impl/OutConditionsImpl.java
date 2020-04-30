@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
@@ -58,13 +59,19 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
     public JOCDefaultResponse getJobOutConditions(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         try {
+
             JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
             ConditionJobsFilter conditionJobsFilterSchema = Globals.objectMapper.readValue(filterBytes, ConditionJobsFilter.class);
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionJobsFilterSchema, accessToken, conditionJobsFilterSchema.getJobschedulerId(),
-                    getPermissonsJocCockpit(conditionJobsFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionJobsFilterSchema, accessToken, conditionJobsFilterSchema
+                    .getJobschedulerId(), getPermissonsJocCockpit(conditionJobsFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView()
+                            .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            readJobSchedulerVariables();
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             checkRequiredParameter("job", conditionJobsFilterSchema.getJobs());
@@ -128,7 +135,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsOutCondition.getExpression());
                         if (contextId != null) {
-                            conditionExpression.setValue(jsConditionResolver.validate(exit,contextId, jsOutCondition));
+                            conditionExpression.setValue(jsConditionResolver.validate(exit, contextId, jsOutCondition));
                         }
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                         outCondition.setConditionExpression(conditionExpression);
@@ -192,10 +199,10 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 if ("create".equals(event.getCommand())) {
                     for (JSCondition jsCondition : listOfConditions) {
                         if (jsCondition.typeIsEvent() && (jsCondition.typeIsGlobalEvent() == event.getGlobalEvent())) {
-                            String jsConditionJobStream="";
+                            String jsConditionJobStream = "";
                             if (jsCondition.getConditionJobStream().isEmpty()) {
                                 jsConditionJobStream = outCondition.getJobStream();
-                            }else {
+                            } else {
                                 jsConditionJobStream = jsCondition.getConditionJobStream();
                             }
                             if (jsCondition.getEventName().equals(event.getEvent()) && (jobStream.equals(jsConditionJobStream) || outCondition

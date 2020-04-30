@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -211,7 +212,7 @@ public class JOCResourceImpl {
         }
         return true;
     }
-    
+
     public boolean checkRequiredParameter(String paramKey, JobSchedulerObjectType paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null || paramVal.value().isEmpty()) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
@@ -319,7 +320,7 @@ public class JOCResourceImpl {
             return null;
         }
     }
-    
+
     public String getAccount() {
         try {
             return jobschedulerUser.getSosShiroCurrentUser().getUsername().trim();
@@ -477,10 +478,34 @@ public class JOCResourceImpl {
 
     }
 
+    protected void readJobSchedulerVariables() throws Exception {
+        if (Globals.schedulerVariables == null) {
+            Globals.schedulerVariables = new HashMap<String, String>();
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+            jocXmlCommand.executePostWithThrowBadRequest("<params.get/>", accessToken);
+            org.w3c.dom.NodeList schedulerParameters = jocXmlCommand.selectNodelist("//param");
+            for (int i = 0; i < schedulerParameters.getLength(); i++) {
+                org.w3c.dom.Node param = schedulerParameters.item(i);
+
+                org.w3c.dom.NamedNodeMap map = param.getAttributes();
+                for (int j = 0; j < map.getLength(); j++) {
+                    String paramName = map.item(j).getNodeValue();
+                    String paramValue = "";
+                    if (map.getLength() > 1) {
+                        j++;
+                        paramValue = map.item(j).getNodeValue();
+                    }
+                    LOGGER.debug(".. parameter: " + paramName + "=" + paramValue);
+                    Globals.schedulerVariables.put(paramName, paramValue);
+                }
+            }
+        }
+    }
+
     protected String getParent(String path) {
         return Globals.getParent(path);
     }
-    
+
     protected boolean canAdd(String path, Set<Folder> listOfFolders) {
         return folderPermissions.isPermittedForFolder(getParent(path), listOfFolders);
     }
