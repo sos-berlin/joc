@@ -1,7 +1,6 @@
 package com.sos.auth.rest;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.config.IniSecurityManagerFactory;
@@ -32,11 +30,9 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMasters;
 import com.sos.auth.rest.permission.model.SOSPermissionRoles;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JocCockpitProperties;
-import com.sos.joc.db.configuration.JocConfigurationDbLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
@@ -45,7 +41,6 @@ import sos.util.SOSSerializerUtil;
 
 public class SOSPermissionsCreator {
 
-    private static final String SHIRO_SESSION = "SHIRO_SESSION";
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSPermissionsCreator.class);
     private SOSShiroCurrentUser currentUser;
     private SOSPermissionRoles roles;
