@@ -16,6 +16,8 @@ import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.DefaultSessionKey;
+import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,46 +56,7 @@ public class SOSPermissionsCreator {
         this.currentUser = currentUser;
     }
 
-    private Session readSessionFromDb(Serializable sessionId) {
-        SOSHibernateSession sosHibernateSession = null;
-        try {
-
-            String sessionIdString = "";
-            if (sessionId != null) {
-                sessionIdString = sessionId.toString();
-            }
-            LOGGER.debug("SOSDistributedSessionDAO: readSessionFromDb: " + sessionIdString);
-
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
-
-            sosHibernateSession.setAutoCommit(false);
-            Globals.beginTransaction(sosHibernateSession);
-
-            JocConfigurationDbItem jocConfigurationDbItem;
-            JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
-            jocConfigurationDBLayer.getFilter().setAccount(".");
-            jocConfigurationDBLayer.getFilter().setName(sessionIdString);
-            jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
-            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
-            Globals.commit(sosHibernateSession);
-            sosHibernateSession.close();
-
-            if (listOfConfigurtions.size() > 0) {
-                jocConfigurationDbItem = listOfConfigurtions.get(0);
-                return (Session) SOSSerializerUtil.fromString(jocConfigurationDbItem.getConfigurationItem());
-            } else {
-                return null;
-            }
-        } catch (SOSHibernateException e) {
-            throw new RuntimeException(e);
-
-        } catch (JocException e) {
-            throw new RuntimeException(e);
-        } finally {
-            Globals.disconnect(sosHibernateSession);
-        }
-    }
-
+    
     public void loginFromAccessToken(String accessToken) throws JocException {
         SOSHibernateSession sosHibernateSession = null;
         try {
@@ -123,7 +86,9 @@ public class SOSPermissionsCreator {
                 SecurityUtils.setSecurityManager(securityManager);
                 LOGGER.debug("loginFromAccessToken --> securityManager created");
 
-                Session session = readSessionFromDb(accessToken);
+                SessionKey s = new DefaultSessionKey(accessToken);
+                Session session = SecurityUtils.getSecurityManager().getSession(s);
+
                 if (session != null) {
                     Subject subject = new Subject.Builder(securityManager).sessionId(accessToken).session(session).buildSubject();
                     LOGGER.debug("loginFromAccessToken --> subject created");
