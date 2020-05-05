@@ -137,7 +137,12 @@ public class JOCResourceImpl {
         }
         return date;
     }
-
+    
+    public Date getDateFromTimestamp(Long timeStamp) {
+        Instant fromEpochMilli = Instant.ofEpochMilli(timeStamp / 1000);
+        return Date.from(fromEpochMilli);
+    }
+    
     private boolean sessionExistInDb(String sessionIdString) {
         SOSHibernateSession sosHibernateSession = null;
         try {
