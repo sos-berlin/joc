@@ -35,6 +35,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.audit.IAuditLog;
 import com.sos.joc.classes.audit.JocAuditLog;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
+import com.sos.joc.db.configuration.JocConfigurationFilter;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -149,10 +150,12 @@ public class JOCResourceImpl {
             sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOCResourceImpl");
 
             JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
-            jocConfigurationDBLayer.getFilter().setAccount(".");
-            jocConfigurationDBLayer.getFilter().setName(sessionIdString);
-            jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
-            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
+            JocConfigurationFilter filter = new JocConfigurationFilter();
+
+            filter.setAccount(".");
+            filter.setName(sessionIdString);
+            filter.setConfigurationType(SHIRO_SESSION);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter,0);
             sosHibernateSession.close();
 
             return (listOfConfigurtions.size() > 0);

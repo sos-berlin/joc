@@ -17,6 +17,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.configurations.resource.IJocConfigurationsResource;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
+import com.sos.joc.db.configuration.JocConfigurationFilter;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.configuration.Configuration;
@@ -68,13 +69,15 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
 
-            jocConfigurationDBLayer.getFilter().setObjectType(objectType);
-            jocConfigurationDBLayer.getFilter().setSchedulerId(configurationsFilter.getJobschedulerId());
-            jocConfigurationDBLayer.getFilter().setConfigurationType(configurationType);
-            jocConfigurationDBLayer.getFilter().setAccount(configurationsFilter.getAccount());
-            jocConfigurationDBLayer.getFilter().setShared(configurationsFilter.getShared());
+            JocConfigurationFilter filter = new JocConfigurationFilter();
 
-            List<JocConfigurationDbItem> listOfJocConfigurationDbItem = jocConfigurationDBLayer.getJocConfigurationList(0);
+            filter.setObjectType(objectType);
+            filter.setSchedulerId(configurationsFilter.getJobschedulerId());
+            filter.setConfigurationType(configurationType);
+            filter.setAccount(configurationsFilter.getAccount());
+            filter.setShared(configurationsFilter.getShared());
+
+            List<JocConfigurationDbItem> listOfJocConfigurationDbItem = jocConfigurationDBLayer.getJocConfigurationList(filter,0);
             Configurations configurations = new Configurations();
             List<Configuration> listOfConfigurations = new ArrayList<Configuration>();
             // cleanup wrongfully duplicated Profile entries
@@ -90,8 +93,8 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
                 String defaultProfileAccount = Globals.sosShiroProperties.getProperty("default_profile_account", "").trim();
                 String currentAccount = configurationsFilter.getAccount();
                 if (!defaultProfileAccount.isEmpty() && !defaultProfileAccount.equalsIgnoreCase(currentAccount)) {
-                    jocConfigurationDBLayer.getFilter().setAccount(defaultProfileAccount);
-                    listOfJocConfigurationDbItem = cleanupProfileDuplicates(jocConfigurationDBLayer.getJocConfigurationList(0));
+                    filter.setAccount(defaultProfileAccount);
+                    listOfJocConfigurationDbItem = cleanupProfileDuplicates(jocConfigurationDBLayer.getJocConfigurationList(filter,0));
                     //if default_profile_account profile exist then store it for new user
                     if (listOfJocConfigurationDbItem != null && !listOfJocConfigurationDbItem.isEmpty()) {
                         listOfJocConfigurationDbItem.get(0).setAccount(currentAccount);

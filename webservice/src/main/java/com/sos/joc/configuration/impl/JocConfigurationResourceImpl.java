@@ -12,6 +12,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.configuration.resource.IJocConfigurationResource;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
+import com.sos.joc.db.configuration.JocConfigurationFilter;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.configuration.Configuration;
@@ -38,9 +39,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         /** check general required parameters */
         checkRequiredParameter("id", configuration.getId());
 
-        /** set general filter */
-        jocConfigurationDBLayer.getFilter().setId(configuration.getId().longValue());
-        jocConfigurationDBLayer.getFilter().setSchedulerId(configuration.getJobschedulerId());
+      
     }
 
     @Override
