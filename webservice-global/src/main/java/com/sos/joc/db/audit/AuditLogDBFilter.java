@@ -1,21 +1,20 @@
 package com.sos.joc.db.audit;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.stream.Collectors;
+
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.model.audit.AuditLogFilter;
 import com.sos.joc.model.common.Folder;
-import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.order.OrderPath;
 
 public class AuditLogDBFilter {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogDBFilter.class);
 	private Date createdFrom;
 	private Date createdTo;
 	private String schedulerId = "";
@@ -26,25 +25,20 @@ public class AuditLogDBFilter {
 	private String ticketLink;
 	private String account;
 	private String reason;
+	private Set<String> requests;
+    
 
 	public AuditLogDBFilter() {
 		super();
 	}
 
 	public AuditLogDBFilter(AuditLogFilter auditLogFilter) throws JobSchedulerInvalidResponseDataException {
-		schedulerId = auditLogFilter.getJobschedulerId();
-		listOfFolders = auditLogFilter.getFolders();
-		for (JobPath j: auditLogFilter.getJobs()) {
-			addJob(j.getJob());
-		}
-		listOfOrders = auditLogFilter.getOrders();
-		ticketLink = auditLogFilter.getTicketLink();
-		account = auditLogFilter.getAccount();
-		listOfCalendars = auditLogFilter.getCalendars();
-
-		createdFrom = JobSchedulerDate.getDateFrom(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone());
-		createdTo = JobSchedulerDate.getDateTo(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone());
-		reason = auditLogFilter.getRegex();
+		setSchedulerId(auditLogFilter.getJobschedulerId());
+		setTicketLink(auditLogFilter.getTicketLink());
+		setAccount(auditLogFilter.getAccount());
+		setRequests(auditLogFilter.getRequests());
+		setCreatedFrom(JobSchedulerDate.getDateFrom(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone()));
+		setCreatedTo(JobSchedulerDate.getDateTo(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone()));
 	}
 
 	public List<String> getListOfCalendars() {
@@ -176,12 +170,19 @@ public class AuditLogDBFilter {
 	}
 
 	public List<String> getStringListOfFolders() {
-		ArrayList<String> l = new ArrayList<String>();
-		for (Folder f: listOfFolders) {
-			l.add(f.getFolder());
-		}
-		return l;
+		return listOfFolders.stream().map(Folder::getFolder).collect(Collectors.toList());
 	}
 
+    public Set<String> getRequests() {
+        return requests;
+    }
+
+    public void setRequests(Collection<String> request) {
+        if (request != null) {
+            this.requests = request.stream().map(r -> r.replaceFirst("^(\\.?/)?", "./")).collect(Collectors.toSet());
+        } else {
+            this.requests = null;
+        }
+    }
 	 
 }

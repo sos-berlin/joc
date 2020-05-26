@@ -1,6 +1,7 @@
 package com.sos.joc.db.audit;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.TemporalType;
 
@@ -26,7 +27,7 @@ public class AuditLogDBLayer extends DBLayer {
         String where = "";
         String and = "";
 
-        if (filter.getSchedulerId() != null && !"".equals(filter.getSchedulerId())) {
+        if (filter.getSchedulerId() != null && !filter.getSchedulerId().isEmpty()) {
             where += and + " schedulerId = :schedulerId";
             and = " and ";
         } else {
@@ -40,6 +41,10 @@ public class AuditLogDBLayer extends DBLayer {
         }
         if (filter.getCreatedTo() != null) {
             where += and + " created < :to";
+            and = " and ";
+        }
+        if (filter.getRequests() != null && !filter.getRequests().isEmpty()) {
+            where += and + " request in (:requests)";
             and = " and ";
         }
         if (filter.getTicketLink() != null && !filter.getTicketLink().isEmpty()) {
@@ -61,8 +66,19 @@ public class AuditLogDBLayer extends DBLayer {
         }
 
         if (filter.getListOfFolders() != null && !filter.getListOfFolders().isEmpty()) {
-            where += and + SearchStringHelper.getStringListPathSql(filter.getStringListOfFolders(), "folder");
-            and = " and ";
+            String clause = filter.getListOfFolders().stream().map(folder -> {
+                if (folder.getRecursive()) {
+                    return "(folder = '" + folder.getFolder() + "' or folder like '" + (folder.getFolder() + "/%").replaceAll(
+                            "//+", "/") + "')";
+                } else {
+                    return "folder = '" + folder.getFolder() + "'";
+                }
+            }).collect(Collectors.joining(" or "));
+            if (filter.getListOfFolders().size() > 1) {
+                clause = "(" + clause + ")";
+            }
+            where += and + " " + clause;
+            and = " and";
         }
 
         if (filter.getListOfCalendars() != null && !filter.getListOfCalendars().isEmpty()) {
@@ -122,6 +138,9 @@ public class AuditLogDBLayer extends DBLayer {
         }
         if (filter.getReason() != null && !filter.getReason().isEmpty()) {
             query.setParameter("comment", filter.getReason());
+        }
+        if (filter.getRequests() != null && !filter.getRequests().isEmpty()) {
+            query.setParameterList("requests", filter.getRequests());
         }
     }
 

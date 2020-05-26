@@ -56,6 +56,12 @@
     "account": {
       "$ref": "../common/string255-schema.json"
     },
+    "requests": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/string255-schema.json"
+      }
+    },
     "regex": {
       "$ref": "../common/regexFilter-schema.json"
     },
