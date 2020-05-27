@@ -2,19 +2,14 @@ package com.sos.joc.calendar.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.exception.SOSInvalidDataException;
-import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarDatesResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendars.CalendarResolver;
-import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.CalendarDatesFilter;
-import com.sos.joc.model.calendar.CalendarObjectFilter;
 import com.sos.joc.model.calendar.Dates;
 import com.sos.schema.JsonValidator;
 
