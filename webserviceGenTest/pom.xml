@@ -118,9 +118,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<version>${project.version}</version>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-xml</artifactId>
+            <version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sos-berlin.jobscheduler</groupId>
