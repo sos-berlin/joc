@@ -132,7 +132,7 @@ public class JsonValidator {
             put("InConditions", "jobstreams/inconditions-schema.json");
             put("OutConditions", "jobstreams/outconditions-schema.json");
             put("JobStreams", "jobstreams/jobStreams-schema.json");
-            put("JobStreamsFilter", "jobstreams/JobStreamsFilter-schema.json");
+            put("JobStreamsFilter", "jobstreams/jobstreamsFilter-schema.json");
 
             put("ApplyConfiguration", "xmleditor/apply/apply-configuration-schema.json");
             put("SchemaAssignConfiguration", "xmleditor/schema/assign/schema-assign-configuration-schema.json");
