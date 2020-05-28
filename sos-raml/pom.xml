@@ -294,7 +294,7 @@
 		<dependency>
 			<groupId>com.sos-berlin</groupId>
 			<artifactId>sos-annotator</artifactId>
-			<scope>compile</scope>
+			<scope>provided</scope>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

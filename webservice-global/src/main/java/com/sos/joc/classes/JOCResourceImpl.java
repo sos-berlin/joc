@@ -172,6 +172,10 @@ public class JOCResourceImpl {
     public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws JocException {
         this.accessToken = accessToken;
 
+
+        SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
+        sosPermissionsCreator.loginFromAccessToken(accessToken);
+
         SessionKey s = new DefaultSessionKey(accessToken);
         Session session = SecurityUtils.getSecurityManager().getSession(s);
         if ("true".equals(session.getAttribute("dao"))) {
@@ -197,8 +201,6 @@ public class JOCResourceImpl {
         if (jobschedulerUser == null) {
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
-        SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
-        sosPermissionsCreator.loginFromAccessToken(accessToken);
 
         initLogging(request, body);
         return init(schedulerId, permission);
