@@ -31,35 +31,13 @@
     "jobs": {
       "type": "array",
       "items": {
-        "javaType": "com.sos.joc.model.job.JobPath",
-        "type": "object",
-        "required": [
-          "job"
-        ],
-        "properties": {
-          "job": {
-            "$ref": "../common/path-schema.json"
-          }
-        }
+        "$ref": "../job/jobPath-schema.json"
       }
     },
     "orders": {
       "type": "array",
       "items": {
-        "javaType": "com.sos.joc.model.order.OrderPath",
-        "type": "object",
-        "required": [
-          "jobChain"
-        ],
-        "properties": {
-          "jobChain": {
-            "$ref": "../common/path-schema.json"
-          },
-          "orderId": {
-            "description": "if orderId undefined or empty then all orders of specified job chain are requested",
-            "$ref": "../common/string255-schema.json"
-          }
-        }
+        "$ref": "../order/orderPath-schema.json"
       }
     },
     "folders": {
