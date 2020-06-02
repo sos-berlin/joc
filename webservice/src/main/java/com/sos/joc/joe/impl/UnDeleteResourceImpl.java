@@ -69,6 +69,7 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
             filter.setConstraint(body);
 
             DBItemJoeObject dbItem = dbLayer.getJoeObject(filter);
+            Date now = Date.from(Instant.now());
             
             if (dbItem != null) {
                 //it happens if an object is marked to delete without any changes in the configuration
@@ -77,10 +78,20 @@ public class UnDeleteResourceImpl extends JOCResourceImpl implements IUnDeleteRe
                     dbLayer.delete(dbItem);
                 } else {
                     dbItem.setOperation("store");
+                    dbItem.setAccount(getAccount());
+                    dbItem.setModified(now);
                     dbLayer.update(dbItem);
                 }
+                
+                if (body.getObjectType() == JobSchedulerObjectType.JOBCHAIN) {
+                    // restore orders, nodeparams
+                    JOEHelper.restoreOrdersAndNodeParams(dbLayer, dbLayer.getOrdersAndNodeParams(dbItem), getAccount(), now);
+                } else if (body.getObjectType() == JobSchedulerObjectType.ORDER) {
+                    // restore nodeparams
+                    JOEHelper.restoreOrdersAndNodeParams(dbLayer, dbLayer.getNodeParams(dbItem), getAccount(), now);
+                }
             }
-
+            
             try {
                 CustomEvent evt = JOEHelper.getJoeUpdatedEvent(folder);
                 SendCalendarEventsUtil.sendEvent(evt, dbItemInventoryInstance, accessToken);

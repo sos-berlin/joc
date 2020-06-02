@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jobscheduler.model.event.CustomEvent;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -14,12 +15,14 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.audit.DeployJoeAudit;
 import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.joe.DBLayerJoeLocks;
 import com.sos.joc.db.joe.DBLayerJoeObjects;
 import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JoeFolderAlreadyLockedException;
 import com.sos.joc.joe.resource.IDeleteDraftResource;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.FilterDeploy;
 import com.sos.schema.JsonValidator;
 
@@ -74,8 +77,22 @@ public class DeleteDraftResourceImpl extends JOCResourceImpl implements IDeleteD
             if ((body.getObjectName() == null || body.getObjectName().isEmpty()) && (body.getRecursive() != null && body.getRecursive())) {
                 filter.setRecursive();
             }
-
-            filter.setObjectType(body.getObjectType());
+            
+            if (body.getObjectType() == JobSchedulerObjectType.JOBCHAIN) {
+                // check if job chain exist on live folder
+                InventoryJobChainsDBLayer jobChainsDbLayer = new InventoryJobChainsDBLayer(sosHibernateSession);
+                DBItemInventoryJobChain dbItem = jobChainsDbLayer.getJobChainByPath(filter.getPath(), dbItemInventoryInstance.getId());
+                if (dbItem != null) { //if exists then only delete nodeparams draft too
+                    filter.setObjectTypes(JobSchedulerObjectType.JOBCHAIN.value(), JobSchedulerObjectType.NODEPARAMS.value());
+                } else { //delete drafts of orders and nodeparams too
+                    filter.setJobChainWithOrders(filter.getPath());
+                    filter.setObjectTypes(JobSchedulerObjectType.JOBCHAIN.value(), JobSchedulerObjectType.ORDER.value(), JobSchedulerObjectType.NODEPARAMS.value());
+                }
+            } else if (body.getObjectType() == JobSchedulerObjectType.ORDER) {
+                filter.setObjectTypes(JobSchedulerObjectType.ORDER.value(), JobSchedulerObjectType.NODEPARAMS.value());
+            } else {
+                filter.setObjectType(body.getObjectType());
+            }
 
             Globals.beginTransaction(sosHibernateSession);
             dbLayer.delete(filter);
