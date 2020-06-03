@@ -24,7 +24,7 @@ public class ExecutePatch {
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING };
 
     public static void main(String[] args) throws Exception {
-        Path executable = Paths.get(System.getProperty("java.class.path")).toAbsolutePath();
+        Path executable = Paths.get(System.getProperty("java.class.path")).toAbsolutePath().normalize();
         Path patchDir = executable.getParent().getParent();
         Path archivePath = patchDir.getParent().resolve(ARCHIVE_DIR_NAME);
         Path webAppDir = patchDir.getParent().resolve("webapps");
@@ -115,7 +115,7 @@ public class ExecutePatch {
                 } else {
                     System.out.println(String.format("File %1$s found. Patching JOC Cockpit ...", patchFilePaths.iterator().next().getFileName().toString()));
                    // copy the patch to temp dir and rename it
-                    Files.copy(patchFilePaths.iterator().next().getFileName(), tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
+                    Files.copy(patchDir.resolve(patchFilePaths.iterator().next().getFileName()), tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
                 }
                 // After patch from patches folder is processed, copy back from temp directory
                 Path copyBack = Files.copy(tempDir.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath, COPYOPTIONS);

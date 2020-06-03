@@ -357,7 +357,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
         }
 
         checkRequiredParameter("calendar path", calendar.getPath());
-        if (calendar.getIncludes() == null || calendar.getExcludes() == null) {
+        if (calendar.getIncludes() == null && calendar.getExcludes() == null) {
             throw new JocMissingRequiredParameterException("undefined frequencies");
         }
 

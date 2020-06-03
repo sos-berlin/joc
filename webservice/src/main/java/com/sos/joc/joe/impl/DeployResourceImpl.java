@@ -197,8 +197,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
 //                if (groupedJoeObjects.containsKey("JOBCHAIN")) { //delete orders and nodeparams too
 //                    List<DBItemJoeObject> allOrdersAndNodeParams = new ArrayList<DBItemJoeObject>();
 //                    for (DBItemJoeObject joeObject : groupedJoeObjects.get("JOBCHAIN")) {
-//                        List<DBItemJoeObject> ordersAndNodeParams = dbLayerJoeObjects.getOrdersAndNodeParamsOfJobChain(joeObject.getPath(), body
-//                                .getJobschedulerId());
+//                        List<DBItemJoeObject> ordersAndNodeParams = dbLayerJoeObjects.getOrdersAndNodeParams(joeObject);
 //                        if (ordersAndNodeParams != null) {
 //                            allOrdersAndNodeParams.addAll(ordersAndNodeParams);
 //                        }
