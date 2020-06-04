@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,19 +104,35 @@ public class ClusterMemberHandler {
     
     public void executeHandlerCalls(SOSHibernateSession connection) throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException,
             DBConnectionRefusedException {
-        InventoryInstancesDBLayer dbInstancesLayer = new InventoryInstancesDBLayer(connection);
-        List<DBItemInventoryInstance> clusterMembers = dbInstancesLayer.getInventoryInstancesBySchedulerId(dbItemInventoryInstance.getSchedulerId());
-        SubmissionsDBLayer dbSubmissionsLayer = new SubmissionsDBLayer(connection);
-        for (HandlerCall handlerCall : handlerCalls) {
-            updateOtherClusterMembers(handlerCall, clusterMembers, dbSubmissionsLayer);
+        if (!handlerCalls.isEmpty()) {
+            InventoryInstancesDBLayer dbInstancesLayer = new InventoryInstancesDBLayer(connection);
+            List<DBItemInventoryInstance> clusterMembers = dbInstancesLayer.getInventoryInstancesBySchedulerId(dbItemInventoryInstance
+                    .getSchedulerId());
+            Map<Long, JOCHotFolder> httpClientPerMember = null;
+            if (clusterMembers != null) {
+                httpClientPerMember = clusterMembers.stream().map(cm -> {
+                    if (Globals.jocConfigurationProperties != null) {
+                        return Globals.jocConfigurationProperties.setUrlMapping(cm);
+                    } else {
+                        return cm;
+                    }
+                }).collect(Collectors.toMap(DBItemInventoryInstance::getId, cm -> new JOCHotFolder(cm)));
+            }
+            SubmissionsDBLayer dbSubmissionsLayer = new SubmissionsDBLayer(connection);
+            for (HandlerCall handlerCall : handlerCalls) {
+                updateOtherClusterMembers(handlerCall, httpClientPerMember, dbSubmissionsLayer);
+            }
+            if (httpClientPerMember != null) {
+                httpClientPerMember.values().stream().forEach(httpCLient -> httpCLient.closeHttpClient());
+            }
         }
     }
 
-    private void updateOtherClusterMembers(HandlerCall handlerCall, List<DBItemInventoryInstance> clusterMembers,
+    private void updateOtherClusterMembers(HandlerCall handlerCall, Map<Long, JOCHotFolder> httpClientPerMember,
             SubmissionsDBLayer dbSubmissionsLayer) throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException,
             DBConnectionRefusedException {
         // ask db for other cluster members
-        JOCHotFolder httpClient = null;
+        // JOCHotFolder httpClient = null;
         boolean isUpdated = false;
         DBItemSubmittedObject dbItem = handlerCall.getDbItem();
         DBItemSubmittedObject oldDbItem = dbSubmissionsLayer.getSubmittedObject(dbItem.getSchedulerId(), dbItem.getPath());
@@ -123,45 +141,46 @@ public class ClusterMemberHandler {
             dbItem.setId(oldDbItem.getId());
             submissions = dbSubmissionsLayer.getSubmissionsBySubmissionId(oldDbItem.getId());
         }
-        if (clusterMembers != null) {
-            for (DBItemInventoryInstance clusterMember : clusterMembers) {
-                if (dbItemInventoryInstance.getId().equals(clusterMember.getId())) {
+        if (httpClientPerMember != null) {
+            for (Entry<Long, JOCHotFolder> clusterMember : httpClientPerMember.entrySet()) {
+                if (dbItemInventoryInstance.getId().equals(clusterMember.getKey())) {
                     // current JobScheduler is already updated
                     continue;
                 }
                 try {
-                    if (Globals.jocConfigurationProperties != null) {
-                        clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
-                    }
-                    successfulConnections.putIfAbsent(clusterMember.getId(), true);
-                    if (!successfulConnections.get(clusterMember.getId())) {
+//                    if (Globals.jocConfigurationProperties != null) {
+//                        clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
+//                    }
+                    successfulConnections.putIfAbsent(clusterMember.getKey(), true);
+                    if (!successfulConnections.get(clusterMember.getKey())) {
                         throw new JobSchedulerConnectionRefusedException();
                     }
-                    httpClient = new JOCHotFolder(clusterMember);
+                    //httpClient = new JOCHotFolder(clusterMember);
+                    clusterMember.getValue().setAutoCloseHttpClient(false);
                     if ("save".equals(handlerCall.getAction())) {
                         if (handlerCall.getIsFolder()) {
-                            httpClient.putFolder(dbItem.getPath());
+                            clusterMember.getValue().putFolder(dbItem.getPath());
                         } else {
-                            httpClient.putFile(dbItem.getPath(), dbItem.getContent());
+                            clusterMember.getValue().putFile(dbItem.getPath(), dbItem.getContent());
                         }
                     } else {
                         if (handlerCall.getIsFolder()) {
-                            httpClient.deleteFolder(dbItem.getPath());
+                            clusterMember.getValue().deleteFolder(dbItem.getPath());
                         } else {
-                            httpClient.deleteFile(dbItem.getPath());
+                            clusterMember.getValue().deleteFile(dbItem.getPath());
                         }
                     }
                 } catch (JobSchedulerObjectNotExistException e) {
                     //
                 } catch (JobSchedulerConnectionResetException | JobSchedulerConnectionRefusedException e) {
-                    successfulConnections.put(clusterMember.getId(), false);
+                    successfulConnections.put(clusterMember.getKey(), false);
                     // if error then store object conf in db for inventory plugin
                     if (!isUpdated) {
                         dbItem = dbSubmissionsLayer.saveOrUpdateSubmittedObject(dbItem);
                         isUpdated = true;
                     }
                     DBItemSubmission dbItemSubmission = new DBItemSubmission();
-                    dbItemSubmission.setInstanceId(clusterMember.getId());
+                    dbItemSubmission.setInstanceId(clusterMember.getKey());
                     dbItemSubmission.setSubmissionId(dbItem.getId());
                     if (!submissions.remove(dbItemSubmission)) {
                         dbItemSubmission = dbSubmissionsLayer.saveSubmission(dbItemSubmission);
@@ -174,7 +193,7 @@ public class ClusterMemberHandler {
                         isUpdated = true;
                     }
                     DBItemSubmission dbItemSubmission = new DBItemSubmission();
-                    dbItemSubmission.setInstanceId(clusterMember.getId());
+                    dbItemSubmission.setInstanceId(clusterMember.getKey());
                     dbItemSubmission.setSubmissionId(dbItem.getId());
                     if (!submissions.remove(dbItemSubmission)) {
                         dbItemSubmission = dbSubmissionsLayer.saveSubmission(dbItemSubmission);
