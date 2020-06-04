@@ -17,6 +17,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ibm.icu.util.TimeZone;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.joc.Globals;
 
@@ -34,7 +35,7 @@ public class JocServletContainer extends ServletContainer {
     public void init() throws ServletException {
         LOGGER.debug("----> init on starting JOC");
         super.init();
-
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         try {
             cleanupOldDeployedFolders(false);
         } catch (Exception e) {
