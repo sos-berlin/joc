@@ -50,7 +50,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
             sosHibernateSession.setAutoCommit(false);
             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerJobStreamStarters.deleteInsert(jobStreamStarters);
+            dbLayerJobStreamStarters.deleteInsert(jobStreamStarters, dbItemInventoryInstance.getTimeZone());
             sosHibernateSession.commit();
             try {
                 notifyEventHandler(accessToken);
