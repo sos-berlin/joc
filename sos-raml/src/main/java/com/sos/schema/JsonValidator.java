@@ -131,6 +131,7 @@ public class JsonValidator {
             put("ConditionEvent", "jobstreams/conditionEvent-schema.json");
             put("InConditions", "jobstreams/inconditions-schema.json");
             put("OutConditions", "jobstreams/outconditions-schema.json");
+            put("JobStream", "jobstreams/jobstream-schema.json");
             put("JobStreams", "jobstreams/jobStreams-schema.json");
             put("JobStreamsFilter", "jobstreams/jobstreamsFilter-schema.json");
 
