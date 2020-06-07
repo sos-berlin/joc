@@ -23,6 +23,7 @@ import com.sos.jitl.jobstreams.db.FilterJobStreams;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.jobstreams.JobStreamMigrator;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IJobStreamsResource;
@@ -57,7 +58,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_LIST_JOBSTREAM);
 
-            DBLayerJobStreams dbLayerEvents = new DBLayerJobStreams(sosHibernateSession);
+            DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
             DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
             DBLayerJobStreamParameters dbLayerJobStreamParameters = new DBLayerJobStreamParameters(sosHibernateSession);
@@ -72,10 +73,13 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             filterJobStreams.setStatus(jobStreamsFilter.getStatus());
             filterJobStreams.setFolder(jobStreamsFilter.getFolder());
 
-            List<DBItemJobStream> listOfJobStreams = dbLayerEvents.getJobStreamsList(filterJobStreams, jobStreamsFilter.getLimit());
+            List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, jobStreamsFilter.getLimit());
             JobStreams jobStreams = new JobStreams();
             jobStreams.setDeliveryDate(new Date());
-
+            
+            JobStreamMigrator jobStreamMigrator = new JobStreamMigrator();
+            jobStreamMigrator.migrate(sosHibernateSession);
+ 
             for (DBItemJobStream dbItemJobStream : listOfJobStreams) {
 
                 JobStream jobStream = new JobStream();
