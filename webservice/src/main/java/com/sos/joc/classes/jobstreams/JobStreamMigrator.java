@@ -20,7 +20,6 @@ import com.sos.jitl.jobstreams.db.DBLayerInConditions;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreams;
 import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
 import com.sos.jitl.jobstreams.db.FilterInConditions;
-import com.sos.jitl.jobstreams.db.FilterJobStreams;
 import com.sos.jitl.jobstreams.db.FilterOutConditions;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.DBOpenSessionException;
@@ -42,7 +41,9 @@ public class JobStreamMigrator {
 
     private void addStarter(SOSHibernateSession sosHibernateSession, DBItemJobStream dbItemJobStream) throws SOSHibernateException {
         for (DBItemOutCondition dbItemOutCondition : listOfOutConditions) {
-            if (dbItemJobStream.getJobStream().equals(dbItemOutCondition.getJobStream()) && !setOfJobsFromIn.contains(dbItemOutCondition.getJob())) {
+            String folder = Paths.get(dbItemOutCondition.getJob()).getParent().toString().replace("\\", "/");
+                    
+            if (folder.equals(dbItemJobStream.getFolder()) && dbItemJobStream.getJobStream().equals(dbItemOutCondition.getJobStream()) && !setOfJobsFromIn.contains(dbItemOutCondition.getJob())) {
                 DBItemJobStreamStarter dbItemJobStreamStarter = new DBItemJobStreamStarter();
                 dbItemJobStreamStarter.setCreated(new Date());
                 dbItemJobStreamStarter.setJobStream(dbItemJobStream.getId());
@@ -62,9 +63,10 @@ public class JobStreamMigrator {
 
     private void createJobStreams(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
         for (DBItemInCondition inCondition : listOfInConditions) {
+            String folder = Paths.get(inCondition.getJob()).getParent().toString().replace("\\", "/");
 
-            if (!setOfJobStreams134.contains(inCondition.getJobStream())) {
-                setOfJobStreams134.add(inCondition.getJobStream());
+            if (!setOfJobStreams134.contains(folder + '/' + inCondition.getJobStream())) {
+                setOfJobStreams134.add(folder + '/' + inCondition.getJobStream());
                 DBItemJobStream dbItemJobStream = new DBItemJobStream();
                 dbItemJobStream.setCreated(new Date());
                 dbItemJobStream.setJobStream(inCondition.getJobStream());
@@ -78,9 +80,10 @@ public class JobStreamMigrator {
         }
 
         for (DBItemOutCondition outCondition : listOfOutConditions) {
+            String folder = Paths.get(outCondition.getJob()).getParent().toString().replace("\\", "/");
 
-            if (!setOfJobStreams134.contains(outCondition.getJobStream())) {
-                setOfJobStreams134.add(outCondition.getJobStream());
+            if (!setOfJobStreams134.contains(folder + '/' + outCondition.getJobStream())) {
+                setOfJobStreams134.add(folder + '/' + outCondition.getJobStream());
                 DBItemJobStream dbItemJobStream = new DBItemJobStream();
                 dbItemJobStream.setCreated(new Date());
                 dbItemJobStream.setJobStream(outCondition.getJobStream());
@@ -107,10 +110,8 @@ public class JobStreamMigrator {
             DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
 
-            FilterJobStreams filterJobStreams = new FilterJobStreams();
             FilterInConditions filterInConditions = new FilterInConditions();
             FilterOutConditions filterOutConditions = new FilterOutConditions();
-            List<DBItemJobStream> listOfJobStreamsIn134 = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 0);
             listOfInConditions = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
             listOfOutConditions = dbLayerOutConditions.getSimpleOutConditionsList(filterOutConditions, 0);
             if (listOfOutConditions.size() > 0) {
@@ -118,10 +119,6 @@ public class JobStreamMigrator {
 
                 setOfJobsFromIn = new HashSet<String>();
                 setOfJobStreams134 = new HashSet<String>();
-
-                for (DBItemJobStream dbItemJobStream : listOfJobStreamsIn134) {
-                    setOfJobStreams134.add(dbItemJobStream.getJobStream());
-                }
 
                 for (DBItemInCondition dbItemInCondition : listOfInConditions) {
                     dbItemInCondition.setFolder(Paths.get(dbItemInCondition.getJob()).getParent().toString().replace("\\", "/"));
@@ -135,11 +132,10 @@ public class JobStreamMigrator {
                 this.createJobStreams(sosHibernateSession);
 
                 sosHibernateSession.commit();
-                LOGGER.info("Migration of Job Stream configurations finished. %s job streams imported successful",counter);
+                LOGGER.info(String.format("Migration of Job Stream configurations finished. %s job streams imported successful",counter));
             }
         }
-        // Für alle Jobs, die eine Run-Time haben, einen Starter und einen StarterJob erzeugen
-
+ 
     }
 
 }
