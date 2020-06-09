@@ -152,7 +152,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             sosHibernateSession.setAutoCommit(false);
             sosHibernateSession.beginTransaction();
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
-            dbLayerJobStreams.deleteInsert(jobStream);
+            dbLayerJobStreams.deleteInsert(jobStream,dbItemInventoryInstance.getTimeZone());
             sosHibernateSession.commit();
 
             notifyEventHandler(accessToken);
