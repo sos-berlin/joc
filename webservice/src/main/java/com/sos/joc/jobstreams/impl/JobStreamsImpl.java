@@ -78,7 +78,9 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             jobStreams.setDeliveryDate(new Date());
             
             JobStreamMigrator jobStreamMigrator = new JobStreamMigrator();
-            jobStreamMigrator.migrate(sosHibernateSession);
+            if (jobStreamMigrator.migrate(sosHibernateSession)) {
+                notifyEventHandler(accessToken);
+            }
  
             for (DBItemJobStream dbItemJobStream : listOfJobStreams) {
 

@@ -42,8 +42,9 @@ public class JobStreamMigrator {
     private void addStarter(SOSHibernateSession sosHibernateSession, DBItemJobStream dbItemJobStream) throws SOSHibernateException {
         for (DBItemOutCondition dbItemOutCondition : listOfOutConditions) {
             String folder = Paths.get(dbItemOutCondition.getJob()).getParent().toString().replace("\\", "/");
-                    
-            if (folder.equals(dbItemJobStream.getFolder()) && dbItemJobStream.getJobStream().equals(dbItemOutCondition.getJobStream()) && !setOfJobsFromIn.contains(dbItemOutCondition.getJob())) {
+
+            if (folder.equals(dbItemJobStream.getFolder()) && dbItemJobStream.getJobStream().equals(dbItemOutCondition.getJobStream())
+                    && !setOfJobsFromIn.contains(dbItemOutCondition.getJob())) {
                 DBItemJobStreamStarter dbItemJobStreamStarter = new DBItemJobStreamStarter();
                 dbItemJobStreamStarter.setCreated(new Date());
                 dbItemJobStreamStarter.setJobStream(dbItemJobStream.getId());
@@ -62,6 +63,8 @@ public class JobStreamMigrator {
     }
 
     private void createJobStreams(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        Set<DBItemJobStream> addStarterFor = new HashSet<DBItemJobStream>();
+
         for (DBItemInCondition inCondition : listOfInConditions) {
             String folder = Paths.get(inCondition.getJob()).getParent().toString().replace("\\", "/");
 
@@ -74,8 +77,8 @@ public class JobStreamMigrator {
                 dbItemJobStream.setState(ACTIVE);
                 dbItemJobStream.setFolder(Paths.get(inCondition.getJob()).getParent().toString().replace("\\", "/"));
                 sosHibernateSession.save(dbItemJobStream);
+                addStarterFor.add(dbItemJobStream);
                 counter = counter + 1;
-                addStarter(sosHibernateSession, dbItemJobStream);
             }
         }
 
@@ -91,14 +94,17 @@ public class JobStreamMigrator {
                 dbItemJobStream.setState(ACTIVE);
                 dbItemJobStream.setFolder(Paths.get(outCondition.getJob()).getParent().toString().replace("\\", "/"));
                 sosHibernateSession.save(dbItemJobStream);
+                addStarterFor.add(dbItemJobStream);
                 counter = counter + 1;
-                addStarter(sosHibernateSession, dbItemJobStream);
             }
+        }
+        for (DBItemJobStream dbItemJobStream : addStarterFor) {
+            addStarter(sosHibernateSession, dbItemJobStream);
         }
     }
 
-    public void migrate(SOSHibernateSession sosHibernateSession) throws JocConfigurationException, DBOpenSessionException, SOSHibernateException {
-
+    public boolean migrate(SOSHibernateSession sosHibernateSession) throws JocConfigurationException, DBOpenSessionException, SOSHibernateException {
+        boolean haveMigrated = false;
         sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOBSTREAM_MIGRATOR");
         sosHibernateSession.beginTransaction();
         DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
@@ -132,10 +138,11 @@ public class JobStreamMigrator {
                 this.createJobStreams(sosHibernateSession);
 
                 sosHibernateSession.commit();
-                LOGGER.info(String.format("Migration of Job Stream configurations finished. %s job streams imported successful",counter));
+                LOGGER.info(String.format("Migration of Job Stream configurations finished. %s job streams imported successful", counter));
+                haveMigrated = true;
             }
         }
- 
+        return haveMigrated;
     }
 
 }
