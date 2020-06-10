@@ -102,10 +102,10 @@ public class CalendarUsedByWriter {
                     }
                 }
             }
-            //JOC-887 don't delete (empty) calendars
-//            for (DBItemInventoryClusterCalendarUsage dbItem : dbCalendarUsage) {
-//                calendarUsageDBLayer.deleteCalendarUsage(dbItem);
-//            }
+            //TODO JOC-887 don't delete (empty) calendars
+            for (DBItemInventoryClusterCalendarUsage dbItem : dbCalendarUsage) {
+                calendarUsageDBLayer.deleteCalendarUsage(dbItem);
+            }
             sosHibernateSession.commit();
         } catch (Exception e) {
             sosHibernateSession.rollback();
