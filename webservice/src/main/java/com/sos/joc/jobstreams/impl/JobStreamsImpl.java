@@ -73,13 +73,15 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             filterJobStreams.setStatus(jobStreamsFilter.getStatus());
             filterJobStreams.setFolder(jobStreamsFilter.getFolder());
 
+            JobStreamMigrator jobStreamMigrator = new JobStreamMigrator();
+            if (jobStreamMigrator.migrate(sosHibernateSession)) {
+                notifyEventHandler(accessToken);
+            }
+            
             List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, jobStreamsFilter.getLimit());
             JobStreams jobStreams = new JobStreams();
             jobStreams.setDeliveryDate(new Date());
             
-            JobStreamMigrator jobStreamMigrator = new JobStreamMigrator();
-            jobStreamMigrator.migrate(sosHibernateSession);
- 
             for (DBItemJobStream dbItemJobStream : listOfJobStreams) {
 
                 JobStream jobStream = new JobStream();
