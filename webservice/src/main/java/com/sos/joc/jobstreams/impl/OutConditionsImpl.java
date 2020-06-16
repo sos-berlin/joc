@@ -112,7 +112,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 filterOutConditions.setJob(job.getJob());
                 filterOutConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
-                JSConditionResolver jsConditionResolver = new JSConditionResolver(sosHibernateSession, conditionJobsFilterSchema.getJobschedulerId());
+                JSConditionResolver jsConditionResolver = new JSConditionResolver(conditionJobsFilterSchema.getJobschedulerId());
                 jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
                 jsConditionResolver.initEvents(sosHibernateSession);
 
@@ -135,7 +135,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsOutCondition.getExpression());
                         if (contextId != null) {
-                            conditionExpression.setValue(jsConditionResolver.validate(exit, contextId, jsOutCondition));
+                            conditionExpression.setValue(jsConditionResolver.validate(sosHibernateSession,exit, contextId, jsOutCondition));
                         }
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                         outCondition.setConditionExpression(conditionExpression);

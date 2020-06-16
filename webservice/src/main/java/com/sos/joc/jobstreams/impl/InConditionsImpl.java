@@ -116,7 +116,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 filterInConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                 filterInConditions.setJob(job.getJob());
 
-                jsConditionResolver = new JSConditionResolver(sosHibernateSession, conditionJobsFilterSchema.getJobschedulerId());
+                jsConditionResolver = new JSConditionResolver(conditionJobsFilterSchema.getJobschedulerId());
                 jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
                 jsConditionResolver.initEvents(sosHibernateSession);
 
@@ -151,7 +151,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsInCondition.getExpression());
                         if (contextId != null) {
-                            conditionExpression.setValue(jsConditionResolver.validate(null, contextId, jsInCondition));
+                            conditionExpression.setValue(jsConditionResolver.validate(sosHibernateSession, null, contextId, jsInCondition));
                         }
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
                         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
