@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <project
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.sos-berlin</groupId>
 		<artifactId>joc</artifactId>
-		<version>1.13.4</version>
+		<version>1.13.4-patch-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.sos-berlin.joc</groupId>
@@ -234,26 +235,31 @@
 							<target description="modify initial values">
 								<!-- to provide that at least an empty run_time is created at job -->
 								<replaceregexp flags="ig" byline="true"
-									match="(private RunTime runTime)( = null)?;" replace="\1 = new RunTime();"
+									match="(private RunTime runTime)( = null)?;"
+									replace="\1 = new RunTime();"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/job/Job.java"
 									preserveLastModified="true" />
 								<!-- to provide that at least an empty run_time is created at order -->
 								<replaceregexp flags="ig" byline="true"
-									match="(private RunTime runTime)( = null)?;" replace="\1 = new RunTime();"
+									match="(private RunTime runTime)( = null)?;"
+									replace="\1 = new RunTime();"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/order/Order.java"
 									preserveLastModified="true" />
 								<!-- makes AbstractSchedule.java abstract -->
 								<replaceregexp flags="ig" byline="true"
-									match="(public )(class AbstractSchedule)" replace="\1abstract \2"
+									match="(public )(class AbstractSchedule)"
+									replace="\1abstract \2"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/schedule/AbstractSchedule.java"
 									preserveLastModified="true" />
 								<!-- change hashcode and equals -->
 								<replaceregexp flags="ig" byline="true"
-									match="(\s*return new HashCodeBuilder).*" replace="\1().append(name).toHashCode();"
+									match="(\s*return new HashCodeBuilder).*"
+									replace="\1().append(name).toHashCode();"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/other/FolderItem.java"
 									preserveLastModified="true" />
 								<replaceregexp flags="ig" byline="true"
-									match="(\s*return new EqualsBuilder).*" replace="\1().append(name, rhs.name).isEquals();"
+									match="(\s*return new EqualsBuilder).*"
+									replace="\1().append(name, rhs.name).isEquals();"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/other/FolderItem.java"
 									preserveLastModified="true" />
 								<replaceregexp flags="ig" byline="true"
@@ -267,19 +273,23 @@
 									file="${project.build.directory}/java-gen/com/sos/joc/model/joe/common/Deployable.java"
 									preserveLastModified="true" />
 								<replaceregexp flags="ig" byline="true"
-									match="(\s*return new HashCodeBuilder).*" replace="\1().append(path).toHashCode();"
+									match="(\s*return new HashCodeBuilder).*"
+									replace="\1().append(path).toHashCode();"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/Tree.java"
 									preserveLastModified="true" />
 								<replaceregexp flags="ig" byline="true"
-									match="(\s*return new EqualsBuilder).*" replace="\1().append(path, rhs.path).isEquals();"
+									match="(\s*return new EqualsBuilder).*"
+									replace="\1().append(path, rhs.path).isEquals();"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/Tree.java"
 									preserveLastModified="true" />
 								<replaceregexp flags="ig" byline="true"
-									match="(\s*return new HashCodeBuilder).*" replace="\1().appendSuper(super.hashCode()).toHashCode();"
+									match="(\s*return new HashCodeBuilder).*"
+									replace="\1().appendSuper(super.hashCode()).toHashCode();"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/JoeTree.java"
 									preserveLastModified="true" />
 								<replaceregexp flags="ig" byline="true"
-									match="(\s*return new EqualsBuilder).*" replace="\1().appendSuper(super.equals(other)).isEquals();"
+									match="(\s*return new EqualsBuilder).*"
+									replace="\1().appendSuper(super.equals(other)).isEquals();"
 									file="${project.build.directory}/java-gen/com/sos/joc/model/tree/JoeTree.java"
 									preserveLastModified="true" />
 							</target>
@@ -302,7 +312,7 @@
 			<artifactId>sos-exceptions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		 
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -312,10 +322,10 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>

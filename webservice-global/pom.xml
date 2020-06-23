@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.sos-berlin</groupId>
 		<artifactId>joc</artifactId>
-		<version>1.13.4</version>
+		<version>1.13.4-patch-SNAPSHOT</version>
 	</parent>
 
 
@@ -33,8 +33,8 @@
 			<artifactId>sos-json</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		 
-	 
+
+
 		<dependency>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-exceptions</artifactId>
