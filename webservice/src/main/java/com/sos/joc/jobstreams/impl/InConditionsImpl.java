@@ -81,7 +81,8 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
             readJobSchedulerVariables();
             Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-
+            Constants.settings = new EventHandlerSettings();
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             checkRequiredParameter("jobs", conditionJobsFilterSchema.getJobs());

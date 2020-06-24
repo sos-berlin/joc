@@ -71,7 +71,8 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
             readJobSchedulerVariables();
             Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-
+            Constants.settings = new EventHandlerSettings();
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             checkRequiredParameter("job", conditionJobsFilterSchema.getJobs());
