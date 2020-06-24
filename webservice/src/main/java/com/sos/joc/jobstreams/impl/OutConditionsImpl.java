@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
@@ -71,6 +72,8 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
             readJobSchedulerVariables();
             Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+            Constants.settings = new EventHandlerSettings();
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 

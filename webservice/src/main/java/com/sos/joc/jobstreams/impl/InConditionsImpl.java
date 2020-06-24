@@ -81,6 +81,8 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
             readJobSchedulerVariables();
             Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+            Constants.settings = new EventHandlerSettings();
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
@@ -94,7 +96,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             } catch (IllegalArgumentException e) {
                 LOGGER.warn("Could not get session from: " + conditionJobsFilterSchema.getSession());
             }
-
+            
             InConditions inConditions = new InConditions();
             inConditions.setJobschedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
