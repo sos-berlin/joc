@@ -17,6 +17,12 @@
 		"nextStart": {
     	    "$ref": "../common/timestamp-schema.json"
 		},
+		"endOfJobStream": {
+			"$ref": "../common/path-schema.json"
+		},
+		"requiredJob": {
+			"$ref": "../common/path-schema.json"
+		},
 		"jobs": {
 			"type": "array",
 			"items": {

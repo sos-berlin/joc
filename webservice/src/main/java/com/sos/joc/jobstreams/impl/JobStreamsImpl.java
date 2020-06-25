@@ -102,6 +102,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                     }
                     jobstreamStarter.setState(dbItemJobStreamStarter.getState());
                     jobstreamStarter.setTitle(dbItemJobStreamStarter.getTitle());
+                    jobstreamStarter.setEndOfJobStream(dbItemJobStreamStarter.getEndOfJobStream());
+                    jobstreamStarter.setRequiredJob(dbItemJobStreamStarter.getRequiredJob());
                     jobstreamStarter.setNextStart(dbItemJobStreamStarter.getNextStart());
                     filterJobStreamParameters.setJobStreamStarterId(dbItemJobStreamStarter.getId());
                     filterJobStreamStarterJobs.setJobStreamStarter(dbItemJobStreamStarter.getId());
