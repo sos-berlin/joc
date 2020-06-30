@@ -1,5 +1,7 @@
 package com.sos.joc.plan.impl;
 
+import java.util.ArrayList;
+
 import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
@@ -41,7 +43,18 @@ public class PlanFromRunTimeResourceImpl extends JOCResourceImpl implements IPla
             if (planFilter.getRunTime() == null) {
                 throw new JocMissingRequiredParameterException("undefined 'runTime'");
             }
-
+            
+            
+            for (com.sos.joc.model.joe.schedule.Date date: planFilter.getRunTime().getDates()) {
+                if (date.getPeriods() == null || date.getPeriods().size()==0) {
+                    date.setPeriods(new ArrayList<com.sos.joc.model.joe.schedule.Period>());
+                    com.sos.joc.model.joe.schedule.Period period= new com.sos.joc.model.joe.schedule.Period();
+                    period.setBegin("00:00:00");
+                    period.setEnd("24:00:00");
+                    date.getPeriods().add(period);
+                }
+            }
+        
             RunTime entity = null;
             String schedule = planFilter.getRunTime().getSchedule();
 
