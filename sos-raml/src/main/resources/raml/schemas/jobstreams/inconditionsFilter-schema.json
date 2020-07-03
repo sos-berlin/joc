@@ -11,6 +11,9 @@
 		"jobschedulerId": {
 			"$ref": "../common/filename100-schema.json"
 		},
+		"folder": {
+			"$ref": "../common/path-schema.json"
+		},
 		"jobs": {
 			"type": "array",
 			"items": {
