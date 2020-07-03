@@ -49,7 +49,7 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             Filter body = Globals.objectMapper.readValue(filterBytes, Filter.class);
             
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
-            boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
+            boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().isOthers();
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {

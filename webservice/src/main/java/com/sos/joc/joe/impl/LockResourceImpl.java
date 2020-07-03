@@ -52,7 +52,7 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
             LockFilter body = Globals.objectMapper.readValue(filterBytes, LockFilter.class);
             
             JOCDefaultResponse jocDefaultResponse = init(apiCall, body, accessToken, body.getJobschedulerId(), getPermissonsJocCockpit(body
-                    .getJobschedulerId(), accessToken).getJobschedulerMaster().getAdministration().getConfigurations().isView());
+                    .getJobschedulerId(), accessToken).getJobschedulerMaster().getAdministration().getConfigurations().getView().isSetOthers());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

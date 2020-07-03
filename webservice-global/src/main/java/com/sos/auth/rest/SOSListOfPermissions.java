@@ -55,7 +55,11 @@ public class SOSListOfPermissions {
         addPermission(forUser, sosPermissionJoc.getSOSPermission(),
                 "sos:products:joc_cockpit:jobscheduler_master:administration:remove_old_instances");
         addPermission(forUser, sosPermissionJoc.getSOSPermission(),
-                "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view");
+                "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:others");
+        addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+                "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:yade");
+        addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+                "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:notification");        
         addPermission(forUser, sosPermissionJoc.getSOSPermission(),
                 "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:edit");
         addPermission(forUser, sosPermissionJoc.getSOSPermission(),

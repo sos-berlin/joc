@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2020.03.03 um 05:35:10 PM CET 
+// Generiert: 2020.07.03 um 04:47:04 PM CEST 
 //
 
 
@@ -85,7 +85,6 @@ import javax.xml.bind.annotation.XmlType;
  *                                 &lt;complexContent>
  *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                                     &lt;sequence>
- *                                       &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                       &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                       &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                       &lt;element name="deploy">
@@ -101,6 +100,19 @@ import javax.xml.bind.annotation.XmlType;
  *                                                 &lt;element name="lock" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                                 &lt;element name="monitor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                                 &lt;element name="xmlEditor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                               &lt;/sequence>
+ *                                             &lt;/restriction>
+ *                                           &lt;/complexContent>
+ *                                         &lt;/complexType>
+ *                                       &lt;/element>
+ *                                       &lt;element name="view">
+ *                                         &lt;complexType>
+ *                                           &lt;complexContent>
+ *                                             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                               &lt;sequence>
+ *                                                 &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                                 &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                                 &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                               &lt;/sequence>
  *                                             &lt;/restriction>
  *                                           &lt;/complexContent>
@@ -5065,7 +5077,6 @@ public class SOSPermissionJocCockpit
      *                       &lt;complexContent>
      *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                           &lt;sequence>
-     *                             &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                             &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                             &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                             &lt;element name="deploy">
@@ -5081,6 +5092,19 @@ public class SOSPermissionJocCockpit
      *                                       &lt;element name="lock" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                                       &lt;element name="monitor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                                       &lt;element name="xmlEditor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                                     &lt;/sequence>
+     *                                   &lt;/restriction>
+     *                                 &lt;/complexContent>
+     *                               &lt;/complexType>
+     *                             &lt;/element>
+     *                             &lt;element name="view">
+     *                               &lt;complexType>
+     *                                 &lt;complexContent>
+     *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                                     &lt;sequence>
+     *                                       &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                                       &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                                       &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                                     &lt;/sequence>
      *                                   &lt;/restriction>
      *                                 &lt;/complexContent>
@@ -5226,7 +5250,6 @@ public class SOSPermissionJocCockpit
          *             &lt;complexContent>
          *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *                 &lt;sequence>
-         *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                   &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                   &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                   &lt;element name="deploy">
@@ -5242,6 +5265,19 @@ public class SOSPermissionJocCockpit
          *                             &lt;element name="lock" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                             &lt;element name="monitor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                             &lt;element name="xmlEditor" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                           &lt;/sequence>
+         *                         &lt;/restriction>
+         *                       &lt;/complexContent>
+         *                     &lt;/complexType>
+         *                   &lt;/element>
+         *                   &lt;element name="view">
+         *                     &lt;complexType>
+         *                       &lt;complexContent>
+         *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                           &lt;sequence>
+         *                             &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                             &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                             &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                           &lt;/sequence>
          *                         &lt;/restriction>
          *                       &lt;/complexContent>
@@ -5408,7 +5444,6 @@ public class SOSPermissionJocCockpit
              *   &lt;complexContent>
              *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
              *       &lt;sequence>
-             *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *         &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *         &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *         &lt;element name="deploy">
@@ -5429,6 +5464,19 @@ public class SOSPermissionJocCockpit
              *             &lt;/complexContent>
              *           &lt;/complexType>
              *         &lt;/element>
+             *         &lt;element name="view">
+             *           &lt;complexType>
+             *             &lt;complexContent>
+             *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *                 &lt;sequence>
+             *                   &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *                   &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *                   &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *                 &lt;/sequence>
+             *               &lt;/restriction>
+             *             &lt;/complexContent>
+             *           &lt;/complexType>
+             *         &lt;/element>
              *       &lt;/sequence>
              *     &lt;/restriction>
              *   &lt;/complexContent>
@@ -5439,41 +5487,22 @@ public class SOSPermissionJocCockpit
              */
             @XmlAccessorType(XmlAccessType.FIELD)
             @XmlType(name = "", propOrder = {
-                "view",
                 "edit",
                 "delete",
-                "deploy"
+                "deploy",
+                "view"
             })
             public static class Configurations
                 implements Serializable
             {
 
                 private final static long serialVersionUID = 12343L;
-                protected boolean view;
                 protected boolean edit;
                 protected boolean delete;
                 @XmlElement(required = true)
                 protected SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations.Deploy deploy;
-
-                /**
-                 * Ruft den Wert der view-Eigenschaft ab.
-                 * 
-                 */
-                public boolean isView() {
-                    return view;
-                }
-
-                /**
-                 * Legt den Wert der view-Eigenschaft fest.
-                 * 
-                 */
-                public void setView(boolean value) {
-                    this.view = value;
-                }
-
-                public boolean isSetView() {
-                    return true;
-                }
+                @XmlElement(required = true)
+                protected SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations.View view;
 
                 /**
                  * Ruft den Wert der edit-Eigenschaft ab.
@@ -5541,6 +5570,34 @@ public class SOSPermissionJocCockpit
 
                 public boolean isSetDeploy() {
                     return (this.deploy!= null);
+                }
+
+                /**
+                 * Ruft den Wert der view-Eigenschaft ab.
+                 * 
+                 * @return
+                 *     possible object is
+                 *     {@link SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations.View }
+                 *     
+                 */
+                public SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations.View getView() {
+                    return view;
+                }
+
+                /**
+                 * Legt den Wert der view-Eigenschaft fest.
+                 * 
+                 * @param value
+                 *     allowed object is
+                 *     {@link SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations.View }
+                 *     
+                 */
+                public void setView(SOSPermissionJocCockpit.JobschedulerMaster.Administration.Configurations.View value) {
+                    this.view = value;
+                }
+
+                public boolean isSetView() {
+                    return (this.view!= null);
                 }
 
 
@@ -5752,6 +5809,105 @@ public class SOSPermissionJocCockpit
                     }
 
                     public boolean isSetXmlEditor() {
+                        return true;
+                    }
+
+                }
+
+
+                /**
+                 * <p>Java-Klasse für anonymous complex type.
+                 * 
+                 * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+                 * 
+                 * <pre>
+                 * &lt;complexType>
+                 *   &lt;complexContent>
+                 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+                 *       &lt;sequence>
+                 *         &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+                 *         &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+                 *         &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+                 *       &lt;/sequence>
+                 *     &lt;/restriction>
+                 *   &lt;/complexContent>
+                 * &lt;/complexType>
+                 * </pre>
+                 * 
+                 * 
+                 */
+                @XmlAccessorType(XmlAccessType.FIELD)
+                @XmlType(name = "", propOrder = {
+                    "others",
+                    "yade",
+                    "notification"
+                })
+                public static class View
+                    implements Serializable
+                {
+
+                    private final static long serialVersionUID = 12343L;
+                    protected boolean others;
+                    protected boolean yade;
+                    protected boolean notification;
+
+                    /**
+                     * Ruft den Wert der others-Eigenschaft ab.
+                     * 
+                     */
+                    public boolean isOthers() {
+                        return others;
+                    }
+
+                    /**
+                     * Legt den Wert der others-Eigenschaft fest.
+                     * 
+                     */
+                    public void setOthers(boolean value) {
+                        this.others = value;
+                    }
+
+                    public boolean isSetOthers() {
+                        return true;
+                    }
+
+                    /**
+                     * Ruft den Wert der yade-Eigenschaft ab.
+                     * 
+                     */
+                    public boolean isYade() {
+                        return yade;
+                    }
+
+                    /**
+                     * Legt den Wert der yade-Eigenschaft fest.
+                     * 
+                     */
+                    public void setYade(boolean value) {
+                        this.yade = value;
+                    }
+
+                    public boolean isSetYade() {
+                        return true;
+                    }
+
+                    /**
+                     * Ruft den Wert der notification-Eigenschaft ab.
+                     * 
+                     */
+                    public boolean isNotification() {
+                        return notification;
+                    }
+
+                    /**
+                     * Legt den Wert der notification-Eigenschaft fest.
+                     * 
+                     */
+                    public void setNotification(boolean value) {
+                        this.notification = value;
+                    }
+
+                    public boolean isSetNotification() {
                         return true;
                     }
 
