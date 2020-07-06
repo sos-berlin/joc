@@ -129,7 +129,7 @@ public class SOSPermissionShiro
      *     {@link Boolean }
      *     
      */
-    public boolean isAuthenticated() {
+    public Boolean isAuthenticated() {
         return authenticated;
     }
 
@@ -141,11 +141,11 @@ public class SOSPermissionShiro
      *     {@link Boolean }
      *     
      */
-    public void setAuthenticated(boolean value) {
+    public void setAuthenticated(Boolean value) {
         this.authenticated = value;
     }
 
-    public boolean isSetAuthenticated() {
+    public Boolean isSetAuthenticated() {
         return (this.authenticated!= null);
     }
 
