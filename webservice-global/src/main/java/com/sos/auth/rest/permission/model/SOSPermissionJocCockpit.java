@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2020.07.03 um 04:47:04 PM CEST 
+// Generiert: 2020.07.06 um 10:00:18 AM CEST 
 //
 
 
@@ -113,6 +113,7 @@ import javax.xml.bind.annotation.XmlType;
  *                                                 &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                                 &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                                 &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                                 &lt;element name="inventory" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                               &lt;/sequence>
  *                                             &lt;/restriction>
  *                                           &lt;/complexContent>
@@ -5105,6 +5106,7 @@ public class SOSPermissionJocCockpit
      *                                       &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                                       &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                                       &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                                       &lt;element name="inventory" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                                     &lt;/sequence>
      *                                   &lt;/restriction>
      *                                 &lt;/complexContent>
@@ -5278,6 +5280,7 @@ public class SOSPermissionJocCockpit
          *                             &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                             &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                             &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                             &lt;element name="inventory" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                           &lt;/sequence>
          *                         &lt;/restriction>
          *                       &lt;/complexContent>
@@ -5472,6 +5475,7 @@ public class SOSPermissionJocCockpit
              *                   &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *                   &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *                   &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *                   &lt;element name="inventory" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *                 &lt;/sequence>
              *               &lt;/restriction>
              *             &lt;/complexContent>
@@ -5828,6 +5832,7 @@ public class SOSPermissionJocCockpit
                  *         &lt;element name="others" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
                  *         &lt;element name="yade" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
                  *         &lt;element name="notification" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+                 *         &lt;element name="inventory" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
                  *       &lt;/sequence>
                  *     &lt;/restriction>
                  *   &lt;/complexContent>
@@ -5840,7 +5845,8 @@ public class SOSPermissionJocCockpit
                 @XmlType(name = "", propOrder = {
                     "others",
                     "yade",
-                    "notification"
+                    "notification",
+                    "inventory"
                 })
                 public static class View
                     implements Serializable
@@ -5850,6 +5856,7 @@ public class SOSPermissionJocCockpit
                     protected boolean others;
                     protected boolean yade;
                     protected boolean notification;
+                    protected boolean inventory;
 
                     /**
                      * Ruft den Wert der others-Eigenschaft ab.
@@ -5908,6 +5915,26 @@ public class SOSPermissionJocCockpit
                     }
 
                     public boolean isSetNotification() {
+                        return true;
+                    }
+
+                    /**
+                     * Ruft den Wert der inventory-Eigenschaft ab.
+                     * 
+                     */
+                    public boolean isInventory() {
+                        return inventory;
+                    }
+
+                    /**
+                     * Legt den Wert der inventory-Eigenschaft fest.
+                     * 
+                     */
+                    public void setInventory(boolean value) {
+                        this.inventory = value;
+                    }
+
+                    public boolean isSetInventory() {
                         return true;
                     }
 

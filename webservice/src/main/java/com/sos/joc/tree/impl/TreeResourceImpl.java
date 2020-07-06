@@ -97,7 +97,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             
             List<JobSchedulerObjectType> types = null;
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(treeBody.getJobschedulerId(), accessToken);
-            boolean permission = sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView();
+            boolean permission = sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getView().isInventory();
 
             if (treeBody.getTypes() == null || treeBody.getTypes().isEmpty()) {
                 treeBody.setTypes(Arrays.asList(JobSchedulerObjectType.JOE));
