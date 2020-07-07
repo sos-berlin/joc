@@ -23,6 +23,7 @@ import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
+import com.sos.jitl.jobstreams.db.DBItemOutCondition;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 import com.sos.jitl.jobstreams.db.DBLayerConsumedInConditions;
 import com.sos.jitl.jobstreams.db.DBLayerInConditions;
@@ -71,7 +72,6 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
         try {
 
-
             JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
             ConditionJobsFilter conditionJobsFilterSchema = Globals.objectMapper.readValue(filterBytes, ConditionJobsFilter.class);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, conditionJobsFilterSchema, accessToken, conditionJobsFilterSchema
@@ -84,15 +84,16 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             if ((conditionJobsFilterSchema.getJobs() == null) && (conditionJobsFilterSchema.getFolder() == null)) {
                 throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", "jobs or folder"));
             }
- 
-            
+
             readJobSchedulerVariables();
             Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
             Constants.settings = new EventHandlerSettings();
             Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            checkRequiredParameter("jobs", conditionJobsFilterSchema.getJobs());
+            if ((conditionJobsFilterSchema.getJobs() == null) && (conditionJobsFilterSchema.getFolder() == null)) {
+                throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", "jobs or folder"));
+            }
 
             UUID contextId = null;
             try {
@@ -106,31 +107,37 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             InConditions inConditions = new InConditions();
             inConditions.setJobschedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
-
             jsConditionResolver = new JSConditionResolver(conditionJobsFilterSchema.getJobschedulerId());
             jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
             jsConditionResolver.initEvents(sosHibernateSession);
-            
+
             DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
-            FilterInConditions filterInConditions; 
+            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+            FilterInConditions filterInConditions;
             Set<String> listOfJobs = new HashSet<String>();
 
             if (conditionJobsFilterSchema.getFolder() != null) {
+                FilterOutConditions filterOutConditions = new FilterOutConditions();
+                filterOutConditions.setFolder(conditionJobsFilterSchema.getFolder());
+                filterOutConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
+                List<DBItemOutCondition> listOfOutConditions = dbLayerOutConditions.getSimpleOutConditionsList(filterOutConditions, 0);
+                for (DBItemOutCondition dbItemOutCondition : listOfOutConditions) {
+                    listOfJobs.add(dbItemOutCondition.getJob());
+                }
                 filterInConditions = new FilterInConditions();
                 filterInConditions.setFolder(conditionJobsFilterSchema.getFolder());
                 filterInConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                 List<DBItemInCondition> listOfInConditions = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
-                for (DBItemInCondition dbItemInCondition:listOfInConditions) {
+                for (DBItemInCondition dbItemInCondition : listOfInConditions) {
                     listOfJobs.add(dbItemInCondition.getJob());
                 }
-            }else {
+            } else {
                 for (JobPath job : conditionJobsFilterSchema.getJobs()) {
                     listOfJobs.add(job.getJob());
                 }
             }
-            
-            
-            for (String job: listOfJobs) {
+
+            for (String job : listOfJobs) {
                 JobInCondition jobInCondition = new JobInCondition();
 
                 DBLayerConsumedInConditions dbLayerCoumsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);

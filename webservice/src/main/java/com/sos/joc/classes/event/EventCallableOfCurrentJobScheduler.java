@@ -320,14 +320,25 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         String eventRemoved = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name(), null);
                         String inconditionValidated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated
                                 .name(), null);
-                        if (eventCreated != null) {
+                        String taskEnded = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name(),null);
+
+                        String contextId = variables.getString("contextId");
+
+                        if (taskEnded != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name());
+                            eventSnapshot.setState(contextId);
+                            eventSnapshot.setTaskId(taskEnded);
+                        }else if (eventCreated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name());
+                            eventSnapshot.setState(contextId);
                             eventSnapshot.setPath(eventCreated);
                         } else if (eventRemoved != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name());
+                            eventSnapshot.setState(contextId);
                             eventSnapshot.setPath(eventRemoved);
                         } else if (inconditionValidated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated.name());
+                            eventSnapshot.setState(contextId);
                             eventSnapshot.setPath(inconditionValidated);
                         }
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);

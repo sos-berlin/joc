@@ -123,6 +123,13 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 for (DBItemOutCondition dbItemOutCondition : listOfOutConditions) {
                     listOfJobs.add(dbItemOutCondition.getJob());
                 }
+                filterInConditions = new FilterInConditions();
+                filterInConditions.setFolder(conditionJobsFilterSchema.getFolder());
+                filterInConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
+                List<DBItemInCondition> listOfInConditions = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
+                for (DBItemInCondition dbItemInCondition : listOfInConditions) {
+                    listOfJobs.add(dbItemInCondition.getJob());
+                }
             } else {
                 for (JobPath job : conditionJobsFilterSchema.getJobs()) {
                     listOfJobs.add(job.getJob());
