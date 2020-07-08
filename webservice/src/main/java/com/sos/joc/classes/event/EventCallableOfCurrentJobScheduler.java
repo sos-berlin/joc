@@ -320,15 +320,21 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         String eventRemoved = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name(), null);
                         String inconditionValidated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated
                                 .name(), null);
-                        String taskEnded = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name(),null);
+                        String taskEnded = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name(), null);
+                        String jobStreamStarted = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name(),
+                                null);
 
-                        String contextId = variables.getString("contextId",null);
-
-                        if (taskEnded != null) {
+                        String contextId = variables.getString("contextId", null);
+                        if (jobStreamStarted != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name());
+                            eventSnapshot.setState(contextId);
+                            eventSnapshot.setPath(jobStreamStarted);
+                        }
+                        else if (taskEnded != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name());
                             eventSnapshot.setState(contextId);
                             eventSnapshot.setTaskId(taskEnded);
-                        }else if (eventCreated != null) {
+                        } else if (eventCreated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name());
                             eventSnapshot.setState(contextId);
                             eventSnapshot.setPath(eventCreated);
