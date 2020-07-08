@@ -322,7 +322,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                                 .name(), null);
                         String taskEnded = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name(),null);
 
-                        String contextId = variables.getString("contextId");
+                        String contextId = variables.getString("contextId",null);
 
                         if (taskEnded != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name());
