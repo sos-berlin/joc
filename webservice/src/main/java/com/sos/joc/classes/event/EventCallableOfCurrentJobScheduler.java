@@ -325,6 +325,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                                 null);
 
                         String contextId = variables.getString("contextId", null);
+                        String path = variables.getString("path", null);
                         if (jobStreamStarted != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name());
                             eventSnapshot.setState(contextId);
@@ -334,14 +335,15 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name());
                             eventSnapshot.setState(contextId);
                             eventSnapshot.setTaskId(taskEnded);
+                            eventSnapshot.setPath(path);
                         } else if (eventCreated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name());
                             eventSnapshot.setState(contextId);
-                            eventSnapshot.setPath(eventCreated);
+                            eventSnapshot.setPath(path);
                         } else if (eventRemoved != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name());
                             eventSnapshot.setState(contextId);
-                            eventSnapshot.setPath(eventRemoved);
+                            eventSnapshot.setPath(path);
                         } else if (inconditionValidated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated.name());
                             eventSnapshot.setState(contextId);
