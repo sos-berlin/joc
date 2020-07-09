@@ -27,34 +27,34 @@ public class PlanFromRunTimeResourceImpl extends JOCResourceImpl implements IPla
     private static final String API_CALL = "./plan/from_run_time";
 
     @Override
-	public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) {
+    public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) {
         try {
-		    JsonValidator.validateFailFast(planFilterBytes, RunTimePlanFilter.class);
-		    RunTimePlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, RunTimePlanFilter.class);
-            
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken,
-					planFilter.getJobschedulerId(), getPermissonsJocCockpit(planFilter.getJobschedulerId(), accessToken)
-							.getOrder().getView().isStatus());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
+            JsonValidator.validateFailFast(planFilterBytes, RunTimePlanFilter.class);
+            RunTimePlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, RunTimePlanFilter.class);
+
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    planFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             checkRequiredParameter("dateTo", planFilter.getDateTo());
             if (planFilter.getRunTime() == null) {
                 throw new JocMissingRequiredParameterException("undefined 'runTime'");
             }
-            
-            
-            for (com.sos.joc.model.joe.schedule.Date date: planFilter.getRunTime().getDates()) {
-                if (date.getPeriods() == null || date.getPeriods().size()==0) {
-                    date.setPeriods(new ArrayList<com.sos.joc.model.joe.schedule.Period>());
-                    com.sos.joc.model.joe.schedule.Period period= new com.sos.joc.model.joe.schedule.Period();
-                    period.setBegin("00:00:00");
-                    period.setEnd("24:00:00");
-                    date.getPeriods().add(period);
+
+            if (planFilter.getRunTime().getDates() != null) {
+                for (com.sos.joc.model.joe.schedule.Date date : planFilter.getRunTime().getDates()) {
+                    if (date.getPeriods() == null || date.getPeriods().size() == 0) {
+                        date.setPeriods(new ArrayList<com.sos.joc.model.joe.schedule.Period>());
+                        com.sos.joc.model.joe.schedule.Period period = new com.sos.joc.model.joe.schedule.Period();
+                        period.setBegin("00:00:00");
+                        period.setEnd("24:00:00");
+                        date.getPeriods().add(period);
+                    }
                 }
             }
-        
+
             RunTime entity = null;
             String schedule = planFilter.getRunTime().getSchedule();
 
