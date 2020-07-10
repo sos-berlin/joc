@@ -1,11 +1,13 @@
 package com.sos.joc.plan.impl;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -136,6 +138,14 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             Globals.beginTransaction(sosHibernateSession);
 
             Date maxDate = getMaxPlannedStart(dailyPlanDBLayer, planFilter.getJobschedulerId());
+            SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd" );
+            SimpleDateFormat df2 = new SimpleDateFormat( "yyyy-MM-dd HH:mm" );
+            df.setTimeZone( TimeZone.getTimeZone( dbItemInventoryInstance.getTimeZone()));  
+            String s = df.format(maxDate);
+            df2.setTimeZone( TimeZone.getTimeZone( dbItemInventoryInstance.getTimeZone()) );
+            maxDate = df2.parse(s + " 00:00");
+            
+            
             Date fromDate = null;
             Date toDate = null;
 
@@ -309,7 +319,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                             if (f.before(fromDate)) {
                                 f = fromDate;
                             }
-                            List<DailyPlanDBItem> listOfCalenderItems = calendar2Db.getStartTimesFromScheduler(f, toDate);
+                            List<DailyPlanDBItem> listOfCalenderItems = calendar2Db.getStartTimesFromScheduler(f, toDate,planFilter);
 
                             Matcher regExMatcherJob = null;
                             if (planFilter.getJob() != null && !planFilter.getJob().isEmpty()) {
