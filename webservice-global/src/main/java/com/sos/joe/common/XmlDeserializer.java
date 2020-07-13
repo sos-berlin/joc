@@ -18,6 +18,7 @@ import com.sos.exception.SOSDoctypeException;
 import com.sos.joc.Globals;
 import com.sos.joc.model.joe.job.Description;
 import com.sos.joc.model.joe.job.Job;
+import com.sos.joc.model.joe.job.Monitor;
 import com.sos.joc.model.joe.job.Script;
 import com.sos.joc.model.joe.nodeparams.Config;
 import com.sos.xml.XMLBuilder;
@@ -93,19 +94,14 @@ public class XmlDeserializer {
                 }
             }
         }
-        String scriptContent = "";
-        Element scriptNode = (Element) doc.selectSingleNode("/job/script");
-        if (scriptNode != null) {
-            scriptContent = scriptNode.getText().trim();
-            if (scriptNode.hasContent()) {
-                @SuppressWarnings("unchecked")
-                List<Node> children = new ArrayList<Node>(scriptNode.content());
-                for (Node child : children) {
-                    if (child.getNodeType() == Node.TEXT_NODE || child.getNodeType() == Node.CDATA_SECTION_NODE) {
-                        scriptNode.remove(child);
-                    }
-                }
-            }
+        String scriptContent = removeTextAndCdata(doc.selectSingleNode("/job/script"));
+        
+        List<String> monitorScriptContents = new ArrayList<String>();
+        @SuppressWarnings("unchecked")
+        List<Node> monitorScriptNodes = new ArrayList<Node>(doc.selectNodes("/job/monitor/script"));
+        for (Node monitorScriptNode : monitorScriptNodes) {
+            String monitorScriptContent = removeTextAndCdata(monitorScriptNode);
+            monitorScriptContents.add(monitorScriptContent);
         }
         Job job = Globals.xmlMapper.readValue(domToString(doc), Job.class);
         if (!descContent.isEmpty()) {
@@ -117,12 +113,16 @@ public class XmlDeserializer {
             job.setDocumentation(desc);
         }
         if (!scriptContent.isEmpty()) {
-            Script scr = job.getScript();
-            if (scr == null) {
-                scr = new Script();
+            job.setScript(getScriptContent(job.getScript(), scriptContent));
+        }
+        if (job.getMonitors() != null) {
+            for (int i=0; i < job.getMonitors().size(); i++) {
+                Monitor monitor = job.getMonitors().get(i);
+                String monitorScriptContent = monitorScriptContents.get(i);
+                if (monitor != null && monitorScriptContent != null && !monitorScriptContent.isEmpty()) {
+                    monitor.setScript(getScriptContent(monitor.getScript(), monitorScriptContent));
+                }
             }
-            scr.setContent(scriptContent);
-            job.setScript(scr);
         }
         return job;
     }
@@ -134,5 +134,31 @@ public class XmlDeserializer {
             note.getParent().remove(note);
         }
         return Globals.xmlMapper.readValue(domToString(doc), Config.class);
+    }
+    
+    private static String removeTextAndCdata(Node scriptNode) {
+        String scriptContent = "";
+        if (scriptNode != null) {
+            Element scriptElem = (Element) scriptNode;
+            scriptContent = scriptElem.getText().trim();
+            if (scriptElem.hasContent()) {
+                @SuppressWarnings("unchecked")
+                List<Node> children = new ArrayList<Node>(scriptElem.content());
+                for (Node child : children) {
+                    if (child.getNodeType() == Node.TEXT_NODE || child.getNodeType() == Node.CDATA_SECTION_NODE) {
+                        scriptElem.remove(child);
+                    }
+                }
+            }
+        }
+        return scriptContent;
+    }
+    
+    private static Script getScriptContent(Script scr, String scriptContent) {
+        if (scr == null) {
+            scr = new Script();
+        }
+        scr.setContent(scriptContent);
+        return scr;
     }
 }
