@@ -683,7 +683,7 @@ public class XmlSerializer {
             if (onReturnCodes.getOnReturnCodeList() != null) {
                 onReturnCodes.setOnReturnCodeList(onReturnCodes.getOnReturnCodeList().stream().filter(i -> i.getReturnCode() != null && ((i
                         .getToState() != null && i.getToState().getState() != null && !i.getToState().getState().isEmpty()) || (i
-                                .getAddOrder() != null && i.getAddOrder().getJobChain() != null && !i.getAddOrder().getJobChain().isEmpty())))
+                                .getAddOrders() != null && !i.getAddOrders().isEmpty())))
                         .collect(Collectors.toList()));
                 if (onReturnCodes.getOnReturnCodeList().isEmpty()) {
                     return null;

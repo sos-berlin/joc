@@ -56,8 +56,12 @@
                   }
                 }
               },
-              "addOrder": {
-                "$ref": "../order/returnCodeAddOrder-schema.json"
+              "addOrders": {
+                "xmlElement": "add_order",
+                "type": "array",
+                "items": {
+                  "$ref": "../order/returnCodeAddOrder-schema.json"
+                }
               }
             }
           }
