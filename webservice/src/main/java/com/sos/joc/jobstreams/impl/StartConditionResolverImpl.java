@@ -51,12 +51,13 @@ public class StartConditionResolverImpl extends JOCResourceImpl implements IStar
         }
     }
 
-    private String notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(StartConditionResolverImpl.class.getName());
         customEventsUtil.addEvent("StartConditionResolver");
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
-        return jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.throwJobSchedulerError();
     }
 
 }

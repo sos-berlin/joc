@@ -57,7 +57,7 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
         }
     }
 
-    private String notifyEventHandler(String accessToken, JobStreamsFilter resetJobStream) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken, JobStreamsFilter resetJobStream) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
@@ -67,7 +67,8 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
         customEventsUtil.addEvent("ResetConditionResolver", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
-        return jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.throwJobSchedulerError();
     }
 
 }

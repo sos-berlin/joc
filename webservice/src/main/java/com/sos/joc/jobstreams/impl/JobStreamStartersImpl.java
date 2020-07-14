@@ -96,7 +96,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
         }
     }
 
-    private String notifyEventHandlerStart(String accessToken, Long starterId) throws JsonProcessingException, JocException {
+    private void notifyEventHandlerStart(String accessToken, Long starterId) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(JobStreamStartersImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
@@ -105,7 +105,8 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
         customEventsUtil.addEvent("StartJobStream", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
-        return jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.throwJobSchedulerError();
     }
 
     private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
@@ -114,5 +115,6 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
         jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.throwJobSchedulerError();
     }
 }

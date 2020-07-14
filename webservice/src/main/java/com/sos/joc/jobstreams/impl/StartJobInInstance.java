@@ -42,6 +42,7 @@ public class StartJobInInstance extends JOCResourceImpl implements IStartJobInIn
 
             try {
                 notifyEventHandler(accessToken, startJob);
+                
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
                         "Start Job: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Job not started");
@@ -58,18 +59,19 @@ public class StartJobInInstance extends JOCResourceImpl implements IStartJobInIn
         }
     }
 
-    private String notifyEventHandler(String accessToken, JobStreamsFilter startJob) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken, JobStreamsFilter startJob) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("job", startJob.getJob());
-        parameters.put("jobstream", startJob.getJobStream());
         parameters.put("session", startJob.getSession());
 
         customEventsUtil.addEvent("StartJob", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
-        return jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.throwJobSchedulerError();
+
     }
 
 }
