@@ -1,6 +1,7 @@
 package com.sos.joc.jobs.impl;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -45,15 +46,18 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
 
         private int count = 0;
         private int countRunningTasks = 0;
+        private int countQueuedTasks = 0;
 
         public void accept(JsonValue jv) {
             ++count;
             countRunningTasks += ((JsonObject) jv).getInt("usedTaskCount", 0);
+            countQueuedTasks += ((JsonObject) jv).getInt("queuedTaskCount", 0);
         }
         
         public SummaryStatistics combine(SummaryStatistics other) {
             this.count += other.count;
             this.countRunningTasks += other.countRunningTasks;
+            this.countQueuedTasks += other.countQueuedTasks;
             return this;
         }
         
@@ -63,6 +67,10 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
         
         public final int getCountRunningTasks() {
             return countRunningTasks;
+        }
+        
+        public final int getCountQueuedTasks() {
+            return countQueuedTasks;
         }
     }
 
@@ -138,6 +146,7 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
                 jobs.setStopped(countStopped);
                 jobs.setWaitingForResource(countWaitingForResource);
                 jobs.setTasks(countRunningTasks);
+                jobs.setQueuedTasks(curQueuedTasks);
 
                 entity.setSurveyDate(jocXmlCommand.getSurveyDate());
             } else {
@@ -187,16 +196,15 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
                     return "unknown";
                 }, Collector.of(SummaryStatistics::new, SummaryStatistics::accept, SummaryStatistics::combine)));
                 
-                summary.putIfAbsent("pending", new SummaryStatistics());
-                summary.putIfAbsent("stopped", new SummaryStatistics());
-                summary.putIfAbsent("running", new SummaryStatistics());
-                summary.putIfAbsent("waitingForResource", new SummaryStatistics());
-                
+                Arrays.asList("pending", "stopped", "running", "waitingForResource").stream().forEach(state -> summary.putIfAbsent(state,
+                        new SummaryStatistics()));
+
                 jobs.setPending(summary.get("pending").getCount());
                 jobs.setRunning(summary.get("running").getCount());
                 jobs.setStopped(summary.get("stopped").getCount());
                 jobs.setWaitingForResource(summary.get("waitingForResource").getCount());
                 jobs.setTasks(summary.get("running").getCountRunningTasks() + summary.get("waitingForResource").getCountRunningTasks());
+                jobs.setQueuedTasks(summary.values().stream().mapToInt(SummaryStatistics::getCountQueuedTasks).sum());
             }
             entity.setJobs(jobs);
             entity.setDeliveryDate(Date.from(Instant.now()));
