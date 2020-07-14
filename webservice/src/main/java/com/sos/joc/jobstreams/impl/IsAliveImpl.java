@@ -15,18 +15,18 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.jobstreams.resource.IStartJobInInInstanceResource;
+import com.sos.joc.jobstreams.resource.IIsAliveResource;
 import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
-public class StartJobInInstance extends JOCResourceImpl implements IStartJobInInInstanceResource {
+public class IsAliveImpl extends JOCResourceImpl implements IIsAliveResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResetJobStreamImpl.class);
-    private static final String API_CALL = "./conditions/startjob";
+    private static final String API_CALL = "./jobstreams/isalive";
 
     @Override
-    public JOCDefaultResponse startJob(String accessToken, byte[] filterBytes) {
+    public JOCDefaultResponse isAlive(String accessToken, byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, JobStreamsFilter.class);
             JobStreamsFilter startJob = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
@@ -37,15 +37,13 @@ public class StartJobInInstance extends JOCResourceImpl implements IStartJobInIn
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("session", startJob.getSession());
-            checkRequiredParameter("job", startJob.getJob());
 
             try {
                 notifyEventHandler(accessToken, startJob);
                 
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
-                        "Start Job: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Job not started");
+                        "IsAlive: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Job not started");
                 return JOCDefaultResponse.responseStatusJSError(e, getJocError());
 
             }
@@ -63,15 +61,15 @@ public class StartJobInInstance extends JOCResourceImpl implements IStartJobInIn
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("job", startJob.getJob());
-        parameters.put("session", startJob.getSession());
 
-        customEventsUtil.addEvent("StartJob", parameters);
+        customEventsUtil.addEvent("IsAlive", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
         jocXmlCommand.executePost(notifyCommand, accessToken);
         jocXmlCommand.throwJobSchedulerError();
 
     }
+
+ 
 
 }

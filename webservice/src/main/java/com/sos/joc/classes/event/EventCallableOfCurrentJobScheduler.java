@@ -321,12 +321,17 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         String inconditionValidated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated
                                 .name(), null);
                         String taskEnded = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name(), null);
+                        String isAlive =  variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.IsAlive.name(), null);
                         String jobStreamStarted = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name(),
                                 null);
 
                         String contextId = variables.getString("contextId", null);
                         String path = variables.getString("path", null);
-                        if (jobStreamStarted != null) {
+                        if (isAlive != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.IsAlive.name());
+                            eventSnapshot.setState("Job Stream Plugin is active");
+                            eventSnapshot.setPath(isAlive);
+                        }else if (jobStreamStarted != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name());
                             eventSnapshot.setState(contextId);
                             eventSnapshot.setPath(jobStreamStarted);

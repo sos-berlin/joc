@@ -20,7 +20,7 @@ import com.sos.schema.JsonValidator;
 public class StartConditionResolverImpl extends JOCResourceImpl implements IStartConditionResolverResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StartConditionResolverImpl.class);
-    private static final String API_CALL = "./conditions/startConditionResolver";
+    private static final String API_CALL = "./conditions/start_condition_resolver";
 
     @Override
     public JOCDefaultResponse startConditionResolver(String accessToken, byte[] filterBytes) {
