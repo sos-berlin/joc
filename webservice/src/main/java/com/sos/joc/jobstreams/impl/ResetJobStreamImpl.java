@@ -36,6 +36,8 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            checkRequiredParameter("session", resetJobStream.getSession());
+            checkRequiredParameter("job", resetJobStream.getJob());
 
             try {
                 notifyEventHandler(accessToken, resetJobStream);
@@ -59,13 +61,9 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
-        if (resetJobStream.getJob() != null) {
-            parameters.put("job", resetJobStream.getJob());
-        }
+        parameters.put("job", resetJobStream.getJob());
         parameters.put("session", resetJobStream.getSession());
-        if (resetJobStream.getJobStream() != null) {
-            parameters.put("jobStream", resetJobStream.getJobStream());
-        }
+     
 
         customEventsUtil.addEvent("ResetConditionResolver", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
