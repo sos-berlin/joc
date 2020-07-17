@@ -167,6 +167,10 @@ public class JobVolatileJson extends JobV {
             setDetailedFields();
         }
     }
+    
+    public boolean isQueued() {
+        return getNumOfQueuedTasks() > 0;
+    }
 
     private void cleanArrays() {
         setParams(null);

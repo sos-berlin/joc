@@ -202,6 +202,8 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
             listJobQueue.put(job.getPath(), job);
         } else {
             List<JobStateText> filterStates = getFilterStates(processingStates);
+            boolean withQueuedState = containsQueuedState(processingStates);
+            boolean onlyWithQueuedState = containsOnlyQueuedState(processingStates);
             for (JsonObject jobsItem : json.getJsonArray("elements").getValuesAs(JsonObject.class)) {
                 
                 JobVolatileJson job = new JobVolatileJson(jobsItem, compactView, summary);
@@ -220,9 +222,16 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
                     continue;
                 }
                 job.setState();
-                if (!FilterAfterResponse.filterStateHasState(filterStates, job.getState().get_text())) {
-                    LOGGER.debug(String.format("...processing skipped because job's state '%1$s' doesn't contain in state filter '%2$s'", job.getState().get_text().name(), processingStates.toString()));
-                    continue; 
+                if (onlyWithQueuedState) {
+                    if (!job.isQueued()) {
+                        LOGGER.debug("...processing skipped because job doesn't contain queued tasks");
+                        continue;
+                    }
+                } else if (!FilterAfterResponse.filterStateHasState(filterStates, job.getState().get_text())) {
+                    if (!withQueuedState || !job.isQueued()) {
+                        LOGGER.debug(String.format("...processing skipped because job's state '%1$s' doesn't contain in state filter '%2$s'", job.getState().get_text().name(), processingStates.toString()));
+                        continue;
+                    }
                 }
                 job.setRunTimeIsTemporary(false);
                 job.setSurveyDate(surveyDate);
@@ -294,6 +303,7 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
                 filterStates.add(JobStateText.STOPPED);
                 break;
             case QUEUED:
+                break;
             case WAITINGFORRESOURCE:
                 filterStates.add(JobStateText.ERROR);
                 filterStates.add(JobStateText.NOT_INITIALIZED);
@@ -306,5 +316,13 @@ public class JobsVCallable implements Callable<Map<String, JobVolatileJson>> {
             }
         }
         return filterStates;
+    }
+    
+    private boolean containsQueuedState(List<JobStateFilter> jobStateFilter) {
+        return jobStateFilter != null && jobStateFilter.contains(JobStateFilter.QUEUED);
+    }
+    
+    private boolean containsOnlyQueuedState(List<JobStateFilter> jobStateFilter) {
+        return jobStateFilter != null && jobStateFilter.size() == 1 && jobStateFilter.get(0).equals(JobStateFilter.QUEUED);
     }
 }
