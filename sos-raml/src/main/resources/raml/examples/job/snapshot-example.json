@@ -5,6 +5,7 @@
 		"running": 1,
 		"stopped": 2,
 		"tasks": 1,
+		"queuedTasks": 0,
 		"waitingForResource": 0
 	},
 	"surveyDate": "2017-11-03T11:06:54.095Z"

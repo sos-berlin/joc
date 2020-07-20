@@ -1,6 +1,6 @@
 #%RAML 0.8
 title: JOC API
-version: 1.13.4
+version: 1.13.5
 protocols: [ HTTP, HTTPS ]
 #baseUri: http://test.sos-berlin.com:3001/joc/api
 #mediaType: application/json
@@ -1014,7 +1014,8 @@ traits:
             * running jobs
             * stopped jobs
             * waiting for process jobs
-            * tasks
+            * running tasks
+            * enqueued tasks
             </h5>
         description200: " "
         schema200: !include schemas/job/snapshot-schema.json
