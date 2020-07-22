@@ -42,6 +42,11 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
             jobStreamSessionFilter = Globals.objectMapper.readValue(filterBytes, JobStreamSessionsFilter.class);
 
+
+            if (jobStreamSessionFilter.getJobschedulerId() == null) {
+                jobStreamSessionFilter.setJobschedulerId("");
+            }
+            
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_JOBSTREAM_STARTER, jobStreamSessionFilter, accessToken, jobStreamSessionFilter
                     .getJobschedulerId(), getPermissonsJocCockpit(jobStreamSessionFilter.getJobschedulerId(), accessToken).getJobStream()
                             .isSetView());
@@ -49,9 +54,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("dateFrom", jobStreamSessionFilter.getDateFrom());
-            this.checkRequiredParameter("dateTo", jobStreamSessionFilter.getDateTo());
-
+       
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM_STARTER);
             DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
             FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
@@ -86,9 +89,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                     jobStreamTask.setCreated(dbItemJobStreamTaskContext.getCreated());
                     jobStreamTask.setId(dbItemJobStreamTaskContext.getId());
                     jobStreamTask.setJob(dbItemJobStreamTaskContext.getJob());
-                    //jobStreamTask.setJobStream(dbItemJobStreamTaskContext.getJobStream());
                     jobStreamSesssion.setJobStream(dbItemJobStreamTaskContext.getJobStream());
-                    //jobStreamTask.setSession(dbItemJobStreamTaskContext.getJobStreamHistoryId());
                     jobStreamTask.setTaskId(dbItemJobStreamTaskContext.getTaskId());
                     jobStreamSesssion.getJobstreamTasks().add(jobStreamTask);
                 }
