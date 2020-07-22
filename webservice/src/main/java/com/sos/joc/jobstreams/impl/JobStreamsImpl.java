@@ -112,6 +112,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                         JobStreamJob jobStreamJob = new JobStreamJob();
                         jobStreamJob.setJob(dbItemJobStreamStarterJobs.getJob());
                         jobStreamJob.setStartDelay(dbItemJobStreamStarterJobs.getDelay());
+                        jobStreamJob.setSkipOutCondition(dbItemJobStreamStarterJobs.getSkipOutCondition());
+                        jobStreamJob.setNextPeriod(dbItemJobStreamStarterJobs.getNextPeriod());
                         jobstreamStarter.getJobs().add(jobStreamJob);
                     }
                     for (DBItemJobStreamParameter dbItemJobStreamParameter : dbLayerJobStreamParameters.getJobStreamParametersList(
