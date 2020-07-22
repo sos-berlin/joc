@@ -70,7 +70,14 @@ public class JOCResourceImpl {
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
-        sosPermissionsCreator.loginFromAccessToken(accessToken);
+        try {
+            sosPermissionsCreator.loginFromAccessToken(accessToken);
+        } catch (DBInvalidDataException e) {
+            LOGGER.warn("Have to create a new sosHibernateFactory" ,e);
+            Globals.sosHibernateFactory.close();
+            Globals.sosHibernateFactory = null;
+            throw e;
+        }
 
         updateUserInMetaInfo();
     }
@@ -138,12 +145,12 @@ public class JOCResourceImpl {
         }
         return date;
     }
-    
+
     public Date getDateFromTimestamp(Long timeStamp) {
         Instant fromEpochMilli = Instant.ofEpochMilli(timeStamp / 1000);
         return Date.from(fromEpochMilli);
     }
-    
+
     private boolean sessionExistInDb(String sessionIdString) {
         SOSHibernateSession sosHibernateSession = null;
         try {
@@ -155,7 +162,7 @@ public class JOCResourceImpl {
             filter.setAccount(".");
             filter.setName(sessionIdString);
             filter.setConfigurationType(SHIRO_SESSION);
-            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter,0);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter, 0);
             sosHibernateSession.close();
 
             return (listOfConfigurtions.size() > 0);
@@ -171,7 +178,6 @@ public class JOCResourceImpl {
 
     public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws JocException {
         this.accessToken = accessToken;
-
 
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
         sosPermissionsCreator.loginFromAccessToken(accessToken);
