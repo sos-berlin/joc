@@ -58,7 +58,7 @@ public class IsAliveImpl extends JOCResourceImpl implements IIsAliveResource {
     }
 
     private void notifyEventHandler(String accessToken, JobStreamsFilter startJob) throws JsonProcessingException, JocException {
-        CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
+        CustomEventsUtil customEventsUtil = new CustomEventsUtil(IsAliveImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
 
