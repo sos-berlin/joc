@@ -350,8 +350,8 @@ public class SOSPermissionsCreator {
             
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setNotification(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:notification"));
-            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setOthers(haveRight(masterId,
-                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:others"));
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setYade(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:yade"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setOthers(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:others"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setInventory(haveRight(masterId,
