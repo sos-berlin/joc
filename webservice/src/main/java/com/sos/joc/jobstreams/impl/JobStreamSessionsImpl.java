@@ -58,13 +58,20 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM_STARTER);
             DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
             FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+            if ("running".equals(jobStreamSessionFilter.getStatus())) {
+                filterJobStreamHistory.setRunning(true);
+            }
+            int limit = 0;
+            if (jobStreamSessionFilter.getLimit() != null){
+                limit = jobStreamSessionFilter.getLimit();
+            }
             filterJobStreamHistory.setContextId(jobStreamSessionFilter.getSession());
             filterJobStreamHistory.setJobStreamId(jobStreamSessionFilter.getJobStreamId());
             filterJobStreamHistory.setStartedFrom(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateFrom(), jobStreamSessionFilter
                     .getTimeZone()));
             filterJobStreamHistory.setStartedTo(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateTo(), jobStreamSessionFilter.getTimeZone()));
             filterJobStreamHistory.setJobStreamStarter(jobStreamSessionFilter.getJobStreamStarterId());
-            List<DBItemJobStreamHistory> listOfSessions = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
+            List<DBItemJobStreamHistory> listOfSessions = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, limit);
 
             DBLayerJobStreamsTaskContext dbLayerJobStreamsTaskContext = new DBLayerJobStreamsTaskContext(sosHibernateSession);
             FilterJobStreamTaskContext filterJobStreamTaskContext = new FilterJobStreamTaskContext();

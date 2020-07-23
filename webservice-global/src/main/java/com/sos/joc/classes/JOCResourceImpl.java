@@ -184,7 +184,7 @@ public class JOCResourceImpl {
 
         SessionKey s = new DefaultSessionKey(accessToken);
         Session session = SecurityUtils.getSecurityManager().getSession(s);
-        if ("true".equals(session.getAttribute("dao"))) {
+        if (session != null && "true".equals(session.getAttribute("dao"))) {
             if (!sessionExistInDb(accessToken)) {
                 if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
                     Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
