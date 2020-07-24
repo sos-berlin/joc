@@ -33,6 +33,7 @@ import com.sos.joc.model.commands.ShowJobChain;
 import com.sos.joc.model.commands.ShowOrder;
 import com.sos.joc.model.commands.ShowState;
 import com.sos.joc.model.commands.StartJob;
+import com.sos.joc.model.commands.SubsystemShow;
 
 public class JobSchedulerCommandFactory {
 
@@ -301,6 +302,9 @@ public class JobSchedulerCommandFactory {
         case "Terminate":
             returnValue = permissions.getJobschedulerMaster().getExecute().isTerminate();
             break;
+        case "SubsystemShow":
+            returnValue = permissions.getSubsystemShow().getView().isSetStatus();
+            break;
         }
 
         if (folder != null) {
@@ -385,6 +389,8 @@ public class JobSchedulerCommandFactory {
                 command = (ScheduleRemove) jaxbElement.getValue();
             } else if ("params.get".equals(jaxbElement.getName().getLocalPart().toString())) {
                 command = (ParamsGet) objectFactory.createParamsGet();
+            }else if ("subsystem.show".equals(jaxbElement.getName().getLocalPart().toString())) {
+                    command = (SubsystemShow) objectFactory.createSubsystemShow();
             }
         }
         this.jaxbElement = jaxbElement;

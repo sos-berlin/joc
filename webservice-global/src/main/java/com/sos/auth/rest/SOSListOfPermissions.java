@@ -291,6 +291,8 @@ public class SOSListOfPermissions {
         addPermission(forUser, sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:change:edit_content");
         addPermission(forUser, sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:change:hot_folder");
 
+        addPermission(forUser, sosPermissionCommands.getSOSPermission(), "sos:products:commands:subsystem:view:status");
+
         sosPermissions.setSOSPermissionListCommands(sosPermissionCommands);
 
         sosPermissionShiro.setSOSPermissionRoles(roles);

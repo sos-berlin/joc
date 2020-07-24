@@ -51,7 +51,6 @@ public class SOSPermissionsCreator {
         this.currentUser = currentUser;
     }
 
-    
     public void loginFromAccessToken(String accessToken) throws JocException {
         SOSHibernateSession sosHibernateSession = null;
         try {
@@ -347,7 +346,7 @@ public class SOSPermissionsCreator {
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:delete"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setEdit(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:edit"));
-            
+
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setNotification(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:notification"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setYade(haveRight(masterId,
@@ -577,6 +576,10 @@ public class SOSPermissionsCreator {
             sosPermissionCommands.setSchedule(o.createSOSPermissionCommandsSchedule());
             sosPermissionCommands.setLock(o.createSOSPermissionCommandsLock());
 
+            sosPermissionCommands.setSubsystemShow(o.createSOSPermissionCommandsSubsystemShow());
+            sosPermissionCommands.getSubsystemShow().setView((o.createSOSPermissionCommandsSubsystemShowView()));
+
+            
             sosPermissionCommands.getJobschedulerMaster().setView(o.createSOSPermissionCommandsJobschedulerMasterView());
             sosPermissionCommands.getJobschedulerMaster().setExecute(o.createSOSPermissionCommandsJobschedulerMasterExecute());
             sosPermissionCommands.getJobschedulerMaster().setAdministration(o.createSOSPermissionCommandsJobschedulerMasterAdministration());
@@ -696,6 +699,8 @@ public class SOSPermissionsCreator {
             sosPermissionCommands.getLock().getView().setStatus(haveRight(masterId, "sos:products:commands:lock:view:status"));
             sosPermissionCommands.getLock().setRemove(haveRight(masterId, "sos:products:commands:lock:remove"));
             sosPermissionCommands.getLock().getChange().setHotFolder(haveRight(masterId, "sos:products:commands:lock:change:hot_folder"));
+
+            sosPermissionCommands.getSubsystemShow().getView().setStatus(haveRight(masterId, "sos:products:commands:subsystem:view:status"));
         }
         return sosPermissionCommands;
     }
