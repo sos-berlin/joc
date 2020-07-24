@@ -74,6 +74,10 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            String jobChainPath = normalizePath(orderHistoryFilter.getJobChain());
+            checkFolderPermissions(jobChainPath);
+            
             LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance, accessToken);
 
             LogInfo200 logInfo200 = new LogInfo200();
@@ -119,6 +123,13 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            if (orderHistoryFilter.getJobChain() != null && !orderHistoryFilter.getJobChain().isEmpty()) {
+                // jobChain is not required for ./log/html
+                String jobChainPath = normalizePath(orderHistoryFilter.getJobChain());
+                checkFolderPermissions(jobChainPath);
+            }
+            
             LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance, accessToken);
             java.nio.file.Path path = getLogPath(logOrderContent, orderHistoryFilter, true);
 //            boolean offerredAsDownload = false;

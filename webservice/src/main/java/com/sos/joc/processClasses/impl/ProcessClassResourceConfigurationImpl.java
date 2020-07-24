@@ -41,9 +41,10 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
                 return jocDefaultResponse;
             }
             checkRequiredParameter("processClass", processClassConfigurationFilter.getProcessClass());
+            String processClassPath = normalizePath(processClassConfigurationFilter.getProcessClass());
+            checkFolderPermissions(processClassPath);
             Configuration200 entity = new Configuration200();
             boolean responseInHtml = processClassConfigurationFilter.getMime() == ConfigurationMime.HTML;
-            String processClassPath = normalizePath(processClassConfigurationFilter.getProcessClass());
             if ("/(default)".equals(processClassPath)) {
                 JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
                 String command = jocXmlCommand.getShowStateCommand("folder process_class", "folders no_subfolders source", getParent(

@@ -59,6 +59,7 @@ public class LockResourceDocumentationImpl extends JOCResourceImpl implements IL
 
             checkRequiredParameter("jobschedulerId", jobschedulerId);
             checkRequiredParameter("lock", path);
+            checkFolderPermissions(path);
 
             documentationFilter.setPath(normalizePath(documentationFilter.getPath()));
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -88,16 +89,17 @@ public class LockResourceDocumentationImpl extends JOCResourceImpl implements IL
         try {
             JsonValidator.validateFailFast(filterBytes, LockDocuFilter.class);
             LockDocuFilter filter = Globals.objectMapper.readValue(filterBytes, LockDocuFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getLock().isAssignDocumentation());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            String lockPath = normalizePath(filter.getLock());
+            checkFolderPermissions(lockPath);
             AssignmentLockDocuAudit assignAudit = new AssignmentLockDocuAudit(filter);
             logAuditMessage(assignAudit);
-            Documentation.assignDocu(filter.getJobschedulerId(), normalizePath(filter.getLock()), filter.getDocumentation(),
-                    JobSchedulerObjectType.LOCK, API_CALL_ASSIGN);
+            Documentation.assignDocu(filter.getJobschedulerId(), lockPath, filter.getDocumentation(), JobSchedulerObjectType.LOCK, API_CALL_ASSIGN);
             storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -106,7 +108,6 @@ public class LockResourceDocumentationImpl extends JOCResourceImpl implements IL
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
-
     }
 
     @Override
@@ -114,15 +115,17 @@ public class LockResourceDocumentationImpl extends JOCResourceImpl implements IL
         try {
             JsonValidator.validateFailFast(filterBytes, LockDocuFilter.class);
             LockDocuFilter filter = Globals.objectMapper.readValue(filterBytes, LockDocuFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_UNASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getLock().isAssignDocumentation());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            String lockPath = normalizePath(filter.getLock());
+            checkFolderPermissions(lockPath);
             AssignmentLockDocuAudit unassignAudit = new AssignmentLockDocuAudit(filter);
             logAuditMessage(unassignAudit);
-            Documentation.unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getLock()), JobSchedulerObjectType.LOCK, API_CALL_UNASSIGN);
+            Documentation.unassignDocu(filter.getJobschedulerId(), lockPath, JobSchedulerObjectType.LOCK, API_CALL_UNASSIGN);
             storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

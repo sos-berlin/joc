@@ -21,6 +21,7 @@ import com.sos.joc.classes.schedule.SchedulePermanent;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.schedule.ScheduleP;
@@ -51,7 +52,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             // FILTER
             boolean withFolderFilter = schedulesFilter.getFolders() != null && !schedulesFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(schedulesFilter.getFolders());
             List<SchedulePath> schedules = schedulesFilter.getSchedules();
 
             Globals.beginTransaction(connection);
@@ -64,24 +65,33 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             if (schedules != null && !schedules.isEmpty()) {
                 List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                for (SchedulePath schedulePath : schedules) {
-                    if (schedulePath != null && canAdd(schedulePath.getSchedule(), permittedFolders)) {
-                        DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePath(schedulePath.getSchedule()),
-                                dbItemInventoryInstance.getId());
-                        if (scheduleFromDb == null) {
-                            continue;
-                        }
-                        ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, documentations.get(scheduleFromDb.getName()),  dbItemInventoryInstance);
-                        if (scheduleP != null) {
-                            schedulesToAdd.add(scheduleP);
+                String unpermittedObject = null;
+                for (SchedulePath schedule : schedules) {
+                    if (schedule != null) {
+                        String schedulePath = normalizePath(schedule.getSchedule());
+                        if (canAdd(schedulePath, permittedFolders)) {
+                            DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(schedulePath, dbItemInventoryInstance.getId());
+                            if (scheduleFromDb == null) {
+                                continue;
+                            }
+                            ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, documentations.get(scheduleFromDb
+                                    .getName()), dbItemInventoryInstance);
+                            if (scheduleP != null) {
+                                schedulesToAdd.add(scheduleP);
+                            }
+                        } else {
+                            unpermittedObject = schedulePath;
                         }
                     }
                 }
                 if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                     listOfSchedules.addAll(schedulesToAdd);
+                } else if (unpermittedObject != null) {
+                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 // no permission
+                throw new JocFolderPermissionsException(schedulesFilter.getFolders().get(0).getFolder());
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventorySchedule> schedulesFromDb = null;

@@ -30,6 +30,7 @@ import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
@@ -67,7 +68,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             // JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
             List<JobPath> jobs = jobsFilter.getJobs();
             boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(jobsFilter.getFolders());
 
             if (versionIsOlderThan("1.12.6")) {
                 JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
@@ -75,16 +76,23 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 if (jobs != null && !jobs.isEmpty()) {
                     List<JobPath> permittedJobs = new ArrayList<JobPath>();
                     Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                    String unpermittedObject = null;
                     for (JobPath job : jobs) {
-                        if (job != null && canAdd(job.getJob(), permittedFolders)) {
-                            permittedJobs.add(job);
+                        if (job != null) {
+                            if (canAdd(job.getJob(), permittedFolders)) {
+                                permittedJobs.add(job);
+                            } else {
+                                unpermittedObject = job.getJob();
+                            }
                         }
                     }
                     if (!permittedJobs.isEmpty()) {
                         listOfJobs = jocXmlCommand.getJobsFromShowJob(permittedJobs, jobsFilter);
+                    } else if (unpermittedObject != null) {
+                        throw new JocFolderPermissionsException(getParent(unpermittedObject));
                     }
                 } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                    // no permission
+                    throw new JocFolderPermissionsException(jobsFilter.getFolders().get(0).getFolder());
                 } else if (folders != null && !folders.isEmpty()) {
                     listOfJobs = jocXmlCommand.getJobsFromShowState(folders, jobsFilter);
                 } else {
@@ -116,18 +124,25 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                         }
                     } else {
                         Set<String> jobPaths = new HashSet<String>();
+                        String unpermittedObject = null;
                         for (JobPath job : jobs) {
-                            if (job != null && canAdd(job.getJob(), permittedFolders)) {
-                                jobPaths.add(job.getJob());
+                            if (job != null) {
+                                if (canAdd(job.getJob(), permittedFolders)) {
+                                    jobPaths.add(job.getJob());
+                                } else {
+                                    unpermittedObject = job.getJob();
+                                }
                             }
                         }
                         if (!jobPaths.isEmpty()) {
                             JobsVCallable callable = new JobsVCallable(jobPaths, jobsFilter, command, accessToken, summary);
                             listJobs.putAll(callable.call());
+                        } else if (unpermittedObject != null) {
+                            throw new JocFolderPermissionsException(getParent(unpermittedObject));
                         }
                     }
                 } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                    // no permission
+                    throw new JocFolderPermissionsException(jobsFilter.getFolders().get(0).getFolder());
                 } else if (folders != null && !folders.isEmpty()) {
                     for (Folder folder : folders) {
                         folder.setFolder(normalizeFolder(folder.getFolder()));

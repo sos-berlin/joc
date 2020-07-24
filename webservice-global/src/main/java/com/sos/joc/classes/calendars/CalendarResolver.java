@@ -23,15 +23,12 @@ import com.sos.joc.model.calendar.Dates;
 
 public class CalendarResolver {
 
-    public Dates getCalendarDates(SOSHibernateSession sosHibernateSession, CalendarDatesFilter calendarFilter) throws DBMissingDataException, JocMissingRequiredParameterException, DBConnectionRefusedException, DBInvalidDataException, JsonParseException, JsonMappingException, IOException, JobSchedulerInvalidResponseDataException  {
-
+    public static CalendarDatesFilter getCalendarDatesFilter(SOSHibernateSession sosHibernateSession, CalendarDatesFilter calendarFilter) throws DBMissingDataException, JocMissingRequiredParameterException, DBConnectionRefusedException, DBInvalidDataException, JsonParseException, JsonMappingException, IOException, JobSchedulerInvalidResponseDataException  {
         boolean calendarIdIsDefined = calendarFilter.getId() != null;
         boolean calendarPathIsDefined = calendarFilter.getPath() != null && !calendarFilter.getPath().isEmpty();
-        if (!calendarIdIsDefined && !calendarPathIsDefined && calendarFilter.getCalendar() == null) {
+        if (!calendarIdIsDefined && !calendarPathIsDefined) {
             throw new JocMissingRequiredParameterException("'calendar' or 'path' parameter is required");
         }
-        Dates dates = null;
-        FrequencyResolver fr = new FrequencyResolver();
 
         if (calendarPathIsDefined || calendarIdIsDefined) {
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(sosHibernateSession);
@@ -42,14 +39,28 @@ public class CalendarResolver {
                 if (calendarItem == null) {
                     throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));
                 }
+                calendarFilter.setId(calendarItem.getId());
             } else {
                 calendarItem = dbLayer.getCalendar(calendarFilter.getId());
                 if (calendarItem == null) {
                     throw new DBMissingDataException(String.format("calendar with id '%1$d' not found", calendarFilter.getId()));
                 }
+                calendarFilter.setPath(calendarItem.getName());
             }
             calendarFilter.setCalendar(new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class));
         }
+        return calendarFilter;
+    }
+    
+    
+    public static Dates getCalendarDates(SOSHibernateSession sosHibernateSession, CalendarDatesFilter calendarFilter) throws DBMissingDataException, JocMissingRequiredParameterException, DBConnectionRefusedException, DBInvalidDataException, JsonParseException, JsonMappingException, IOException, JobSchedulerInvalidResponseDataException  {
+
+        if (calendarFilter.getCalendar() == null) {
+            throw new JocMissingRequiredParameterException("undefined 'calendar'");
+        }
+        
+        Dates dates = null;
+        FrequencyResolver fr = new FrequencyResolver();
 
         try {
             if (calendarFilter.getCalendar().getBasedOn() != null && !calendarFilter.getCalendar().getBasedOn().isEmpty()) {

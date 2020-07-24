@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +24,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.audit.AuditLog;
 import com.sos.joc.model.audit.AuditLogFilter;
 import com.sos.joc.model.audit.AuditLogItem;
+import com.sos.joc.model.common.Folder;
 import com.sos.schema.JsonValidator;
 
 @Path("audit_log")
@@ -77,12 +80,20 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
         }
     }
 
-    private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb, String jobschedulerId, Matcher regExMatcher)
-            throws JocException {
+    private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb, String jobschedulerId, Matcher regExMatcher) throws JocException {
 
+        Map<String, Set<Folder>> permittedFoldersMap = folderPermissions.getListOfFoldersForInstance();
         List<AuditLogItem> audits = new ArrayList<AuditLogItem>();
         for (DBItemAuditLog auditLogFromDb : auditLogsFromDb) {
             AuditLogItem auditLogItem = new AuditLogItem();
+            if (auditLogFromDb.getFolder() != null && !auditLogFromDb.getFolder().isEmpty()) {
+                if (!folderPermissions.isPermittedForFolder(auditLogFromDb.getFolder(), permittedFoldersMap.get(""))) {
+                    continue;
+                }
+                if (!folderPermissions.isPermittedForFolder(auditLogFromDb.getFolder(), permittedFoldersMap.get(auditLogFromDb.getSchedulerId()))) {
+                    continue;
+                }
+            }
             if (jobschedulerId.isEmpty()) {
                 if (!getPermissonsJocCockpit(auditLogFromDb.getSchedulerId(), getAccessToken()).getAuditLog().getView().isStatus()) {
                     continue;

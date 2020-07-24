@@ -30,11 +30,11 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
+            
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            CalendarResolver calendarResolver = new CalendarResolver();
-            dates = calendarResolver.getCalendarDates(sosHibernateSession, calendarFilter);
+            calendarFilter = CalendarResolver.getCalendarDatesFilter(sosHibernateSession, calendarFilter);
+            checkCalendarFolderPermissions(calendarFilter.getPath());
+            dates = CalendarResolver.getCalendarDates(sosHibernateSession, calendarFilter);
 
             return JOCDefaultResponse.responseStatus200(dates);
         } catch (JocException e) {

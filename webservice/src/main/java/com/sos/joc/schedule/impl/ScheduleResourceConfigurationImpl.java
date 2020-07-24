@@ -52,9 +52,10 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             }
 
             checkRequiredParameter("schedule", scheduleBody.getSchedule());
+            String schedulePath = normalizePath(scheduleBody.getSchedule());
+            checkFolderPermissions(schedulePath);
 
             Configuration200 entity = new Configuration200();
-            String schedulePath = normalizePath(scheduleBody.getSchedule());
             boolean responseInHtml = scheduleBody.getMime() == ConfigurationMime.HTML;
             if (versionIsOlderThan("1.13.1")) {
                 entity.setConfiguration(getConfiguration(schedulePath, responseInHtml));
@@ -93,11 +94,12 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             }
 
             checkRequiredParameter("schedule", scheduleBody.getSchedule());
+            String schedulePath = normalizePath(scheduleBody.getSchedule());
+            checkFolderPermissions(schedulePath);
 
             RunTime200 runTimeAnswer = new RunTime200();
 
             Configuration conf = new Configuration();
-            String schedulePath = normalizePath(scheduleBody.getSchedule());
             if (versionIsOlderThan("1.13.1")) {
                 conf = getConfiguration(schedulePath, false);
             } else {

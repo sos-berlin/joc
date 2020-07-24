@@ -20,6 +20,7 @@ import com.sos.joc.classes.orders.OrderPermanent;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.order.OrderPath;
@@ -56,22 +57,30 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             String regex = ordersFilter.getRegex();
             List<OrderPath> orderPaths = ordersFilter.getOrders();
             boolean withFolderFilter = ordersFilter.getFolders() != null && !ordersFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(ordersFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(ordersFilter.getFolders());
             
             List<DBItemInventoryOrder> ordersFromDB = new ArrayList<DBItemInventoryOrder>();
             if (orderPaths != null && !orderPaths.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                String unpermittedObject = null;
                 for (OrderPath order : orderPaths) {
-                    if (order != null && canAdd(order.getJobChain(), permittedFolders)) {
-                        List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(normalizePath(order.getJobChain()), order
-                                .getOrderId(), instanceId);
-                        if (filteredOrders != null && !filteredOrders.isEmpty()) {
-                            ordersFromDB.addAll(filteredOrders);
+                    if (order != null) {
+                        if (canAdd(order.getJobChain(), permittedFolders)) {
+                            List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(normalizePath(order.getJobChain()),
+                                    order.getOrderId(), instanceId);
+                            if (filteredOrders != null && !filteredOrders.isEmpty()) {
+                                ordersFromDB.addAll(filteredOrders);
+                            }
+                        } else {
+                            unpermittedObject = order.getJobChain();
                         }
                     }
                 }
+                if (ordersFromDB.isEmpty() && unpermittedObject != null) {
+                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
+                }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                throw new JocFolderPermissionsException(ordersFilter.getFolders().get(0).getFolder());
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(normalizeFolder(folder.getFolder()),

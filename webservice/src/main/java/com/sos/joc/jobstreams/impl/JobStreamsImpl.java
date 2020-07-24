@@ -152,7 +152,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("jobStream", jobStream.getJobStream());
+            checkRequiredParameter("jobStream", jobStream.getJobStream());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM);
             sosHibernateSession.setAutoCommit(false);
@@ -186,9 +186,9 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
 
             try {
-                this.checkRequiredParameter("jobStreamId", jobStream.getJobStreamId());
+                checkRequiredParameter("jobStreamId", jobStream.getJobStreamId());
             } catch (JocMissingRequiredParameterException e) {
-                this.checkRequiredParameter("jobStream", jobStream.getJobStream());
+                checkRequiredParameter("jobStream", jobStream.getJobStream());
             }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM);

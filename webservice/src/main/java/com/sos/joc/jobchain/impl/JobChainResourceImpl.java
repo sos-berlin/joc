@@ -48,9 +48,11 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            JobChainV200 entity = new JobChainV200();
+            
             checkRequiredParameter("jobChain", jobChainFilter.getJobChain());
+            checkFolderPermissions(jobChainFilter.getJobChain());
 
+            JobChainV200 entity = new JobChainV200();
             boolean getJobChainFromXMLCommand = Globals.rollbackJobChainWithJSON;
             if (!getJobChainFromXMLCommand) {
                 getJobChainFromXMLCommand = versionIsOlderThan("1.12.10");

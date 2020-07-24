@@ -32,18 +32,15 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
 		SOSHibernateSession connection = null;
 		try {
 		    JsonValidator.validateFailFast(calendarFilterBytes, CalendarId.class);
-		    CalendarId calendarFilter = Globals.objectMapper.readValue(calendarFilterBytes, CalendarId.class);
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken,
-					calendarFilter.getJobschedulerId(),
-					getPermissonsJocCockpit(calendarFilter.getJobschedulerId(), accessToken).getCalendar().getView()
-							.isStatus());
-			if (jocDefaultResponse != null) {
+            CalendarId calendarFilter = Globals.objectMapper.readValue(calendarFilterBytes, CalendarId.class);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, calendarFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(calendarFilter.getJobschedulerId(), accessToken).getCalendar().getView().isStatus());
+            if (jocDefaultResponse != null) {
 				return jocDefaultResponse;
 			}
-			if (calendarFilter.getId() == null
-					&& (calendarFilter.getPath() == null || calendarFilter.getPath().isEmpty())) {
-				throw new JocMissingRequiredParameterException("undefined 'calendar path'");
-			}
+            if (calendarFilter.getId() == null && (calendarFilter.getPath() == null || calendarFilter.getPath().isEmpty())) {
+                throw new JocMissingRequiredParameterException("undefined 'calendar path'");
+            }
 			// TODO only check path, id will be removed
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
@@ -62,9 +59,7 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
 				}
 			}
 			
-			if (!canAdd(calendarItem.getName(), folderPermissions.getListOfFolders())) {
-			    return accessDeniedResponse("Access to folder " + getParent(calendarItem.getName()) + " denied.");
-            }
+			checkCalendarFolderPermissions(calendarItem.getName());
 			
 			DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
             

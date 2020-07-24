@@ -42,9 +42,10 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
 			if (jocDefaultResponse != null) {
 				return jocDefaultResponse;
 			}
-			this.checkRequiredParameter("schedule", scheduleFilter.getSchedule());
-
+			
+			checkRequiredParameter("schedule", scheduleFilter.getSchedule());
 			String schedulePath = normalizePath(scheduleFilter.getSchedule());
+            checkFolderPermissions(schedulePath);
 			String scheduleParent = getParent(schedulePath);
 
 			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);

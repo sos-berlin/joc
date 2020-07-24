@@ -45,8 +45,10 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
 
             checkRequiredParameter("orderId", orderBody.getOrderId());
             checkRequiredParameter("jobChain", orderBody.getJobChain());
+            String jobChainPath = normalizePath(orderBody.getJobChain());
+            checkFolderPermissions(jobChainPath);
 
-            orderBody.setJobChain(normalizePath(orderBody.getJobChain()));
+            orderBody.setJobChain(jobChainPath);
             OrderV o = new OrdersVCallable(orderBody, command, accessToken).getOrder();
 
             // JOC-678

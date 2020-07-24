@@ -42,6 +42,7 @@ import com.sos.schema.JsonValidator;
 public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements IJobsResourceOverviewSnapshot {
 
     private static final String API_CALL = "./jobs/overview/snapshot";
+    private static Set<Folder> permittedFolders;
     public class SummaryStatistics {
 
         private int count = 0;
@@ -158,6 +159,30 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
                 entity.setSurveyDate(JobSchedulerDate.getDateFromEventId(json.getJsonNumber("eventId").longValue()));
                 JsonArray elements = json.getJsonArray("elements");
                 
+                permittedFolders = folderPermissions.getListOfFolders();
+                
+                Predicate<JsonValue> jobIsEnabled = p -> {
+                    try {
+                        JsonObject overview = ((JsonObject) p);
+                        String path = overview.getString("path", "");
+                        if (path.isEmpty() || path.equals("/scheduler_file_order_sink") || path.equals("/scheduler_service_forwarder") || !overview
+                                .getBoolean("enabled", true)) {
+                            return false;
+                        } else {
+                            ConfigurationState confState = ConfigurationStatus.getConfigurationStatus(overview.getJsonArray("obstacles"));
+                            if (confState != null && confState.getSeverity() == 2) {
+                                return false;
+                            }
+                            if (!isPermittedForFolder(getParent(path))) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                };
+                
                 Map<String, SummaryStatistics> summary = elements.stream().filter(jobIsEnabled).collect(Collectors.groupingBy(p -> {
                     JsonObject overview = ((JsonObject) p);
                     JsonArray obstacles = overview.getJsonArray("obstacles");
@@ -222,28 +247,14 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
 
     }
     
-    public static Predicate<JsonValue> jobIsEnabled = new Predicate<JsonValue>() {
-
-        @Override
-        public boolean test(JsonValue p) {
-            try {
-                JsonObject overview = ((JsonObject) p);
-                String path = overview.getString("path", "");
-                if (path.isEmpty() || path.equals("/scheduler_file_order_sink") || path.equals("/scheduler_service_forwarder") || !overview.getBoolean("enabled", true)) {
-                    return false;
-                } else {
-                    ConfigurationState confState = ConfigurationStatus.getConfigurationStatus(overview.getJsonArray("obstacles"));
-                    if (confState != null && confState.getSeverity() == 2) {
-                        return false;
-                    }
-                }
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
+    private static boolean isPermittedForFolder(String folder) {
+        if (permittedFolders == null || permittedFolders.isEmpty()) {
+            return true;
         }
-        
-    };
+        Predicate<Folder> filter = f -> f.getFolder().equals(folder) || (f.getRecursive() && ("/".equals(f.getFolder()) || folder.startsWith(f
+                .getFolder() + "/")));
+        return permittedFolders.stream().parallel().anyMatch(filter);
+    }
     
     public static boolean isWaitingForAgent(JsonObject taskObstacles) {
         if (taskObstacles != null) {

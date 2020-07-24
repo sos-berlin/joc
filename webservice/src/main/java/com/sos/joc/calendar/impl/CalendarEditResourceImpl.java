@@ -83,10 +83,13 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                             .getEdit().isChange())) {
                 return accessDeniedResponse();
             }
-            if (!canAdd(calendar.getPath(), folderPermissions.getListOfFolders())) {
-                return accessDeniedResponse("Access to folder " + getParent(calendar.getPath()) + " denied.");
+            
+            if (calendar.getPath() != null && !calendar.getPath().isEmpty()) {
+                checkCalendarFolderPermissions(calendar.getPath());
+            } else if (calendarDbItem != null && calendarDbItem.getName() != null && !calendarDbItem.getName().isEmpty()) {
+                checkCalendarFolderPermissions(calendarDbItem.getName());
             }
-
+            
             ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog(),
                     calendarFilter.getJobschedulerId());
             logAuditMessage(calendarAudit);
@@ -205,12 +208,9 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             }
 
             checkRequiredComment(calendarFilter.getAuditLog());
-
             Calendar calendar = checkRequirements(calendarFilter.getCalendar());
-            if (!canAdd(calendar.getPath(), folderPermissions.getListOfFolders())) {
-                return accessDeniedResponse("Access to folder " + getParent(calendar.getPath()) + " denied.");
-            }
-
+            checkCalendarFolderPermissions(calendar.getPath());
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_SAVE_AS);
             CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
 
@@ -279,9 +279,9 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 
             String calendarPath = normalizePath(calendarFilter.getPath());
             String calendarNewPath = normalizePath(calendarFilter.getNewPath());
-            if (!canAdd(calendarNewPath, folderPermissions.getListOfFolders())) {
-                return accessDeniedResponse("Access to folder " + getParent(calendarNewPath) + " denied.");
-            }
+            
+            checkCalendarFolderPermissions(calendarNewPath);
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_MOVE);
 
             ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, calendarPath, calendarFilter.getAuditLog(), calendarFilter

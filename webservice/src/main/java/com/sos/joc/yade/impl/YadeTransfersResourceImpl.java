@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -24,6 +25,7 @@ import com.sos.joc.db.yade.JocYadeFilter;
 import com.sos.joc.db.yade.YadeSourceTargetFiles;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.yade.Operation;
 import com.sos.joc.model.yade.Protocol;
 import com.sos.joc.model.yade.ProtocolFragment;
@@ -222,6 +224,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 				if (filteredTransferIds == null) {
 					filteredTransferIds = new ArrayList<Long>();
 				}
+				Map<String, Set<Folder>> permittedFoldersMap = folderPermissions.getListOfFoldersForInstance();
 				for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
 					if (withSourceTargetFilter && !filteredTransferIds.contains(transferFromDb.getId())) {
 						continue;
@@ -232,6 +235,21 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 							continue;
 						}
 					}
+					if (transferFromDb.getJobChain() != null && !transferFromDb.getJobChain().isEmpty()) {
+		                if (!canAdd(transferFromDb.getJobChain(), permittedFoldersMap.get(""))) {
+		                    continue;
+		                }
+		                if (!canAdd(transferFromDb.getJobChain(), permittedFoldersMap.get(transferFromDb.getJobschedulerId()))) {
+		                    continue;
+		                }
+		            } else if (transferFromDb.getJob() != null && !transferFromDb.getJob().isEmpty()) {
+		                if (!canAdd(transferFromDb.getJob(), permittedFoldersMap.get(""))) {
+                            continue;
+                        }
+                        if (!canAdd(transferFromDb.getJob(), permittedFoldersMap.get(transferFromDb.getJobschedulerId()))) {
+                            continue;
+                        }
+		            }
 					transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
 				}
 			}
@@ -398,6 +416,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 			}
 		}
 		transfer.setTaskId(dbTransfer.getTaskId());
+		// TODO consider folder perms
 		if (!compact) {
 			transfer.setJob(dbTransfer.getJob());
 			transfer.setJobChain(dbTransfer.getJobChain());

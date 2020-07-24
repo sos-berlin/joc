@@ -21,6 +21,7 @@ import com.sos.joc.classes.jobs.JobPermanent;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -99,7 +100,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         List<DBItemInventoryJob> listOfJobs = null;
         List<JobPath> jobs = jobsFilter.getJobs();
         boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
-        List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+        Set<Folder> folders = addPermittedFolders(jobsFilter.getFolders());
         String regex = jobsFilter.getRegex();
         
         Set<String> criticalities = null;
@@ -112,17 +113,25 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             List<DBItemInventoryJob> filteredJobs = null;
             
             Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+            String unpermittedObject = null;
             for (JobPath job : jobs) {
-                if (job != null && canAdd(job.getJob(), permittedFolders)) {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePath(job.getJob()), jobsFilter.getIsOrderJob(), criticalities,
-                            dbItemInventoryInstance.getId());
-                    if (filteredJobs != null) {
-                        listOfJobs.addAll(filteredJobs);
+                if (job != null) {
+                    if (canAdd(job.getJob(), permittedFolders)) {
+                        filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePath(job.getJob()), jobsFilter.getIsOrderJob(),
+                                criticalities, dbItemInventoryInstance.getId());
+                        if (filteredJobs != null) {
+                            listOfJobs.addAll(filteredJobs);
+                        }
+                    } else {
+                        unpermittedObject = job.getJob();
                     }
+                }
+                if (listOfJobs.isEmpty() && unpermittedObject != null) {
+                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
                 }
             }
         } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-            // no permission
+            throw new JocFolderPermissionsException(jobsFilter.getFolders().get(0).getFolder());
         } else if (folders != null && !folders.isEmpty()) {
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;

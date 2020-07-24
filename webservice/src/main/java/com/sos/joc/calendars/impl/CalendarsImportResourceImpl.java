@@ -79,7 +79,8 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
             }
 
             List<Calendar> calendars = calendarImportFilter.getCalendars();
-            Set<Folder> folders = folderPermissions.getListOfFolders();
+            
+            Set<Folder> folders = getCalendarFolderPermissions().getListOfFolders();
 
             if (calendars != null && !calendars.isEmpty()) {
 

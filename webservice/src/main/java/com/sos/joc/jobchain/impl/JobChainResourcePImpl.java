@@ -46,6 +46,10 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            checkRequiredParameter("jobChain", jobChainFilter.getJobChain());
+            checkFolderPermissions(jobChainFilter.getJobChain());
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             JobChainP200 entity = new JobChainP200();

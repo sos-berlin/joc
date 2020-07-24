@@ -3,6 +3,7 @@ package com.sos.joc.orders.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -15,6 +16,7 @@ import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandDeleteOrder;
@@ -43,8 +45,9 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
                 throw new JocMissingRequiredParameterException("undefined 'orders'");
             }
             Date surveyDate = new Date();
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             for (ModifyOrder order : modifyOrders.getOrders()) {
-                surveyDate = executeDeleteOrderCommand(order, modifyOrders);
+                surveyDate = executeDeleteOrderCommand(order, modifyOrders, permittedFolders);
             }
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -58,7 +61,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
         }
     }
 
-    private Date executeDeleteOrderCommand(ModifyOrder order, ModifyOrders modifyOrders) {
+    private Date executeDeleteOrderCommand(ModifyOrder order, ModifyOrders modifyOrders, Set<Folder> permittedFolders) {
         try {
             if (order.getParams() != null && order.getParams().isEmpty()) {
                 order.setParams(null);
@@ -71,6 +74,8 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
 
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
+            checkFolderPermissions(order.getJobChain(), permittedFolders);
+            
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             XMLBuilder xml = new XMLBuilder("remove_order");
             xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", normalizePath(order.getJobChain()));

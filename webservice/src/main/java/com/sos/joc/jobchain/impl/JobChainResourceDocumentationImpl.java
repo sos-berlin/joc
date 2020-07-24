@@ -59,7 +59,8 @@ public class JobChainResourceDocumentationImpl extends JOCResourceImpl implement
 
             checkRequiredParameter("jobschedulerId", jobschedulerId);
             checkRequiredParameter("jobChain", path);
-
+            checkFolderPermissions(path);
+            
             documentationFilter.setPath(normalizePath(documentationFilter.getPath()));
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
@@ -88,16 +89,18 @@ public class JobChainResourceDocumentationImpl extends JOCResourceImpl implement
         try {
             JsonValidator.validateFailFast(filterBytes, JobChainDocuFilter.class);
             JobChainDocuFilter filter = Globals.objectMapper.readValue(filterBytes, JobChainDocuFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getJobChain().isAssignDocumentation());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            String jobChainPath = normalizePath(filter.getJobChain());
+            checkFolderPermissions(jobChainPath);
             AssignmentJobChainDocuAudit assignAudit = new AssignmentJobChainDocuAudit(filter);
             logAuditMessage(assignAudit);
-            Documentation.assignDocu(filter.getJobschedulerId(), normalizePath(filter.getJobChain()), filter.getDocumentation(),
-                    JobSchedulerObjectType.JOBCHAIN, API_CALL_ASSIGN);
+            Documentation.assignDocu(filter.getJobschedulerId(), jobChainPath, filter.getDocumentation(), JobSchedulerObjectType.JOBCHAIN,
+                    API_CALL_ASSIGN);
             storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -106,7 +109,6 @@ public class JobChainResourceDocumentationImpl extends JOCResourceImpl implement
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
-
     }
 
     @Override
@@ -114,16 +116,17 @@ public class JobChainResourceDocumentationImpl extends JOCResourceImpl implement
         try {
             JsonValidator.validateFailFast(filterBytes, JobChainDocuFilter.class);
             JobChainDocuFilter filter = Globals.objectMapper.readValue(filterBytes, JobChainDocuFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_UNASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getJobChain().isAssignDocumentation());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            String jobChainPath = normalizePath(filter.getJobChain());
+            checkFolderPermissions(jobChainPath);
             AssignmentJobChainDocuAudit unassignAudit = new AssignmentJobChainDocuAudit(filter);
             logAuditMessage(unassignAudit);
-            Documentation.unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getJobChain()), JobSchedulerObjectType.JOBCHAIN,
-                    API_CALL_UNASSIGN);
+            Documentation.unassignDocu(filter.getJobschedulerId(), jobChainPath, JobSchedulerObjectType.JOBCHAIN, API_CALL_UNASSIGN);
             storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

@@ -31,27 +31,26 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
 		try {
 		    JsonValidator.validateFailFast(calendarFilterBytes, CalendarId.class);
             CalendarId calendarFilter = Globals.objectMapper.readValue(calendarFilterBytes, CalendarId.class);
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken,
-					calendarFilter.getJobschedulerId(),
-					getPermissonsJocCockpit(calendarFilter.getJobschedulerId(), accessToken).getCalendar().getView()
-							.isStatus());
-			if (jocDefaultResponse != null) {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, calendarFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(calendarFilter.getJobschedulerId(), accessToken).getCalendar().getView().isStatus());
+            if (jocDefaultResponse != null) {
 				return jocDefaultResponse;
 			}
-			if (calendarFilter.getId() == null
-					&& (calendarFilter.getPath() == null || calendarFilter.getPath().isEmpty())) {
-				throw new JocMissingRequiredParameterException("undefined 'calendar path'");
-			}
+            if (calendarFilter.getId() == null && (calendarFilter.getPath() == null || calendarFilter.getPath().isEmpty())) {
+                throw new JocMissingRequiredParameterException("undefined 'calendar path'");
+            }
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			CalendarUsageDBLayer dbCalendarLayer = new CalendarUsageDBLayer(connection);
 
 			List<DBItemInventoryClusterCalendarUsage> calendarUsages = null;
-			if (calendarFilter.getId() != null) {
-				calendarUsages = dbCalendarLayer.getCalendarUsages(calendarFilter.getId());
-			} else {
-				calendarUsages = dbCalendarLayer.getCalendarUsages(dbItemInventoryInstance.getSchedulerId(),
-						normalizePath(calendarFilter.getPath()));
-			}
+            if (calendarFilter.getId() != null) {
+                calendarUsages = dbCalendarLayer.getCalendarUsages(calendarFilter.getId());
+                // TODO id -> path then checkCalendarFolderPermissions(path);
+            } else {
+                String calendarPath = normalizePath(calendarFilter.getPath());
+                checkCalendarFolderPermissions(calendarPath);
+                calendarUsages = dbCalendarLayer.getCalendarUsages(dbItemInventoryInstance.getSchedulerId(), calendarPath);
+            }
 
 			List<String> orders = new ArrayList<String>();
 			List<String> jobs = new ArrayList<String>();

@@ -1,6 +1,7 @@
 package com.sos.joc.yade.impl;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -12,6 +13,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.db.yade.JocDBLayerYade;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.yade.TransferFilesSummary;
 import com.sos.joc.model.yade.TransferFilter;
 import com.sos.joc.yade.resource.IYadeOverviewSummaryResource;
@@ -37,7 +39,9 @@ public class YadeOverviewSummaryResourceImpl extends JOCResourceImpl implements 
                 return jocDefaultResponse;
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            
             // filter values
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             String dateFrom = filterBody.getDateFrom();
             String dateTo = filterBody.getDateTo();
             String timeZone = filterBody.getTimeZone();
@@ -51,8 +55,8 @@ public class YadeOverviewSummaryResourceImpl extends JOCResourceImpl implements 
             }
             JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
             TransferFilesSummary entity = new TransferFilesSummary();
-            entity.setSuccessful(dbLayer.getSuccessFulTransfersCount(filterBody.getJobschedulerId(), from, to));
-            entity.setFailed(dbLayer.getFailedTransfersCount(filterBody.getJobschedulerId(), from, to));
+            entity.setSuccessful(dbLayer.getSuccessFulTransfersCount(filterBody.getJobschedulerId(), from, to, permittedFolders));
+            entity.setFailed(dbLayer.getFailedTransfersCount(filterBody.getJobschedulerId(), from, to, permittedFolders));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

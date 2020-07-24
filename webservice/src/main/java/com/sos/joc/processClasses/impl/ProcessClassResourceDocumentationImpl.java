@@ -38,12 +38,12 @@ public class ProcessClassResourceDocumentationImpl extends JOCResourceImpl imple
     public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) {
         SOSHibernateSession connection = null;
         try {
-            //String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
+            // String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
             JsonObjectBuilder builder = Json.createObjectBuilder();
-            if(jobschedulerId != null) {
+            if (jobschedulerId != null) {
                 builder.add("jobschedulerId", jobschedulerId);
             }
-            if(path != null) {
+            if (path != null) {
                 builder.add("path", path);
             }
             String json = builder.build().toString();
@@ -59,8 +59,9 @@ public class ProcessClassResourceDocumentationImpl extends JOCResourceImpl imple
 
             checkRequiredParameter("jobschedulerId", jobschedulerId);
             checkRequiredParameter("processClass", path);
-
             documentationFilter.setPath(normalizePath(documentationFilter.getPath()));
+            checkFolderPermissions(documentationFilter.getPath());
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             String docPath = dbLayer.getDocumentationPath(documentationFilter);
@@ -88,16 +89,20 @@ public class ProcessClassResourceDocumentationImpl extends JOCResourceImpl imple
         try {
             JsonValidator.validateFailFast(filterBytes, ProcessClassDocuFilter.class);
             ProcessClassDocuFilter filter = Globals.objectMapper.readValue(filterBytes, ProcessClassDocuFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getProcessClass().isAssignDocumentation());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            String processClassPath = normalizePath(filter.getProcessClass());
+            checkFolderPermissions(processClassPath);
+
             AssignmentProcessClassDocuAudit assignAudit = new AssignmentProcessClassDocuAudit(filter);
             logAuditMessage(assignAudit);
-            Documentation.assignDocu(filter.getJobschedulerId(), normalizePath(filter.getProcessClass()), filter.getDocumentation(),
-                    JobSchedulerObjectType.PROCESSCLASS, API_CALL_ASSIGN);
+            Documentation.assignDocu(filter.getJobschedulerId(), processClassPath, filter.getDocumentation(), JobSchedulerObjectType.PROCESSCLASS,
+                    API_CALL_ASSIGN);
             storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -114,16 +119,19 @@ public class ProcessClassResourceDocumentationImpl extends JOCResourceImpl imple
         try {
             JsonValidator.validateFailFast(filterBytes, ProcessClassDocuFilter.class);
             ProcessClassDocuFilter filter = Globals.objectMapper.readValue(filterBytes, ProcessClassDocuFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_UNASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getProcessClass().isAssignDocumentation());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            String processClassPath = normalizePath(filter.getProcessClass());
+            checkFolderPermissions(processClassPath);
+
             AssignmentProcessClassDocuAudit unassignAudit = new AssignmentProcessClassDocuAudit(filter);
             logAuditMessage(unassignAudit);
-            Documentation.unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getProcessClass()), JobSchedulerObjectType.PROCESSCLASS,
-                    API_CALL_UNASSIGN);
+            Documentation.unassignDocu(filter.getJobschedulerId(), processClassPath, JobSchedulerObjectType.PROCESSCLASS, API_CALL_UNASSIGN);
             storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

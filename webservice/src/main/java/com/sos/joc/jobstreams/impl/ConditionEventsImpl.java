@@ -113,10 +113,10 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("jobStream", conditionEvent.getJobStream());
-            this.checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
-            this.checkRequiredParameter("event", conditionEvent.getEvent());
-            this.checkRequiredParameter("session", conditionEvent.getSession());
+            checkRequiredParameter("jobStream", conditionEvent.getJobStream());
+            checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
+            checkRequiredParameter("event", conditionEvent.getEvent());
+            checkRequiredParameter("session", conditionEvent.getSession());
 
             FilterEvents filter = new FilterEvents();
             filter.setEvent(conditionEvent.getEvent());
@@ -153,8 +153,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("event", conditionEvent.getEvent());
-            this.checkRequiredParameter("session", conditionEvent.getSession());
+            checkRequiredParameter("event", conditionEvent.getEvent());
+            checkRequiredParameter("session", conditionEvent.getSession());
 
             conditionEvent.setSession(conditionEvent.getSession());
 

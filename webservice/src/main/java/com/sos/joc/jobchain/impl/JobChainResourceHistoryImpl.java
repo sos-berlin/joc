@@ -107,16 +107,18 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
 		SOSHibernateSession connection = null;
 		try {
-		    JsonValidator.validateFailFast(jobChainHistoryFilterBytes, JobChainHistoryFilter.class);
-		    JobChainHistoryFilter jobChainHistoryFilter = Globals.objectMapper.readValue(jobChainHistoryFilterBytes, JobChainHistoryFilter.class);
+            JsonValidator.validateFailFast(jobChainHistoryFilterBytes, JobChainHistoryFilter.class);
+            JobChainHistoryFilter jobChainHistoryFilter = Globals.objectMapper.readValue(jobChainHistoryFilterBytes, JobChainHistoryFilter.class);
+
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainHistoryFilter, accessToken, jobChainHistoryFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(jobChainHistoryFilter.getJobschedulerId(), accessToken).getJobChain().getView().isHistory());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
             
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainHistoryFilter, accessToken,
-					jobChainHistoryFilter.getJobschedulerId(),
-					getPermissonsJocCockpit(jobChainHistoryFilter.getJobschedulerId(), accessToken).getJobChain()
-							.getView().isHistory());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
+            checkRequiredParameter("jobChain", jobChainHistoryFilter.getJobChain());
+            String jobChainPath = normalizePath(jobChainHistoryFilter.getJobChain());
+            checkFolderPermissions(jobChainPath);
 
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			Globals.beginTransaction(connection);
@@ -131,10 +133,9 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
 			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
 
-			String jobChainCommand = jocXmlCommand.getShowJobChainCommand(
-					normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0,
-					jobChainHistoryFilter.getMaxLastHistoryItems());
-			jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobChainCommand, accessToken);
+            String jobChainCommand = jocXmlCommand.getShowJobChainCommand(jobChainPath, "order_history", 0, jobChainHistoryFilter
+                    .getMaxLastHistoryItems());
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobChainCommand, accessToken);
 
 			// nested Job chains ermitteln
 			Node jobChain = jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/job_chain");
@@ -144,24 +145,24 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 			List<OrderHistoryItem> listOfHistory = new ArrayList<OrderHistoryItem>();
 
 			if (jobChainNodes.getLength() > 0) {
-				boolean validInnerChainExist = false;
-				StringBuilder str = new StringBuilder();
-				str.append("<commands>");
-				for (int i = 0; i < jobChainNodes.getLength(); i++) {
-					String innerChainPath = normalizePath(jobChainNodes.item(i).getNodeValue());
-					if (jocXmlCommand.getSosxml().selectSingleNode(jobChain, "file_based/requisites/requisite[@path='"
-							+ innerChainPath.toLowerCase() + "' and @is_missing='yes']") != null) {
-						continue;
-					}
-					validInnerChainExist = true;
-					str.append(jocXmlCommand.getShowJobChainCommand(innerChainPath, "order_history", 0,
-							jobChainHistoryFilter.getMaxLastHistoryItems()));
-				}
-				str.append("</commands>");
-				if (validInnerChainExist) {
-					jocXmlCommand.executePostWithThrowBadRequestAfterRetry(str.toString(), accessToken);
-					listOfHistory.addAll(handleJobChain(jocXmlCommand, jobChainHistoryFilter));
-				}
+                boolean validInnerChainExist = false;
+                StringBuilder str = new StringBuilder();
+                str.append("<commands>");
+                for (int i = 0; i < jobChainNodes.getLength(); i++) {
+                    String innerChainPath = normalizePath(jobChainNodes.item(i).getNodeValue());
+                    if (jocXmlCommand.getSosxml().selectSingleNode(jobChain, "file_based/requisites/requisite[@path='" + innerChainPath.toLowerCase()
+                            + "' and @is_missing='yes']") != null) {
+                        continue;
+                    }
+                    validInnerChainExist = true;
+                    str.append(jocXmlCommand.getShowJobChainCommand(innerChainPath, "order_history", 0, jobChainHistoryFilter
+                            .getMaxLastHistoryItems()));
+                }
+                str.append("</commands>");
+                if (validInnerChainExist) {
+                    jocXmlCommand.executePostWithThrowBadRequestAfterRetry(str.toString(), accessToken);
+                    listOfHistory.addAll(handleJobChain(jocXmlCommand, jobChainHistoryFilter));
+                }
 			} else {
 				listOfHistory.addAll(handleJobChain(jocXmlCommand, jobChainHistoryFilter));
 			}

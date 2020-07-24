@@ -45,6 +45,7 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
 
             checkRequiredParameter("jobschedulerId", jobFilter.getJobschedulerId());
             checkRequiredParameter("job", jobFilter.getJob());
+            checkFolderPermissions(jobFilter.getJob());
 
             JOCJsonCommand jocJsonCommand = new JOCJsonCommand(this);
             jocJsonCommand.setUriBuilderForJobs();

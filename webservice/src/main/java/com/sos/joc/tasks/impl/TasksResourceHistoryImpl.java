@@ -3,6 +3,7 @@ package com.sos.joc.tasks.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +20,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
@@ -62,7 +64,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             boolean hasPermission = true;
             boolean getTaskFromHistoryIdAndNode = false;
             boolean getTaskFromOrderHistory = false;
-            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(jobsFilter.getFolders());
 
             ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(connection);
             reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
@@ -105,10 +107,20 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
                     if (jobsFilter.getJobs() != null && !jobsFilter.getJobs().isEmpty()) {
                         Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                        String unpermittedObject = null;
+                        hasPermission = false;
                         for (JobPath jobPath : jobsFilter.getJobs()) {
-                            if (jobPath != null && canAdd(jobPath.getJob(), permittedFolders)) {
-                                reportTaskExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
+                            if (jobPath != null) {
+                                if (canAdd(jobPath.getJob(), permittedFolders)) {
+                                    reportTaskExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
+                                    hasPermission = true;
+                                } else {
+                                    unpermittedObject = jobPath.getJob();
+                                }
                             }
+                        }
+                        if (!hasPermission && unpermittedObject != null) {
+                            throw new JocFolderPermissionsException(getParent(unpermittedObject));
                         }
                         jobsFilter.setRegex("");
                     } else {
@@ -120,6 +132,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
                         if (withFolderFilter && (folders == null || folders.isEmpty())) {
                             hasPermission = false;
+                            throw new JocFolderPermissionsException(jobsFilter.getFolders().get(0).getFolder());
                         } else if (folders != null && !folders.isEmpty()) {
                             for (Folder folder : folders) {
                                 folder.setFolder(normalizeFolder(folder.getFolder()));
@@ -156,15 +169,20 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                 if (jobsFilter.getRegex() != null && !jobsFilter.getRegex().isEmpty()) {
                     regExMatcher = Pattern.compile(jobsFilter.getRegex()).matcher("");
                 }
+                Map<String, Set<Folder>> permittedFoldersMap = folderPermissions.getListOfFoldersForInstance();
 
                 if (listOfDBItemReportTaskDBItems != null) {
                     for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
                         TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
-                        if (!getPermissonsJocCockpit(dbItemReportTask.getSchedulerId(), accessToken).getHistory().getView().isStatus()) {
-                            continue;
-                        }
+                        
                         if (jobsFilter.getJobschedulerId().isEmpty()) {
-                            taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
+                            if (!getPermissonsJocCockpit(dbItemReportTask.getSchedulerId(), accessToken).getHistory().getView().isStatus()) {
+                                continue;
+                            }
+                            if (!folderPermissions.isPermittedForFolder(dbItemReportTask.getFolder(), permittedFoldersMap.get(dbItemReportTask
+                                    .getSchedulerId()))) {
+                                continue;
+                            }
                         }
 
                         taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());

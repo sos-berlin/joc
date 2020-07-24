@@ -42,7 +42,12 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
 			}
 			
 			checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
-			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			checkRequiredParameter("orderId", orderHistoryFilter.getOrderId());
+            checkRequiredParameter("jobChain", orderHistoryFilter.getJobChain());
+            String jobChainPath = normalizePath(orderHistoryFilter.getJobChain());
+            checkFolderPermissions(jobChainPath);
+            
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			Globals.beginTransaction(connection);
 
 			List<OrderStepHistoryItem> listOrderStepHistory = new ArrayList<OrderStepHistoryItem>();

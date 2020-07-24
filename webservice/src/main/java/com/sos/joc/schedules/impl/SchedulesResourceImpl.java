@@ -3,6 +3,7 @@ package com.sos.joc.schedules.impl;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -22,6 +24,7 @@ import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.schedule.ScheduleVolatile;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.schedule.SchedulePath;
@@ -55,16 +58,30 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
             List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
             boolean withFolderFilter = schedulesFilter.getFolders() != null && !schedulesFilter.getFolders().isEmpty();
             boolean hasPermission = true;
-            List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(schedulesFilter.getFolders());
 
             Set<String> setOfSchedules = new HashSet<String>();
             if (schedulesFilter.getSchedules() != null && !schedulesFilter.getSchedules().isEmpty()) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                String unpermittedObject = null;
                 for (SchedulePath schedule : schedulesFilter.getSchedules()) {
-                    checkRequiredParameter("schedules.schedule", schedule.getSchedule());
-                    setOfSchedules.add(normalizePath(schedule.getSchedule()));
+                    if (schedule != null) {
+                        checkRequiredParameter("schedules.schedule", schedule.getSchedule());
+                        String schedulePath = normalizePath(schedule.getSchedule());
+                        if (canAdd(schedulePath, permittedFolders)) {
+                            setOfSchedules.add(schedulePath);
+                        } else {
+                            unpermittedObject = schedulePath;
+                        }
+                    }
+                }
+                if (setOfSchedules.isEmpty() && unpermittedObject != null) {
+                    hasPermission = false;
+                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 hasPermission = false;
+                throw new JocFolderPermissionsException(schedulesFilter.getFolders().get(0).getFolder());
             }
 
             if (hasPermission) {
@@ -124,7 +141,7 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
         }
     }
 
-    private boolean isInFolderList(List<Folder> folders, String path) throws JocMissingRequiredParameterException {
+    private boolean isInFolderList(Collection<Folder> folders, String path) throws JocMissingRequiredParameterException {
         if (folders == null || folders.isEmpty()) {
             return true;
         }

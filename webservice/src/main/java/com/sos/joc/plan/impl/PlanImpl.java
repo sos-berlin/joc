@@ -3,11 +3,11 @@ package com.sos.joc.plan.impl;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +30,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.plan.Period;
@@ -134,9 +135,15 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(sosHibernateSession);
             boolean withFolderFilter = planFilter.getFolders() != null && !planFilter.getFolders().isEmpty();
             boolean hasPermission = true;
-            List<Folder> folders = addPermittedFolder(planFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(planFilter.getFolders());
 
             Globals.beginTransaction(sosHibernateSession);
+            
+            if (planFilter.getJob() != null && !planFilter.getJob().isEmpty()) {
+                checkFolderPermissions(planFilter.getJob());
+            } else if (planFilter.getJobChain() != null && !planFilter.getJobChain().isEmpty()) {
+                checkFolderPermissions(planFilter.getJobChain());
+            }
 
             Date maxDate = getMaxPlannedStart(dailyPlanDBLayer, planFilter.getJobschedulerId());
             SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd" );
@@ -178,6 +185,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 hasPermission = false;
+                throw new JocFolderPermissionsException(planFilter.getFolders().get(0).getFolder());
             } else if (folders != null && !folders.isEmpty()) {
                 dailyPlanDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(folders));
             }

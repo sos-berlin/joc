@@ -2,7 +2,6 @@ package com.sos.joc.jobs.impl;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Path;
@@ -14,6 +13,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobs.resource.IJobsResourceOverviewSummary;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
@@ -51,7 +51,7 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
 
             boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
             boolean hasPermission = true;
-            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(jobsFilter.getFolders());
 
             if (jobsFilter.getDateFrom() != null) {
                 reportTaskExecDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
@@ -62,13 +62,22 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
 
             if (jobsFilter.getJobs().size() > 0) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                String unpermittedObject = null;
                 for (JobPath jobPath : jobsFilter.getJobs()) {
-                    if (jobPath != null && canAdd(jobPath.getJob(), permittedFolders)) {
-                        reportTaskExecDBLayer.getFilter().addJobPath(normalizePath(jobPath.getJob()));
+                    if (jobPath != null) {
+                        if (canAdd(jobPath.getJob(), permittedFolders)) {
+                            reportTaskExecDBLayer.getFilter().addJobPath(normalizePath(jobPath.getJob()));
+                        } else {
+                            unpermittedObject = jobPath.getJob();
+                        }
                     }
+                }
+                if (reportTaskExecDBLayer.getFilter().getListOfJobs().isEmpty() && unpermittedObject != null) {
+                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 hasPermission = false;
+                throw new JocFolderPermissionsException(jobsFilter.getFolders().get(0).getFolder());
             } else if (folders != null && !folders.isEmpty()) {
                 reportTaskExecDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(jobsFilter.getFolders()));
             }

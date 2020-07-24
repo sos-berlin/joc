@@ -30,6 +30,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
                 return jocDefaultResponse;
             }
             checkRequiredParameter("job", jobBody.getJob());
+            checkFolderPermissions(jobBody.getJob());
             Configuration200 entity = new Configuration200();
             JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(accessToken, versionIsOlderThan("1.13.1"));
             boolean responseInHtml = jobBody.getMime() == ConfigurationMime.HTML;

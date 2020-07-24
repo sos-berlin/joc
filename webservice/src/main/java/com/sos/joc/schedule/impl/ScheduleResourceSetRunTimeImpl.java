@@ -70,14 +70,17 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 				return jocDefaultResponse;
 			}
 			checkRequiredComment(modifyRuntime.getAuditLog());
-			ModifyScheduleAudit scheduleAudit = new ModifyScheduleAudit(modifyRuntime);
-			logAuditMessage(scheduleAudit);
 			checkRequiredParameter("schedule", modifyRuntime.getSchedule());
-			if (modifyRuntime.getRunTime() == null) {
+            String schedulePath = normalizePath(modifyRuntime.getSchedule());
+            checkFolderPermissions(schedulePath);
+			
+            ModifyScheduleAudit scheduleAudit = new ModifyScheduleAudit(modifyRuntime);
+            logAuditMessage(scheduleAudit);
+            
+            if (modifyRuntime.getRunTime() == null) {
                 throw new JocMissingRequiredParameterException("undefined 'runTime'");
             }
 			
-			String schedulePath = normalizePath(modifyRuntime.getSchedule());
 			String substitutePath = null;
 			boolean addSubstitute = false;
 			Schedule runTime = modifyRuntime.getRunTime();

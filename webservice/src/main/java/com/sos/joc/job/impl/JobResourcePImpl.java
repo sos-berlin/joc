@@ -43,6 +43,8 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             }
             checkRequiredParameter("job", jobFilter.getJob());
             String jobPath = normalizePath(jobFilter.getJob());
+            checkFolderPermissions(jobPath);
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryJobsDBLayer dbJobsLayer = new InventoryJobsDBLayer(connection);
             Long instanceId = dbItemInventoryInstance.getId();

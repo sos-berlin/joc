@@ -1,6 +1,7 @@
 package com.sos.joc.classes;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.SOSPermissionsCreator;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.auth.rest.SOSShiroFolderPermissions;
@@ -42,6 +42,7 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocAuthenticationException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingCommentException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
@@ -132,7 +133,7 @@ public class JOCResourceImpl {
         return jocError;
     }
 
-    public Date getDateFromString(String dateString) {
+    public static Date getDateFromString(String dateString) {
         Date date = null;
         try {
             dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
@@ -146,7 +147,7 @@ public class JOCResourceImpl {
         return date;
     }
 
-    public Date getDateFromTimestamp(Long timeStamp) {
+    public static Date getDateFromTimestamp(Long timeStamp) {
         Instant fromEpochMilli = Instant.ofEpochMilli(timeStamp / 1000);
         return Date.from(fromEpochMilli);
     }
@@ -175,7 +176,7 @@ public class JOCResourceImpl {
             Globals.disconnect(sosHibernateSession);
         }
     }
-
+    
     public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws JocException {
         this.accessToken = accessToken;
 
@@ -225,18 +226,18 @@ public class JOCResourceImpl {
         return init401And440();
     }
 
-    public String normalizePath(String path) {
+    public static String normalizePath(String path) {
         return Globals.normalizePath(path);
     }
 
-    public String normalizeFolder(String path) {
+    public static String normalizeFolder(String path) {
         if (path == null) {
             return null;
         }
         return ("/" + path.trim()).replaceAll("//+", "/");
     }
 
-    public boolean checkRequiredComment(AuditParams auditParams) throws JocMissingCommentException {
+    public static boolean checkRequiredComment(AuditParams auditParams) throws JocMissingCommentException {
         if (Globals.auditLogCommentsAreRequired) {
             String comment = null;
             if (auditParams != null) {
@@ -249,7 +250,7 @@ public class JOCResourceImpl {
         return true;
     }
 
-    public boolean checkRequiredComment(String comment) throws JocMissingCommentException {
+    public static boolean checkRequiredComment(String comment) throws JocMissingCommentException {
         if (Globals.auditLogCommentsAreRequired) {
             if (comment == null || comment.isEmpty()) {
                 throw new JocMissingCommentException();
@@ -258,42 +259,42 @@ public class JOCResourceImpl {
         return true;
     }
 
-    public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
+    public static boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null || paramVal.isEmpty()) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
         }
         return true;
     }
 
-    public boolean checkRequiredParameter(String paramKey, JobSchedulerObjectType paramVal) throws JocMissingRequiredParameterException {
+    public static boolean checkRequiredParameter(String paramKey, JobSchedulerObjectType paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null || paramVal.value().isEmpty()) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
         }
         return true;
     }
 
-    public boolean checkRequiredParameter(String paramKey, Long paramVal) throws JocMissingRequiredParameterException {
+    public static boolean checkRequiredParameter(String paramKey, Long paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
         }
         return true;
     }
 
-    public boolean checkRequiredParameter(String paramKey, List<?> paramVal) throws JocMissingRequiredParameterException {
+    public static boolean checkRequiredParameter(String paramKey, List<?> paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null || paramVal.isEmpty()) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
         }
         return true;
     }
 
-    public boolean checkRequiredParameter(String paramKey, Integer paramVal) throws JocMissingRequiredParameterException {
+    public static boolean checkRequiredParameter(String paramKey, Integer paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
         }
         return true;
     }
 
-    protected boolean matchesRegex(Pattern p, String path) {
+    protected static boolean matchesRegex(Pattern p, String path) {
         if (p != null) {
             return p.matcher(path).find();
         } else {
@@ -314,10 +315,10 @@ public class JOCResourceImpl {
         return jocAuditLog.storeAuditLogEntry(body);
     }
 
-    public String getJsonString(Object body) {
+    public static String getJsonString(Object body) {
         if (body != null) {
             try {
-                return new ObjectMapper().writeValueAsString(body);
+                return Globals.objectMapper.writeValueAsString(body);
             } catch (Exception e) {
                 return body.toString();
             }
@@ -325,7 +326,7 @@ public class JOCResourceImpl {
         return "-";
     }
 
-    public String writeXmlPoJoAsString(Object xmlPoJo) throws JsonProcessingException {
+    public static String writeXmlPoJoAsString(Object xmlPoJo) throws JsonProcessingException {
         // ObjectMapper xmlMapper = new XmlMapper().configure(Feature.WRITE_XML_DECLARATION, true).configure(SerializationFeature.INDENT_OUTPUT, true);
         // TODO generates <?xml version="1.0" encoding="UTF-8" ?> instead of ISO-8859-1
         return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n\n" + Globals.xmlMapper.writeValueAsString(xmlPoJo);
@@ -554,15 +555,42 @@ public class JOCResourceImpl {
         }
     }
 
-    protected String getParent(String path) {
+    protected static String getParent(String path) {
         return Globals.getParent(path);
     }
-
-    protected boolean canAdd(String path, Set<Folder> listOfFolders) {
+    
+    protected void checkFolderPermissions(String path) throws JocFolderPermissionsException {
+        String folder = getParent(path);
+        if (!folderPermissions.isPermittedForFolder(folder)) {
+            throw new JocFolderPermissionsException(folder);
+        }
+    }
+    
+    protected void checkFolderPermissions(String path, Collection<Folder> listOfFolders) throws JocFolderPermissionsException {
+        String folder = getParent(path);
+        if (!folderPermissions.isPermittedForFolder(folder, listOfFolders)) {
+            throw new JocFolderPermissionsException(folder);
+        }
+    }
+    
+    protected boolean canAdd(String path, Collection<Folder> listOfFolders) {
         return folderPermissions.isPermittedForFolder(getParent(path), listOfFolders);
     }
 
-    protected List<Folder> addPermittedFolder(List<Folder> folders) {
+    protected Set<Folder> addPermittedFolders(Collection<Folder> folders) {
         return folderPermissions.getPermittedFolders(folders);
+    }
+    
+    protected void checkCalendarFolderPermissions(String path) throws JocFolderPermissionsException, SessionNotExistException {
+        String folder = getParent(path);
+        if (!getCalendarFolderPermissions().isPermittedForFolder(folder)) {
+            throw new JocFolderPermissionsException(folder);
+        }
+    }
+    
+    protected SOSShiroFolderPermissions getCalendarFolderPermissions() throws SessionNotExistException {
+        SOSShiroFolderPermissions calendarFolderPermissions = jobschedulerUser.getSosShiroCurrentUser().getSosShiroCalendarFolderPermissions();
+        calendarFolderPermissions.setSchedulerId(jobschedulerId);
+        return calendarFolderPermissions;
     }
 }

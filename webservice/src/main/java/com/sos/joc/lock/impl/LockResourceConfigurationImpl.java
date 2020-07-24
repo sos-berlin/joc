@@ -38,8 +38,10 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
                 return jocDefaultResponse;
             }
             checkRequiredParameter("lock", lockBody.getLock());
-            Configuration200 entity = new Configuration200();
             String lockPath = normalizePath(lockBody.getLock());
+            checkFolderPermissions(lockPath);
+            
+            Configuration200 entity = new Configuration200();
             boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;
             if (versionIsOlderThan("1.13.1")) {
                 entity.setConfiguration(getConfiguration(lockPath, responseInHtml));

@@ -12,6 +12,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.yade.TransferFileUtils;
 import com.sos.joc.db.yade.JocDBLayerYade;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.order.OrderV200;
 import com.sos.joc.model.yade.ModifyTransfer;
 import com.sos.joc.yade.resource.IYadeTransferOrderResource;
@@ -39,7 +40,9 @@ public class YadeTransferOrderResourceImpl extends JOCResourceImpl implements IY
 			JocDBLayerYade yadeDbLayer = new JocDBLayerYade(connection);
 
 			OrderV200 entity = new OrderV200();
-			entity.setOrder(TransferFileUtils.getOrderForResume(yadeDbLayer, filterBody, this));
+			OrderV order = TransferFileUtils.getOrderForResume(yadeDbLayer, filterBody, this);
+			checkFolderPermissions(order.getJobChain());
+			entity.setOrder(order);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 
 			return JOCDefaultResponse.responseStatus200(entity);

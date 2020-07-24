@@ -38,7 +38,6 @@ public class JobResourceDocumentationImpl extends JOCResourceImpl implements IJo
     public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String path) {
         SOSHibernateSession connection = null;
         try {
-            //String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, path);
             JsonObjectBuilder builder = Json.createObjectBuilder();
             if(jobschedulerId != null) {
                 builder.add("jobschedulerId", jobschedulerId);
@@ -59,7 +58,8 @@ public class JobResourceDocumentationImpl extends JOCResourceImpl implements IJo
 
             checkRequiredParameter("jobschedulerId", jobschedulerId);
             checkRequiredParameter("job", path);
-
+            checkFolderPermissions(path);
+            
             documentationFilter.setPath(normalizePath(documentationFilter.getPath()));
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
@@ -88,16 +88,17 @@ public class JobResourceDocumentationImpl extends JOCResourceImpl implements IJo
         try {
             JsonValidator.validateFailFast(filterBytes, JobDocuFilter.class);
             JobDocuFilter filter = Globals.objectMapper.readValue(filterBytes, JobDocuFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getJob().isAssignDocumentation());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            String jobPath = normalizePath(filter.getJob());
+            checkFolderPermissions(jobPath);
             AssignmentJobDocuAudit assignAudit = new AssignmentJobDocuAudit(filter);
             logAuditMessage(assignAudit);
-            Documentation.assignDocu(filter.getJobschedulerId(), normalizePath(filter.getJob()), filter.getDocumentation(),
-                    JobSchedulerObjectType.JOB, API_CALL_ASSIGN);
+            Documentation.assignDocu(filter.getJobschedulerId(), jobPath, filter.getDocumentation(), JobSchedulerObjectType.JOB, API_CALL_ASSIGN);
             storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -106,7 +107,6 @@ public class JobResourceDocumentationImpl extends JOCResourceImpl implements IJo
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
-
     }
 
     @Override
@@ -120,9 +120,11 @@ public class JobResourceDocumentationImpl extends JOCResourceImpl implements IJo
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            String jobPath = normalizePath(filter.getJob());
+            checkFolderPermissions(jobPath);
             AssignmentJobDocuAudit unassignAudit = new AssignmentJobDocuAudit(filter);
             logAuditMessage(unassignAudit);
-            Documentation.unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getJob()), JobSchedulerObjectType.JOB, API_CALL_UNASSIGN);
+            Documentation.unassignDocu(filter.getJobschedulerId(), jobPath, JobSchedulerObjectType.JOB, API_CALL_UNASSIGN);
             storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

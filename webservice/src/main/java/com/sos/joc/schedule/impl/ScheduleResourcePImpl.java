@@ -34,19 +34,23 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
         try {
             JsonValidator.validateFailFast(scheduleFilterBytes, ScheduleFilter.class);
             ScheduleFilter scheduleFilter = Globals.objectMapper.readValue(scheduleFilterBytes, ScheduleFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleFilter, accessToken, scheduleFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(scheduleFilter.getJobschedulerId(), accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            checkRequiredParameter("schedule", scheduleFilter.getSchedule());
+            String schedulePath = normalizePath(scheduleFilter.getSchedule());
+            checkFolderPermissions(schedulePath);
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(connection);
             InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(connection);
-            DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePath(scheduleFilter.getSchedule()), dbItemInventoryInstance
-                    .getId());
+            DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(schedulePath, dbItemInventoryInstance.getId());
             if (scheduleFromDb == null) {
-                throw new DBMissingDataException(String.format("no schedule found in DB: %s", scheduleFilter.getSchedule()));
+                throw new DBMissingDataException(String.format("no schedule found in DB: %s", schedulePath));
             }
             DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
             ScheduleP schedule = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbDocLayer.getDocumentationPath(scheduleFilter

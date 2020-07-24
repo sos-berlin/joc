@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -34,6 +35,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
 import com.sos.schema.JsonValidator;
@@ -146,7 +148,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     private Date executeModifyJobCommand(ModifyJob modifyJob, ModifyJobs modifyJobs, String command, List<DBItemInventoryInstance> clusterMembers,
-            SOSHibernateSession connection) {
+            SOSHibernateSession connection, Set<Folder> permittedFolders) {
 
         try {
             if (modifyJob.getCalendars() != null && modifyJob.getCalendars().isEmpty()) {
@@ -156,6 +158,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             logAuditMessage(jobAudit);
 
             checkRequiredParameter("job", modifyJob.getJob());
+            checkFolderPermissions(modifyJob.getJob(), permittedFolders);
+            
             if (SET_RUN_TIME.equals(command) && modifyJob.getRunTime() == null) {
                 throw new JocMissingRequiredParameterException("undefined 'runTime'");
             }
@@ -250,10 +254,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     clusterMembers = instanceLayer.getInventoryInstancesBySchedulerId(modifyJobs.getJobschedulerId());
                 }
             }
-
+            
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             Date surveyDate = new Date();
             for (ModifyJob job : modifyJobs.getJobs()) {
-                surveyDate = executeModifyJobCommand(job, modifyJobs, command, clusterMembers, connection);
+                surveyDate = executeModifyJobCommand(job, modifyJobs, command, clusterMembers, connection, permittedFolders);
             }
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);

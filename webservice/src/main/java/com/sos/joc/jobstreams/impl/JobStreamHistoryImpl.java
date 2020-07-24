@@ -58,13 +58,13 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamH
                 return jocDefaultResponse;
             }
 
-            this.checkRequiredParameter("jobschedulerid", jobStreamFilter.getJobschedulerId());
+            checkRequiredParameter("jobschedulerid", jobStreamFilter.getJobschedulerId());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(sosHibernateSession);
 
             if (jobStreamFilter.getSession() == null && jobStreamFilter.getSession().isEmpty()) {
-                this.checkRequiredParameter("jobStream", jobStreamFilter.getJobStream());
+                checkRequiredParameter("jobStream", jobStreamFilter.getJobStream());
                 DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
                 FilterInConditions filterInConditions = new FilterInConditions();
                 filterInConditions.setJobSchedulerId(jobStreamFilter.getJobschedulerId());

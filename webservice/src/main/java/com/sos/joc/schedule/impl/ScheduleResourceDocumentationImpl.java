@@ -59,8 +59,9 @@ public class ScheduleResourceDocumentationImpl extends JOCResourceImpl implement
 
             checkRequiredParameter("jobschedulerId", jobschedulerId);
             checkRequiredParameter("schedule", path);
-
             documentationFilter.setPath(normalizePath(documentationFilter.getPath()));
+            checkFolderPermissions(documentationFilter.getPath());
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             String docPath = dbLayer.getDocumentationPath(documentationFilter);

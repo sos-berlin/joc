@@ -26,6 +26,7 @@ import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderPath;
@@ -63,7 +64,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
             List<OrderPath> orders = ordersBody.getOrders();
             boolean withFolderFilter = ordersBody.getFolders() != null && !ordersBody.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(ordersBody.getFolders());
+            Set<Folder> folders = addPermittedFolders(ordersBody.getFolders());
 
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
@@ -75,29 +76,37 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                 List<String> outerJobChains = dbJCLayer.getOuterJobChains(dbItemInventoryInstance.getId());
 
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                String unpermittedObject = null;
                 for (OrderPath order : orders) {
-                    if (order != null && canAdd(order.getJobChain(), permittedFolders)) {
-                        if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
-                            throw new JocMissingRequiredParameterException("jobChain");
-                        } else {
-                            order.setJobChain(normalizePath(order.getJobChain()));
-                        }
-                        OrdersPerJobChain opj;
-                        if (ordersLists.containsKey(order.getJobChain())) {
-                            opj = ordersLists.get(order.getJobChain());
-                            if (opj.containsOrder(order.getOrderId())) {
-                                continue;
+                    if (order != null) {
+                        if (canAdd(order.getJobChain(), permittedFolders)) {
+                            if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
+                                throw new JocMissingRequiredParameterException("jobChain");
                             } else {
+                                order.setJobChain(normalizePath(order.getJobChain()));
+                            }
+                            OrdersPerJobChain opj;
+                            if (ordersLists.containsKey(order.getJobChain())) {
+                                opj = ordersLists.get(order.getJobChain());
+                                if (opj.containsOrder(order.getOrderId())) {
+                                    continue;
+                                } else {
+                                    opj.addOrder(order.getOrderId());
+                                }
+                            } else {
+                                opj = new OrdersPerJobChain();
+                                opj.setJobChain(order.getJobChain());
+                                opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain()));
                                 opj.addOrder(order.getOrderId());
                             }
+                            ordersLists.put(order.getJobChain(), opj);
                         } else {
-                            opj = new OrdersPerJobChain();
-                            opj.setJobChain(order.getJobChain());
-                            opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain()));
-                            opj.addOrder(order.getOrderId());
+                            unpermittedObject = order.getJobChain();
                         }
-                        ordersLists.put(order.getJobChain(), opj);
                     }
+                }
+                if (ordersLists.isEmpty() && unpermittedObject != null) {
+                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
                 }
             }
 
@@ -106,7 +115,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                     tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken));
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                throw new JocFolderPermissionsException(ordersBody.getFolders().get(0).getFolder());
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));

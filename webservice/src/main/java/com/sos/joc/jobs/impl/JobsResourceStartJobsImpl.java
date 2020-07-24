@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -21,6 +22,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobs.resource.IJobsResourceStartJob;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.job.StartJobs;
@@ -51,9 +53,11 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             if (startJobs.getJobs().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'jobs'");
             }
+            
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             StartedTasks entity = new StartedTasks();
             for (StartJob job : startJobs.getJobs()) {
-                executeStartJobCommand(job, startJobs);
+                executeStartJobCommand(job, startJobs, permittedFolders);
             }
             entity.setTasks(taskPaths);
             if (taskPaths.isEmpty()) {
@@ -77,7 +81,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-    private void executeStartJobCommand(StartJob startJob, StartJobs startJobs) {
+    private void executeStartJobCommand(StartJob startJob, StartJobs startJobs, Set<Folder> permittedFolders) {
 
         try {
             if (startJob.getParams() != null && startJob.getParams().isEmpty()) {
@@ -90,6 +94,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             logAuditMessage(jobAudit);
 
             checkRequiredParameter("job", startJob.getJob());
+            checkFolderPermissions(startJob.getJob(), permittedFolders);
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 
             XMLBuilder xml = new XMLBuilder("start_job");

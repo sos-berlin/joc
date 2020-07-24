@@ -19,6 +19,7 @@ import com.sos.joc.classes.processclasses.ProcessClassPermanent;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.processClass.ProcessClassP;
@@ -56,24 +57,34 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
             List<ProcessClassPath> processClassPaths = processClassFilter.getProcessClasses();
             boolean withFolderFilter = processClassFilter.getFolders() != null && !processClassFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(processClassFilter.getFolders());
 
             if (processClassPaths != null && !processClassPaths.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                for (ProcessClassPath processClassPath : processClassPaths) {
-                    checkRequiredParameter("processClass", processClassPath.getProcessClass());
-                    if (processClassPath != null && canAdd(processClassPath.getProcessClass(), permittedFolders)) {
-                        DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(normalizePath(processClassPath.getProcessClass()),
-                                dbItemInventoryInstance.getId());
-                        if (processClassFromDb == null) {
-                            continue;
+                String unpermittedObject = null;
+                boolean hasPermission = false;
+                for (ProcessClassPath processClass : processClassPaths) {
+                    if (processClass != null) {
+                        checkRequiredParameter("processClass", processClass.getProcessClass());
+                        String processClassPath = normalizePath(processClass.getProcessClass());
+                        if (canAdd(processClassPath, permittedFolders)) {
+                            hasPermission = true;
+                            DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(processClassPath, dbItemInventoryInstance.getId());
+                            if (processClassFromDb == null) {
+                                continue;
+                            }
+                            listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, documentations.get(processClassFromDb.getName()),
+                                    processClassFromDb));
+                        } else {
+                            unpermittedObject = processClassPath;
                         }
-                        listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, documentations.get(processClassFromDb.getName()),
-                                processClassFromDb));
                     }
                 }
+                if (!hasPermission && unpermittedObject != null) {
+                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
+                }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                throw new JocFolderPermissionsException(processClassFilter.getFolders().get(0).getFolder());
             } else if (folders != null && !folders.isEmpty()) {
                 Map<String, ProcessClassP> mapOfProcessClasses = new HashMap<String, ProcessClassP>();
                 for (Folder folder : folders) {
