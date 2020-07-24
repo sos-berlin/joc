@@ -129,7 +129,7 @@ public class SOSPermissionShiro
      *     {@link Boolean }
      *     
      */
-    public boolean isAuthenticated() {
+    public Boolean isAuthenticated() {
         return authenticated;
     }
 
