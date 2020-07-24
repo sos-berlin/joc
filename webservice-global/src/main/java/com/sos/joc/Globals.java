@@ -14,6 +14,7 @@ import javax.json.Json;
 import javax.json.JsonReader;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
@@ -39,7 +40,7 @@ import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 
-public class Globals {
+ public class Globals {
 
     private static final String SHIRO_INI_FILENAME = "shiro.ini";
     private static final String HIBERNATE_CONFIGURATION_FILE = "hibernate_configuration_file";
@@ -73,8 +74,8 @@ public class Globals {
     public static String servletContextContextPath = null; // /joc
     public static Path servletContextRealPath = null;
     public static URI servletBaseUri = null;
-    public static Map<String,String> schedulerVariables=null;
-    
+    public static Map<String, String> schedulerVariables = null;
+
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {
             try {
@@ -127,19 +128,22 @@ public class Globals {
         }
     }
 
-    public static IniSecurityManagerFactory getShiroIniSecurityManagerFactory() {
+     public static IniSecurityManagerFactory getShiroIniSecurityManagerFactory() {
         String iniFile = getShiroIniInClassPath();
+        SecurityManager securityManager;
         if (shiroSecurityManagerfactory == null) {
             shiroSecurityManagerfactory = new IniSecurityManagerFactory(getIniFileForShiro(iniFile));
+            securityManager = shiroSecurityManagerfactory.getInstance();
+            SecurityUtils.setSecurityManager(securityManager);
         } else {
             Ini oldShiroIni = shiroSecurityManagerfactory.getIni();
             Ini currentShiroIni = Ini.fromResourcePath(getIniFileForShiro(iniFile));
             if (!oldShiroIni.equals(currentShiroIni)) {
                 LOGGER.debug(getIniFileForShiro(iniFile) + " is changed");
-                factory = new IniSecurityManagerFactory();
+                shiroSecurityManagerfactory = new IniSecurityManagerFactory();
+                securityManager = shiroSecurityManagerfactory.getInstance();
+                SecurityUtils.setSecurityManager(securityManager);
                 shiroSecurityManagerfactory.setIni(currentShiroIni);
-                SecurityManager securityManager = shiroSecurityManagerfactory.getInstance();
-                 
             }
         }
         return shiroSecurityManagerfactory;
