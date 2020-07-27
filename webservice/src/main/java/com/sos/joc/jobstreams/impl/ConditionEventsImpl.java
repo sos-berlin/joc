@@ -127,6 +127,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 return jocDefaultResponse;
             }
 
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_EVENT);
+
             checkRequiredParameter("jobStream", conditionEvent.getJobStream());
             checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             checkRequiredParameter("event", conditionEvent.getEvent());
@@ -187,6 +189,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             checkRequiredParameter("event", conditionEvent.getEvent());
             checkRequiredParameter("session", conditionEvent.getSession());
             checkRequiredParameter("jobStream", conditionEvent.getJobStream());
+
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_DELETE_EVENT);
 
             conditionEvent.setSession(conditionEvent.getSession());
 
