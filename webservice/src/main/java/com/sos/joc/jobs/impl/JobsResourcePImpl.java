@@ -21,7 +21,6 @@ import com.sos.joc.classes.jobs.JobPermanent;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -113,7 +112,6 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             List<DBItemInventoryJob> filteredJobs = null;
             
             Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-            String unpermittedObject = null;
             for (JobPath job : jobs) {
                 if (job != null) {
                     if (canAdd(job.getJob(), permittedFolders)) {
@@ -122,16 +120,11 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
                         if (filteredJobs != null) {
                             listOfJobs.addAll(filteredJobs);
                         }
-                    } else {
-                        unpermittedObject = job.getJob();
                     }
-                }
-                if (listOfJobs.isEmpty() && unpermittedObject != null) {
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
                 }
             }
         } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-            throw new JocFolderPermissionsException(jobsFilter.getFolders().get(0).getFolder());
+            // no folder permissions
         } else if (folders != null && !folders.isEmpty()) {
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;

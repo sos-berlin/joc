@@ -20,7 +20,6 @@ import com.sos.joc.classes.orders.OrderPermanent;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.order.OrderPath;
@@ -62,7 +61,6 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             List<DBItemInventoryOrder> ordersFromDB = new ArrayList<DBItemInventoryOrder>();
             if (orderPaths != null && !orderPaths.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                String unpermittedObject = null;
                 for (OrderPath order : orderPaths) {
                     if (order != null) {
                         if (canAdd(order.getJobChain(), permittedFolders)) {
@@ -71,16 +69,11 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                             if (filteredOrders != null && !filteredOrders.isEmpty()) {
                                 ordersFromDB.addAll(filteredOrders);
                             }
-                        } else {
-                            unpermittedObject = order.getJobChain();
                         }
                     }
                 }
-                if (ordersFromDB.isEmpty() && unpermittedObject != null) {
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
-                }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                throw new JocFolderPermissionsException(ordersFilter.getFolders().get(0).getFolder());
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(normalizeFolder(folder.getFolder()),

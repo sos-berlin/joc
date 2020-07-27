@@ -32,7 +32,6 @@ import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.CalendarsFilter;
@@ -120,9 +119,7 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
             CalendarsDBLayer calendarDbLayer, String accessToken, Set<Folder> permittedFolders) {
         if (calendarDbItem != null) {
             try {
-                if (!canAdd(calendarDbItem.getName(), permittedFolders)) {
-                    throw new JocFolderPermissionsException(calendarDbItem.getName());
-                }
+                checkFolderPermissions(calendarDbItem.getName(), permittedFolders);
                 ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendarDbItem.getId(), calendarDbItem.getName(), calendarsFilter
                         .getAuditLog(), calendarsFilter.getJobschedulerId());
                 logAuditMessage(calendarAudit);

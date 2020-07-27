@@ -21,7 +21,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.processclasses.ProcessClassesVCallable;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.processClass.ProcessClassPath;
 import com.sos.joc.model.processClass.ProcessClassV;
@@ -65,23 +64,17 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             ProcessClassesV entity = new ProcessClassesV();
             if (processClasses != null && !processClasses.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                String unpermittedObject = null;
                 for (ProcessClassPath processClass : processClasses) {
                     if (processClass != null) {
                         checkRequiredParameter("processClass", processClass.getProcessClass());
                         String processClassPath = normalizePath(processClass.getProcessClass());
                         if (canAdd(processClassPath, permittedFolders)) {
                             tasks.add(new ProcessClassesVCallable(processClassPath, new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
-                        } else {
-                            unpermittedObject = processClassPath;
                         }
                     }
                 }
-                if (tasks.isEmpty() && unpermittedObject != null) {
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
-                }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                throw new JocFolderPermissionsException(processClassFilter.getFolders().get(0).getFolder());
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));

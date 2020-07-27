@@ -25,7 +25,6 @@ import com.sos.joc.classes.orders.OrdersSnapshotEvent;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainPath;
@@ -59,10 +58,16 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             OrdersSnapshot entity = new OrdersSnapshot();
             
             if (withFolderFilter && (folders == null || folders.isEmpty())) {
-//                entity.setOrders(null);
-//                entity.setSurveyDate(Date.from(Instant.now()));
-//                entity.setDeliveryDate(entity.getSurveyDate());
-                throw new JocFolderPermissionsException(jobChainsFilter.getFolders().get(0).getFolder());
+                OrdersSummary summary = new OrdersSummary();
+                summary.setBlacklist(0);
+                summary.setPending(0);
+                summary.setRunning(0);
+                summary.setSetback(0);
+                summary.setSuspended(0);
+                summary.setWaitingForResource(0);
+                entity.setOrders(summary);
+                entity.setSurveyDate(Date.from(Instant.now()));
+                entity.setDeliveryDate(entity.getSurveyDate());
             } else {
                 entity = getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter.getJobChains(), folders);
             }
@@ -93,16 +98,10 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         OrdersSnapshot entity = new OrdersSnapshot();
 
         if (jobChains.size() > 0) {
-            String unpermittedObject = null;
             for (String jobChain : jobChains) {
                 if (canAdd(jobChain, permittedFolders)) {
                     tasks.add(new OrdersSnapshotCallable(jobChain, new JOCJsonCommand(command), accessToken));
-                } else {
-                    unpermittedObject = jobChain;
                 }
-            }
-            if (tasks.isEmpty() && unpermittedObject != null) {
-                throw new JocFolderPermissionsException(getParent(unpermittedObject));
             }
         } else if (folders.size() > 0) {
             for (String folder : folders) {
@@ -111,6 +110,16 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         } else {
             tasks.add(new OrdersSnapshotCallable("/", command, accessToken));
         }
+        
+        OrdersSummary summary = new OrdersSummary();
+        summary.setBlacklist(0);
+        summary.setPending(0);
+        summary.setRunning(0);
+        summary.setSetback(0);
+        summary.setSuspended(0);
+        summary.setWaitingForResource(0);
+        entity.setOrders(summary);
+        entity.setDeliveryDate(Date.from(Instant.now()));
 
         if (!tasks.isEmpty()) {
             if (tasks.size() == 1) {
@@ -119,14 +128,6 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                 entity.setOrders(oe);
             } else {
                 Long eventId = 0L;
-                OrdersSummary summary = new OrdersSummary();
-                summary.setBlacklist(0);
-                summary.setPending(0);
-                summary.setRunning(0);
-                summary.setSetback(0);
-                summary.setSuspended(0);
-                summary.setWaitingForResource(0);
-
                 ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
                 try {
                     for (Future<OrdersSnapshotEvent> result : executorService.invokeAll(tasks)) {

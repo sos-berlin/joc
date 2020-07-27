@@ -22,7 +22,6 @@ import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobchains.resource.IJobChainsResourceP;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -76,7 +75,6 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
 
             if (jobChainPaths != null && !jobChainPaths.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                String unpermittedObject = null;
                 for (JobChainPath jobChainPath : jobChainPaths) {
                     if (jobChainPath != null) {
                         if (canAdd(jobChainPath.getJobChain(), permittedFolders)) {
@@ -90,16 +88,11 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                                 jobChains.add(jobChain);
                                 initNestedJobChainsIfExists(dbLayer, documentations, jobChain, processClassJobs, compact);
                             }
-                        } else {
-                            unpermittedObject = jobChainPath.getJobChain();
                         }
                     }
                 }
-                if (jobChains.isEmpty() && unpermittedObject != null) {
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
-                }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                throw new JocFolderPermissionsException(jobChainsFilter.getFolders().get(0).getFolder());
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChainsByFolder(normalizeFolder(folder.getFolder()), folder

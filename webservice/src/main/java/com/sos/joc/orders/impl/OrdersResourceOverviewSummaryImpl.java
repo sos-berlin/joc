@@ -64,23 +64,16 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             if (ordersFilter.getOrders() != null && !ordersFilter.getOrders().isEmpty()) {
                 hasPermission = false;
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                String unpermittedObject = null;
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
                     if (orderPath != null) {
                         if (canAdd(orderPath.getJobChain(), permittedFolders)) {
                             reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
                             hasPermission = true;
-                        } else {
-                            unpermittedObject = orderPath.getJobChain();
                         }
                     }
                 }
-                if (!hasPermission && unpermittedObject != null) {
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
-                }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 hasPermission = false;
-                throw new JocFolderPermissionsException(ordersFilter.getFolders().get(0).getFolder());
             } else if (folders != null && !folders.isEmpty()) {
                 reportTriggerDBLayer.getFilter().addFolderPaths(folders);
             }

@@ -15,7 +15,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -24,7 +23,6 @@ import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.schedule.ScheduleVolatile;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.schedule.SchedulePath;
@@ -63,25 +61,19 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
             Set<String> setOfSchedules = new HashSet<String>();
             if (schedulesFilter.getSchedules() != null && !schedulesFilter.getSchedules().isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                String unpermittedObject = null;
+                hasPermission = false;
                 for (SchedulePath schedule : schedulesFilter.getSchedules()) {
                     if (schedule != null) {
                         checkRequiredParameter("schedules.schedule", schedule.getSchedule());
                         String schedulePath = normalizePath(schedule.getSchedule());
                         if (canAdd(schedulePath, permittedFolders)) {
                             setOfSchedules.add(schedulePath);
-                        } else {
-                            unpermittedObject = schedulePath;
+                            hasPermission = true;
                         }
                     }
                 }
-                if (setOfSchedules.isEmpty() && unpermittedObject != null) {
-                    hasPermission = false;
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
-                }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 hasPermission = false;
-                throw new JocFolderPermissionsException(schedulesFilter.getFolders().get(0).getFolder());
             }
 
             if (hasPermission) {

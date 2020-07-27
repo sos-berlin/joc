@@ -169,10 +169,6 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
                                 .getBoolean("enabled", true)) {
                             return false;
                         } else {
-                            ConfigurationState confState = ConfigurationStatus.getConfigurationStatus(overview.getJsonArray("obstacles"));
-                            if (confState != null && confState.getSeverity() == 2) {
-                                return false;
-                            }
                             if (!isPermittedForFolder(getParent(path))) {
                                 return false;
                             }
@@ -187,6 +183,10 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
                     JsonObject overview = ((JsonObject) p);
                     JsonArray obstacles = overview.getJsonArray("obstacles");
                     String stateText = overview.getString("state", "UNKNOWN").toUpperCase();
+                    ConfigurationState confState = ConfigurationStatus.getConfigurationStatus(overview.getJsonArray("obstacles"));
+                    if (confState != null && confState.getSeverity() == 2) {
+                        stateText = "ERROR";
+                    }
                     switch (stateText) {
                     case "STOPPED":
                         return "stopped";
