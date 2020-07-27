@@ -1,5 +1,6 @@
 package com.sos.joc.jobstreams.impl;
 
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,6 +41,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IOutConditionsResource;
 import com.sos.joc.model.job.JobPath;
@@ -115,6 +117,14 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             FilterOutConditions filterOutConditions;
             if (conditionJobsFilterSchema.getFolder() != null) {
+                
+                try {
+                    checkFolderPermissions(conditionJobsFilterSchema.getFolder() + "/item");
+                } catch (JocFolderPermissionsException e) {
+                    LOGGER.debug("Folder permission for " + conditionJobsFilterSchema.getFolder() + " is missing for outconditons");
+                }
+
+                
                 reportTaskExecutionsDBLayer.getFilter().addFolderPath(conditionJobsFilterSchema.getFolder(), false);
                 filterOutConditions = new FilterOutConditions();
                 filterOutConditions.setFolder(conditionJobsFilterSchema.getFolder());
@@ -132,8 +142,15 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 }
             } else {
                 for (JobPath job : conditionJobsFilterSchema.getJobs()) {
-                    listOfJobs.add(job.getJob());
-                    reportTaskExecutionsDBLayer.getFilter().addJobPath(job.getJob());
+
+                     try {
+                        checkFolderPermissions(job.getJob());
+                        listOfJobs.add(job.getJob());
+                        reportTaskExecutionsDBLayer.getFilter().addJobPath(job.getJob());
+                    } catch (JocFolderPermissionsException e) {
+                        LOGGER.debug("Folder permission for " + job.getJob() + " is missing for outconditons");
+                    }
+                    
                 }
             }
             Map<String, Integer> mapOfExitCodes = new HashMap<String, Integer>();

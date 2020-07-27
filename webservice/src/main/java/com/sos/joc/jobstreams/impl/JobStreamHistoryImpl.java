@@ -1,5 +1,6 @@
 package com.sos.joc.jobstreams.impl;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -7,6 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Path;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
@@ -26,6 +30,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobstreams.resource.IJobStreamHistoryResource;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
@@ -40,6 +45,7 @@ import com.sos.schema.JsonValidator;
 public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamHistoryResource {
 
     private static final String API_CALL = "./jobstream/history";
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamHistoryImpl.class);
 
     @Override
     public JOCDefaultResponse postJobStreamHistory(String accessToken, byte[] filterBytes) {
@@ -134,6 +140,14 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamH
                     for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
                         TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
                         if (!getPermissonsJocCockpit(dbItemReportTask.getSchedulerId(), accessToken).getHistory().getView().isStatus()) {
+                            continue;
+                        }
+
+                        try {
+                            checkFolderPermissions(dbItemReportTask.getName());
+                        } catch (JocFolderPermissionsException e) {
+                            LOGGER.debug("Folder permission for " + dbItemReportTask.getName() + " is missing. TaskHistory " + taskHistoryItem
+                                    .getJob() + "." + taskHistoryItem.getTaskId() + " ignored.");
                             continue;
                         }
 

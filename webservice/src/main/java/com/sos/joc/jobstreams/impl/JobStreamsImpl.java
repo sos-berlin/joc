@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -25,6 +28,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobstreams.JobStreamMigrator;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IJobStreamsResource;
 import com.sos.joc.model.common.NameValuePair;
@@ -42,6 +46,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
     private static final String API_CALL_LIST_JOBSTREAM = "./jobstreams/list_jobstreams";
     private static final String API_CALL_ADD_JOBSTREAM = "./jobstreams/add_jobstream";
     private static final String API_CALL_DELETE_JOBSTREAM = "./jobstreams/delete_jobstreams";
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamsImpl.class);
 
     @Override
     public JOCDefaultResponse getJobStreams(String accessToken, byte[] filterBytes) {
@@ -77,12 +82,20 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             if (jobStreamMigrator.migrate(sosHibernateSession)) {
                 notifyEventHandler(accessToken);
             }
-            
+
             List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, jobStreamsFilter.getLimit());
             JobStreams jobStreams = new JobStreams();
             jobStreams.setDeliveryDate(new Date());
-            
+
             for (DBItemJobStream dbItemJobStream : listOfJobStreams) {
+
+                try {
+                    checkFolderPermissions(dbItemJobStream.getFolder() +"/item");
+                } catch (JocFolderPermissionsException e) {
+                    LOGGER.debug("Folder permission for " + dbItemJobStream.getFolder() + " is missing. Job stream " + dbItemJobStream.getJobStream()
+                            + " ignored.");
+                    continue;
+                }
 
                 JobStream jobStream = new JobStream();
                 jobStream.setJobStreamId(dbItemJobStream.getId());
@@ -153,12 +166,23 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
 
             checkRequiredParameter("jobStream", jobStream.getJobStream());
-
+            
+            for (JobStreamStarter jobstreamStarter : jobStream.getJobstreamStarters()) {
+                for (JobStreamJob jobStreamJob : jobstreamStarter.getJobs()) {
+                    try {
+                        checkFolderPermissions(jobStreamJob.getJob());
+                    } catch (JocFolderPermissionsException e) {
+                        LOGGER.debug("Folder permission for " + jobStreamJob.getJob() + " is missing. job stream " + jobStream.getJobStream() + " will not be added ");
+                        jobStream.setJobStream("");
+                    }
+                 }
+            }
+           
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM);
             sosHibernateSession.setAutoCommit(false);
             sosHibernateSession.beginTransaction();
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
-            dbLayerJobStreams.deleteInsert(jobStream,dbItemInventoryInstance.getTimeZone());
+            dbLayerJobStreams.deleteInsert(jobStream, dbItemInventoryInstance.getTimeZone());
             sosHibernateSession.commit();
 
             notifyEventHandler(accessToken);
@@ -200,7 +224,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             filterJobStreams.setJobStreamId(jobStream.getJobStreamId());
             filterJobStreams.setJobStream(jobStream.getJobStream());
             filterJobStreams.setFolder(jobStream.getFolder());
-            dbLayerJobStreams.deleteCascading(filterJobStreams,true);
+            dbLayerJobStreams.deleteCascading(filterJobStreams, true);
 
             sosHibernateSession.commit();
 

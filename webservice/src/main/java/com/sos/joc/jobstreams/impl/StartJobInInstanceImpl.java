@@ -15,6 +15,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobstreams.resource.IStartJobInInInstanceResource;
 import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
@@ -31,9 +32,9 @@ public class StartJobInInstanceImpl extends JOCResourceImpl implements IStartJob
             JsonValidator.validateFailFast(filterBytes, JobStreamsFilter.class);
             JobStreamsFilter startJob = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, startJob, accessToken, startJob.getJobschedulerId(),
-                    getPermissonsJocCockpit(startJob.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());            
-            
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, startJob, accessToken, startJob.getJobschedulerId(), getPermissonsJocCockpit(
+                    startJob.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
+
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -41,8 +42,11 @@ public class StartJobInInstanceImpl extends JOCResourceImpl implements IStartJob
             checkRequiredParameter("job", startJob.getJob());
 
             try {
+                checkFolderPermissions(startJob.getJob());
                 notifyEventHandler(accessToken, startJob);
-                
+            } catch (JocFolderPermissionsException e) {
+                LOGGER.debug("Folder permission for " + startJob.getJob() + " is missing. Job start ignored.");
+
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
                         "Start Job: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Job not started");

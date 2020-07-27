@@ -1,5 +1,7 @@
 package com.sos.joc.jobstreams.impl;
 
+import java.nio.file.Paths;
+
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
@@ -15,8 +17,10 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobstreams.resource.IEditInConditionsResource;
 import com.sos.joc.model.jobstreams.InConditions;
+import com.sos.joc.model.jobstreams.JobInCondition;
 import com.sos.schema.JsonValidator;
 
 @Path("jobstreams/edit")
@@ -37,6 +41,17 @@ public class EditInConditionsImpl extends JOCResourceImpl implements IEditInCond
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            for (JobInCondition jobInCondition : inConditions.getJobsInconditions()) {
+                 try {
+                    checkFolderPermissions(jobInCondition.getJob());
+                } catch (JocFolderPermissionsException e) {
+                    jobInCondition.setJob("");
+                    LOGGER.debug("Folder permission for " + jobInCondition.getJob() + " is missing. Edit Inconditon " + jobInCondition.getJob() + " ignored.");
+                }
+            }
+                
+
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             sosHibernateSession.setAutoCommit(false);
             DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);

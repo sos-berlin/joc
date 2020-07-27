@@ -32,7 +32,7 @@ public class IsAliveImpl extends JOCResourceImpl implements IIsAliveResource {
             JobStreamsFilter startJob = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, startJob, accessToken, startJob.getJobschedulerId(),
-                    getPermissonsJocCockpit(startJob.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());            
+                    true);            
             
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

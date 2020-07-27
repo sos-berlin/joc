@@ -1,5 +1,6 @@
 package com.sos.joc.jobstreams.impl;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobstreams.resource.IJobStreamSessionsResource;
 import com.sos.joc.model.jobstreams.JobStream;
 import com.sos.joc.model.jobstreams.JobStreamSessions;
@@ -42,11 +44,10 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
             jobStreamSessionFilter = Globals.objectMapper.readValue(filterBytes, JobStreamSessionsFilter.class);
 
-
             if (jobStreamSessionFilter.getJobschedulerId() == null) {
                 jobStreamSessionFilter.setJobschedulerId("");
             }
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_JOBSTREAM_STARTER, jobStreamSessionFilter, accessToken, jobStreamSessionFilter
                     .getJobschedulerId(), getPermissonsJocCockpit(jobStreamSessionFilter.getJobschedulerId(), accessToken).getJobStream()
                             .isSetView());
@@ -54,7 +55,6 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                 return jocDefaultResponse;
             }
 
-       
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM_STARTER);
             DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
             FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
@@ -62,12 +62,12 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                 filterJobStreamHistory.setRunning(true);
             }
             int limit = 0;
-            if (jobStreamSessionFilter.getLimit() != null){
+            if (jobStreamSessionFilter.getLimit() != null) {
                 limit = jobStreamSessionFilter.getLimit();
             }
             filterJobStreamHistory.setContextId(jobStreamSessionFilter.getSession());
             filterJobStreamHistory.setJobStreamId(jobStreamSessionFilter.getJobStreamId());
-            filterJobStreamHistory.setStartedFrom(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateFrom(), jobStreamSessionFilter
+            filterJobStreamHistory.setStartedFrom(JobSchedulerDate.getDateFrom(jobStreamSessionFilter.getDateFrom(), jobStreamSessionFilter
                     .getTimeZone()));
             filterJobStreamHistory.setStartedTo(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateTo(), jobStreamSessionFilter.getTimeZone()));
             filterJobStreamHistory.setJobStreamStarter(jobStreamSessionFilter.getJobStreamStarterId());
@@ -87,16 +87,25 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                 jobStreamSesssion.setStarted(dbItemJobStreamHistory.getStarted());
                 jobStreamSesssion.setEnded(dbItemJobStreamHistory.getEnded());
                 jobStreamSesssion.setRunning(dbItemJobStreamHistory.getRunning());
+                jobStreamSesssion.setJobschedulerId(dbItemJobStreamHistory.getSchedulerId());
                 jobStreamSesssion.setJobstreamTasks(new ArrayList<JobStreamTask>());
                 filterJobStreamTaskContext.setJobstreamHistoryId(dbItemJobStreamHistory.getContextId());
                 List<DBItemJobStreamTaskContext> listOfTaskContexts = dbLayerJobStreamsTaskContext.getJobStreamStarterJobsList(
                         filterJobStreamTaskContext, 0);
+                if (listOfTaskContexts.size() > 0) {
+                    jobStreamSesssion.setJobStream(listOfTaskContexts.get(0).getJobStream());
+                     try {
+                        checkFolderPermissions(listOfTaskContexts.get(0).getJob());
+                    } catch (JocFolderPermissionsException e) {
+                        LOGGER.debug("Folder permission for " + listOfTaskContexts.get(0).getJob() + " is missing. Session " + jobStreamSesssion.getSession() + " ignored.");
+                    }
+                }
+
                 for (DBItemJobStreamTaskContext dbItemJobStreamTaskContext : listOfTaskContexts) {
                     JobStreamTask jobStreamTask = new JobStreamTask();
                     jobStreamTask.setCreated(dbItemJobStreamTaskContext.getCreated());
                     jobStreamTask.setId(dbItemJobStreamTaskContext.getId());
                     jobStreamTask.setJob(dbItemJobStreamTaskContext.getJob());
-                    jobStreamSesssion.setJobStream(dbItemJobStreamTaskContext.getJobStream());
                     jobStreamTask.setTaskId(dbItemJobStreamTaskContext.getTaskId());
                     jobStreamSesssion.getJobstreamTasks().add(jobStreamTask);
                 }

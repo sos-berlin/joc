@@ -1,5 +1,6 @@
 package com.sos.joc.jobstreams.impl;
 
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +46,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IInConditionsResource;
 import com.sos.joc.model.job.JobPath;
@@ -117,6 +119,13 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             Set<String> listOfJobs = new HashSet<String>();
 
             if (conditionJobsFilterSchema.getFolder() != null) {
+
+                try {
+                    checkFolderPermissions(conditionJobsFilterSchema.getFolder() + "/item");
+                } catch (JocFolderPermissionsException e) {
+                    LOGGER.debug("Folder permission for " + conditionJobsFilterSchema.getFolder() + " is missing for inconditons");
+                }
+
                 FilterOutConditions filterOutConditions = new FilterOutConditions();
                 filterOutConditions.setFolder(conditionJobsFilterSchema.getFolder());
                 filterOutConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
@@ -133,7 +142,12 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 }
             } else {
                 for (JobPath job : conditionJobsFilterSchema.getJobs()) {
-                    listOfJobs.add(job.getJob());
+                     try {
+                        checkFolderPermissions(job.getJob());
+                        listOfJobs.add(job.getJob());
+                    } catch (JocFolderPermissionsException e) {
+                        LOGGER.debug("Folder permission for " + job.getJob() + " is missing for inconditons");
+                    }
                 }
             }
 

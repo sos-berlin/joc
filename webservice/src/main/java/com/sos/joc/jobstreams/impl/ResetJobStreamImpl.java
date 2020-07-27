@@ -1,5 +1,6 @@
 package com.sos.joc.jobstreams.impl;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobstreams.resource.IResetJobStreamResource;
 import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
@@ -38,9 +40,13 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
             }
             checkRequiredParameter("session", resetJobStream.getSession());
             checkRequiredParameter("job", resetJobStream.getJob());
-
+ 
             try {
+                checkFolderPermissions(resetJobStream.getJob());
                 notifyEventHandler(accessToken, resetJobStream);
+            } catch (JocFolderPermissionsException e) {
+                LOGGER.debug("Folder permission for " + resetJobStream.getJob() + " is missing. Reset job stream for job " + resetJobStream.getJob() + " ignored.");
+
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
                         "Reset Job Stream: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Job Stream not resetted");
