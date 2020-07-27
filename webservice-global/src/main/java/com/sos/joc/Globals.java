@@ -128,27 +128,24 @@ import com.sos.joc.exceptions.JocException;
         }
     }
 
+ 
+     
      public static IniSecurityManagerFactory getShiroIniSecurityManagerFactory() {
-        String iniFile = getShiroIniInClassPath();
-        SecurityManager securityManager;
-        if (shiroSecurityManagerfactory == null) {
-            shiroSecurityManagerfactory = new IniSecurityManagerFactory(getIniFileForShiro(iniFile));
-            securityManager = shiroSecurityManagerfactory.getInstance();
-            SecurityUtils.setSecurityManager(securityManager);
-        } else {
-            Ini oldShiroIni = shiroSecurityManagerfactory.getIni();
-            Ini currentShiroIni = Ini.fromResourcePath(getIniFileForShiro(iniFile));
-            if (!oldShiroIni.equals(currentShiroIni)) {
-                LOGGER.debug(getIniFileForShiro(iniFile) + " is changed");
-                shiroSecurityManagerfactory = new IniSecurityManagerFactory();
-                securityManager = shiroSecurityManagerfactory.getInstance();
-                SecurityUtils.setSecurityManager(securityManager);
-                shiroSecurityManagerfactory.setIni(currentShiroIni);
-            }
-        }
-        return shiroSecurityManagerfactory;
-    }
-
+         String iniFile = getShiroIniInClassPath();
+         if (shiroSecurityManagerfactory == null) {
+             shiroSecurityManagerfactory = new IniSecurityManagerFactory(getIniFileForShiro(iniFile));
+         } else {
+             Ini oldShiroIni = shiroSecurityManagerfactory.getIni();
+             Ini currentShiroIni = Ini.fromResourcePath(getIniFileForShiro(iniFile));
+             if (!oldShiroIni.equals(currentShiroIni)) {
+                 LOGGER.debug(getIniFileForShiro(iniFile) + " is changed");
+                 shiroSecurityManagerfactory = new IniSecurityManagerFactory();
+                 shiroSecurityManagerfactory.setIni(currentShiroIni);
+             }
+         }
+         return shiroSecurityManagerfactory;
+     }
+     
     public static Ini getIniFromSecurityManagerFactory() {
         if (shiroSecurityManagerfactory == null) {
             String iniFile = getShiroIniInClassPath();
