@@ -20,7 +20,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
@@ -107,20 +106,14 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
                     if (jobsFilter.getJobs() != null && !jobsFilter.getJobs().isEmpty()) {
                         Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                        String unpermittedObject = null;
                         hasPermission = false;
                         for (JobPath jobPath : jobsFilter.getJobs()) {
                             if (jobPath != null) {
                                 if (canAdd(jobPath.getJob(), permittedFolders)) {
                                     reportTaskExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
                                     hasPermission = true;
-                                } else {
-                                    unpermittedObject = jobPath.getJob();
                                 }
                             }
-                        }
-                        if (!hasPermission && unpermittedObject != null) {
-                            throw new JocFolderPermissionsException(getParent(unpermittedObject));
                         }
                         jobsFilter.setRegex("");
                     } else {
@@ -132,7 +125,6 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
                         if (withFolderFilter && (folders == null || folders.isEmpty())) {
                             hasPermission = false;
-                            throw new JocFolderPermissionsException(jobsFilter.getFolders().get(0).getFolder());
                         } else if (folders != null && !folders.isEmpty()) {
                             for (Folder folder : folders) {
                                 folder.setFolder(normalizeFolder(folder.getFolder()));

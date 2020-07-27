@@ -22,7 +22,6 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
 import com.sos.joc.model.common.HistoryStateText;
@@ -106,7 +105,6 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 						instanceId = dbItemInventoryInstance.getId();
 					}
 					Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-					String unpermittedObject = null;
 					hasPermission = false;
                     for (OrderPath orderPath : ordersFilter.getOrders()) {
                         if (orderPath != null) {
@@ -121,18 +119,12 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                                     }
                                 }
                                 hasPermission = true;
-                            } else {
-                                unpermittedObject = orderPath.getJobChain();
                             }
                         }
-                    }
-                    if (!hasPermission && unpermittedObject != null) {
-                        throw new JocFolderPermissionsException(getParent(unpermittedObject));
                     }
 					ordersFilter.setRegex("");
 				} else if (withFolderFilter && (folders == null || folders.isEmpty())) {
 					hasPermission = false;
-					throw new JocFolderPermissionsException(ordersFilter.getFolders().get(0).getFolder());
 				} else {
 
 					if (ordersFilter.getExcludeOrders().size() > 0) {

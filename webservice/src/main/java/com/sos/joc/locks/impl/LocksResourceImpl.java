@@ -19,7 +19,6 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.locks.LockVolatile;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.locks.resource.ILocksResource;
 import com.sos.joc.model.common.Folder;
@@ -56,7 +55,6 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             String command = null;
             if (filteredByLocks) {
                 Set<Folder> filteredFolders = new HashSet<Folder>();
-                String unpermittedObject = null;
                 for (LockPath l : locksFilter.getLocks()) {
                     l.setLock(normalizePath(l.getLock()));
                     if (canAdd(l.getLock(), permittedFolders)) {
@@ -66,17 +64,13 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
                         folders.add(folder);
                         filteredFolders.add(folder);
                         lockPathFilter.add(l.getLock());
-                    } else {
-                        unpermittedObject = l.getLock();
                     }
                 }
                 if (!filteredFolders.isEmpty()) {
                     command = createLocksPostCommand(filteredFolders);
-                } else if (unpermittedObject != null) {
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                throw new JocFolderPermissionsException(locksFilter.getFolders().get(0).getFolder());
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 command = createLocksPostCommand(folders);
             } else {

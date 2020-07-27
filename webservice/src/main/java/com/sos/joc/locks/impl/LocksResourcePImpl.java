@@ -18,7 +18,6 @@ import com.sos.joc.classes.locks.LockPermanent;
 import com.sos.joc.db.documentation.DocumentationDBLayer;
 import com.sos.joc.db.inventory.locks.InventoryLocksDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.locks.resource.ILocksResourceP;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -61,7 +60,6 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             List<LockP> listOfLocks = new ArrayList<LockP>();
             if (locks != null && !locks.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                String unpermittedObject = null;
                 for (LockPath lockPath : locks) {
                     if (lockPath != null) {
                         if (lockPath != null && canAdd(lockPath.getLock(), permittedFolders)) {
@@ -74,16 +72,11 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                                 lock.setMaxNonExclusive(lockFromDb.getMaxNonExclusive());
                             }
                             listOfLocks.add(lock);
-                        } else {
-                            unpermittedObject = lockPath.getLock();
                         }
                     }
                 }
-                if (listOfLocks.isEmpty() && unpermittedObject != null) {
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
-                }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                throw new JocFolderPermissionsException(locksFilter.getFolders().get(0).getFolder());
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventoryLock> locksFromDb = dbLayer.getLocksByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance

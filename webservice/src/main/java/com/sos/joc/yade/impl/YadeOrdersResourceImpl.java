@@ -25,7 +25,6 @@ import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrderV;
@@ -72,7 +71,6 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
                 InventoryJobChainsDBLayer dbJCLayer = new InventoryJobChainsDBLayer(connection);
                 List<String> outerJobChains = dbJCLayer.getOuterJobChains(dbItemInventoryInstance.getId());
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                String unpermittedObject = null;
                 for (OrderPath order : orders) {
                     if (order != null) {
                         checkRequiredParameter("jobChain", order.getJobChain());
@@ -93,13 +91,8 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
                                 opj.addOrder(order.getOrderId());
                             }
                             ordersLists.put(order.getJobChain(), opj);
-                        } else {
-                            unpermittedObject = order.getJobChain();
                         }
                     }
-                }
-                if (ordersLists.isEmpty() && unpermittedObject != null) {
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
                 }
             }
 
@@ -108,8 +101,7 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
                     tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken, yadeJobs));
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
-                throw new JocFolderPermissionsException(ordersBody.getFolders().get(0).getFolder());
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));

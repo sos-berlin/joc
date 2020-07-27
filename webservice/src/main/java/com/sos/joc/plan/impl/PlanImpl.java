@@ -30,7 +30,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.plan.Period;
@@ -185,7 +184,6 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 hasPermission = false;
-                throw new JocFolderPermissionsException(planFilter.getFolders().get(0).getFolder());
             } else if (folders != null && !folders.isEmpty()) {
                 dailyPlanDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(folders));
             }

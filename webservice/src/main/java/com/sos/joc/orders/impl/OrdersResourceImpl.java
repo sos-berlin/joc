@@ -76,7 +76,6 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                 List<String> outerJobChains = dbJCLayer.getOuterJobChains(dbItemInventoryInstance.getId());
 
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                String unpermittedObject = null;
                 for (OrderPath order : orders) {
                     if (order != null) {
                         if (canAdd(order.getJobChain(), permittedFolders)) {
@@ -100,13 +99,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                                 opj.addOrder(order.getOrderId());
                             }
                             ordersLists.put(order.getJobChain(), opj);
-                        } else {
-                            unpermittedObject = order.getJobChain();
                         }
                     }
-                }
-                if (ordersLists.isEmpty() && unpermittedObject != null) {
-                    throw new JocFolderPermissionsException(getParent(unpermittedObject));
                 }
             }
 
@@ -115,7 +109,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                     tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken));
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                throw new JocFolderPermissionsException(ordersBody.getFolders().get(0).getFolder());
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));
