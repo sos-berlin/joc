@@ -12,6 +12,9 @@
 		"id": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
 		"jobStreamId": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
