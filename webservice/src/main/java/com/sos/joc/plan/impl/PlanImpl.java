@@ -44,7 +44,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
     private static final int MAX_PLAN_ENTRIED = 2000;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PlanImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlanImpl.class);
 
     private static final int SUCCESSFUL = 0;
     private static final int SUCCESSFUL_LATE = 1;
@@ -120,7 +120,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             LOGGER.debug("Reading the daily plan");
             JsonValidator.validateFailFast(planFilterBytes, PlanFilter.class);
             PlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, PlanFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     planFilter.getJobschedulerId(), accessToken).getDailyPlan().getView().isStatus());
 
@@ -152,12 +152,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 GregorianCalendar calendar = new GregorianCalendar();
                 calendar.setTime(fromDate);
                 calendar.add(GregorianCalendar.DAY_OF_MONTH, MAX_PLAN_ENTRIED);
-                Date max = calendar.getTime();  
+                Date max = calendar.getTime();
                 if (max.before(toDate)) {
                     toDate = max;
                 }
                 dailyPlanDBLayer.getFilter().setPlannedStartTo(toDate);
-            }            dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
+            }
+            dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
 
             for (PlanStateText state : planFilter.getStates()) {
                 dailyPlanDBLayer.getFilter().addState(state.name());
@@ -180,7 +181,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             if (hasPermission) {
                 List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(0);
-                List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(0);
+                List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(
+                        0);
                 List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(0);
                 List<DailyPlanWithReportExecutionDBItem> listOfDailyPlanStandaloneDBItems = dailyPlanDBLayer.getDailyPlanListStandalone(0);
 
@@ -194,6 +196,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
                         add = regExMatcher.find();
                     }
+
+                    for (Folder filterFolder : folders) {
+                        if (!filterFolder.getRecursive()) {
+                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJob()));
+                        }
+                    }
+
                     p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
 
                     if (dailyPlanDBItem.getDbItemReportTask() != null) {
@@ -219,6 +228,14 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                                 .getOrderId());
                         add = regExMatcher.find();
                     }
+                    
+                    for (Folder filterFolder : folders) {
+                        if (!filterFolder.getRecursive()) {
+                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJobChain()));
+                        }
+                    }
+
+                    
                     p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
                     p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
 
@@ -239,6 +256,14 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
                         add = regExMatcher.find();
                     }
+                    
+                    for (Folder filterFolder : folders) {
+                        if (!filterFolder.getRecursive()) {
+                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJob()));
+                        }
+                    }
+
+                    
                     p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
 
                     if (dailyPlanDBItem.getDbItemReportTask() != null) {
@@ -268,6 +293,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                                 .getOrderId());
                         add = regExMatcher.find();
                     }
+                    
+                    for (Folder filterFolder : folders) {
+                        if (!filterFolder.getRecursive()) {
+                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJobChain()));
+                        }
+                    }
+
                     p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
                     p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
 
