@@ -26,7 +26,7 @@ public class TasksResourceKillImplTest {
         //Preparation: Start the jobs on JobScheduler assigned to scheduler_id and put the task id in the list.
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"","JOC Cockpit", LDAP_USER, LDAP_PASSWORD).getEntity();
         ModifyTasks modifyTasksSchema = new ModifyTasks();
         List<TasksFilter> listOfJobs = new ArrayList<TasksFilter>();
         TasksFilter jobKill1 = new TasksFilter();

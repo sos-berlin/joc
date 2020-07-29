@@ -74,7 +74,7 @@ public class JOCResourceImpl {
         try {
             sosPermissionsCreator.loginFromAccessToken(accessToken);
         } catch (DBInvalidDataException e) {
-            LOGGER.warn("Have to create a new sosHibernateFactory" ,e);
+            LOGGER.warn("Have to create a new sosHibernateFactory", e);
             Globals.sosHibernateFactory.close();
             Globals.sosHibernateFactory = null;
             throw e;
@@ -103,7 +103,12 @@ public class JOCResourceImpl {
     protected SOSPermissionCommands getPermissonsCommands(String masterId, String accessToken) throws JocException {
         initGetPermissions(accessToken);
         masterId = getMasterId(masterId);
-        return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands(masterId);
+        SOSPermissionCommands sosPermissionCommands = jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands(masterId);
+        if (sosPermissionCommands == null) {
+            sosPermissionCommands = jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands("");
+        }
+        return sosPermissionCommands;
+
     }
 
     public String getAccessToken() {
@@ -176,7 +181,7 @@ public class JOCResourceImpl {
             Globals.disconnect(sosHibernateSession);
         }
     }
-    
+
     public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws JocException {
         this.accessToken = accessToken;
 
@@ -558,21 +563,21 @@ public class JOCResourceImpl {
     protected static String getParent(String path) {
         return Globals.getParent(path);
     }
-    
+
     protected void checkFolderPermissions(String path) throws JocFolderPermissionsException {
         String folder = getParent(path);
         if (!folderPermissions.isPermittedForFolder(folder)) {
             throw new JocFolderPermissionsException(folder);
         }
     }
-    
+
     protected void checkFolderPermissions(String path, Collection<Folder> listOfFolders) throws JocFolderPermissionsException {
         String folder = getParent(path);
         if (!folderPermissions.isPermittedForFolder(folder, listOfFolders)) {
             throw new JocFolderPermissionsException(folder);
         }
     }
-    
+
     protected boolean canAdd(String path, Collection<Folder> listOfFolders) {
         return folderPermissions.isPermittedForFolder(getParent(path), listOfFolders);
     }
@@ -580,14 +585,14 @@ public class JOCResourceImpl {
     protected Set<Folder> addPermittedFolders(Collection<Folder> folders) {
         return folderPermissions.getPermittedFolders(folders);
     }
-    
+
     protected void checkCalendarFolderPermissions(String path) throws JocFolderPermissionsException, SessionNotExistException {
         String folder = getParent(path);
         if (!getCalendarFolderPermissions().isPermittedForFolder(folder)) {
             throw new JocFolderPermissionsException(folder);
         }
     }
-    
+
     protected SOSShiroFolderPermissions getCalendarFolderPermissions() throws SessionNotExistException {
         SOSShiroFolderPermissions calendarFolderPermissions = jobschedulerUser.getSosShiroCurrentUser().getSosShiroCalendarFolderPermissions();
         calendarFolderPermissions.setSchedulerId(jobschedulerId);

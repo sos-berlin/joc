@@ -18,7 +18,7 @@ public class TestEnvWebserviceTest {
                  
         public static String getAccessToken() throws Exception   {
             SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"", USER, PASSWORD).getEntity();
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"", "JOC Cockpit",USER, PASSWORD).getEntity();
             return sosShiroCurrentUserAnswer.getAccessToken();        
         }
 

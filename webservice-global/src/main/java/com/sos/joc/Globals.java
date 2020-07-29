@@ -14,10 +14,8 @@ import javax.json.Json;
 import javax.json.JsonReader;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
-import org.apache.shiro.mgt.SecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +73,7 @@ import com.sos.joc.exceptions.JocException;
     public static Path servletContextRealPath = null;
     public static URI servletBaseUri = null;
     public static Map<String, String> schedulerVariables = null;
+    public static String loginClientId="";
 
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {

@@ -18,7 +18,7 @@ public class JobSchedulerResourceCommandImplTest {
     public void postJobschedulerCommandTest() throws Exception {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost(null,"", "JOC Cockpit", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobschedulerCommands jobschedulerCommand = new JobschedulerCommands();
         jobschedulerCommand.setUrl("http://localhost:4444");
         jobschedulerCommand.setJobschedulerId("scheduler_joc_cockpit");

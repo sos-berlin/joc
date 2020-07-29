@@ -163,7 +163,7 @@ public class SOSPermissionsCreator {
         SOSPermissionRoles sosPermissionRoles = sosPermissionsCreator.getRoles(true);
 
         addSosPermissionJocCockpit("", sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
-
+ 
         for (SecurityConfigurationMaster instance : listOfMasters) {
             if (!"".equals(instance.getMaster())) {
                 addSosPermissionJocCockpit(instance.getMaster(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
