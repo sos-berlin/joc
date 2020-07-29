@@ -9,6 +9,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendars.CalendarResolver;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.CalendarDatesFilter;
 import com.sos.joc.model.calendar.Dates;
 import com.sos.schema.JsonValidator;
@@ -33,7 +34,14 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
             
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             calendarFilter = CalendarResolver.getCalendarDatesFilter(sosHibernateSession, calendarFilter);
-            checkCalendarFolderPermissions(calendarFilter.getPath());
+            if (calendarFilter.getCalendar() == null) {
+                throw new JocMissingRequiredParameterException("undefined 'calendar'");
+            }
+            if (calendarFilter.getPath() != null) {
+                checkCalendarFolderPermissions(calendarFilter.getPath());
+            } else if(calendarFilter.getCalendar().getBasedOn() != null && !calendarFilter.getCalendar().getBasedOn().isEmpty()) {
+                checkCalendarFolderPermissions(calendarFilter.getCalendar().getBasedOn());
+            }
             dates = CalendarResolver.getCalendarDates(sosHibernateSession, calendarFilter);
 
             return JOCDefaultResponse.responseStatus200(dates);

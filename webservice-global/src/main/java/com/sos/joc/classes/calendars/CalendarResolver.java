@@ -16,6 +16,7 @@ import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarDatesFilter;
@@ -26,7 +27,7 @@ public class CalendarResolver {
     public static CalendarDatesFilter getCalendarDatesFilter(SOSHibernateSession sosHibernateSession, CalendarDatesFilter calendarFilter) throws DBMissingDataException, JocMissingRequiredParameterException, DBConnectionRefusedException, DBInvalidDataException, JsonParseException, JsonMappingException, IOException, JobSchedulerInvalidResponseDataException  {
         boolean calendarIdIsDefined = calendarFilter.getId() != null;
         boolean calendarPathIsDefined = calendarFilter.getPath() != null && !calendarFilter.getPath().isEmpty();
-        if (!calendarIdIsDefined && !calendarPathIsDefined) {
+        if (!calendarIdIsDefined && !calendarPathIsDefined && calendarFilter.getCalendar() == null) {
             throw new JocMissingRequiredParameterException("'calendar' or 'path' parameter is required");
         }
 
@@ -66,6 +67,7 @@ public class CalendarResolver {
             if (calendarFilter.getCalendar().getBasedOn() != null && !calendarFilter.getCalendar().getBasedOn().isEmpty()) {
                 CalendarsDBLayer dbLayer = new CalendarsDBLayer(sosHibernateSession);
                 String calendarPath = Globals.normalizePath(calendarFilter.getCalendar().getBasedOn());
+                
                 DBItemInventoryClusterCalendar calendarItem = dbLayer.getCalendar(calendarFilter.getJobschedulerId(), calendarPath);
                 if (calendarItem == null) {
                     throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));
