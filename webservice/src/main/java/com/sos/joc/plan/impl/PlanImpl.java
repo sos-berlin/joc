@@ -207,6 +207,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
                         add = regExMatcher.find();
                     }
+                    
+                    for (Folder filterFolder : folders) {
+                        if (!filterFolder.getRecursive()) {
+                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJob()));
+                        }
+                    }
+
                     p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
                     p.setJobStream(dailyPlanDBItem.getDailyPlanDbItem().getJobStream());
 
@@ -233,6 +240,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                                 .getOrderId());
                         add = regExMatcher.find();
                     }
+
+                    for (Folder filterFolder : folders) {
+                        if (!filterFolder.getRecursive()) {
+                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJobChain()));
+                        }
+                    }
+
                     p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
                     p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
 
@@ -253,6 +267,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
                         add = regExMatcher.find();
                     }
+                    
+                    for (Folder filterFolder : folders) {
+                        if (!filterFolder.getRecursive()) {
+                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJob()));
+                        }
+                    }
+
                     p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
 
                     if (dailyPlanDBItem.getDbItemReportTask() != null) {
@@ -282,6 +303,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                                 .getOrderId());
                         add = regExMatcher.find();
                     }
+                    
+                    for (Folder filterFolder : folders) {
+                        if (!filterFolder.getRecursive()) {
+                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJobChain()));
+                        }
+                    }
+
                     p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
                     p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
 
