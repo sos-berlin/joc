@@ -218,7 +218,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
                     for (Folder filterFolder : folders) {
                         if (!filterFolder.getRecursive()) {
-                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJob()));
+                            add = filterFolder.getFolder().equals(Globals.getParent(dailyPlanDBItem.getDailyPlanDbItem().getJob()));
                         }
                     }
 
@@ -251,7 +251,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     
                     for (Folder filterFolder : folders) {
                         if (!filterFolder.getRecursive()) {
-                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJobChain()));
+                            add = filterFolder.getFolder().equals(Globals.getParent(dailyPlanDBItem.getDailyPlanDbItem().getJobChain()));
                         }
                     }
 
@@ -279,7 +279,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     
                     for (Folder filterFolder : folders) {
                         if (!filterFolder.getRecursive()) {
-                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJob()));
+                            add = filterFolder.getFolder().equals(Globals.getParent(dailyPlanDBItem.getDailyPlanDbItem().getJob()));
                         }
                     }
 
@@ -316,7 +316,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     
                     for (Folder filterFolder : folders) {
                         if (!filterFolder.getRecursive()) {
-                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJobChain()));
+                            add = filterFolder.getFolder().equals(Globals.getParent(dailyPlanDBItem.getDailyPlanDbItem().getJobChain()));
                         }
                     }
 
