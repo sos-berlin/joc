@@ -32,6 +32,9 @@
 		"limit": {
 			"type": "integer",
 			"default": 10000
+		},
+		"auditLog": {
+			"$ref": "../audit/auditParams-schema.json"
 		}
 	}
 }

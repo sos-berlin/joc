@@ -22,6 +22,9 @@
 			"items": {
 				"$ref": "jobstreamStarter-schema.json"
 			}
+		},
+		"auditLog": {
+			"$ref": "../audit/auditParams-schema.json"
 		}
 	}
 }
