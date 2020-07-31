@@ -30,11 +30,10 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMasters;
 import com.sos.auth.rest.permission.model.SOSPermissionRoles;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JocCockpitProperties;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JocAuthenticationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.security.SecurityConfigurationMaster;
 
@@ -103,7 +102,6 @@ public class SOSPermissionsCreator {
                         currentUser.setCurrentSubject(subject);
                         currentUser.setAccessToken(accessToken);
 
-                        // SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(accessToken);
                         SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = null;
                         if (subject.getSession().getAttribute("username_joc_permissions") != null) {
                             sosPermissionJocCockpitMasters = (SOSPermissionJocCockpitMasters) SOSSerializerUtil.fromString(subject.getSession()
@@ -124,12 +122,14 @@ public class SOSPermissionsCreator {
                                 currentUser.addFolder(role, section.get(role));
                             }
                         }
-                        // SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(accessToken);
-                        SOSPermissionCommandsMasters sosPermissionCommandsMasters = (SOSPermissionCommandsMasters) SOSSerializerUtil.fromString(
-                                subject.getSession().getAttribute("username_command_permissions").toString());
-                        LOGGER.debug("loginFromAccessToken --> CommandsPermissionMasterObjectList created");
 
-                        currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
+                        if (subject.getSession().getAttribute("username_command_permissions") != null) {
+                            SOSPermissionCommandsMasters sosPermissionCommandsMasters = (SOSPermissionCommandsMasters) SOSSerializerUtil.fromString(
+                                    subject.getSession().getAttribute("username_command_permissions").toString());
+                            LOGGER.debug("loginFromAccessToken --> CommandsPermissionMasterObjectList created");
+                            currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
+                        }
+
                         Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
                     }
                 }
@@ -163,7 +163,7 @@ public class SOSPermissionsCreator {
         SOSPermissionRoles sosPermissionRoles = sosPermissionsCreator.getRoles(true);
 
         addSosPermissionJocCockpit("", sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
- 
+
         for (SecurityConfigurationMaster instance : listOfMasters) {
             if (!"".equals(instance.getMaster())) {
                 addSosPermissionJocCockpit(instance.getMaster(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
