@@ -72,7 +72,7 @@ public class DeleteResourceImpl extends JOCResourceImpl implements IDeleteResour
         SOSPermissionJocCockpit permissions = getPermissonsJocCockpit(in.getJobschedulerId(), accessToken);
         boolean permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().isDelete();
         JOCDefaultResponse response = init(IMPL_PATH, in, accessToken, in.getJobschedulerId(), permission);
-        if (response == null) {
+        if (permission && response == null) {
             if (versionIsOlderThan(JocXmlEditor.AVAILABILITY_STARTING_WITH)) {
                 throw new JobSchedulerBadRequestException(JocXmlEditor.MESSAGE_UNSUPPORTED_WEB_SERVICE);
             }

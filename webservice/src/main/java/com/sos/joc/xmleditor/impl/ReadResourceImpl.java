@@ -80,14 +80,20 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
     private JOCDefaultResponse checkPermissions(final String accessToken, final ReadConfiguration in) throws Exception {
         SOSPermissionJocCockpit permissions = getPermissonsJocCockpit(in.getJobschedulerId(), accessToken);
         boolean permission = false;
-         switch (in.getObjectType()) {
-        case OTHER: permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().getView().isOthers();
-        case YADE: permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().getView().isYade();
-        case NOTIFICATION: permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().getView().isNotification();
+        switch (in.getObjectType()) {
+        case OTHER:
+            permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().getView().isOthers();
+            break;
+        case YADE:
+            permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().getView().isYade();
+            break;
+        case NOTIFICATION:
+            permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().getView().isNotification();
+            break;
         }
-         
+
         JOCDefaultResponse response = init(IMPL_PATH, in, accessToken, in.getJobschedulerId(), permission);
-        if (response == null) {
+        if (permission && response == null) {
             if (versionIsOlderThan(JocXmlEditor.AVAILABILITY_STARTING_WITH)) {
                 throw new JobSchedulerBadRequestException(JocXmlEditor.MESSAGE_UNSUPPORTED_WEB_SERVICE);
             }
