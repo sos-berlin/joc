@@ -180,6 +180,17 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
            
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM);
             sosHibernateSession.setAutoCommit(false);
+            
+            if (jobStream.getOldJobStreamName() != null) {
+                DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+                sosHibernateSession.beginTransaction();
+                FilterJobStreams filterJobStreams = new FilterJobStreams();
+                filterJobStreams.setSchedulerId(jobStream.getJobschedulerId());
+                filterJobStreams.setJobStream(jobStream.getOldJobStreamName());
+                filterJobStreams.setFolder(jobStream.getFolder());
+                dbLayerJobStreams.deleteCascading(filterJobStreams, false);
+            }
+            
             sosHibernateSession.beginTransaction();
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
             dbLayerJobStreams.deleteInsert(jobStream, dbItemInventoryInstance.getTimeZone());
