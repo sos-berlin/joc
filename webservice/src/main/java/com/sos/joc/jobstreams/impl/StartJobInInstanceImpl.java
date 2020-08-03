@@ -13,13 +13,16 @@ import com.sos.classes.CustomEventsUtil;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.audit.StartJobAudit;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobstreams.resource.IStartJobInInInstanceResource;
+import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.job.StartJobs;
+import com.sos.joc.model.jobstreams.JobStreamStartJob;
 import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
 
@@ -33,35 +36,38 @@ public class StartJobInInstanceImpl extends JOCResourceImpl implements IStartJob
     public JOCDefaultResponse startJob(String accessToken, byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, JobStreamsFilter.class);
-            JobStreamsFilter jobStreamsFilter = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
+            JobStreamStartJob jobStreamStartJob = Globals.objectMapper.readValue(filterBytes, JobStreamStartJob.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobStreamsFilter, accessToken, jobStreamsFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    jobStreamsFilter.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobStreamStartJob, accessToken, jobStreamStartJob.getJobschedulerId(),
+                    getPermissonsJocCockpit(jobStreamStartJob.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("session", jobStreamsFilter.getSession());
-            checkRequiredParameter("job", jobStreamsFilter.getJob());
+            checkRequiredParameter("session", jobStreamStartJob.getSession());
+            checkRequiredParameter("job", jobStreamStartJob.getJob());
 
             try {
-                checkFolderPermissions(jobStreamsFilter.getJob());
-                
+                checkFolderPermissions(jobStreamStartJob.getJob());
+
                 StartJob startJob = new StartJob();
-                startJob.setAt("now");
-                startJob .setJob(jobStreamsFilter.getJob());
-                
+
+                startJob.setAt(jobStreamStartJob.getAt());
+                startJob.setJob(jobStreamStartJob.getJob());
+
                 StartJobs startJobs = new StartJobs();
-                startJobs.setAuditLog(jobStreamsFilter.getAuditLog());
-                startJobs.setJobschedulerId(jobStreamsFilter.getJobschedulerId());
+                startJobs.setAuditLog(jobStreamStartJob.getAuditLog());
+                startJobs.setJobschedulerId(jobStreamStartJob.getJobschedulerId());
 
                 StartJobAudit jobAudit = new StartJobAudit(startJob, startJobs);
                 logAuditMessage(jobAudit);
                 storeAuditLogEntry(jobAudit);
+                
+                
 
-                notifyEventHandler(accessToken, jobStreamsFilter);
+                notifyEventHandler(accessToken, jobStreamStartJob);
             } catch (JocFolderPermissionsException e) {
-                LOGGER.debug("Folder permission for " + jobStreamsFilter.getJob() + " is missing. Job start ignored.");
+                LOGGER.debug("Folder permission for " + jobStreamStartJob.getJob() + " is missing. Job start ignored.");
 
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
@@ -70,7 +76,7 @@ public class StartJobInInstanceImpl extends JOCResourceImpl implements IStartJob
 
             }
 
-            return JOCDefaultResponse.responseStatus200(jobStreamsFilter);
+            return JOCDefaultResponse.responseStatus200(jobStreamStartJob);
 
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
@@ -79,12 +85,29 @@ public class StartJobInInstanceImpl extends JOCResourceImpl implements IStartJob
         }
     }
 
-    private void notifyEventHandler(String accessToken, JobStreamsFilter startJob) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken, JobStreamStartJob startJob) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("job", startJob.getJob());
         parameters.put("session", startJob.getSession());
+        String at;
+
+        if (startJob.getAt() == null || startJob.getAt().isEmpty()) {
+            at = "now";
+        } else {
+            if (startJob.getAt().contains("now")) {
+                at = startJob.getAt();
+            } else {
+                at = JobSchedulerDate.getAtInJobSchedulerTimezone(startJob.getAt(), startJob.getTimeZone(), dbItemInventoryInstance.getTimeZone());
+            }
+        }
+
+        parameters.put("at", at);
+        
+        for (NameValuePair param: startJob.getParams()) {
+            parameters.put("#" + param.getName(), param.getValue());
+        }
 
         customEventsUtil.addEvent("StartJob", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
@@ -93,5 +116,7 @@ public class StartJobInInstanceImpl extends JOCResourceImpl implements IStartJob
         jocXmlCommand.throwJobSchedulerError();
 
     }
+    
+ 
 
 }
