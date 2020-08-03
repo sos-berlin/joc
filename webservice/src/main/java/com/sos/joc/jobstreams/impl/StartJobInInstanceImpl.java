@@ -57,6 +57,7 @@ public class StartJobInInstanceImpl extends JOCResourceImpl implements IStartJob
 
                 StartJobAudit jobAudit = new StartJobAudit(startJob, startJobs);
                 logAuditMessage(jobAudit);
+                storeAuditLogEntry(jobAudit);
 
                 notifyEventHandler(accessToken, jobStreamsFilter);
             } catch (JocFolderPermissionsException e) {

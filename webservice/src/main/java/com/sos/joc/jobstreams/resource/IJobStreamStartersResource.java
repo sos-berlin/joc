@@ -19,6 +19,12 @@ public interface IJobStreamStartersResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse editJobStreamStarters(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamStartersFilter);
+
+    @POST
+    @Path("delete_jobstream_starters")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
+    public JOCDefaultResponse deleteJobStreamStarters(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamStartersFilter);
     
 
     @POST

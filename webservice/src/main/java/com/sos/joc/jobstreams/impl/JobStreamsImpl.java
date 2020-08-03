@@ -26,6 +26,7 @@ import com.sos.jitl.jobstreams.db.FilterJobStreams;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.audit.EditJobStreamsAudit;
 import com.sos.joc.classes.jobstreams.JobStreamMigrator;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocFolderPermissionsException;
@@ -44,7 +45,7 @@ import com.sos.schema.JsonValidator;
 public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResource {
 
     private static final String API_CALL_LIST_JOBSTREAM = "./jobstreams/list_jobstreams";
-    private static final String API_CALL_ADD_JOBSTREAM = "./jobstreams/add_jobstream";
+    private static final String API_CALL_EDIT_JOBSTREAM = "./jobstreams/edit_jobstream";
     private static final String API_CALL_DELETE_JOBSTREAM = "./jobstreams/delete_jobstreams";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamsImpl.class);
 
@@ -152,14 +153,14 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
     }
 
     @Override
-    public JOCDefaultResponse addJobStream(String accessToken, byte[] filterBytes) {
+    public JOCDefaultResponse editJobStream(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
 
         try {
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
             JobStream jobStream = Globals.objectMapper.readValue(filterBytes, JobStream.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_JOBSTREAM, jobStream, accessToken, jobStream.getJobschedulerId(),
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EDIT_JOBSTREAM, jobStream, accessToken, jobStream.getJobschedulerId(),
                     getPermissonsJocCockpit(jobStream.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -178,7 +179,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                  }
             }
            
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EDIT_JOBSTREAM);
             sosHibernateSession.setAutoCommit(false);
             
             if (jobStream.getOldJobStreamName() != null) {
@@ -189,12 +190,18 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 filterJobStreams.setJobStream(jobStream.getOldJobStreamName());
                 filterJobStreams.setFolder(jobStream.getFolder());
                 dbLayerJobStreams.deleteCascading(filterJobStreams, false);
+                sosHibernateSession.commit();
+
             }
             
             sosHibernateSession.beginTransaction();
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
             dbLayerJobStreams.deleteInsert(jobStream, dbItemInventoryInstance.getTimeZone());
             sosHibernateSession.commit();
+            
+            EditJobStreamsAudit editJobStreamAudit = new EditJobStreamsAudit(jobStream);
+            logAuditMessage(editJobStreamAudit);
+            storeAuditLogEntry(editJobStreamAudit);
 
             notifyEventHandler(accessToken);
             return JOCDefaultResponse.responseStatus200(jobStream);
@@ -206,6 +213,11 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         }
     }
 
+    @Override
+    public JOCDefaultResponse addJobStream(String accessToken, byte[] filterBytes) {
+        return editJobStream(accessToken, filterBytes);
+    }
+    
     @Override
     public JOCDefaultResponse deleteJobStream(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
@@ -226,7 +238,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 checkRequiredParameter("jobStream", jobStream.getJobStream());
             }
 
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EDIT_JOBSTREAM);
             sosHibernateSession.setAutoCommit(false);
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
             sosHibernateSession.beginTransaction();
@@ -238,6 +250,12 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             dbLayerJobStreams.deleteCascading(filterJobStreams, true);
 
             sosHibernateSession.commit();
+            
+            
+            EditJobStreamsAudit editJobStreamAudit = new EditJobStreamsAudit(jobStream);
+            logAuditMessage(editJobStreamAudit);
+            storeAuditLogEntry(editJobStreamAudit);
+
 
             notifyEventHandler(accessToken);
             return JOCDefaultResponse.responseStatus200(jobStream);

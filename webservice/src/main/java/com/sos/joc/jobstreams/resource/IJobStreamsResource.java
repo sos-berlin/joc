@@ -24,6 +24,12 @@ public interface IJobStreamsResource {
     public JOCDefaultResponse deleteJobStream(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamsFilter);
 
     @POST
+    @Path("edit_jobstream")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
+    public JOCDefaultResponse editJobStream(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamsFilter);
+
+    @POST
     @Path("add_jobstream")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })

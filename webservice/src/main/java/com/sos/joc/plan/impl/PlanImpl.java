@@ -230,7 +230,11 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
                         p.setHistoryId(dailyPlanDBItem.getDbItemReportTask().getHistoryIdAsString());
                     }
-
+                    
+                    if (planFilter.getIsJobStream() != null && planFilter.getIsJobStream()) {
+                        add = add && (dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull() != null)  && (dailyPlanDBItem.getDailyPlanDbItem().getJobStream() != null) && (dailyPlanDBItem.getDailyPlanDbItem().getJobStream().length() > 0); 
+                    }
+                    
                     if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() == null) {
                         result.add(p);
                     }
@@ -267,12 +271,18 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         err.setMessage(dailyPlanDBItem.getDbItemReportTask().getErrorText());
                         p.setError(err);
                     }
+
+                    if (planFilter.getIsJobStream() != null && planFilter.getIsJobStream()) {
+                        add = add && (dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull() != null)  && (dailyPlanDBItem.getDailyPlanDbItem().getJobStream() != null) && (dailyPlanDBItem.getDailyPlanDbItem().getJobStream().length() > 0); 
+                    }
+
+                    
                     if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() != null) {
                         result.add(p);
                     }
                 }
 
-                if (!planFilter.getIsJobStream()) {
+                if (planFilter.getIsJobStream() == null || !planFilter.getIsJobStream()) {
                     for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfWaitingDailyPlanOrderDBItems) {
 
                         boolean add = true;
@@ -418,7 +428,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                                 }
 
                                 add = add && (dailyPlanDBLayer.getFilter().containsFolder(path));
-                                if (planFilter.getIsJobStream()) {
+                                if (planFilter.getIsJobStream() != null && planFilter.getIsJobStream()) {
                                     add = add && (dailyPlanDBItem.getJobOrNull() != null)  && (dailyPlanDBItem.getJobStream() != null) && (dailyPlanDBItem.getJobStream().length() > 0); 
                                 }
                                 

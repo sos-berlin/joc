@@ -24,6 +24,8 @@ import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.audit.EditJobStreamStarterAudit;
+import com.sos.joc.classes.audit.EditJobStreamsAudit;
 import com.sos.joc.classes.audit.StartJobAudit;
 import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
@@ -68,6 +70,57 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
             sosHibernateSession.beginTransaction();
             dbLayerJobStreamStarters.deleteInsert(jobStreamStarters, dbItemInventoryInstance.getTimeZone());
             sosHibernateSession.commit();
+
+            for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
+                EditJobStreamStarterAudit editJobStreamStartersAudit = new EditJobStreamStarterAudit(jobStreamStarters, jobStreamStarter);
+                logAuditMessage(editJobStreamStartersAudit);
+                storeAuditLogEntry(editJobStreamStartersAudit);
+            }
+
+            try {
+                notifyEventHandler(accessToken);
+            } catch (JobSchedulerConnectionRefusedException e) {
+                LOGGER.warn(
+                        "Add JobStreamStarter: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Data are stored in Database");
+            }
+            return JOCDefaultResponse.responseStatus200(jobStreamStarters);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+        }
+    }
+
+    @Override
+    public JOCDefaultResponse deleteJobStreamStarters(String accessToken, byte[] filterBytes) {
+        SOSHibernateSession sosHibernateSession = null;
+        JobStreamStarters jobStreamStarters = null;
+        try {
+            JsonValidator.validateFailFast(filterBytes, JobStream.class);
+            jobStreamStarters = Globals.objectMapper.readValue(filterBytes, JobStreamStarters.class);
+
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_JOBSTREAM_STARTER, jobStreamStarters, accessToken, jobStreamStarters
+                    .getJobschedulerId(), getPermissonsJocCockpit(jobStreamStarters.getJobschedulerId(), accessToken).getJobStream().getChange()
+                            .getEvents().isAdd());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
+            checkRequiredParameter("jobStreamId", jobStreamStarters.getJobStreamId());
+
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM_STARTER);
+            sosHibernateSession.setAutoCommit(false);
+            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+            sosHibernateSession.beginTransaction();
+            dbLayerJobStreamStarters.deleteStarters(jobStreamStarters, dbItemInventoryInstance.getTimeZone());
+            sosHibernateSession.commit();
+
+            for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
+                EditJobStreamStarterAudit editJobStreamStartersAudit = new EditJobStreamStarterAudit(jobStreamStarters, jobStreamStarter);
+                logAuditMessage(editJobStreamStartersAudit);
+                storeAuditLogEntry(editJobStreamStartersAudit);
+            }
+            
             try {
                 notifyEventHandler(accessToken);
             } catch (JobSchedulerConnectionRefusedException e) {
@@ -90,9 +143,8 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
             jobStreamStarters = Globals.objectMapper.readValue(filterBytes, JobStreamStarters.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_JOBSTREAM_STARTER, jobStreamStarters, accessToken, jobStreamStarters
-                    .getJobschedulerId(), getPermissonsJocCockpit(jobStreamStarters.getJobschedulerId(), accessToken).getJobStream().getChange()
-                            .getEvents().isAdd());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_START, jobStreamStarters, accessToken, jobStreamStarters.getJobschedulerId(),
+                    getPermissonsJocCockpit(jobStreamStarters.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -150,6 +202,8 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
 
                 StartJobAudit jobAudit = new StartJobAudit(startJob, startJobs);
                 logAuditMessage(jobAudit);
+                storeAuditLogEntry(jobAudit);
+
             }
         } finally {
             Globals.disconnect(sosHibernateSession);
