@@ -57,7 +57,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_JOBSTREAM_STARTER, jobStreamStarters, accessToken, jobStreamStarters
                     .getJobschedulerId(), getPermissonsJocCockpit(jobStreamStarters.getJobschedulerId(), accessToken).getJobStream().getChange()
-                            .getEvents().isAdd());
+                            .isJobStream());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -101,7 +101,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_JOBSTREAM_STARTER, jobStreamStarters, accessToken, jobStreamStarters
                     .getJobschedulerId(), getPermissonsJocCockpit(jobStreamStarters.getJobschedulerId(), accessToken).getJobStream().getChange()
-                            .getEvents().isAdd());
+                            .isJobStream());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -144,7 +144,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
             jobStreamStarters = Globals.objectMapper.readValue(filterBytes, JobStreamStarters.class);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_START, jobStreamStarters, accessToken, jobStreamStarters.getJobschedulerId(),
-                    getPermissonsJocCockpit(jobStreamStarters.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
+                    getPermissonsJocCockpit(jobStreamStarters.getJobschedulerId(), accessToken).getJobStream().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

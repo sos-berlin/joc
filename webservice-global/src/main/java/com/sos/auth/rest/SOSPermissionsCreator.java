@@ -530,6 +530,8 @@ public class SOSPermissionsCreator {
             sosPermissionJocCockpit.getJobStream().getView().setStatus(haveRight(masterId, "sos:products:joc_cockpit:jobstream:view:status"));
             sosPermissionJocCockpit.getJobStream().getChange().setConditions(haveRight(masterId,
                     "sos:products:joc_cockpit:jobstream:change:conditions"));
+            sosPermissionJocCockpit.getJobStream().getChange().setJobStream(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobstream:change:jobstream"));
             sosPermissionJocCockpit.getJobStream().getChange().getEvents().setAdd(haveRight(masterId,
                     "sos:products:joc_cockpit:jobstream:change:events:add"));
             sosPermissionJocCockpit.getJobStream().getChange().getEvents().setRemove(haveRight(masterId,

@@ -215,6 +215,7 @@ public class SOSListOfPermissions {
         addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:view:graph");
         addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:view:eventlist");
         addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:change:conditions");
+        addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:change:jobstream");
         addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:change:events:add");
         addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:change:events:remove");
         sosPermissions.setSOSPermissionListJoc(sosPermissionJoc);
