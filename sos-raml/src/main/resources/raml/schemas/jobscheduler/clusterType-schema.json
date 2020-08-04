@@ -2,7 +2,6 @@
   "title": "jobscheduler cluster type",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobscheduler.ClusterType",
-  "type": "string",
   "description": "Possible values are: 'standalone','active','passive'; JobScheduler doesn't run in a cluster (standalone) or is member of an active (distributed orders) or passive cluster (backup)",
   "type": "string",
   "enum": [
