@@ -15,6 +15,7 @@ import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreams;
@@ -182,21 +183,34 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EDIT_JOBSTREAM);
             sosHibernateSession.setAutoCommit(false);
             
-            if (jobStream.getOldJobStreamName() != null) {
-                DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+            DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+
+            Long oldId=null;
+            if (jobStream.getOldJobStreamName() != null && !jobStream.getOldJobStreamName().equals(jobStream.getJobStream())) {
+                
                 sosHibernateSession.beginTransaction();
                 FilterJobStreams filterJobStreams = new FilterJobStreams();
                 filterJobStreams.setSchedulerId(jobStream.getJobschedulerId());
                 filterJobStreams.setJobStream(jobStream.getOldJobStreamName());
                 filterJobStreams.setFolder(jobStream.getFolder());
+                
+                List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 1);
+                
+                if (listOfJobStreams.size() > 0) {
+                    oldId = listOfJobStreams.get(0).getId();
+                }
+                
                 dbLayerJobStreams.deleteCascading(filterJobStreams, false);
                 sosHibernateSession.commit();
 
             }
             
             sosHibernateSession.beginTransaction();
-            DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
-            dbLayerJobStreams.deleteInsert(jobStream, dbItemInventoryInstance.getTimeZone());
+            Long newId = dbLayerJobStreams.deleteInsert(jobStream, dbItemInventoryInstance.getTimeZone());
+            if (oldId != null && oldId != newId) {
+                DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+                dbLayerJobStreamHistory.updateHistoryWithJobStream(oldId, newId);
+            }
             sosHibernateSession.commit();
             
             EditJobStreamsAudit editJobStreamAudit = new EditJobStreamsAudit(jobStream);
