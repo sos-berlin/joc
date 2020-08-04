@@ -41,7 +41,7 @@ public class JSObjectConfiguration {
         Configuration200 entity = new Configuration200();
         if (getSourceWithXMLCommand) {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
-            String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
+            String orderCommand = jocXmlCommand.getShowOrderCommand(JOCResourceImpl.normalizePath(jobChain), orderId, "source");
             entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order",
                     responseInHtml, accessToken));
         } else {
@@ -50,7 +50,7 @@ public class JSObjectConfiguration {
                         JobSchedulerObjectType.ORDER, responseInHtml));
             } catch (JobSchedulerObjectNotExistException e) {
                 JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
-                String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
+                String orderCommand = jocXmlCommand.getShowOrderCommand(JOCResourceImpl.normalizePath(jobChain), orderId, "source");
                 entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order",
                         responseInHtml, accessToken));
             }
@@ -64,7 +64,7 @@ public class JSObjectConfiguration {
 
         if (getSourceWithXMLCommand) {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
-            String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
+            String jobCommand = jocXmlCommand.getShowJobCommand(JOCResourceImpl.normalizePath(job), "source", 0, 0);
             entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml,
                     accessToken));
         } else {
@@ -73,7 +73,7 @@ public class JSObjectConfiguration {
                         responseInHtml));
             } catch (JobSchedulerObjectNotExistException e) {
                 JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
-                String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
+                String jobCommand = jocXmlCommand.getShowJobCommand(JOCResourceImpl.normalizePath(job), "source", 0, 0);
                 entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml,
                         accessToken));
             }
@@ -84,7 +84,7 @@ public class JSObjectConfiguration {
 
     public ModifyOrder modifyOrderRuntime(String newRunTime, JOCResourceImpl jocResourceImpl, String jobChain, String orderId) throws JocException {
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
-        String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
+        String orderCommand = jocXmlCommand.getShowOrderCommand(JOCResourceImpl.normalizePath(jobChain), orderId, "source");
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(orderCommand, jocResourceImpl.getAccessToken());
         try {
             Node orderNode = jocXmlCommand.getSosxml().selectSingleNode("//source/order");
@@ -167,9 +167,10 @@ public class JSObjectConfiguration {
 
     public String modifyJobRuntime(String newRunTime, JOCResourceImpl jocResourceImpl, String job) throws JocException {
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
-        String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
+        String jobCommand = jocXmlCommand.getShowJobCommand(JOCResourceImpl.normalizePath(job), "source", 0, 0);
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobCommand, jocResourceImpl.getAccessToken());
         try {
+            String x = jocXmlCommand.getXmlString(jocXmlCommand.getSosxml().getRoot());
             Node jobNode = jocXmlCommand.getSosxml().selectSingleNode("//source/job");
             if (newRunTime != null && !newRunTime.trim().isEmpty()) {
                 jobNode = modifyJobRuntimeNode(jocXmlCommand.getSosxml(), cleanEmptyCalendarDates(new SOSXMLXPath(new StringBuffer(newRunTime))));

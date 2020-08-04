@@ -65,13 +65,13 @@ public class JOCHotFolder extends JobSchedulerRestApiClient {
     }
 
     /**
-     * The bytes of the body get the charset ISO_8859_1
+     * The bytes of the body get the charset UTF-8
      * @param path
      * @param body
      * @throws JocException
      */
     public void putFile(String path, String body) throws JocException {
-        putFile(path, body, StandardCharsets.ISO_8859_1);
+        putFile(path, body, StandardCharsets.UTF_8);
     }
     
     public void putFile(String path, String body, Charset charset) throws JocException {

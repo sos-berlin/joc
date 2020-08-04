@@ -85,8 +85,7 @@ public class XmlDeserializer {
         if (descriptionNode != null) {
             descContent = descriptionNode.getText().trim();
             if (descriptionNode.hasContent()) {
-                @SuppressWarnings("unchecked")
-                List<Node> children = new ArrayList<Node>(descriptionNode.content());
+                List<Node> children = descriptionNode.content();
                 for (Node child : children) {
                     if (child.getNodeType() == Node.TEXT_NODE || child.getNodeType() == Node.CDATA_SECTION_NODE) {
                         descriptionNode.remove(child);
@@ -97,8 +96,7 @@ public class XmlDeserializer {
         String scriptContent = removeTextAndCdata(doc.selectSingleNode("/job/script"));
         
         List<String> monitorScriptContents = new ArrayList<String>();
-        @SuppressWarnings("unchecked")
-        List<Node> monitorScriptNodes = new ArrayList<Node>(doc.selectNodes("/job/monitor/script"));
+        List<Node> monitorScriptNodes = doc.selectNodes("/job/monitor/script");
         for (Node monitorScriptNode : monitorScriptNodes) {
             String monitorScriptContent = removeTextAndCdata(monitorScriptNode);
             monitorScriptContents.add(monitorScriptContent);
@@ -128,8 +126,7 @@ public class XmlDeserializer {
     }
     
     private static Config deserializeNodeParams(Document doc) throws JsonParseException, JsonMappingException, IOException {
-        @SuppressWarnings("unchecked")
-        List<Node> notes = new ArrayList<Node>(doc.selectNodes("//note"));
+        List<Node> notes = doc.selectNodes("//note");
         for (Node note : notes) {
             note.getParent().remove(note);
         }
@@ -142,8 +139,7 @@ public class XmlDeserializer {
             Element scriptElem = (Element) scriptNode;
             scriptContent = scriptElem.getText().trim();
             if (scriptElem.hasContent()) {
-                @SuppressWarnings("unchecked")
-                List<Node> children = new ArrayList<Node>(scriptElem.content());
+                List<Node> children = scriptElem.content();
                 for (Node child : children) {
                     if (child.getNodeType() == Node.TEXT_NODE || child.getNodeType() == Node.CDATA_SECTION_NODE) {
                         scriptElem.remove(child);
