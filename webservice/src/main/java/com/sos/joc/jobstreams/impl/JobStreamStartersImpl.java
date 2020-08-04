@@ -25,7 +25,6 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.EditJobStreamStarterAudit;
-import com.sos.joc.classes.audit.EditJobStreamsAudit;
 import com.sos.joc.classes.audit.StartJobAudit;
 import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
