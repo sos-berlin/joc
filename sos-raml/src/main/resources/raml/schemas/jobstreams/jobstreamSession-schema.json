@@ -24,6 +24,9 @@
 		"session": {
 			"$ref": "../common/string255-schema.json"
 		},
+		"jobStreamStarter": {
+			"$ref": "jobStreamStarter-schema.json"
+		},
 		"running": {
 			"type": "boolean"
 		},

@@ -13,8 +13,10 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamTaskContext;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreams;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamsTaskContext;
 import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
@@ -30,6 +32,7 @@ import com.sos.joc.model.jobstreams.JobStream;
 import com.sos.joc.model.jobstreams.JobStreamSessions;
 import com.sos.joc.model.jobstreams.JobStreamSessionsFilter;
 import com.sos.joc.model.jobstreams.JobStreamSesssion;
+import com.sos.joc.model.jobstreams.JobStreamStarter;
 import com.sos.joc.model.jobstreams.JobStreamTask;
 import com.sos.schema.JsonValidator;
 
@@ -95,14 +98,27 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
 
             DBLayerJobStreamsTaskContext dbLayerJobStreamsTaskContext = new DBLayerJobStreamsTaskContext(sosHibernateSession);
             FilterJobStreamTaskContext filterJobStreamTaskContext = new FilterJobStreamTaskContext();
-
+            DBLayerJobStreamStarters dbLayerJobStreamStarter = new DBLayerJobStreamStarters(sosHibernateSession);
+             
+            
             JobStreamSessions jobStreamSesssions = new JobStreamSessions();
             jobStreamSesssions.setDeliveryDate(new Date());
             jobStreamSesssions.setJobstreamSessions(new ArrayList<JobStreamSesssion>());
             for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfSessions) {
                 JobStreamSesssion jobStreamSesssion = new JobStreamSesssion();
+                jobStreamSesssion.setJobStreamStarter(new JobStreamStarter());
                 jobStreamSesssion.setId(dbItemJobStreamHistory.getId());
                 jobStreamSesssion.setJobStreamId(dbItemJobStreamHistory.getJobStream());
+                DBItemJobStreamStarter dbItemJobStreamStarter = dbLayerJobStreamStarter.getJobStreamStartersDbItem(dbItemJobStreamHistory.getJobStreamStarter());
+                if (dbItemJobStreamStarter != null){
+                    jobStreamSesssion.getJobStreamStarter().setTitle(dbItemJobStreamStarter.getTitle());
+                    jobStreamSesssion.getJobStreamStarter().setJobStreamStarterId(dbItemJobStreamHistory.getJobStreamStarter());
+                    jobStreamSesssion.getJobStreamStarter().setNextStart(dbItemJobStreamStarter.getNextStart());
+                    jobStreamSesssion.getJobStreamStarter().setEndOfJobStream(dbItemJobStreamStarter.getEndOfJobStream());
+                    jobStreamSesssion.getJobStreamStarter().setRequiredJob(dbItemJobStreamStarter.getRequiredJob());
+                    jobStreamSesssion.getJobStreamStarter().setState(dbItemJobStreamStarter.getState());
+                }
+
                 jobStreamSesssion.setSession(dbItemJobStreamHistory.getContextId());
                 jobStreamSesssion.setStarted(dbItemJobStreamHistory.getStarted());
                 jobStreamSesssion.setEnded(dbItemJobStreamHistory.getEnded());
