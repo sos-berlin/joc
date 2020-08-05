@@ -334,7 +334,7 @@ public class JOCResourceImpl {
     public static String writeXmlPoJoAsString(Object xmlPoJo) throws JsonProcessingException {
         // ObjectMapper xmlMapper = new XmlMapper().configure(Feature.WRITE_XML_DECLARATION, true).configure(SerializationFeature.INDENT_OUTPUT, true);
         // TODO generates <?xml version="1.0" encoding="UTF-8" ?> instead of ISO-8859-1
-        return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n\n" + Globals.xmlMapper.writeValueAsString(xmlPoJo);
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n\n" + Globals.xmlMapper.writeValueAsString(xmlPoJo);
     }
 
     public String getUrl() {

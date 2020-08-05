@@ -52,7 +52,8 @@ public class XmlSerializer {
             "SCHEDULE", "RUNTIME", "MONITOR", "NODEPARAMS");
     private static final List<String> trueValues = Arrays.asList("true", "1", "yes");
     private static final List<String> falseValues = Arrays.asList("false", "0", "no");
-    public static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" + System.lineSeparator() + System.lineSeparator();
+    //public static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" + System.lineSeparator() + System.lineSeparator();
+    public static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + System.lineSeparator() + System.lineSeparator();
 
     public static String serializeToStringWithHeader(Object jsonPojo) throws JsonProcessingException {
         return xmlHeader + Globals.xmlMapper.writeValueAsString(jsonPojo);
