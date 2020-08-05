@@ -72,10 +72,12 @@ public class RunTime {
             if (schedule != null && !schedule.isEmpty() && path != null) {
                 runtimeElem.setAttribute("schedule", path.resolve(schedule).normalize().toString().replace('\\', '/'));
             }
+            String encoding = "UTF-8";
             Source source = new DOMSource(runtimeElem);
             Result result = new StreamResult(writer);
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
             transformer.transform(source, result);

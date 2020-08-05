@@ -129,9 +129,11 @@ public class ConfigurationUtils {
         }
         StringWriter writer = new StringWriter();
         try {
+            String encoding = "UTF-8";
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
             transformer.transform(new DOMSource(sourceNode), new StreamResult(writer));
             return writer.toString();
