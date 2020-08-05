@@ -11,8 +11,6 @@ import javax.ws.rs.Path;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
-import com.sos.joe.common.XmlDeserializer;
-import com.sos.joe.common.XmlSerializer;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jobscheduler.model.event.CalendarEvent;
@@ -38,9 +36,11 @@ import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
-import com.sos.schema.JsonValidator;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.schedule.RunTime;
+import com.sos.joe.common.XmlDeserializer;
+import com.sos.joe.common.XmlSerializer;
+import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
 
  
@@ -171,12 +171,12 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                 try {
                     RunTime runTime = XmlSerializer.serializeAbstractSchedule(modifyJob.getRunTime());
                     modifyJob.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
-                    JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
-                    String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTimeXml(), this, jobPath);
-                    Document doc = ValidateXML.validateAgainstJobSchedulerSchema(configuration);
                     
                     if (versionIsOlderThan("1.13.1")) {
 
+                        JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
+                        String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTimeXml(), this, jobPath);
+                        Document doc = ValidateXML.validateAgainstJobSchedulerSchema(configuration);
                         XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
                         if (doc != null) {
                             Element jobElement = doc.getRootElement();
@@ -186,13 +186,16 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                         jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
                     } else {
                         
-                        Job jobPojo = XmlDeserializer.deserialize(configuration, Job.class);
-                        if (jobPojo.getRunTime() != null && modifyJob.getCalendars() != null && !modifyJob.getCalendars().isEmpty()) {
+                        JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                        Job jobPojo = XmlDeserializer.deserialize(jocHotFolder.getFile(jobPath + ".job.xml"), Job.class);
+                        jobPojo.setRunTime(runTime);
+                        ValidateXML.validateAgainstJobSchedulerSchema(Globals.xmlMapper.writeValueAsString(jobPojo));
+
+                        if (runTime != null && modifyJob.getCalendars() != null && !modifyJob.getCalendars().isEmpty()) {
                             Calendars calendars = new Calendars();
                             calendars.setCalendars(modifyJob.getCalendars());
                             jobPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(calendars)); 
                         }
-                        JOCHotFolder jocHotFolder = new JOCHotFolder(this);
                         jocHotFolder.putFile(jobPath + ".job.xml", XmlSerializer.serializeToStringWithHeader(XmlSerializer.serializeJob(jobPojo)));
                     }
 

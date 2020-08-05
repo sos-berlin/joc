@@ -17,8 +17,6 @@ import org.dom4j.Element;
 import org.hibernate.exception.ConstraintViolationException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sos.joe.common.XmlDeserializer;
-import com.sos.joe.common.XmlSerializer;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -63,6 +61,8 @@ import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
+import com.sos.joe.common.XmlDeserializer;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
 
@@ -306,14 +306,18 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                             }
                             jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
                         } else {
+                            
+                            JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                            Order orderPojo = XmlDeserializer.deserialize(jocHotFolder.getFile(jobChainPath + "," + order.getOrderId()
+                                    + ".order.xml"), Order.class);
+                            orderPojo.setRunTime(runTime);
+                            ValidateXML.validateAgainstJobSchedulerSchema(Globals.xmlMapper.writeValueAsString(orderPojo));
 
-                            Order orderPojo = XmlDeserializer.deserialize(configuration.getRunTimeXml(), Order.class);
-                            if (orderPojo.getRunTime() != null && order.getCalendars() != null && !order.getCalendars().isEmpty()) {
+                            if (runTime != null && order.getCalendars() != null && !order.getCalendars().isEmpty()) {
                                 Calendars calendars = new Calendars();
                                 calendars.setCalendars(order.getCalendars());
                                 orderPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(calendars));
                             }
-                            JOCHotFolder jocHotFolder = new JOCHotFolder(this);
                             jocHotFolder.putFile(jobChainPath + "," + order.getOrderId() + ".order.xml", XmlSerializer.serializeToStringWithHeader(
                                     XmlSerializer.serializeOrder(orderPojo)));
                         }
