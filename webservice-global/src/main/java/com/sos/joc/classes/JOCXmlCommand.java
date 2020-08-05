@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.file.Files;
@@ -511,15 +512,14 @@ public class JOCXmlCommand extends SOSXmlCommand {
     
     public String getXmlString(Node node) throws Exception {
         String encoding = "UTF-8";
-//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        OutputStreamWriter writer = new OutputStreamWriter(new ByteArrayOutputStream(), encoding);
-//        StringWriter writer = new StringWriter();
+//        OutputStreamWriter writer = new OutputStreamWriter(new ByteArrayOutputStream(), encoding);
+        StringWriter writer = new StringWriter();
         try {
             Source source = new DOMSource(node);
             Result result = new StreamResult(writer);
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-//            transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+            transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(source, result);
             return writer.toString().trim();
