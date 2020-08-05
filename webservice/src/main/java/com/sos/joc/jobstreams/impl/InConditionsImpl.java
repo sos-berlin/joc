@@ -1,6 +1,5 @@
 package com.sos.joc.jobstreams.impl;
 
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -121,7 +120,13 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             if (conditionJobsFilterSchema.getFolder() != null) {
 
                 try {
-                    checkFolderPermissions(conditionJobsFilterSchema.getFolder() + "/item");
+                    String p;
+                    if ("/".equals(conditionJobsFilterSchema.getFolder())) {
+                        p = "/item";
+                    } else {
+                        p = conditionJobsFilterSchema.getFolder() + "/item";
+                    }
+                    checkFolderPermissions(p);
                 } catch (JocFolderPermissionsException e) {
                     LOGGER.debug("Folder permission for " + conditionJobsFilterSchema.getFolder() + " is missing for inconditons");
                 }
@@ -142,7 +147,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 }
             } else {
                 for (JobPath job : conditionJobsFilterSchema.getJobs()) {
-                     try {
+                    try {
                         checkFolderPermissions(job.getJob());
                         listOfJobs.add(job.getJob());
                     } catch (JocFolderPermissionsException e) {

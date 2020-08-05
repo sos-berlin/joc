@@ -94,6 +94,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                     .getTimeZone()));
             filterJobStreamHistory.setStartedTo(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateTo(), jobStreamSessionFilter.getTimeZone()));
             filterJobStreamHistory.setJobStreamStarter(jobStreamSessionFilter.getJobStreamStarterId());
+            filterJobStreamHistory.setSchedulerId(jobStreamSessionFilter.getJobschedulerId());
             List<DBItemJobStreamHistory> listOfSessions = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, limit);
 
             DBLayerJobStreamsTaskContext dbLayerJobStreamsTaskContext = new DBLayerJobStreamsTaskContext(sosHibernateSession);

@@ -93,7 +93,13 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             for (DBItemJobStream dbItemJobStream : listOfJobStreams) {
 
                 try {
-                    checkFolderPermissions(dbItemJobStream.getFolder() +"/item");
+                    String p;
+                    if ("/".equals(dbItemJobStream.getFolder())) {
+                        p = "/item";
+                    } else {
+                        p = dbItemJobStream.getFolder() + "/item";
+                    }
+                    checkFolderPermissions(p);
                 } catch (JocFolderPermissionsException e) {
                     LOGGER.debug("Folder permission for " + dbItemJobStream.getFolder() + " is missing. Job stream " + dbItemJobStream.getJobStream()
                             + " ignored.");
@@ -154,57 +160,58 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         }
     }
 
-   public JOCDefaultResponse jobStream(String accessToken, byte[] filterBytes, String apiCall) {
+    public JOCDefaultResponse jobStream(String accessToken, byte[] filterBytes, String apiCall) {
         SOSHibernateSession sosHibernateSession = null;
 
         try {
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
             JobStream jobStream = Globals.objectMapper.readValue(filterBytes, JobStream.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(apiCall, jobStream, accessToken, jobStream.getJobschedulerId(),
-                    getPermissonsJocCockpit(jobStream.getJobschedulerId(), accessToken).getJobStream().getChange().isJobStream());
+            JOCDefaultResponse jocDefaultResponse = init(apiCall, jobStream, accessToken, jobStream.getJobschedulerId(), getPermissonsJocCockpit(
+                    jobStream.getJobschedulerId(), accessToken).getJobStream().getChange().isJobStream());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
             checkRequiredParameter("jobStream", jobStream.getJobStream());
-            
+
             for (JobStreamStarter jobstreamStarter : jobStream.getJobstreamStarters()) {
                 for (JobStreamJob jobStreamJob : jobstreamStarter.getJobs()) {
                     try {
                         checkFolderPermissions(jobStreamJob.getJob());
                     } catch (JocFolderPermissionsException e) {
-                        LOGGER.debug("Folder permission for " + jobStreamJob.getJob() + " is missing. job stream " + jobStream.getJobStream() + " will not be added ");
+                        LOGGER.debug("Folder permission for " + jobStreamJob.getJob() + " is missing. job stream " + jobStream.getJobStream()
+                                + " will not be added ");
                         jobStream.setJobStream("");
                     }
-                 }
+                }
             }
-           
+
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EDIT_JOBSTREAM);
             sosHibernateSession.setAutoCommit(false);
-            
+
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
 
-            Long oldId=null;
+            Long oldId = null;
             if (jobStream.getOldJobStreamName() != null && !jobStream.getOldJobStreamName().equals(jobStream.getJobStream())) {
-                
+
                 sosHibernateSession.beginTransaction();
                 FilterJobStreams filterJobStreams = new FilterJobStreams();
                 filterJobStreams.setSchedulerId(jobStream.getJobschedulerId());
                 filterJobStreams.setJobStream(jobStream.getOldJobStreamName());
                 filterJobStreams.setFolder(jobStream.getFolder());
-                
+
                 List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 1);
-                
+
                 if (listOfJobStreams.size() > 0) {
                     oldId = listOfJobStreams.get(0).getId();
                 }
-                
+
                 dbLayerJobStreams.deleteCascading(filterJobStreams, false);
                 sosHibernateSession.commit();
 
             }
-            
+
             sosHibernateSession.beginTransaction();
             Long newId = dbLayerJobStreams.deleteInsert(jobStream, dbItemInventoryInstance.getTimeZone());
             if (oldId != null && oldId != newId) {
@@ -212,7 +219,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 dbLayerJobStreamHistory.updateHistoryWithJobStream(oldId, newId);
             }
             sosHibernateSession.commit();
-            
+
             EditJobStreamsAudit editJobStreamAudit = new EditJobStreamsAudit(jobStream);
             logAuditMessage(editJobStreamAudit);
             storeAuditLogEntry(editJobStreamAudit);
@@ -227,17 +234,16 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         }
     }
 
-
     @Override
     public JOCDefaultResponse editJobStream(String accessToken, byte[] filterBytes) {
-        return jobStream(accessToken,filterBytes,API_CALL_EDIT_JOBSTREAM); 
+        return jobStream(accessToken, filterBytes, API_CALL_EDIT_JOBSTREAM);
     }
 
     @Override
     public JOCDefaultResponse addJobStream(String accessToken, byte[] filterBytes) {
-        return jobStream(accessToken,filterBytes,API_CALL_ADD_JOBSTREAM); 
+        return jobStream(accessToken, filterBytes, API_CALL_ADD_JOBSTREAM);
     }
-    
+
     @Override
     public JOCDefaultResponse deleteJobStream(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
@@ -270,12 +276,10 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             dbLayerJobStreams.deleteCascading(filterJobStreams, true);
 
             sosHibernateSession.commit();
-            
-            
+
             EditJobStreamsAudit editJobStreamAudit = new EditJobStreamsAudit(jobStream);
             logAuditMessage(editJobStreamAudit);
             storeAuditLogEntry(editJobStreamAudit);
-
 
             notifyEventHandler(accessToken);
             return JOCDefaultResponse.responseStatus200(jobStream);

@@ -14,10 +14,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreams;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamsStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
@@ -65,13 +67,17 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM_STARTER);
             sosHibernateSession.setAutoCommit(false);
+            
+            DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+            DBItemJobStream dbItemJobStream = dbLayerJobStreams.getJobStreamsDbItem(jobStreamStarters.getJobStreamId());
+
             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
             sosHibernateSession.beginTransaction();
             dbLayerJobStreamStarters.deleteInsert(jobStreamStarters, dbItemInventoryInstance.getTimeZone());
             sosHibernateSession.commit();
 
             for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
-                EditJobStreamStarterAudit editJobStreamStartersAudit = new EditJobStreamStarterAudit(jobStreamStarters, jobStreamStarter);
+                EditJobStreamStarterAudit editJobStreamStartersAudit = new EditJobStreamStarterAudit(dbItemJobStream.getJobStream(), jobStreamStarters, jobStreamStarter);
                 logAuditMessage(editJobStreamStartersAudit);
                 storeAuditLogEntry(editJobStreamStartersAudit);
             }
@@ -106,16 +112,22 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
             }
 
             checkRequiredParameter("jobStreamId", jobStreamStarters.getJobStreamId());
+            
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_JOBSTREAM_STARTER);
             sosHibernateSession.setAutoCommit(false);
+            
+            DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+            DBItemJobStream dbItemJobStream = dbLayerJobStreams.getJobStreamsDbItem(jobStreamStarters.getJobStreamId());
+
+            
             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
             sosHibernateSession.beginTransaction();
             dbLayerJobStreamStarters.deleteStarters(jobStreamStarters, dbItemInventoryInstance.getTimeZone());
             sosHibernateSession.commit();
 
             for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
-                EditJobStreamStarterAudit editJobStreamStartersAudit = new EditJobStreamStarterAudit(jobStreamStarters, jobStreamStarter);
+                EditJobStreamStarterAudit editJobStreamStartersAudit = new EditJobStreamStarterAudit(dbItemJobStream.getJobStream(), jobStreamStarters, jobStreamStarter);
                 logAuditMessage(editJobStreamStartersAudit);
                 storeAuditLogEntry(editJobStreamStartersAudit);
             }

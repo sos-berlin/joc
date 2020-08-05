@@ -119,8 +119,13 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             if (conditionJobsFilterSchema.getFolder() != null) {
                 
                 try {
-                    checkFolderPermissions(conditionJobsFilterSchema.getFolder() + "/item");
-                } catch (JocFolderPermissionsException e) {
+                    String p;
+                    if ("/".equals(conditionJobsFilterSchema.getFolder())) {
+                        p = "/item";
+                    } else {
+                        p = conditionJobsFilterSchema.getFolder() + "/item";
+                    }
+                    checkFolderPermissions(p);                } catch (JocFolderPermissionsException e) {
                     LOGGER.debug("Folder permission for " + conditionJobsFilterSchema.getFolder() + " is missing for outconditons");
                 }
 
