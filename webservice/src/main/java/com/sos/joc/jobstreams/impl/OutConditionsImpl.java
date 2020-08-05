@@ -117,7 +117,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             FilterOutConditions filterOutConditions;
             if (conditionJobsFilterSchema.getFolder() != null) {
-                
+
                 try {
                     String p;
                     if ("/".equals(conditionJobsFilterSchema.getFolder())) {
@@ -125,11 +125,11 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                     } else {
                         p = conditionJobsFilterSchema.getFolder() + "/item";
                     }
-                    checkFolderPermissions(p);                } catch (JocFolderPermissionsException e) {
+                    checkFolderPermissions(p);
+                } catch (JocFolderPermissionsException e) {
                     LOGGER.debug("Folder permission for " + conditionJobsFilterSchema.getFolder() + " is missing for outconditons");
                 }
 
-                
                 reportTaskExecutionsDBLayer.getFilter().addFolderPath(conditionJobsFilterSchema.getFolder(), false);
                 filterOutConditions = new FilterOutConditions();
                 filterOutConditions.setFolder(conditionJobsFilterSchema.getFolder());
@@ -148,14 +148,14 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             } else {
                 for (JobPath job : conditionJobsFilterSchema.getJobs()) {
 
-                     try {
+                    try {
                         checkFolderPermissions(job.getJob());
                         listOfJobs.add(job.getJob());
                         reportTaskExecutionsDBLayer.getFilter().addJobPath(job.getJob());
                     } catch (JocFolderPermissionsException e) {
                         LOGGER.debug("Folder permission for " + job.getJob() + " is missing for outconditons");
                     }
-                    
+
                 }
             }
             Map<String, Integer> mapOfExitCodes = new HashMap<String, Integer>();
@@ -213,12 +213,18 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             jsEventKey.setEvent(jsOutConditionEvent.getEvent());
                             jsEventKey.setGlobalEvent(jsOutConditionEvent.isGlobal());
                             jsEventKey.setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
-                            if (jsOutConditionEvent.isCreateCommand() && jsEventKey.getSession() != null) {
-                                jsEventKey.setJobStream(outCondition.getJobStream());
-                                outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey));
-
-                                jsEventKey.setJobStream("");
-                                outConditionEvent.setExists(jsConditionResolver.eventExists(jsEventKey));
+                            if (jsOutConditionEvent.isGlobal()  || (jsOutConditionEvent.isCreateCommand() && jsEventKey.getSession() != null)) {
+                                if (jsOutConditionEvent.isGlobal()) {
+                                    jsEventKey.setJobStream("");
+                                    jsEventKey.setSession(Constants.getSession());
+                                    outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey));
+                                    outConditionEvent.setExists(jsConditionResolver.eventExists(jsEventKey));
+                                } else {
+                                    jsEventKey.setJobStream(outCondition.getJobStream());
+                                    outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey));
+                                    jsEventKey.setJobStream("");
+                                    outConditionEvent.setExists(jsConditionResolver.eventExists(jsEventKey));
+                                }
                             } else {
                                 outConditionEvent.setExistsInJobStream(false);
                                 outConditionEvent.setExists(false);

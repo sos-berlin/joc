@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.db.DBItemEvent;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemOutCondition;
@@ -69,12 +70,48 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 filter.setSchedulerId(conditionEventsFilter.getJobschedulerId());
                 filter.setOutConditionId(conditionEventsFilter.getOutConditionId());
 
+                filter.setJobStream(conditionEventsFilter.getJobStream());
                 filter.setSession(conditionEventsFilter.getSession());
 
-                filter.setJobStream(conditionEventsFilter.getJobStream());
                 List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
                 conditionEvents.setDeliveryDate(new Date());
                 conditionEvents.setSession(filter.getSession());
+
+                for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
+                    DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
+                    ConditionEvent conditionEvent = new ConditionEvent();
+                    if (dbItemEvent != null) {
+                        DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
+                        if (dbItemOutCondition != null) {
+                            conditionEvent.setEvent(dbItemEvent.getEvent());
+                            conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
+                            conditionEvent.setSession(dbItemEvent.getSession());
+                            conditionEvent.setJobStream(dbItemEvent.getJobStream());
+                            conditionEvent.setPath(dbItemOutCondition.getPath());
+                            conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
+
+                            if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getFolder()
+                                    .equals(conditionEventsFilter.getPath())) {
+                                try {
+                                    checkFolderPermissions(dbItemOutCondition.getJob());
+                                } catch (JocFolderPermissionsException e) {
+                                    LOGGER.debug("Folder permission for " + dbItemOutCondition.getJob() + " is missing. Outconditon " + conditionEvent
+                                            .getJobStream() + "." + conditionEvent.getEvent() + " ignored.");
+                                }
+                                conditionEvents.getConditionEvents().add(conditionEvent);
+
+                            }
+                        }
+                    }
+                }
+                
+                
+ 
+                filter.setJobStream("");
+                filter.setGlobalEvent(true);
+                filter.setSession(Constants.getSession());
+
+                listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
 
                 for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
                     DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
@@ -113,6 +150,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         }
     }
 
+  
     @Override
     public JOCDefaultResponse addEvent(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
