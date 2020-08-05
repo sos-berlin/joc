@@ -1,9 +1,10 @@
 package com.sos.joc.classes;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.file.Files;
@@ -509,10 +510,10 @@ public class JOCXmlCommand extends SOSXmlCommand {
     }
     
     public String getXmlString(Node node) throws Exception {
-//        String encoding = "UTF-8";
+        String encoding = "UTF-8";
 //        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//        OutputStreamWriter writer = new OutputStreamWriter(bos, encoding);
-        StringWriter writer = new StringWriter();
+        OutputStreamWriter writer = new OutputStreamWriter(new ByteArrayOutputStream(), encoding);
+//        StringWriter writer = new StringWriter();
         try {
             Source source = new DOMSource(node);
             Result result = new StreamResult(writer);

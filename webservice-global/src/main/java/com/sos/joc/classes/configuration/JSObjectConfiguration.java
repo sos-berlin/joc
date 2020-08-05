@@ -170,7 +170,7 @@ public class JSObjectConfiguration {
         String jobCommand = jocXmlCommand.getShowJobCommand(JOCResourceImpl.normalizePath(job), "source", 0, 0);
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobCommand, jocResourceImpl.getAccessToken());
         try {
-            String x = jocXmlCommand.getXmlString(jocXmlCommand.getSosxml().getRoot());
+            //String x = jocXmlCommand.getXmlString(jocXmlCommand.getSosxml().getRoot());
             Node jobNode = jocXmlCommand.getSosxml().selectSingleNode("//source/job");
             if (newRunTime != null && !newRunTime.trim().isEmpty()) {
                 jobNode = modifyJobRuntimeNode(jocXmlCommand.getSosxml(), cleanEmptyCalendarDates(new SOSXMLXPath(new StringBuffer(newRunTime))));
