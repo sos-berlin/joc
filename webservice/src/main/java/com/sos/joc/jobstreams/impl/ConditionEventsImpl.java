@@ -92,6 +92,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
                             if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getFolder()
                                     .equals(conditionEventsFilter.getPath())) {
+
                                 try {
                                     checkFolderPermissions(dbItemOutCondition.getJob());
                                 } catch (JocFolderPermissionsException e) {
@@ -104,9 +105,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                         }
                     }
                 }
-                
-                
- 
+
                 filter.setJobStream("");
                 filter.setGlobalEvent(true);
                 filter.setSession(Constants.getSession());
@@ -126,17 +125,6 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                             conditionEvent.setPath(dbItemOutCondition.getPath());
                             conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
 
-                            if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getFolder()
-                                    .equals(conditionEventsFilter.getPath())) {
-                                try {
-                                    checkFolderPermissions(dbItemOutCondition.getJob());
-                                } catch (JocFolderPermissionsException e) {
-                                    LOGGER.debug("Folder permission for " + dbItemOutCondition.getJob() + " is missing. Outconditon " + conditionEvent
-                                            .getJobStream() + "." + conditionEvent.getEvent() + " ignored.");
-                                }
-                                conditionEvents.getConditionEvents().add(conditionEvent);
-
-                            }
                         }
                     }
                 }
@@ -150,7 +138,6 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         }
     }
 
-  
     @Override
     public JOCDefaultResponse addEvent(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
@@ -181,7 +168,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             if (listOfJobStreams.size() > 0) {
                 DBItemJobStream dbItemJobStream = listOfJobStreams.get(0);
                 try {
-                    checkFolderPermissions(dbItemJobStream.getFolder() + "/item");
+
+                    String p;
+                    if ("/".equals(dbItemJobStream.getFolder())) {
+                        p = "/item";
+                    } else {
+                        p = dbItemJobStream.getFolder() + "/item";
+                    }
+                    checkFolderPermissions(p);
 
                     FilterEvents filter = new FilterEvents();
                     filter.setEvent(conditionEvent.getEvent());
@@ -241,7 +235,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             if (listOfJobStreams.size() > 0) {
                 DBItemJobStream dbItemJobStream = listOfJobStreams.get(0);
                 try {
-                    checkFolderPermissions(dbItemJobStream.getFolder() + "/item");
+
+                    String p;
+                    if ("/".equals(dbItemJobStream.getFolder())) {
+                        p = "/item";
+                    } else {
+                        p = dbItemJobStream.getFolder() + "/item";
+                    }
+                    checkFolderPermissions(p);
 
                     FilterEvents filter = new FilterEvents();
                     filter.setEvent(conditionEvent.getEvent());
