@@ -17,6 +17,9 @@
 		"jobStreamId": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
+		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
 		"jobstreamStarters": {
 			"type": "array",
 			"items": {

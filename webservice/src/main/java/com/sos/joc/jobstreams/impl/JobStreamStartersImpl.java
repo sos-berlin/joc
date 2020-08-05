@@ -198,6 +198,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                 StartJob startJob = new StartJob();
                 startJob.setAt("now");
                 startJob.setJob(dbItemJobStreamStarterJob.getJob());
+                startJob.setJobStream(jobStreamStarters.getJobStream());
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 for (DBItemJobStreamParameter dbItemJobStreamParameter : listOfJobStreamParameters) {
                     NameValuePair param = new NameValuePair();
