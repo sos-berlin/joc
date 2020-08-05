@@ -10,8 +10,10 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.model.audit.AuditLogFilter;
 import com.sos.joc.model.audit.JobPath;
+import com.sos.joc.model.audit.JobStreamPath;
 import com.sos.joc.model.audit.OrderPath;
 import com.sos.joc.model.common.Folder;
+
 
 public class AuditLogDBFilter {
 
@@ -19,6 +21,7 @@ public class AuditLogDBFilter {
     private Date createdTo;
     private String schedulerId = "";
     private Set<String> listOfJobs;
+    private Set<String> listOfJobStreams;
     private List<OrderPath> listOfOrders;
     private Set<String> listOfFolders;
     private List<String> listOfCalendars;
@@ -40,6 +43,7 @@ public class AuditLogDBFilter {
         setCreatedTo(JobSchedulerDate.getDateTo(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone()));
         setListOfFolders(auditLogFilter.getFolders());
         setListOfJobs(auditLogFilter.getJobs());
+        setListOfJobStreams(auditLogFilter.getJobStreams());
         setListOfCalendars(auditLogFilter.getCalendars());
         setListOfOrders(auditLogFilter.getOrders());
     }
@@ -120,6 +124,18 @@ public class AuditLogDBFilter {
         return listOfJobs;
     }
 
+    public Set<String> getListOfJobStreams() {
+        return listOfJobStreams;
+    }
+
+    public void setListOfJobStreams(Collection<JobStreamPath> listOfJobStreams) {
+        if (listOfJobStreams != null) {
+            this.listOfJobStreams = listOfJobStreams.stream().map(JobStreamPath::getJobStream).collect(Collectors.toSet());
+        } else {
+            this.listOfJobStreams = null;
+        }
+    }
+    
     public void setListOfJobs(Collection<JobPath> listOfJobs) {
         if (listOfJobs != null) {
             this.listOfJobs = listOfJobs.stream().map(JobPath::getJob).collect(Collectors.toSet());

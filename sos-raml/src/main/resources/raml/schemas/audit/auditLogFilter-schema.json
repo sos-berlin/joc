@@ -25,6 +25,21 @@
         }
       }
     },
+     "jobStreams": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.audit.JobStreamPath",
+        "type": "object",
+        "required": [
+          "jobStream"
+        ],
+        "properties": {
+          "jobStream": {
+            "$ref": "../common/searchPath-schema.json"
+          }
+        }
+      }
+    },
     "orders": {
       "type": "array",
       "items": {

@@ -13,6 +13,9 @@
     "at": {
       "$ref": "../common/timestampWithNow-schema.json"
     },
+    "jobStream":{
+      "$ref": "../common/string255-schema.json"
+    },
     "timeZone": {
       "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
       "$ref": "../common/string255-schema.json"

@@ -46,6 +46,7 @@ public class StartJobInInstanceImpl extends JOCResourceImpl implements IStartJob
             }
             checkRequiredParameter("session", jobStreamStartJob.getSession());
             checkRequiredParameter("job", jobStreamStartJob.getJob());
+            checkRequiredParameter("jobStream", jobStreamStartJob.getJobStream());
 
             try {
                 checkFolderPermissions(jobStreamStartJob.getJob());
@@ -54,6 +55,7 @@ public class StartJobInInstanceImpl extends JOCResourceImpl implements IStartJob
 
                 startJob.setAt(jobStreamStartJob.getAt());
                 startJob.setJob(jobStreamStartJob.getJob());
+                startJob.setJobStream(jobStreamStartJob.getJobStream());
 
                 StartJobs startJobs = new StartJobs();
                 startJobs.setAuditLog(jobStreamStartJob.getAuditLog());

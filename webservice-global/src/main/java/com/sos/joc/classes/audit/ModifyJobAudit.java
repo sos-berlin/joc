@@ -9,27 +9,26 @@ import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
 
-
 public class ModifyJobAudit extends ModifyJob implements IAuditLog {
-    
+
     @JsonIgnore
     private String folder;
-    
-//    //@JsonIgnore
-//    private String job;
-    
+
+    // //@JsonIgnore
+    // private String job;
+
     @JsonIgnore
     private String comment;
-    
+
     @JsonIgnore
     private Integer timeSpent;
-    
+
     @JsonIgnore
     private String ticketLink;
-    
-    //@JsonIgnore
+
+    // @JsonIgnore
     private String jobschedulerId;
-    
+
     public ModifyJobAudit(ModifyJob modifyJob, ModifyJobs modifyJobs) {
         if (modifyJob != null) {
             setCalendars(modifyJob.getCalendars());
@@ -38,7 +37,7 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
             if (modifyJob.getJob() != null) {
                 Path p = Paths.get(modifyJob.getJob());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                //this.job = p.toString().replace('\\', '/');
+                // this.job = p.toString().replace('\\', '/');
             }
         }
         if (modifyJobs != null) {
@@ -46,12 +45,12 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
             this.jobschedulerId = modifyJobs.getJobschedulerId();
         }
     }
-    
+
     private void setAuditParams(AuditParams auditParams) {
         if (auditParams != null) {
             this.comment = auditParams.getComment();
             this.timeSpent = auditParams.getTimeSpent();
-            this.ticketLink = auditParams.getTicketLink(); 
+            this.ticketLink = auditParams.getTicketLink();
         }
     }
 
@@ -60,18 +59,18 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
     public String getComment() {
         return comment;
     }
-    
+
     @Override
     @JsonIgnore
     public String getFolder() {
         return folder;
     }
 
-//    @Override
-//    //@JsonIgnore
-//    public String getJob() {
-//        return job;
-//    }
+    // @Override
+    // //@JsonIgnore
+    // public String getJob() {
+    // return job;
+    // }
 
     @Override
     @JsonIgnore
@@ -104,7 +103,7 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
     }
 
     @Override
-    //@JsonIgnore
+    // @JsonIgnore
     public String getJobschedulerId() {
         return jobschedulerId;
     }
@@ -112,6 +111,12 @@ public class ModifyJobAudit extends ModifyJob implements IAuditLog {
     @Override
     @JsonIgnore
     public Date getStartTime() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
         return null;
     }
 }

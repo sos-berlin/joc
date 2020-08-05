@@ -1,0 +1,14 @@
+{
+  "title": "jobStreamPath",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobstreams.JobStreamPath",
+  "type": "object",
+  "required": [
+    "jobStream"
+  ],
+  "properties": {
+    "jobStream": {
+      "$ref": "../common/path-schema.json"
+    }
+  }
+}

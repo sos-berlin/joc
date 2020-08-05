@@ -9,34 +9,33 @@ import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.jobChain.ModifyJobChain;
 import com.sos.joc.model.jobChain.ModifyJobChains;
 
-
 public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
-    
+
     @JsonIgnore
     private String folder;
-    
-//    //@JsonIgnore
-//    private String jobChain;
-    
+
+    // //@JsonIgnore
+    // private String jobChain;
+
     @JsonIgnore
     private String comment;
-    
+
     @JsonIgnore
     private Integer timeSpent;
-    
+
     @JsonIgnore
     private String ticketLink;
-    
-    //@JsonIgnore
+
+    // @JsonIgnore
     private String jobschedulerId;
-    
+
     public ModifyJobChainAudit(ModifyJobChain modifyJobChain, ModifyJobChains modifyJobChains) {
         if (modifyJobChain != null) {
             setJobChain(modifyJobChain.getJobChain());
             if (modifyJobChain.getJobChain() != null) {
                 Path p = Paths.get(modifyJobChain.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                //this.jobChain = p.toString().replace('\\', '/');
+                // this.jobChain = p.toString().replace('\\', '/');
             }
         }
         if (modifyJobChains != null) {
@@ -44,12 +43,12 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
             this.jobschedulerId = modifyJobChains.getJobschedulerId();
         }
     }
-    
+
     private void setAuditParams(AuditParams auditParams) {
         if (auditParams != null) {
             this.comment = auditParams.getComment();
             this.timeSpent = auditParams.getTimeSpent();
-            this.ticketLink = auditParams.getTicketLink(); 
+            this.ticketLink = auditParams.getTicketLink();
         }
     }
 
@@ -70,7 +69,7 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
     public String getTicketLink() {
         return ticketLink;
     }
-    
+
     @Override
     @JsonIgnore
     public String getFolder() {
@@ -83,11 +82,11 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
         return null;
     }
 
-//    @Override
-//    //@JsonIgnore
-//    public String getJobChain() {
-//        return jobChain;
-//    }
+    // @Override
+    // //@JsonIgnore
+    // public String getJobChain() {
+    // return jobChain;
+    // }
 
     @Override
     @JsonIgnore
@@ -102,7 +101,7 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
     }
 
     @Override
-    //@JsonIgnore
+    // @JsonIgnore
     public String getJobschedulerId() {
         return jobschedulerId;
     }
@@ -112,4 +111,11 @@ public class ModifyJobChainAudit extends ModifyJobChain implements IAuditLog {
     public Date getStartTime() {
         return null;
     }
+
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
+
 }

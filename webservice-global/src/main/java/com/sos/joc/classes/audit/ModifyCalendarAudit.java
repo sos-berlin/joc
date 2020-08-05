@@ -7,25 +7,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.calendar.CalendarId;
 
-
 public class ModifyCalendarAudit extends CalendarId implements IAuditLog {
-    
+
     @JsonIgnore
     private String folder;
-    
+
     @JsonIgnore
     private String comment;
 
     @JsonIgnore
     private Integer timeSpent;
-    
+
     @JsonIgnore
     private String ticketLink;
-    
+
     @JsonIgnore
     private String calendar;
-    
-    
+
     public ModifyCalendarAudit(Long calendarId, String calendarPath, AuditParams auditParams, String jobschedulerId) {
         setId(calendarId);
         setPath(calendarPath);
@@ -41,7 +39,7 @@ public class ModifyCalendarAudit extends CalendarId implements IAuditLog {
         if (auditParams != null) {
             this.comment = auditParams.getComment();
             this.timeSpent = auditParams.getTimeSpent();
-            this.ticketLink = auditParams.getTicketLink(); 
+            this.ticketLink = auditParams.getTicketLink();
         }
     }
 
@@ -62,7 +60,7 @@ public class ModifyCalendarAudit extends CalendarId implements IAuditLog {
     public String getTicketLink() {
         return ticketLink;
     }
-    
+
     @Override
     @JsonIgnore
     public String getFolder() {
@@ -96,6 +94,12 @@ public class ModifyCalendarAudit extends CalendarId implements IAuditLog {
     @Override
     @JsonIgnore
     public Date getStartTime() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
         return null;
     }
 }

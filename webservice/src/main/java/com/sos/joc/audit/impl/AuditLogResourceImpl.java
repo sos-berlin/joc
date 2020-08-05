@@ -112,6 +112,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             auditLogItem.setParameters(auditLogFromDb.getParameters().replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
             auditLogItem.setJob(auditLogFromDb.getJob());
             auditLogItem.setJobChain(auditLogFromDb.getJobChain());
+            auditLogItem.setJobStream(auditLogFromDb.getJobStream());
             auditLogItem.setOrderId(auditLogFromDb.getOrderId());
             auditLogItem.setComment(auditLogFromDb.getComment());
             auditLogItem.setCreated(auditLogFromDb.getCreated());

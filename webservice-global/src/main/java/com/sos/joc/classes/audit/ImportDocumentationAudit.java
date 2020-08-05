@@ -6,19 +6,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.docu.DocumentationImport;
 
-
 public class ImportDocumentationAudit extends DocumentationImport implements IAuditLog {
-    
+
     @JsonIgnore
     private String comment;
 
     @JsonIgnore
     private Integer timeSpent;
-    
+
     @JsonIgnore
     private String ticketLink;
-    
-    
+
     public ImportDocumentationAudit(DocumentationImport documentationImport) {
         setFile(documentationImport.getFile());
         setFolder(documentationImport.getFolder());
@@ -30,7 +28,7 @@ public class ImportDocumentationAudit extends DocumentationImport implements IAu
         if (auditParams != null) {
             this.comment = auditParams.getComment();
             this.timeSpent = auditParams.getTimeSpent();
-            this.ticketLink = auditParams.getTicketLink(); 
+            this.ticketLink = auditParams.getTicketLink();
         }
     }
 
@@ -51,7 +49,7 @@ public class ImportDocumentationAudit extends DocumentationImport implements IAu
     public String getTicketLink() {
         return ticketLink;
     }
-    
+
     @Override
     @JsonIgnore
     public String getJob() {
@@ -79,6 +77,12 @@ public class ImportDocumentationAudit extends DocumentationImport implements IAu
     @Override
     @JsonIgnore
     public Date getStartTime() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
         return null;
     }
 }

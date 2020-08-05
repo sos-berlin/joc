@@ -19,12 +19,14 @@ public class EditJobStreamStarterAudit extends JobStreamStarter implements IAudi
     private String ticketLink;
     private String title;
     private String jobschedulerId;
+    private String jobStream;
 
-    public EditJobStreamStarterAudit(JobStreamStarters jobStreamStarters, JobStreamStarter jobStreamStarter) {
+    public EditJobStreamStarterAudit(String jobStream, JobStreamStarters jobStreamStarters, JobStreamStarter jobStreamStarter) {
         if (jobStreamStarter != null) {
             setJobschedulerId(jobStreamStarters.getJobschedulerId());
             setTitle(jobStreamStarter.getTitle());
             setAuditParams(jobStreamStarters.getAuditLog());
+            setJobStream(jobStream);
         }
     }
 
@@ -104,6 +106,16 @@ public class EditJobStreamStarterAudit extends JobStreamStarter implements IAudi
 
     public String getJobschedulerId() {
         return jobschedulerId;
+    }
+
+    @Override
+    public String getJobStream() {
+        return jobStream;
+    }
+
+    
+    public void setJobStream(String jobStream) {
+        this.jobStream = jobStream;
     }
 
 }

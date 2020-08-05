@@ -89,4 +89,9 @@ public class AssignmentJobDocuAudit extends JobDocuFilter implements IAuditLog {
         return null;
     }
 
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

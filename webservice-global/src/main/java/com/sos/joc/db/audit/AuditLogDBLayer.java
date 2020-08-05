@@ -64,6 +64,11 @@ public class AuditLogDBLayer extends DBLayer {
             and = " and ";
         }
 
+        if (filter.getListOfJobStreams() != null && !filter.getListOfJobStreams().isEmpty()) {
+            where += and + SearchStringHelper.getStringListPathSql(filter.getListOfJobStreams(), "jobStream");
+            and = " and ";
+        }
+
         if (filter.getListOfFolders() != null && !filter.getListOfFolders().isEmpty()) {
             where += and + SearchStringHelper.getStringListPathSql(filter.getListOfFolders(), "folder");
             and = " and ";

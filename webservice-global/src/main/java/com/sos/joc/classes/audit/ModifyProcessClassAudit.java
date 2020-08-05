@@ -102,5 +102,11 @@ public class ModifyProcessClassAudit extends ProcessClassEdit implements IAuditL
     public Date getStartTime() {
         return null;
     }
+    
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 
 }

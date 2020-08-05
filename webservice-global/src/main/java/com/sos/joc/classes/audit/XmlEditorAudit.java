@@ -147,4 +147,9 @@ public class XmlEditorAudit implements IAuditLog {
         return objectType;
     }
 
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

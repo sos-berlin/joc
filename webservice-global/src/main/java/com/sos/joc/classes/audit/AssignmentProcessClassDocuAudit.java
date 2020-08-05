@@ -95,4 +95,9 @@ public class AssignmentProcessClassDocuAudit extends ProcessClassDocuFilter impl
         return null;
     }
 
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

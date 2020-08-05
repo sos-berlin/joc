@@ -88,5 +88,10 @@ public class AssignmentJobChainDocuAudit extends JobChainDocuFilter implements I
     public Date getStartTime() {
         return null;
     }
-
+    
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

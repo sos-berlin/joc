@@ -112,4 +112,10 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     public Date getStartTime() {
         return null;
     }
+
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }
