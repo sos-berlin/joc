@@ -46,7 +46,7 @@ public class XMLBuilder {
         try {
             doc = reader.read(new StringReader(xmlString));
         } catch (DocumentException e) {
-            Throwable nested = e.getNestedException();
+            Throwable nested = e.getCause();
             if (nested != null && SAXParseException.class.isInstance(nested) && nested.getMessage().toUpperCase().contains("DOCTYPE")) {
                 // On Apache, this should be thrown when disallowing DOCTYPE
                 throw new SOSDoctypeException("A DOCTYPE was passed into the XML document", e);

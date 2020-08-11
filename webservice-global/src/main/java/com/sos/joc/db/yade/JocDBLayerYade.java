@@ -324,7 +324,7 @@ public class JocDBLayerYade extends DBLayer {
 			if (filter.getDateTo() != null) {
 				query.setParameter("dateTo", filter.getDateTo(), TemporalType.TIMESTAMP);
 			}
-			if (!onlyTransferIds && filter.getLimit() != null) {
+			if (!onlyTransferIds && filter.getLimit() != null && filter.getLimit() > 0) {
 				query.setMaxResults(filter.getLimit());
 			}
 			return getSession().getResultList(query);
@@ -446,7 +446,7 @@ public class JocDBLayerYade extends DBLayer {
 				}
 			}
 			Query<DBItemYadeFiles> query = getSession().createQuery(sql.toString());
-			if (limit != null) {
+			if (limit != null && limit > 0) {
 				query.setMaxResults(limit);
 			}
 			return getSession().getResultList(query);

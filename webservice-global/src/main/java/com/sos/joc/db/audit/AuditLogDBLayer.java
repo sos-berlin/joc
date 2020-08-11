@@ -133,7 +133,7 @@ public class AuditLogDBLayer extends DBLayer {
 
             bindParameters(query, auditLogDBFilter);
 
-            if (limit != null) {
+            if (limit != null && limit > 0) {
                 query.setMaxResults(limit);
             }
             return getSession().getResultList(query);
