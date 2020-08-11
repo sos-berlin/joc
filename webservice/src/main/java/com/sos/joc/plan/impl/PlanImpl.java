@@ -1,11 +1,14 @@
 package com.sos.joc.plan.impl;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,8 +137,9 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             List<Folder> folders = addPermittedFolder(planFilter.getFolders());
 
             Globals.beginTransaction(sosHibernateSession);
-
+            
             Date maxDate = getMaxPlannedStart(dailyPlanDBLayer, planFilter.getJobschedulerId());
+            
             Date fromDate = null;
             Date toDate = null;
 
@@ -199,7 +203,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
                     for (Folder filterFolder : folders) {
                         if (!filterFolder.getRecursive()) {
-                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJob()));
+                            add = filterFolder.getFolder().equals(Globals.getParent(dailyPlanDBItem.getDailyPlanDbItem().getJob()));
                         }
                     }
 
@@ -231,7 +235,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     
                     for (Folder filterFolder : folders) {
                         if (!filterFolder.getRecursive()) {
-                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJobChain()));
+                            add = filterFolder.getFolder().equals(Globals.getParent(dailyPlanDBItem.getDailyPlanDbItem().getJobChain()));
                         }
                     }
 
@@ -259,7 +263,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     
                     for (Folder filterFolder : folders) {
                         if (!filterFolder.getRecursive()) {
-                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJob()));
+                            add = filterFolder.getFolder().equals(Globals.getParent(dailyPlanDBItem.getDailyPlanDbItem().getJob()));
                         }
                     }
 
@@ -296,7 +300,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     
                     for (Folder filterFolder : folders) {
                         if (!filterFolder.getRecursive()) {
-                            add = filterFolder.getFolder().equals(Globals.getParent(planFilter.getJobChain()));
+                            add = filterFolder.getFolder().equals(Globals.getParent(dailyPlanDBItem.getDailyPlanDbItem().getJobChain()));
                         }
                     }
 
