@@ -113,7 +113,7 @@ public class LockResourceImpl extends JOCResourceImpl implements ILockResource {
         return lockOrReleaseOrInfo(dbLayerJoeLocks, schedulerId, path, true, true, account);
     }
 
-    public static DBItemJoeLock lockOrReleaseOrInfo(DBLayerJoeLocks dbLayerJoeLocks, String schedulerId, String path, Boolean lock, Boolean forceLock,
+    public static synchronized DBItemJoeLock lockOrReleaseOrInfo(DBLayerJoeLocks dbLayerJoeLocks, String schedulerId, String path, Boolean lock, Boolean forceLock,
             String account) throws DBConnectionRefusedException, DBInvalidDataException, JoeFolderAlreadyLockedException {
         DBItemJoeLock dbItem = dbLayerJoeLocks.getJoeLock(schedulerId, path);
         if (lock != null) {
