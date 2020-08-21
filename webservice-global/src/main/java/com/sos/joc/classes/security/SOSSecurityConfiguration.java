@@ -28,276 +28,268 @@ import com.sos.joc.model.security.SecurityConfigurationUser;
 
 public class SOSSecurityConfiguration {
 
-	private static final String SECTION_USERS = "users";
-	private static final String SECTION_ROLES = "roles";
-	private static final String SECTION_FOLDERS = "folders";
-	private static final String SECTION_MAIN = "main";
+    private static final String SECTION_USERS = "users";
+    private static final String SECTION_ROLES = "roles";
+    private static final String SECTION_FOLDERS = "folders";
+    private static final String SECTION_MAIN = "main";
 
-	private Ini ini;
-	private Wini writeIni;
-	private SecurityConfiguration securityConfiguration = new SecurityConfiguration();
-	private SOSSecurityConfigurationMasters listOfMasters;
+    private Ini ini;
+    private Wini writeIni;
+    private Wini readIni;
 
-	public SOSSecurityConfiguration() {
-		super();
-		securityConfiguration = new SecurityConfiguration();
-		String iniFileName = Globals.getShiroIniInClassPath();
-		ini = Ini.fromResourcePath(Globals.getIniFileForShiro(iniFileName));
-		listOfMasters = SOSSecurityConfigurationMasters.getInstance();
-	}
+    private SecurityConfiguration securityConfiguration = new SecurityConfiguration();
+    private SOSSecurityConfigurationMasters listOfMasters;
 
-	private void addUsers() {
+    public SOSSecurityConfiguration() {
+        super();
+        securityConfiguration = new SecurityConfiguration();
+        String iniFileName = Globals.getShiroIniInClassPath();
+        ini = Ini.fromResourcePath(Globals.getIniFileForShiro(iniFileName));
+        listOfMasters = SOSSecurityConfigurationMasters.getInstance();
+    }
 
-		Section s = getSection(SECTION_USERS);
+    private void addUsers() {
 
-		for (String user : s.keySet()) {
-			SecurityConfigurationUser securityConfigurationUser = new SecurityConfigurationUser();
-			SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(
-					s.get(user), null, null);
-			securityConfigurationUser.setUser(user);
-			securityConfigurationUser.setPassword(sosSecurityConfigurationUserEntry.getPassword());
-			securityConfigurationUser.setRoles(sosSecurityConfigurationUserEntry.getRoles());
-			securityConfiguration.getUsers().add(securityConfigurationUser);
-		}
-	}
+        for (String user : readIni.get(SECTION_USERS).keySet()) {
+            SecurityConfigurationUser securityConfigurationUser = new SecurityConfigurationUser();
+            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(readIni.get("users", user),
+                    null, null);
+            securityConfigurationUser.setUser(user);
+            securityConfigurationUser.setPassword(sosSecurityConfigurationUserEntry.getPassword());
+            securityConfigurationUser.setRoles(sosSecurityConfigurationUserEntry.getRoles());
+            securityConfiguration.getUsers().add(securityConfigurationUser);
+        }
 
-	private void addMain() throws JocException {
+    }
 
-		SOSSecurityConfigurationMainEntry sosSecurityConfigurationMainEntry = new SOSSecurityConfigurationMainEntry();
-		HashMap<String, String> comments = new HashMap<String, String>();
-		Section mainSection = ini.getSection(SECTION_MAIN);
-		if (mainSection == null) {
-			JocError jocError = new JocError();
-			jocError.setCode("");
-			jocError.setMessage("Missing [main] section");
-			throw new JocException(jocError);
-		}
-		for (Map.Entry<String, String> entry : mainSection.entrySet()) {
-			if (writeIni.get(SECTION_MAIN).getComment(entry.getKey()) != null) {
-				comments.put(entry.getKey(), writeIni.get(SECTION_MAIN).getComment(entry.getKey()));
-			}
-		}
+    private void addMain() throws JocException {
 
-		for (String main : mainSection.keySet()) {
-			List<String> entryComment = sosSecurityConfigurationMainEntry.getMultiLineComment(main, comments);
-			List<String> entryValue = sosSecurityConfigurationMainEntry.getMultiLineValue(main, mainSection.get(main));
+        SOSSecurityConfigurationMainEntry sosSecurityConfigurationMainEntry = new SOSSecurityConfigurationMainEntry();
+        HashMap<String, String> comments = new HashMap<String, String>();
+        Section mainSection = ini.getSection(SECTION_MAIN);
+        if (mainSection == null) {
+            JocError jocError = new JocError();
+            jocError.setCode("");
+            jocError.setMessage("Missing [main] section");
+            throw new JocException(jocError);
+        }
+        for (Map.Entry<String, String> entry : mainSection.entrySet()) {
+            if (writeIni.get(SECTION_MAIN).getComment(entry.getKey()) != null) {
+                comments.put(entry.getKey(), writeIni.get(SECTION_MAIN).getComment(entry.getKey()));
+            }
+        }
 
-			SecurityConfigurationMainEntry securityConfigurationMainEntry = new SecurityConfigurationMainEntry();
-			securityConfigurationMainEntry.setEntryName(main);
-			securityConfigurationMainEntry.setEntryValue(entryValue);
+        for (String main : mainSection.keySet()) {
+            List<String> entryComment = sosSecurityConfigurationMainEntry.getMultiLineComment(main, comments);
+            List<String> entryValue = sosSecurityConfigurationMainEntry.getMultiLineValue(main, mainSection.get(main));
 
-			securityConfigurationMainEntry.setEntryComment(entryComment);
-			securityConfiguration.getMain().add(securityConfigurationMainEntry);
-		}
-	}
+            SecurityConfigurationMainEntry securityConfigurationMainEntry = new SecurityConfigurationMainEntry();
+            securityConfigurationMainEntry.setEntryName(main);
+            securityConfigurationMainEntry.setEntryValue(entryValue);
 
-	private void addRoles() {
+            securityConfigurationMainEntry.setEntryComment(entryComment);
+            securityConfiguration.getMain().add(securityConfigurationMainEntry);
+        }
 
-		Section s = getSection(SECTION_ROLES);
-		for (String role : s.keySet()) {
-			SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = new SOSSecurityConfigurationRoleEntry(
-					role, s.get(role));
-			sosSecurityConfigurationRoleEntry.addPermissions();
-		}
-	}
+    }
 
-	private void addFolders() {
+    private void addRoles() {
 
-		Section s = getSection(SECTION_FOLDERS);
-		if (s != null) {
-			for (String role2Master : s.keySet()) {
-				SOSSecurityConfigurationFolderEntry sosSecurityConfigurationFolderEntry = new SOSSecurityConfigurationFolderEntry(
-						role2Master, s.get(role2Master));
-				sosSecurityConfigurationFolderEntry.addFolders();
-			}
-		}
-	}
+        Section s = getSection(SECTION_ROLES);
+        for (String role : s.keySet()) {
+            SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = new SOSSecurityConfigurationRoleEntry(role, s.get(role));
+            sosSecurityConfigurationRoleEntry.addPermissions();
+        }
+    }
 
-	private void writeUsers() throws InvalidFileFormatException, IOException {
-		Wini oldWriteIni;
-		oldWriteIni = new Wini(Globals.getShiroIniFile().toFile());
-		Profile.Section oldSection = oldWriteIni.get(SECTION_USERS);
-		clearSection(SECTION_USERS);
-		Profile.Section s = writeIni.get(SECTION_USERS);
-		SOSSecurityHashSettings sosSecurityHashSettings = new SOSSecurityHashSettings();
-		sosSecurityHashSettings.setMain(getSection(SECTION_MAIN));
+    private void addFolders() {
 
-		for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
-			SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(
-					securityConfigurationUser, oldSection, sosSecurityHashSettings);
-			if ((securityConfigurationUser.getPassword() != null && !securityConfigurationUser.getPassword().isEmpty())
-					|| securityConfigurationUser.getRoles().size() > 0) {
-				s.put(securityConfigurationUser.getUser(), sosSecurityConfigurationUserEntry.getIniWriteString());
-			}
-		}
-	}
+        Section s = getSection(SECTION_FOLDERS);
+        if (s != null) {
+            for (String role2Master : s.keySet()) {
+                SOSSecurityConfigurationFolderEntry sosSecurityConfigurationFolderEntry = new SOSSecurityConfigurationFolderEntry(role2Master, s.get(
+                        role2Master));
+                sosSecurityConfigurationFolderEntry.addFolders();
+            }
+        }
+    }
 
-	private void clearSection(String section) {
-		if (writeIni.get(section) != null) {
-			writeIni.get(section).clear();
-		} else {
-			writeIni.add(section);
-		}
-	}
+    private void writeUsers() throws InvalidFileFormatException, IOException {
+        Wini oldWriteIni;
+        oldWriteIni = new Wini(Globals.getShiroIniFile().toFile());
+        Profile.Section oldSection = oldWriteIni.get(SECTION_USERS);
+        clearSection(SECTION_USERS);
+        Profile.Section s = writeIni.get(SECTION_USERS);
+        SOSSecurityHashSettings sosSecurityHashSettings = new SOSSecurityHashSettings();
+        sosSecurityHashSettings.setMain(getSection(SECTION_MAIN));
 
-	private Section getSection(String section) {
-		Section s = ini.addSection(section);
-		return s;
-	}
+        for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
+            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser,
+                    oldSection, sosSecurityHashSettings);
+            if ((securityConfigurationUser.getPassword() != null && !securityConfigurationUser.getPassword().isEmpty()) || securityConfigurationUser
+                    .getRoles().size() > 0) {
+                s.put(securityConfigurationUser.getUser(), sosSecurityConfigurationUserEntry.getIniWriteString());
+            }
+        }
+    }
 
-	private void writeMasters() {
-		clearSection(SECTION_ROLES);
-		clearSection(SECTION_FOLDERS);
+    private void clearSection(String section) {
+        if (writeIni.get(section) != null) {
+            writeIni.get(section).clear();
+        } else {
+            writeIni.add(section);
+        }
+    }
 
-		Map<String, SOSSecurityConfigurationRoleEntry> roles = new HashMap<String, SOSSecurityConfigurationRoleEntry>();
-		Map<String, SOSSecurityConfigurationFolderEntry> folders = new HashMap<String, SOSSecurityConfigurationFolderEntry>();
+    private Section getSection(String section) {
+        Section s = ini.addSection(section);
+        return s;
+    }
 
-		for (SecurityConfigurationMaster securityConfigurationMaster : securityConfiguration.getMasters()) {
-			String master = securityConfigurationMaster.getMaster();
-			for (SecurityConfigurationRole securityConfigurationRole : securityConfigurationMaster.getRoles()) {
-				String role = securityConfigurationRole.getRole();
-				String folderKey = SOSSecurityConfigurationFolderEntry.getFolderKey(master, role);
-				if (roles.get(role) == null) {
-					SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = new SOSSecurityConfigurationRoleEntry(
-							role);
-					roles.put(role, sosSecurityConfigurationRoleEntry);
-				}
+    private void writeMasters() {
+        clearSection(SECTION_ROLES);
+        clearSection(SECTION_FOLDERS);
 
-				if (folders.get(folderKey) == null) {
-					SOSSecurityConfigurationFolderEntry sosSecurityConfigurationFolderEntry = new SOSSecurityConfigurationFolderEntry(
-							folderKey);
-					folders.put(folderKey, sosSecurityConfigurationFolderEntry);
-				}
+        Map<String, SOSSecurityConfigurationRoleEntry> roles = new HashMap<String, SOSSecurityConfigurationRoleEntry>();
+        Map<String, SOSSecurityConfigurationFolderEntry> folders = new HashMap<String, SOSSecurityConfigurationFolderEntry>();
 
-				for (SecurityConfigurationFolder securityConfigurationFolder : securityConfigurationRole.getFolders()) {
-					SOSSecurityFolderItem sosSecurityFolderItem = new SOSSecurityFolderItem(master,
-							securityConfigurationFolder);
-					folders.get(folderKey).addFolder(sosSecurityFolderItem.getIniValue());
-				}
-				for (SecurityConfigurationPermission securityConfigurationPermission : securityConfigurationRole
-						.getPermissions()) {
-					SOSSecurityPermissionItem sosSecurityPermissionItem = new SOSSecurityPermissionItem(master,
-							securityConfigurationPermission);
-					roles.get(role).addPermission(sosSecurityPermissionItem.getIniValue());
-				}
-			}
-		}
+        for (SecurityConfigurationMaster securityConfigurationMaster : securityConfiguration.getMasters()) {
+            String master = securityConfigurationMaster.getMaster();
+            for (SecurityConfigurationRole securityConfigurationRole : securityConfigurationMaster.getRoles()) {
+                String role = securityConfigurationRole.getRole();
+                String folderKey = SOSSecurityConfigurationFolderEntry.getFolderKey(master, role);
+                if (roles.get(role) == null) {
+                    SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = new SOSSecurityConfigurationRoleEntry(role);
+                    roles.put(role, sosSecurityConfigurationRoleEntry);
+                }
 
-		for (String role : roles.keySet()) {
-			SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = roles.get(role);
-			if (!"".equals(sosSecurityConfigurationRoleEntry.getIniWriteString())) {
-				writeIni.get(SECTION_ROLES).put(role, sosSecurityConfigurationRoleEntry.getIniWriteString());
-			}
-		}
-		for (String masterAndRole : folders.keySet()) {
-			SOSSecurityConfigurationFolderEntry sosSecurityConfigurationFolderEntry = folders.get(masterAndRole);
-			if (!"".equals(sosSecurityConfigurationFolderEntry.getIniWriteString())) {
-				writeIni.get(SECTION_FOLDERS).put(masterAndRole,
-						sosSecurityConfigurationFolderEntry.getIniWriteString());
-			}
-		}
-	}
+                if (folders.get(folderKey) == null) {
+                    SOSSecurityConfigurationFolderEntry sosSecurityConfigurationFolderEntry = new SOSSecurityConfigurationFolderEntry(folderKey);
+                    folders.put(folderKey, sosSecurityConfigurationFolderEntry);
+                }
 
-	private boolean roleIsEmpty(String role) {
-		for (Map.Entry<String, SecurityConfigurationMaster> entry : listOfMasters.getListOfMasters().entrySet()) {
-			SecurityConfigurationMaster securityConfigurationMaster = listOfMasters.getListOfMasters()
-					.get(entry.getKey());
+                for (SecurityConfigurationFolder securityConfigurationFolder : securityConfigurationRole.getFolders()) {
+                    SOSSecurityFolderItem sosSecurityFolderItem = new SOSSecurityFolderItem(master, securityConfigurationFolder);
+                    folders.get(folderKey).addFolder(sosSecurityFolderItem.getIniValue());
+                }
+                for (SecurityConfigurationPermission securityConfigurationPermission : securityConfigurationRole.getPermissions()) {
+                    SOSSecurityPermissionItem sosSecurityPermissionItem = new SOSSecurityPermissionItem(master, securityConfigurationPermission);
+                    roles.get(role).addPermission(sosSecurityPermissionItem.getIniValue());
+                }
+            }
+        }
 
-			for (SecurityConfigurationRole securityConfigurationRole : securityConfigurationMaster.getRoles()) {
-				if (role.equals(securityConfigurationRole.getRole())) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+        for (String role : roles.keySet()) {
+            SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = roles.get(role);
+            if (!"".equals(sosSecurityConfigurationRoleEntry.getIniWriteString())) {
+                writeIni.get(SECTION_ROLES).put(role, sosSecurityConfigurationRoleEntry.getIniWriteString());
+            }
+        }
+        for (String masterAndRole : folders.keySet()) {
+            SOSSecurityConfigurationFolderEntry sosSecurityConfigurationFolderEntry = folders.get(masterAndRole);
+            if (!"".equals(sosSecurityConfigurationFolderEntry.getIniWriteString())) {
+                writeIni.get(SECTION_FOLDERS).put(masterAndRole, sosSecurityConfigurationFolderEntry.getIniWriteString());
+            }
+        }
+    }
 
-	private void addRole(SecurityConfigurationMaster securityConfigurationMaster, String role) {
-		SecurityConfigurationRole securityConfigurationRole = new SecurityConfigurationRole();
-		securityConfigurationRole.setRole(role);
-		securityConfigurationMaster.getRoles().add(securityConfigurationRole);
-	}
+    private boolean roleIsEmpty(String role) {
+        for (Map.Entry<String, SecurityConfigurationMaster> entry : listOfMasters.getListOfMasters().entrySet()) {
+            SecurityConfigurationMaster securityConfigurationMaster = listOfMasters.getListOfMasters().get(entry.getKey());
 
-	private void addEmptyRoles() {
+            for (SecurityConfigurationRole securityConfigurationRole : securityConfigurationMaster.getRoles()) {
+                if (role.equals(securityConfigurationRole.getRole())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-		for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
-			for (String role : securityConfigurationUser.getRoles()) {
-				if (roleIsEmpty(role)) {
-					SecurityConfigurationMaster defaultMaster = listOfMasters.getDefaultMaster(securityConfiguration);
-					addRole(defaultMaster, role);
-				}
-			}
-		}
+    private void addRole(SecurityConfigurationMaster securityConfigurationMaster, String role) {
+        SecurityConfigurationRole securityConfigurationRole = new SecurityConfigurationRole();
+        securityConfigurationRole.setRole(role);
+        securityConfigurationMaster.getRoles().add(securityConfigurationRole);
+    }
 
-	}
+    private void addEmptyRoles() {
 
+        for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
+            for (String role : securityConfigurationUser.getRoles()) {
+                if (roleIsEmpty(role)) {
+                    SecurityConfigurationMaster defaultMaster = listOfMasters.getDefaultMaster(securityConfiguration);
+                    addRole(defaultMaster, role);
+                }
+            }
+        }
 
+    }
 
-	private void writeMain() throws InvalidFileFormatException, IOException {
-		clearSection(SECTION_MAIN);
-		Profile.Section s = writeIni.get(SECTION_MAIN);
-		for (SecurityConfigurationMainEntry securityConfigurationMainEntry : securityConfiguration.getMain()) {
-			SOSSecurityConfigurationMainEntry sosSecurityConfigurationMainEntry = new SOSSecurityConfigurationMainEntry(
-					securityConfigurationMainEntry);
+    private void writeMain() throws InvalidFileFormatException, IOException {
+        clearSection(SECTION_MAIN);
+        Profile.Section s = writeIni.get(SECTION_MAIN);
+        for (SecurityConfigurationMainEntry securityConfigurationMainEntry : securityConfiguration.getMain()) {
+            SOSSecurityConfigurationMainEntry sosSecurityConfigurationMainEntry = new SOSSecurityConfigurationMainEntry(
+                    securityConfigurationMainEntry);
 
-			String comment = "";
-			String nl = "\r\n";
-			for (int i = 0; i < securityConfigurationMainEntry.getEntryComment().size(); i++) {
-				comment = comment + securityConfigurationMainEntry.getEntryComment().get(i) + nl;
-				if (i==securityConfigurationMainEntry.getEntryComment().size()-1) {
-					nl = "";
-				}
-			}
-			writeIni.get(SECTION_MAIN).putComment(securityConfigurationMainEntry.getEntryName(),comment);
-			s.put(securityConfigurationMainEntry.getEntryName(), sosSecurityConfigurationMainEntry.getIniWriteString());
-		}
-	}
+            String comment = "";
+            String nl = "\r\n";
+            for (int i = 0; i < securityConfigurationMainEntry.getEntryComment().size(); i++) {
+                comment = comment + securityConfigurationMainEntry.getEntryComment().get(i) + nl;
+                if (i == securityConfigurationMainEntry.getEntryComment().size() - 1) {
+                    nl = "";
+                }
+            }
+            writeIni.get(SECTION_MAIN).putComment(securityConfigurationMainEntry.getEntryName(), comment);
+            s.put(securityConfigurationMainEntry.getEntryName(), sosSecurityConfigurationMainEntry.getIniWriteString());
+        }
+    }
 
-	public SecurityConfiguration readConfiguration()
-			throws InvalidFileFormatException, IOException, JocException, SOSHibernateException {
-		SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("Import shiro.ini");
+    public SecurityConfiguration readConfiguration() throws InvalidFileFormatException, IOException, JocException, SOSHibernateException {
+        SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("Import shiro.ini");
 
-		try {
-
-			SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
-			sosShiroIniShare.provideIniFile();
-
-			writeIni = new Wini(Globals.getShiroIniFile().toFile());
-
-			addUsers();
-			addRoles();
-			addFolders();
-			addMain();
-			addEmptyRoles();
-
-			listOfMasters.createConfigurations(securityConfiguration);
-			return this.securityConfiguration;
-		} finally {
-			sosHibernateSession.close();
-		}
-	}
-
-	public SecurityConfiguration writeConfiguration(SecurityConfiguration securityConfiguration)
-			throws IOException, SOSHibernateException, JocException {
-		writeIni = new Wini(Globals.getShiroIniFile().toFile());
-		SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("Import shiro.ini");
-
-		try {
-			this.securityConfiguration = securityConfiguration;
-			writeMain();
-			writeUsers();
-			writeMasters();
-			writeIni.store();
-
-			IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
-            //SecurityManager securityManager = factory.getInstance();
+        try {
+            readIni = new Wini(Globals.getShiroIniFile().toFile());
 
             SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
-			sosShiroIniShare.copyFileToDb(Globals.getShiroIniFile().toFile());
+            sosShiroIniShare.provideIniFile();
 
-			return this.securityConfiguration;
-		} finally {
-			Globals.disconnect(sosHibernateSession);
-		}
-	}
+            writeIni = new Wini(Globals.getShiroIniFile().toFile());
+
+            addUsers();
+            addRoles();
+            addFolders();
+            addMain();
+            addEmptyRoles();
+
+            listOfMasters.createConfigurations(securityConfiguration);
+            return this.securityConfiguration;
+        } finally {
+            sosHibernateSession.close();
+        }
+    }
+
+    public SecurityConfiguration writeConfiguration(SecurityConfiguration securityConfiguration) throws IOException, SOSHibernateException,
+            JocException {
+        writeIni = new Wini(Globals.getShiroIniFile().toFile());
+        SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("Import shiro.ini");
+
+        try {
+            this.securityConfiguration = securityConfiguration;
+            writeMain();
+            writeUsers();
+            writeMasters();
+            writeIni.store();
+
+            IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
+            // SecurityManager securityManager = factory.getInstance();
+
+            SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
+            sosShiroIniShare.copyFileToDb(Globals.getShiroIniFile().toFile());
+
+            return this.securityConfiguration;
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+        }
+    }
 }
