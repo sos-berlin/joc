@@ -29,6 +29,8 @@
     "exitCode": {
       "$ref": "../common/nonNegativeInteger-schema.json"
     },
+    "expiresTimezone": {
+       "$ref": "../common/string255-schema.json"    },
     "expires": {
       "$ref": "../common/string255-schema.json"
     },
