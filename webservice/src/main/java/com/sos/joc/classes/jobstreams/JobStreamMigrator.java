@@ -55,6 +55,7 @@ public class JobStreamMigrator {
                 DBItemJobStreamStarterJob dbItemJobStreamStarterJob = new DBItemJobStreamStarterJob();
                 dbItemJobStreamStarterJob.setCreated(new Date());
                 dbItemJobStreamStarterJob.setDelay(0L);
+                dbItemJobStreamStarterJob.setSkipOutCondition(false);
                 dbItemJobStreamStarterJob.setJob(dbItemOutCondition.getJob());
                 dbItemJobStreamStarterJob.setJobStreamStarter(dbItemJobStreamStarter.getId());
                 sosHibernateSession.save(dbItemJobStreamStarterJob);
