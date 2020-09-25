@@ -129,7 +129,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                     jobstreamStarter.setNextStart(dbItemJobStreamStarter.getNextStart());
                     filterJobStreamParameters.setJobStreamStarterId(dbItemJobStreamStarter.getId());
                     filterJobStreamStarterJobs.setJobStreamStarter(dbItemJobStreamStarter.getId());
-                    for (DBItemJobStreamStarterJob dbItemJobStreamStarterJobts : dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(
+                    for (DBItemJobStreamStarterJob dbItemJobStreamStarterJobs : dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(
                             filterJobStreamStarterJobs, 0)) {
                         JobStreamJob jobStreamJob = new JobStreamJob();
                         jobStreamJob.setJob(dbItemJobStreamStarterJobs.getJob());
