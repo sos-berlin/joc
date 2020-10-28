@@ -89,7 +89,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             }
 
             DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
-            if ("running".equals(jobStreamSessionFilter.getStatus())) {
+            if ("running".equals(jobStreamSessionFilter.getState())) {
                 filterJobStreamHistory.setRunning(true);
             }
             int limit = 0;
@@ -210,7 +210,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                 throw new JocMissingRequiredParameterException(String.format("undefined: jobstream, jobstreamId or sessionId required"));
             }
 
-            boolean valueRunning = ("running".equals(jobStreamSessionFilter.getStatus()));
+            boolean valueRunning = ("running".equals(jobStreamSessionFilter.getState()));
 
             sosHibernateSession.setAutoCommit(false);
             sosHibernateSession.beginTransaction();
