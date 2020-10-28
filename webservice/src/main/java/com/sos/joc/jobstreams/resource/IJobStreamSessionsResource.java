@@ -14,5 +14,9 @@ public interface IJobStreamSessionsResource {
     @POST
     @Path("sessions")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobStreamSessions(@HeaderParam("X-Access-Token") String accessToken, byte[] jobStreamFilter);
+    public JOCDefaultResponse postJobStreamSessions(@HeaderParam("X-Access-Token") String accessToken, byte[] jobStreamSessionFilter);
+
+    @POST
+    @Path("sessions/updatestate")
+    public JOCDefaultResponse setRunningJobStreamSessions(@HeaderParam("X-Access-Token") String accessToken, byte[] jobStreamSessionFilter);
 }

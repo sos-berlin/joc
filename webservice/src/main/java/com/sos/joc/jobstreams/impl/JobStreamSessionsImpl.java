@@ -1,15 +1,18 @@
 package com.sos.joc.jobstreams.impl;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
@@ -26,7 +29,9 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocFolderPermissionsException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IJobStreamSessionsResource;
 import com.sos.joc.model.jobstreams.JobStream;
 import com.sos.joc.model.jobstreams.JobStreamSessions;
@@ -34,6 +39,7 @@ import com.sos.joc.model.jobstreams.JobStreamSessionsFilter;
 import com.sos.joc.model.jobstreams.JobStreamSesssion;
 import com.sos.joc.model.jobstreams.JobStreamStarter;
 import com.sos.joc.model.jobstreams.JobStreamTask;
+import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
@@ -41,6 +47,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamSessionsImpl.class);
     private static final String API_CALL_JOBSTREAM_SESSIONS = "./jobstreams/sessions";
+    private static final String API_CALL_JOBSTREAM_SESSIONS_RUNNING = "./jobstreams/sessions/running";
 
     @Override
     public JOCDefaultResponse postJobStreamSessions(String accessToken, byte[] filterBytes) {
@@ -100,8 +107,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             DBLayerJobStreamsTaskContext dbLayerJobStreamsTaskContext = new DBLayerJobStreamsTaskContext(sosHibernateSession);
             FilterJobStreamTaskContext filterJobStreamTaskContext = new FilterJobStreamTaskContext();
             DBLayerJobStreamStarters dbLayerJobStreamStarter = new DBLayerJobStreamStarters(sosHibernateSession);
-             
-            
+
             JobStreamSessions jobStreamSesssions = new JobStreamSessions();
             jobStreamSesssions.setDeliveryDate(new Date());
             jobStreamSesssions.setJobstreamSessions(new ArrayList<JobStreamSesssion>());
@@ -110,8 +116,9 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                 jobStreamSesssion.setJobStreamStarter(new JobStreamStarter());
                 jobStreamSesssion.setId(dbItemJobStreamHistory.getId());
                 jobStreamSesssion.setJobStreamId(dbItemJobStreamHistory.getJobStream());
-                DBItemJobStreamStarter dbItemJobStreamStarter = dbLayerJobStreamStarter.getJobStreamStartersDbItem(dbItemJobStreamHistory.getJobStreamStarter());
-                if (dbItemJobStreamStarter != null){
+                DBItemJobStreamStarter dbItemJobStreamStarter = dbLayerJobStreamStarter.getJobStreamStartersDbItem(dbItemJobStreamHistory
+                        .getJobStreamStarter());
+                if (dbItemJobStreamStarter != null) {
                     jobStreamSesssion.getJobStreamStarter().setTitle(dbItemJobStreamStarter.getTitle());
                     jobStreamSesssion.getJobStreamStarter().setJobStreamStarterId(dbItemJobStreamHistory.getJobStreamStarter());
                     jobStreamSesssion.getJobStreamStarter().setNextStart(dbItemJobStreamStarter.getNextStart());
@@ -156,6 +163,89 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
         } finally {
             Globals.disconnect(sosHibernateSession);
         }
+    }
+
+    @Override
+    public JOCDefaultResponse setRunningJobStreamSessions(String accessToken, byte[] filterBytes) {
+        SOSHibernateSession sosHibernateSession = null;
+        JobStreamSessionsFilter jobStreamSessionFilter = null;
+        try {
+            JsonValidator.validateFailFast(filterBytes, JobStream.class);
+            jobStreamSessionFilter = Globals.objectMapper.readValue(filterBytes, JobStreamSessionsFilter.class);
+
+            if (jobStreamSessionFilter.getJobschedulerId() == null) {
+                jobStreamSessionFilter.setJobschedulerId("");
+            }
+
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_JOBSTREAM_SESSIONS_RUNNING, jobStreamSessionFilter, accessToken,
+                    jobStreamSessionFilter.getJobschedulerId(), getPermissonsJocCockpit(jobStreamSessionFilter.getJobschedulerId(), accessToken)
+                            .getJobStream().isSetView());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_JOBSTREAM_SESSIONS_RUNNING);
+            FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+
+            DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+            FilterJobStreams filterJobStreams = new FilterJobStreams();
+
+            if (jobStreamSessionFilter.getJobStream() != null) {
+                filterJobStreams.setJobStream(jobStreamSessionFilter.getJobStream());
+                filterJobStreams.setSchedulerId(jobStreamSessionFilter.getJobschedulerId());
+
+                List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 0);
+                if (listOfJobStreams.size() > 0) {
+                    filterJobStreamHistory.setJobStreamId(listOfJobStreams.get(0).getId());
+                }else {
+                    throw new JocMissingRequiredParameterException(String.format("not found: jobstream " + jobStreamSessionFilter.getJobStream() + " not found"));
+                }
+            }
+
+            if (filterJobStreamHistory.getJobStreamId() == null) {             
+                filterJobStreamHistory.setJobStreamId(jobStreamSessionFilter.getJobStreamId());
+            }
+
+            if ((filterJobStreamHistory.getJobStreamId() == null) && (filterJobStreamHistory.getContextId() == null)) {
+                throw new JocMissingRequiredParameterException(String.format("undefined: jobstream, jobstreamId or sessionId required"));
+            }
+
+            boolean valueRunning = ("running".equals(jobStreamSessionFilter.getStatus()));
+
+            sosHibernateSession.setAutoCommit(false);
+            sosHibernateSession.beginTransaction();
+
+            DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+
+            filterJobStreamHistory.setContextId(jobStreamSessionFilter.getSession());
+            filterJobStreamHistory.setStartedFrom(JobSchedulerDate.getDateFrom(jobStreamSessionFilter.getDateFrom(), jobStreamSessionFilter
+                    .getTimeZone()));
+            filterJobStreamHistory.setStartedTo(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateTo(), jobStreamSessionFilter.getTimeZone()));
+            filterJobStreamHistory.setJobStreamStarter(jobStreamSessionFilter.getJobStreamStarterId());
+            filterJobStreamHistory.setSchedulerId(jobStreamSessionFilter.getJobschedulerId());
+
+            dbLayerJobStreamHistory.updateRunning(filterJobStreamHistory, valueRunning);
+            sosHibernateSession.commit();
+            notifyEventHandler(accessToken);
+
+            return JOCDefaultResponse.responseStatusJSOk(new Date());
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+        }
+    }
+    
+    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
+        CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
+
+        Map<String, String> parameters = new HashMap<String, String>();
+     
+        customEventsUtil.addEvent("InitConditionResolver", parameters);
+        String notifyCommand = customEventsUtil.getEventCommandAsXml();
+        com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
+        jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.throwJobSchedulerError();
     }
 
 }
