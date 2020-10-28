@@ -16,6 +16,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
@@ -23,6 +24,7 @@ import com.sos.jitl.jobstreams.db.DBLayerJobStreams;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamsStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
+import com.sos.jitl.jobstreams.db.FilterJobStreamStarters;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -160,10 +162,24 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                 return jocDefaultResponse;
             }
             try {
-
                 for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
+                    if (jobStreamStarter.getJobStreamStarterId() == null) {
+                        try {
+                            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_START);
+                            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+                            FilterJobStreamStarters filter = new FilterJobStreamStarters();
+                            filter.setTitle(jobStreamStarter.getTitle()); 
+
+                            List<DBItemJobStreamStarter> listOfStartes = dbLayerJobStreamStarters.getJobStreamStartersList(filter, 0);
+                            if (listOfStartes.size() > 0) {
+                                jobStreamStarter.setJobStreamStarterId(listOfStartes.get(0).getId());
+                            }
+                        }finally{
+                            Globals.disconnect(sosHibernateSession);
+                        }
+                    }
                     setAudit(jobStreamStarter, jobStreamStarters);
-                    notifyEventHandlerStart(accessToken, jobStreamStarter.getJobStreamStarterId());
+                    notifyEventHandlerStart(accessToken, jobStreamStarter);
                 }
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
@@ -222,11 +238,15 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
         }
     }
 
-    private void notifyEventHandlerStart(String accessToken, Long starterId) throws JsonProcessingException, JocException {
+    private void notifyEventHandlerStart(String accessToken, JobStreamStarter jobStreamStarter) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(JobStreamStartersImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("starterId", String.valueOf(starterId));
+        parameters.put("starterId", String.valueOf(jobStreamStarter.getJobStreamStarterId()));
+       
+        for (NameValuePair param: jobStreamStarter.getParams()) {
+            parameters.put("#" + param.getName(), param.getValue());
+         }
 
         customEventsUtil.addEvent("StartJobStream", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
