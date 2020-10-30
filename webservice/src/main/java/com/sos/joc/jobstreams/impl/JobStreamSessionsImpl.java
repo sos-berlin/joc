@@ -39,7 +39,6 @@ import com.sos.joc.model.jobstreams.JobStreamSessionsFilter;
 import com.sos.joc.model.jobstreams.JobStreamSesssion;
 import com.sos.joc.model.jobstreams.JobStreamStarter;
 import com.sos.joc.model.jobstreams.JobStreamTask;
-import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
@@ -89,14 +88,17 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             }
 
             DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
-            if ("running".equals(jobStreamSessionFilter.getState())) {
+            if ("running".equals(jobStreamSessionFilter.getStatus())) {
                 filterJobStreamHistory.setRunning(true);
             }
             int limit = 0;
             if (jobStreamSessionFilter.getLimit() != null) {
                 limit = jobStreamSessionFilter.getLimit();
             }
-            filterJobStreamHistory.setContextId(jobStreamSessionFilter.getSession());
+           
+            for (String session:jobStreamSessionFilter.getSession()) {
+                filterJobStreamHistory.addContextId(session);
+            }
             filterJobStreamHistory.setStartedFrom(JobSchedulerDate.getDateFrom(jobStreamSessionFilter.getDateFrom(), jobStreamSessionFilter
                     .getTimeZone()));
             filterJobStreamHistory.setStartedTo(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateTo(), jobStreamSessionFilter.getTimeZone()));
@@ -205,19 +207,23 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             if (filterJobStreamHistory.getJobStreamId() == null) {             
                 filterJobStreamHistory.setJobStreamId(jobStreamSessionFilter.getJobStreamId());
             }
-
-            if ((filterJobStreamHistory.getJobStreamId() == null) && (filterJobStreamHistory.getContextId() == null)) {
+            
+            for (String session:jobStreamSessionFilter.getSession()) {
+                filterJobStreamHistory.addContextId(session);
+            }
+            
+            if ((filterJobStreamHistory.getJobStreamId() == null) && (filterJobStreamHistory.getListContextIds() == null)) {
                 throw new JocMissingRequiredParameterException(String.format("undefined: jobstream, jobstreamId or sessionId required"));
             }
 
-            boolean valueRunning = ("running".equals(jobStreamSessionFilter.getState()));
+            boolean valueRunning = ("running".equals(jobStreamSessionFilter.getStatus()));
 
             sosHibernateSession.setAutoCommit(false);
             sosHibernateSession.beginTransaction();
 
             DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
 
-            filterJobStreamHistory.setContextId(jobStreamSessionFilter.getSession());
+     
             filterJobStreamHistory.setStartedFrom(JobSchedulerDate.getDateFrom(jobStreamSessionFilter.getDateFrom(), jobStreamSessionFilter
                     .getTimeZone()));
             filterJobStreamHistory.setStartedTo(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateTo(), jobStreamSessionFilter.getTimeZone()));

@@ -12,7 +12,10 @@
 			"$ref": "../common/filename100-schema.json"
 		},
 		"session": {
-			"$ref": "../common/string255-schema.json"
+			"type": "array",
+			"items": {
+				"$ref": "../common/string255-schema.json"
+			}
 		},
 		"jobStream": {
 			"$ref": "../common/string255-schema.json"
@@ -23,7 +26,7 @@
 		"jobStreamStarterId": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
-		"state": {
+		"status": {
 			"$ref": "../common/string255-schema.json"
 		},
 		"dateFrom": {
