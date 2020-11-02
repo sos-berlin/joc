@@ -25,6 +25,7 @@ import com.sos.jitl.jobstreams.db.DBLayerJobStreamsStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarters;
+import com.sos.jitl.jobstreams.db.FilterJobStreams;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -162,6 +163,24 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                 return jocDefaultResponse;
             }
             try {
+                
+                if (jobStreamStarters.getJobStream() != null) {
+                    try {
+                        sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_START);
+                        DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+                        FilterJobStreams filter = new FilterJobStreams();
+                        filter.setJobStream(jobStreamStarters.getJobStream()); 
+
+                        List<DBItemJobStream> listOfStreams = dbLayerJobStreams.getJobStreamsList(filter, 0);
+                        if (listOfStreams.size() > 0) {
+                            jobStreamStarters.setJobStreamId(listOfStreams.get(0).getId());
+                        }
+                    }finally{
+                        Globals.disconnect(sosHibernateSession);
+                    }
+                }
+                
+                
                 for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
                     if (jobStreamStarter.getJobStreamStarterId() == null) {
                         try {
@@ -169,7 +188,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             FilterJobStreamStarters filter = new FilterJobStreamStarters();
                             filter.setTitle(jobStreamStarter.getTitle()); 
-
+                            filter.setJobStreamId(jobStreamStarters.getJobStreamId());
                             List<DBItemJobStreamStarter> listOfStartes = dbLayerJobStreamStarters.getJobStreamStartersList(filter, 0);
                             if (listOfStartes.size() > 0) {
                                 jobStreamStarter.setJobStreamStarterId(listOfStartes.get(0).getId());
