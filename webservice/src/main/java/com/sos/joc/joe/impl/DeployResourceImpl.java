@@ -538,11 +538,19 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             NodeList calendarNodes = sosxml.selectNodeList("//date/@calendar|//holiday/@calendar");
             Node calendarsNode = sosxml.selectSingleNode("//calendars");
             Map<String, Calendar> calendars = new HashMap<String, Calendar>();
-            if (calendarsNode != null && calendarsNode.getNodeValue() != null && !calendarsNode.getNodeValue().isEmpty()) {
-                Calendars cals = Globals.objectMapper.readValue(calendarsNode.getNodeValue(), Calendars.class);
-                if (cals != null) {
-                    calendars = cals.getCalendars().stream().filter(cal -> cal.getBasedOn() != null).collect(Collectors.toMap(Calendar::getPath,
-                            Function.identity()));
+            if (calendarsNode != null) {
+                String calendarData = null;
+                if (calendarsNode.hasChildNodes()) {
+                    calendarData = calendarsNode.getFirstChild().getNodeValue();
+                } else {
+                    calendarData = calendarsNode.getTextContent();
+                }
+                if (calendarData != null && !calendarData.isEmpty()) {
+                    Calendars cals = Globals.objectMapper.readValue(calendarData, Calendars.class);
+                    if (cals != null) {
+                        calendars = cals.getCalendars().stream().filter(cal -> cal.getBasedOn() != null).collect(Collectors.toMap(Calendar::getBasedOn,
+                                Function.identity()));
+                    }
                 }
             }
 
