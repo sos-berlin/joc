@@ -321,8 +321,10 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         String inconditionValidated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated
                                 .name(), null);
                         String taskEnded = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name(), null);
-                        String isAlive =  variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.IsAlive.name(), null);
+                        String isAlive = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.IsAlive.name(), null);
                         String jobStreamStarted = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name(),
+                                null);
+                        String jobStreamCompleted = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamCompleted.name(),
                                 null);
 
                         String contextId = variables.getString("contextId", null);
@@ -331,12 +333,15 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.IsAlive.name());
                             eventSnapshot.setState("Job Stream Plugin is active");
                             eventSnapshot.setPath(isAlive);
-                        }else if (jobStreamStarted != null) {
+                        } else if (jobStreamStarted != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name());
                             eventSnapshot.setState(contextId);
                             eventSnapshot.setPath(jobStreamStarted);
-                        }
-                        else if (taskEnded != null) {
+                        } else if (jobStreamCompleted != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamCompleted.name());
+                            eventSnapshot.setState(contextId);
+                            eventSnapshot.setPath(jobStreamStarted);
+                        } else if (taskEnded != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name());
                             eventSnapshot.setState(contextId);
                             eventSnapshot.setTaskId(taskEnded);
