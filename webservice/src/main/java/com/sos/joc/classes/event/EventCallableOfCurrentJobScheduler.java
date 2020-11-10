@@ -340,7 +340,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         } else if (jobStreamCompleted != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamCompleted.name());
                             eventSnapshot.setState(contextId);
-                            eventSnapshot.setPath(jobStreamStarted);
+                            eventSnapshot.setPath(jobStreamCompleted);
                         } else if (taskEnded != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name());
                             eventSnapshot.setState(contextId);

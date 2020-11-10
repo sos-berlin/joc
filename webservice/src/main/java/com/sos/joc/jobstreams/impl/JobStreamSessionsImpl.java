@@ -95,8 +95,8 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             if (jobStreamSessionFilter.getLimit() != null) {
                 limit = jobStreamSessionFilter.getLimit();
             }
-           
-            for (String session:jobStreamSessionFilter.getSession()) {
+
+            for (String session : jobStreamSessionFilter.getSession()) {
                 filterJobStreamHistory.addContextId(session);
             }
             filterJobStreamHistory.setStartedFrom(JobSchedulerDate.getDateFrom(jobStreamSessionFilter.getDateFrom(), jobStreamSessionFilter
@@ -104,6 +104,20 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             filterJobStreamHistory.setStartedTo(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateTo(), jobStreamSessionFilter.getTimeZone()));
             filterJobStreamHistory.setJobStreamStarter(jobStreamSessionFilter.getJobStreamStarterId());
             filterJobStreamHistory.setSchedulerId(jobStreamSessionFilter.getJobschedulerId());
+           
+            if ("completed".equalsIgnoreCase(jobStreamSessionFilter.getStatus()) && "running".equalsIgnoreCase(jobStreamSessionFilter.getStatus())) {
+                filterJobStreamHistory.setRunning(null);
+                filterJobStreamHistory.setCompleted(null);
+            }else {
+                if ("running".equalsIgnoreCase(jobStreamSessionFilter.getStatus())) {
+                    filterJobStreamHistory.setCompleted(false);
+                    filterJobStreamHistory.setRunning(true);
+                }
+                if ("completed".equalsIgnoreCase(jobStreamSessionFilter.getStatus())) {
+                    filterJobStreamHistory.setRunning(false);
+                    filterJobStreamHistory.setCompleted(true);
+                }
+            }
             List<DBItemJobStreamHistory> listOfSessions = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, limit);
 
             DBLayerJobStreamsTaskContext dbLayerJobStreamsTaskContext = new DBLayerJobStreamsTaskContext(sosHibernateSession);
@@ -199,19 +213,20 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                 List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 0);
                 if (listOfJobStreams.size() > 0) {
                     filterJobStreamHistory.setJobStreamId(listOfJobStreams.get(0).getId());
-                }else {
-                    throw new JocMissingRequiredParameterException(String.format("not found: jobstream " + jobStreamSessionFilter.getJobStream() + " not found"));
+                } else {
+                    throw new JocMissingRequiredParameterException(String.format("not found: jobstream " + jobStreamSessionFilter.getJobStream()
+                            + " not found"));
                 }
             }
 
-            if (filterJobStreamHistory.getJobStreamId() == null) {             
+            if (filterJobStreamHistory.getJobStreamId() == null) {
                 filterJobStreamHistory.setJobStreamId(jobStreamSessionFilter.getJobStreamId());
             }
-            
-            for (String session:jobStreamSessionFilter.getSession()) {
+
+            for (String session : jobStreamSessionFilter.getSession()) {
                 filterJobStreamHistory.addContextId(session);
             }
-            
+
             if ((filterJobStreamHistory.getJobStreamId() == null) && (filterJobStreamHistory.getListContextIds() == null)) {
                 throw new JocMissingRequiredParameterException(String.format("undefined: jobstream, jobstreamId or sessionId required"));
             }
@@ -223,7 +238,6 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
 
             DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
 
-     
             filterJobStreamHistory.setStartedFrom(JobSchedulerDate.getDateFrom(jobStreamSessionFilter.getDateFrom(), jobStreamSessionFilter
                     .getTimeZone()));
             filterJobStreamHistory.setStartedTo(JobSchedulerDate.getDateTo(jobStreamSessionFilter.getDateTo(), jobStreamSessionFilter.getTimeZone()));
@@ -241,12 +255,12 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             Globals.disconnect(sosHibernateSession);
         }
     }
-    
+
     private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
-     
+
         customEventsUtil.addEvent("InitConditionResolver", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
