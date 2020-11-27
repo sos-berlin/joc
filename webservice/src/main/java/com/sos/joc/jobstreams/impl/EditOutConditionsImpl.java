@@ -1,6 +1,5 @@
 package com.sos.joc.jobstreams.impl;
 
-import java.nio.file.Paths;
 import java.util.List;
 
 import javax.ws.rs.Path;
@@ -21,7 +20,6 @@ import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobstreams.resource.IEditOutConditionsResource;
-import com.sos.joc.model.jobstreams.JobInCondition;
 import com.sos.joc.model.jobstreams.JobOutCondition;
 import com.sos.joc.model.jobstreams.OutConditions;
 import com.sos.schema.JsonValidator;
