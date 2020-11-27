@@ -24,8 +24,11 @@ import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemOutCondition;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
+import com.sos.jitl.jobstreams.db.DBLayerEvents;
 import com.sos.jitl.jobstreams.db.DBLayerInConditions;
 import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
+import com.sos.jitl.jobstreams.db.FilterEvents;
 import com.sos.jitl.jobstreams.db.FilterInConditions;
 import com.sos.jitl.jobstreams.db.FilterOutConditions;
 import com.sos.jitl.reporting.db.DBItemReportTask;
@@ -65,6 +68,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
     @Override
     public JOCDefaultResponse getJobOutConditions(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
+        boolean compact = false;
         try {
 
             JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
@@ -74,6 +78,10 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
+            }
+            
+            if (conditionJobsFilterSchema.getCompact() != null) {
+                compact = conditionJobsFilterSchema.getCompact();
             }
 
             readJobSchedulerVariables();
@@ -105,7 +113,6 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
             JSConditionResolver jsConditionResolver = new JSConditionResolver(conditionJobsFilterSchema.getJobschedulerId());
             jsConditionResolver.setWorkingDirectory(dbItemInventoryInstance.getLiveDirectory() + "/../../");
-            jsConditionResolver.initEvents(sosHibernateSession);
 
             ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(sosHibernateSession);
             reportTaskExecutionsDBLayer.getFilter().setSortMode("desc");
@@ -117,7 +124,6 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             FilterOutConditions filterOutConditions;
             if (conditionJobsFilterSchema.getFolder() != null) {
-
                 try {
                     String p;
                     if ("/".equals(conditionJobsFilterSchema.getFolder())) {
@@ -158,11 +164,18 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
                 }
             }
+
+            if (!compact) {
+                jsConditionResolver.initEvents(sosHibernateSession, contextId);
+            }
+
             Map<String, Integer> mapOfExitCodes = new HashMap<String, Integer>();
-            List<DBItemReportTask> listOfHistoryItems = reportTaskExecutionsDBLayer.getLastHistoryItems();
-            for (DBItemReportTask dbItemReportTask : listOfHistoryItems) {
-                if (mapOfExitCodes.get(dbItemReportTask.getName()) == null) {
-                    mapOfExitCodes.put(dbItemReportTask.getName(), dbItemReportTask.getExitCode());
+            if (!compact) {
+                List<DBItemReportTask> listOfHistoryItems = reportTaskExecutionsDBLayer.getLastHistoryItems();
+                for (DBItemReportTask dbItemReportTask : listOfHistoryItems) {
+                    if (mapOfExitCodes.get(dbItemReportTask.getName()) == null) {
+                        mapOfExitCodes.put(dbItemReportTask.getName(), dbItemReportTask.getExitCode());
+                    }
                 }
             }
 
@@ -194,10 +207,23 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                     jsEventKey.setSession(conditionJobsFilterSchema.getSession());
 
                     for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
+                        List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsOutCondition.getExpression());
+                        if (!compact) {
+                            for (JSCondition jsCondition : listOfConditions) {
+                                if (jsCondition.isNonContextEvent()) {
+                                    FilterEvents filterEvents = jsCondition.getFilterEventsNonContextEvent(conditionJobsFilterSchema
+                                            .getJobschedulerId());
+                                    DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+                                    List<DBItemOutConditionWithEvent> listOfNonContextEvents = dbLayerEvents.getEventsList(filterEvents, 0);
+                                    jsConditionResolver.addEventsFromList(listOfNonContextEvents);
+                                }
+                            }
+                        }
+
                         OutCondition outCondition = new OutCondition();
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsOutCondition.getExpression());
-                        if (contextId != null) {
+                        if (contextId != null && !compact) {
                             conditionExpression.setValue(jsConditionResolver.validate(sosHibernateSession, exit, contextId, jsOutCondition));
                         }
                         conditionExpression.setValidatedExpression(jsConditionResolver.getBooleanExpression().getNormalizedBoolExpr());
@@ -213,7 +239,9 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             jsEventKey.setEvent(jsOutConditionEvent.getEvent());
                             jsEventKey.setGlobalEvent(jsOutConditionEvent.isGlobal());
                             jsEventKey.setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
-                            if (jsOutConditionEvent.isGlobal()  || (jsOutConditionEvent.isCreateCommand() && jsEventKey.getSession() != null)) {
+
+                            if (!compact && (jsOutConditionEvent.isGlobal() || (jsOutConditionEvent.isCreateCommand() && jsEventKey
+                                    .getSession() != null))) {
                                 if (jsOutConditionEvent.isGlobal()) {
                                     jsEventKey.setJobStream("");
                                     jsEventKey.setSession(Constants.getSession());
@@ -234,6 +262,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                         }
 
                         outCondition.setInconditions(getInConditions(sosHibernateSession, outCondition, listOfInConditionsItems));
+
                         jobOutCondition.getOutconditions().add(outCondition);
                     }
                 }

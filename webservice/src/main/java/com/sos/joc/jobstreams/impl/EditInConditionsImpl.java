@@ -1,7 +1,5 @@
 package com.sos.joc.jobstreams.impl;
 
-import java.nio.file.Paths;
-
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;

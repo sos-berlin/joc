@@ -77,8 +77,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 conditionEvents.setDeliveryDate(new Date());
                 conditionEvents.setSession(filter.getSession());
 
-                for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
-                    DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
+                for (DBItemOutConditionWithEvent dbItemEvent : listOfEvents) {
                     ConditionEvent conditionEvent = new ConditionEvent();
                     if (dbItemEvent != null) {
                         DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());
@@ -112,8 +111,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
                 listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
 
-                for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
-                    DBItemEvent dbItemEvent = dbItemOutConditionWithEvent.getDbItemEvent();
+                for (DBItemOutConditionWithEvent dbItemEvent : listOfEvents) {
                     ConditionEvent conditionEvent = new ConditionEvent();
                     if (dbItemEvent != null) {
                         DBItemOutCondition dbItemOutCondition = dbLayerOutConditions.getOutConditionsDbItem(dbItemEvent.getOutConditionId());

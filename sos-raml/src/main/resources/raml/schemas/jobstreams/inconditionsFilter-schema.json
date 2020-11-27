@@ -20,6 +20,9 @@
 				"$ref": "../job/jobPath-schema.json"
 			}
 		},
+		"compact": {
+			"type": "boolean"
+		},
 		"session": {
 			"$ref": "../common/string255-schema.json"
 		}
