@@ -12,6 +12,12 @@ import com.sos.joc.classes.JOCDefaultResponse;
 public interface IConditionEventsResource {
 
     @POST
+    @Path("missing_events")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
+    public JOCDefaultResponse getMissingEvents(@HeaderParam("X-Access-Token") String accessToken, byte[] conditionEventsFilter);
+
+    @POST
     @Path("eventlist")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
@@ -28,4 +34,7 @@ public interface IConditionEventsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse addEvent(@HeaderParam("X-Access-Token") String accessToken, byte[] conditionEvent);
+    
+    
+ 
 }

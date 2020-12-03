@@ -95,10 +95,13 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             if (conditionJobsFilterSchema.getCompact() != null) {
                 compact = conditionJobsFilterSchema.getCompact();
             }
-            readJobSchedulerVariables();
-            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-            Constants.settings = new EventHandlerSettings();
-            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
+            if (Globals.schedulerVariables == null) {
+                readJobSchedulerVariables();
+                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+                Constants.settings = new EventHandlerSettings();
+                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
+            }
+
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             if ((conditionJobsFilterSchema.getJobs() == null) && (conditionJobsFilterSchema.getFolder() == null)) {
