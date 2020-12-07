@@ -50,14 +50,16 @@ public class SOSSecurityConfiguration {
 
     private void addUsers() {
 
-        for (String user : readIni.get(SECTION_USERS).keySet()) {
-            SecurityConfigurationUser securityConfigurationUser = new SecurityConfigurationUser();
-            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(readIni.get("users", user),
-                    null, null);
-            securityConfigurationUser.setUser(user);
-            securityConfigurationUser.setPassword(sosSecurityConfigurationUserEntry.getPassword());
-            securityConfigurationUser.setRoles(sosSecurityConfigurationUserEntry.getRoles());
-            securityConfiguration.getUsers().add(securityConfigurationUser);
+        if (readIni.get(SECTION_USERS) != null) {
+            for (String user : readIni.get(SECTION_USERS).keySet()) {
+                SecurityConfigurationUser securityConfigurationUser = new SecurityConfigurationUser();
+                SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(readIni.get("users",
+                        user), null, null);
+                securityConfigurationUser.setUser(user);
+                securityConfigurationUser.setPassword(sosSecurityConfigurationUserEntry.getPassword());
+                securityConfigurationUser.setRoles(sosSecurityConfigurationUserEntry.getRoles());
+                securityConfiguration.getUsers().add(securityConfigurationUser);
+            }
         }
 
     }
