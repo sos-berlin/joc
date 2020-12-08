@@ -85,7 +85,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
 
             }
 
-            if (jobStreamSessionFilter.getJobStreamId() == null) {
+            if (jobStreamSessionFilter.getJobStreamId() != null) {
                 listOfJobStreamIds.add(jobStreamSessionFilter.getJobStreamId());
             }
 
@@ -126,7 +126,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             jobStreamSesssions.setJobstreamSessions(new ArrayList<JobStreamSesssion>());
 
             for (Long id : listOfJobStreamIds) {
-                filterJobStreamHistory.setId(id);
+                filterJobStreamHistory.setJobStreamId(id);
 
                 List<DBItemJobStreamHistory> listOfSessions = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, limit);
 
