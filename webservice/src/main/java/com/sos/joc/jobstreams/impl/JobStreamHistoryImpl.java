@@ -99,6 +99,8 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamH
                     listOfTaskIds.add(dbItemJobStreamTaskContext.getTaskId());
                 }
             }
+            
+            
 
             List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
 
@@ -132,6 +134,8 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamH
             if (listOfTaskIds.size() > 0 || (listOfJobs.size() > 0)) {
 
                 filter.setLimit(jobStreamFilter.getLimit());
+                filter.setOrderCriteria("historyId");
+                filter.setSortMode("desc");
                 List<DBItemReportTask> listOfDBItemReportTaskDBItems = new ArrayList<DBItemReportTask>();
 
                 listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo(filter);
