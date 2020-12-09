@@ -132,10 +132,13 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
 
                 DBLayerJobStreamsTaskContext dbLayerJobStreamsTaskContext = new DBLayerJobStreamsTaskContext(sosHibernateSession);
                 FilterJobStreamTaskContext filterJobStreamTaskContext = new FilterJobStreamTaskContext();
+                filterJobStreamTaskContext.setOrderCriteria("taskId");
+                filterJobStreamTaskContext.setSortMode("desc");
+                
                 DBLayerJobStreamStarters dbLayerJobStreamStarter = new DBLayerJobStreamStarters(sosHibernateSession);
 
-                JobStreamSesssion jobStreamSesssion = new JobStreamSesssion();
                 for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfSessions) {
+                    JobStreamSesssion jobStreamSesssion = new JobStreamSesssion();
                     jobStreamSesssion.setJobStreamStarter(new JobStreamStarter());
                     jobStreamSesssion.setId(dbItemJobStreamHistory.getId());
                     jobStreamSesssion.setJobStreamId(dbItemJobStreamHistory.getJobStream());
