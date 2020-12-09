@@ -197,6 +197,7 @@ public class JocCockpitProperties {
         String propKeyLog4J = "log4j.configuration";
         String log4jConf = getProperty(propKeyLog4J);
         if (log4jConf != null) {
+            log4jConf = log4jConf.trim();
             Path p = resolvePath(log4jConf);
             if (p != null) {
                 if (Files.exists(p)) {
