@@ -10,15 +10,21 @@
 	"properties": {
 		"deliveryDate": {
 			"$ref": "../common/deliveryDate-schema.json"
-	     },
-	     "session": {
+		},
+		"session": {
 			"$ref": "../common/string100-schema.json"
-		 },
-         "conditionEvents": {
-           "type": "array",
-           "items": {
-              "$ref": "conditionEvent-schema.json"
-            }
-        } 
-    }
+		},
+		"conditionEvents": {
+			"type": "array",
+			"items": {
+				"$ref": "conditionEvent-schema.json"
+			}
+		},
+		"conditionMissingEvents": {
+			"type": "array",
+			"items": {
+				"$ref": "conditionEvent-schema.json"
+			}
+		}
+	}
 }

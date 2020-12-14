@@ -12,10 +12,10 @@ import com.sos.joc.classes.JOCDefaultResponse;
 public interface IConditionEventsResource {
 
     @POST
-    @Path("missing_events")
+    @Path("expression_events")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
-    public JOCDefaultResponse getMissingEvents(@HeaderParam("X-Access-Token") String accessToken, byte[] conditionEventsFilter);
+    public JOCDefaultResponse getExpressionEvents(@HeaderParam("X-Access-Token") String accessToken, byte[] conditionEventsFilter);
 
     @POST
     @Path("eventlist")

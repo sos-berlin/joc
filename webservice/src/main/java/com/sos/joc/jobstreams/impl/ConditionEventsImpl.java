@@ -1,7 +1,5 @@
 package com.sos.joc.jobstreams.impl;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,32 +19,26 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
-import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
-import com.sos.jitl.jobstreams.db.DBItemEvent;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemOutCondition;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
-import com.sos.jitl.jobstreams.db.DBLayerCalendarUsages;
-import com.sos.jitl.jobstreams.db.DBLayerConsumedInConditions;
 import com.sos.jitl.jobstreams.db.DBLayerEvents;
 import com.sos.jitl.jobstreams.db.DBLayerInConditions;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreams;
 import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
-import com.sos.jitl.jobstreams.db.FilterCalendarUsage;
-import com.sos.jitl.jobstreams.db.FilterConsumedInConditions;
 import com.sos.jitl.jobstreams.db.FilterEvents;
 import com.sos.jitl.jobstreams.db.FilterInConditions;
 import com.sos.jitl.jobstreams.db.FilterJobStreams;
-import com.sos.jitl.jobstreams.db.FilterOutConditions;
 import com.sos.jobstreams.resolver.JSCondition;
 import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSConditions;
 import com.sos.jobstreams.resolver.JSInCondition;
-import com.sos.jobstreams.resolver.JSInConditionCommand;
 import com.sos.jobstreams.resolver.JSJobConditionKey;
 import com.sos.jobstreams.resolver.JSJobInConditions;
+import com.sos.jobstreams.resolver.JSJobStreamConditionKey;
+import com.sos.jobstreams.resolver.JSOutCondition;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -56,15 +48,11 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IConditionEventsResource;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
-import com.sos.joc.model.jobscheduler.DB;
 import com.sos.joc.model.jobstreams.ConditionEvent;
 import com.sos.joc.model.jobstreams.ConditionEvents;
 import com.sos.joc.model.jobstreams.ConditionEventsFilter;
 import com.sos.joc.model.jobstreams.ConditionExpression;
 import com.sos.joc.model.jobstreams.ConditionJobsFilter;
-import com.sos.joc.model.jobstreams.InCondition;
-import com.sos.joc.model.jobstreams.InConditionCommand;
-import com.sos.joc.model.jobstreams.InConditions;
 import com.sos.joc.model.jobstreams.JobInCondition;
 import com.sos.schema.JsonValidator;
 
@@ -73,7 +61,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConditionEventsImpl.class);
     private static final String API_CALL_EVENTLIST = "./jobstreams/eventlist";
-    private static final String API_CALL_MISSING_EVENTLIST = "./jobstreams/missingvents";
+    private static final String API_CALL_EXPRESSION_EVENTS = "./jobstreams/expression_events";
     private static final String API_CALL_ADD_EVENT = "./jobstreams/add_event";
     private static final String API_CALL_DELETE_EVENT = "./jobstreams/delete_event";
 
@@ -179,7 +167,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
     }
 
     @Override
-    public JOCDefaultResponse getMissingEvents(String accessToken, byte[] filterBytes) {
+    public JOCDefaultResponse getExpressionEvents(String accessToken, byte[] filterBytes) {
 
         SOSHibernateSession sosHibernateSession = null;
 
@@ -187,16 +175,18 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
             JsonValidator.validateFailFast(filterBytes, JobsFilter.class);
             ConditionJobsFilter conditionJobsFilterSchema = Globals.objectMapper.readValue(filterBytes, ConditionJobsFilter.class);
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_MISSING_EVENTLIST, conditionJobsFilterSchema, accessToken, conditionJobsFilterSchema
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EXPRESSION_EVENTS, conditionJobsFilterSchema, accessToken, conditionJobsFilterSchema
                     .getJobschedulerId(), getPermissonsJocCockpit(conditionJobsFilterSchema.getJobschedulerId(), accessToken).getJobStream().getView()
                             .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            if ((conditionJobsFilterSchema.getJobs() == null) && (conditionJobsFilterSchema.getFolder() == null)) {
-                throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", "jobs or folder"));
+            if ((conditionJobsFilterSchema.getJobs() == null) && (conditionJobsFilterSchema.getFolder() == null) && (conditionJobsFilterSchema
+                    .getJobStream() == null)) {
+                throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", "jobStream, jobs or folder"));
             }
+            checkRequiredParameter("session", conditionJobsFilterSchema.getSession());
 
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
@@ -205,11 +195,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
             }
 
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_MISSING_EVENTLIST);
-
-            if ((conditionJobsFilterSchema.getJobs() == null) && (conditionJobsFilterSchema.getFolder() == null)) {
-                throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", "jobs or folder"));
-            }
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EXPRESSION_EVENTS);
 
             UUID contextId = null;
             try {
@@ -246,6 +232,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 filterInConditions = new FilterInConditions();
                 filterInConditions.setFolder(conditionJobsFilterSchema.getFolder());
                 filterInConditions.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
+                filterInConditions.setJobStream(conditionJobsFilterSchema.getJobStream());
                 List<DBItemInCondition> listOfInConditions = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
                 for (DBItemInCondition dbItemInCondition : listOfInConditions) {
                     listOfJobs.add(dbItemInCondition.getJob());
@@ -262,6 +249,17 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             }
 
             jsConditionResolver.initEvents(sosHibernateSession, contextId);
+            jsConditionResolver.initJobOutConditions(sosHibernateSession);
+
+            Set<String> setEventsInExpression = new HashSet<String>();
+            Set<String> addedEvents = new HashSet<String>();
+
+            if (conditionJobsFilterSchema.getExpression() != null) {
+                List<JSCondition> listEventsInExpression = JSConditions.getListOfConditions(conditionJobsFilterSchema.getExpression());
+                for (JSCondition jsCondition : listEventsInExpression) {
+                    setEventsInExpression.add(jsCondition.getConditionValueShort());
+                }
+            }
 
             for (String job : listOfJobs) {
                 JobInCondition jobInCondition = new JobInCondition();
@@ -285,7 +283,6 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 jobInCondition.setJob(jsJobConditionKey.getJob());
                 if (jsJobInConditions.getInConditions(jsJobConditionKey) != null) {
                     for (JSInCondition jsInCondition : jsJobInConditions.getInConditions(jsJobConditionKey).getListOfInConditions().values()) {
-
                         ConditionExpression conditionExpression = new ConditionExpression();
                         conditionExpression.setExpression(jsInCondition.getExpression());
 
@@ -307,11 +304,38 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                             }
                         }
 
+                        JSJobStreamConditionKey jsJobStreamConditionKey = new JSJobStreamConditionKey();
+                        jsJobStreamConditionKey.setJobSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
+                        jsJobStreamConditionKey.setJobStream(jsInCondition.getJobStream());
+                        JSOutCondition jsOutCondition = null;
+
                         conditionExpression.setValue(jsConditionResolver.validate(sosHibernateSession, null, contextId, jsInCondition));
                         for (String missingEvent : jsConditionResolver.getListOfMissingEvents()) {
-                            ConditionEvent conditionEvent = new ConditionEvent();
-                            conditionEvent.setEvent(missingEvent);
-                            conditionEvents.getConditionEvents().add(conditionEvent);
+                            if (!addedEvents.contains(missingEvent) && (conditionJobsFilterSchema.getExpression() == null || setEventsInExpression
+                                    .contains(missingEvent))) {
+                                ConditionEvent conditionEvent = new ConditionEvent();
+                                conditionEvent.setEvent(missingEvent);
+                                jsOutCondition = jsConditionResolver.getOutConditionForEvent(missingEvent, jsJobStreamConditionKey);
+                                if (jsOutCondition != null) {
+                                    conditionEvent.setOutConditionId(jsOutCondition.getId());
+                                }
+                                conditionEvents.getConditionEvents().add(conditionEvent);
+                                conditionEvents.getConditionMissingEvents().add(conditionEvent);
+                                addedEvents.add(missingEvent);
+                            }
+                        }
+                        for (String presentEvent : jsConditionResolver.getListOfPresentEvents()) {
+                            if (!addedEvents.contains(presentEvent) && (conditionJobsFilterSchema.getExpression() == null || setEventsInExpression
+                                    .contains(presentEvent))) {
+                                ConditionEvent conditionEvent = new ConditionEvent();
+                                conditionEvent.setEvent(presentEvent);
+                                jsOutCondition = jsConditionResolver.getOutConditionForEvent(presentEvent, jsJobStreamConditionKey);
+                                if (jsOutCondition != null) {
+                                    conditionEvent.setOutConditionId(jsOutCondition.getId());
+                                }
+                                conditionEvents.getConditionEvents().add(conditionEvent);
+                                addedEvents.add(presentEvent);
+                            }
                         }
                     }
                 }

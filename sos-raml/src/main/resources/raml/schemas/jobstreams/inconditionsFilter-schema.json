@@ -14,6 +14,9 @@
 		"folder": {
 			"$ref": "../common/path-schema.json"
 		},
+		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
 		"jobs": {
 			"type": "array",
 			"items": {
@@ -22,6 +25,9 @@
 		},
 		"compact": {
 			"type": "boolean"
+		},
+		"expression": {
+			"$ref": "../common/string255-schema.json"
 		},
 		"session": {
 			"$ref": "../common/string255-schema.json"
