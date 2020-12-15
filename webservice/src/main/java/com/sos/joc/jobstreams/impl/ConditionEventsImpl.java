@@ -249,7 +249,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             }
 
             jsConditionResolver.initEvents(sosHibernateSession, contextId);
-            jsConditionResolver.initJobOutConditions(sosHibernateSession);
+            jsConditionResolver.initJobOutConditions(sosHibernateSession, conditionJobsFilterSchema.getJobStream());
 
             Set<String> setEventsInExpression = new HashSet<String>();
             Set<String> addedEvents = new HashSet<String>();
@@ -319,9 +319,10 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                                 if (jsOutCondition != null) {
                                     conditionEvent.setOutConditionId(jsOutCondition.getId());
                                 }
-                                conditionEvents.getConditionEvents().add(conditionEvent);
-                                conditionEvents.getConditionMissingEvents().add(conditionEvent);
-                                addedEvents.add(missingEvent);
+                                if (conditionEvent.getOutConditionId() != null) {
+                                    conditionEvents.getConditionMissingEvents().add(conditionEvent);
+                                    addedEvents.add(missingEvent);
+                                }
                             }
                         }
                         for (String presentEvent : jsConditionResolver.getListOfPresentEvents()) {
@@ -333,8 +334,10 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                                 if (jsOutCondition != null) {
                                     conditionEvent.setOutConditionId(jsOutCondition.getId());
                                 }
-                                conditionEvents.getConditionEvents().add(conditionEvent);
-                                addedEvents.add(presentEvent);
+                                if (conditionEvent.getOutConditionId() != null) {
+                                    conditionEvents.getConditionEvents().add(conditionEvent);
+                                    addedEvents.add(presentEvent);
+                                }
                             }
                         }
                     }
