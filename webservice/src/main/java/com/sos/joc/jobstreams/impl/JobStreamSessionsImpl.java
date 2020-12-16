@@ -125,6 +125,10 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
             jobStreamSesssions.setDeliveryDate(new Date());
             jobStreamSesssions.setJobstreamSessions(new ArrayList<JobStreamSesssion>());
 
+            if (listOfJobStreamIds.size() == 0) {
+                listOfJobStreamIds.add(null);
+            }
+
             for (Long id : listOfJobStreamIds) {
                 filterJobStreamHistory.setJobStreamId(id);
 
@@ -134,7 +138,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                 FilterJobStreamTaskContext filterJobStreamTaskContext = new FilterJobStreamTaskContext();
                 filterJobStreamTaskContext.setOrderCriteria("taskId");
                 filterJobStreamTaskContext.setSortMode("desc");
-                
+
                 DBLayerJobStreamStarters dbLayerJobStreamStarter = new DBLayerJobStreamStarters(sosHibernateSession);
 
                 for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfSessions) {
