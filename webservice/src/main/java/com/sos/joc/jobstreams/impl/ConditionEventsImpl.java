@@ -31,6 +31,8 @@ import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
 import com.sos.jitl.jobstreams.db.FilterEvents;
 import com.sos.jitl.jobstreams.db.FilterInConditions;
 import com.sos.jitl.jobstreams.db.FilterJobStreams;
+import com.sos.jobstreams.classes.CheckHistoryValue;
+import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.resolver.JSCondition;
 import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSConditions;
@@ -372,6 +374,13 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_EVENT);
 
+            if (Globals.schedulerVariables == null) {
+                readJobSchedulerVariables();
+                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+                Constants.settings = new EventHandlerSettings();
+                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
+            }
+
             checkRequiredParameter("jobStream", conditionEvent.getJobStream());
             checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
             checkRequiredParameter("event", conditionEvent.getEvent());
@@ -395,10 +404,27 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                     }
                     checkFolderPermissions(p);
 
+                    JSCondition j = new JSCondition(conditionEvent.getEvent());
+
                     FilterEvents filter = new FilterEvents();
-                    filter.setEvent(conditionEvent.getEvent());
-                    filter.setSession(conditionEvent.getSession());
-                    filter.setJobStream(conditionEvent.getJobStream());
+
+                    filter.setEvent(j.getEventName());
+                    EventDate eventDate = new EventDate();
+                    if (j.isHaveDate()) {
+                        if ("*".equals(j.getConditionDate())) {
+                            filter.setSession(Constants.getSession());
+                        } else {
+                            filter.setSession(eventDate.getEventDate(j.getConditionDate()));
+                        }
+                    } else {
+                        filter.setSession(conditionEvent.getSession());
+                    }
+                    if (j.getConditionJobStream().isEmpty()) {
+                        filter.setJobStream(conditionEvent.getJobStream());
+                    } else {
+                        filter.setJobStream(j.getConditionJobStream());
+                    }
+                    filter.setGlobalEvent(conditionEvent.getGlobalEvent());
                     filter.setOutConditionId(conditionEvent.getOutConditionId());
                     if (conditionEvent.getGlobalEvent() != null) {
                         filter.setGlobalEvent(conditionEvent.getGlobalEvent());
@@ -406,13 +432,20 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                         filter.setGlobalEvent(false);
                     }
 
-                    notifyEventHandler(accessToken, "AddEvent", filter);
+                    notifyEventHandler(accessToken, "AddEvent", conditionEvent.getSession(), filter);
+                    
+                    conditionEvent.setEvent(filter.getEvent());
+                    conditionEvent.setJobStream(filter.getJobStream());
+                    conditionEvent.setSession(filter.getSession());
+
+
                 } catch (JocFolderPermissionsException e) {
                     LOGGER.debug("Folder permission for " + dbItemJobStream.getFolder() + " is missing. Event " + conditionEvent.getEvent()
                             + " not added.");
                 }
 
             }
+            
             return JOCDefaultResponse.responseStatus200(conditionEvent);
 
         } catch (Exception e) {
@@ -434,6 +467,13 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                     getPermissonsJocCockpit(conditionEvent.getJobschedulerId(), accessToken).getJobStream().getChange().getEvents().isAdd());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
+            }
+
+            if (Globals.schedulerVariables == null) {
+                readJobSchedulerVariables();
+                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+                Constants.settings = new EventHandlerSettings();
+                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
             }
 
             checkRequiredParameter("event", conditionEvent.getEvent());
@@ -461,14 +501,31 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                         p = dbItemJobStream.getFolder() + "/item";
                     }
                     checkFolderPermissions(p);
-
+                    JSCondition j = new JSCondition(conditionEvent.getEvent());
                     FilterEvents filter = new FilterEvents();
-                    filter.setEvent(conditionEvent.getEvent());
-                    filter.setSession(conditionEvent.getSession());
-                    filter.setJobStream(conditionEvent.getJobStream());
+
+                    filter.setEvent(j.getEventName());
+                    if (j.isHaveDate()) {
+                        EventDate eventDate = new EventDate();
+                        filter.setSession(eventDate.getEventDate(j.getConditionDate()));
+                    } else {
+                        filter.setSession(conditionEvent.getSession());
+                    }
+                    if (j.getConditionJobStream().isEmpty()) {
+                        filter.setJobStream(conditionEvent.getJobStream());
+                    } else {
+                        filter.setJobStream(j.getConditionJobStream());
+                    }
                     filter.setGlobalEvent(conditionEvent.getGlobalEvent());
 
-                    notifyEventHandler(accessToken, "RemoveEvent", filter);
+                    if (!"*".equals(j.getConditionDate())) {
+                        notifyEventHandler(accessToken, "RemoveEvent",conditionEvent.getSession(), filter);
+                    }
+                    
+                    conditionEvent.setEvent(filter.getEvent());
+                    conditionEvent.setJobStream(filter.getJobStream());
+                    conditionEvent.setSession(filter.getSession());
+                    
                 } catch (JocFolderPermissionsException e) {
                     LOGGER.debug("Folder permission for " + dbItemJobStream.getFolder() + " is missing. Event " + conditionEvent.getEvent()
                             + " not deleted.");
@@ -483,12 +540,13 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         }
     }
 
-    private void notifyEventHandler(String accessToken, String eventKey, FilterEvents filter) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken, String eventKey, String session, FilterEvents filter) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ConditionEventsImpl.class.getName());
         Map<String, String> parameters = new HashMap<String, String>();
         if (filter != null) {
             parameters.put("event", filter.getEvent());
-            parameters.put("session", filter.getSession());
+            parameters.put("session", session);
+            parameters.put("source", filter.getSession());
             if (filter.getOutConditionId() != null) {
                 parameters.put("outConditionId", String.valueOf(filter.getOutConditionId()));
             }
