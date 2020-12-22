@@ -79,7 +79,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             if (conditionJobsFilterSchema.getCompact() != null) {
                 compact = conditionJobsFilterSchema.getCompact();
             }
@@ -207,7 +207,6 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 if (jsJobOutConditions.getOutConditions(jsJobConditionKey) != null) {
 
                     JSEventKey jsEventKey = new JSEventKey();
-                    jsEventKey.setSession(conditionJobsFilterSchema.getSession());
 
                     for (JSOutCondition jsOutCondition : jsJobOutConditions.getOutConditions(jsJobConditionKey).getListOfOutConditions().values()) {
                         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsOutCondition.getExpression());
@@ -239,12 +238,11 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             outConditionEvent.setEvent(jsOutConditionEvent.getEventValue());
                             outConditionEvent.setCommand(jsOutConditionEvent.getCommand());
                             outConditionEvent.setGlobalEvent(jsOutConditionEvent.isGlobal());
-                            
-                            
+
                             jsEventKey.setGlobalEvent(jsOutConditionEvent.isGlobal());
                             jsEventKey.setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
-                            if (!compact && (jsOutConditionEvent.isGlobal() || (jsOutConditionEvent.isCreateCommand() && jsEventKey
+                            if (!compact && (jsOutConditionEvent.isGlobal() || (jsOutConditionEvent.isCreateCommand() && conditionJobsFilterSchema
                                     .getSession() != null))) {
                                 if (jsOutConditionEvent.isGlobal()) {
                                     jsEventKey.setJobStream("");
@@ -253,31 +251,28 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                                     outConditionEvent.setExists(jsConditionResolver.eventExists(jsEventKey));
                                 } else {
                                     JSCondition j = new JSCondition(jsOutConditionEvent.getEventValue());
-                                    
+
                                     if (j.isNonContextEvent()) {
-                                        FilterEvents filterEvents = j.getFilterEventsNonContextEvent(conditionJobsFilterSchema
-                                                .getJobschedulerId());
+                                        FilterEvents filterEvents = j.getFilterEventsNonContextEvent(conditionJobsFilterSchema.getJobschedulerId());
                                         DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
                                         List<DBItemOutConditionWithEvent> listOfNonContextEvents = dbLayerEvents.getEventsList(filterEvents, 0);
                                         jsConditionResolver.addEventsFromList(listOfNonContextEvents);
                                     }
 
                                     if (!conditionExpression.getJobStreamEvents().contains(j.getEventNameWithType())) {
-                                        if (j.getConditionJobStream().isEmpty() || outCondition.getJobStream().equals(j
-                                                .getConditionJobStream())) {
+                                        if (j.getConditionJobStream().isEmpty() || outCondition.getJobStream().equals(j.getConditionJobStream())) {
                                             conditionExpression.getJobStreamEvents().add(j.getEventNameWithType());
                                         }
                                     }
-                                    
-                                    
+
                                     if (j.isHaveDate()) {
                                         jsEventKey.setEvent(j.getEventName());
                                         jsEventKey.setSession(j.getConditionDate());
-                                    }else {
+                                    } else {
                                         jsEventKey.setEvent(jsOutConditionEvent.getEvent());
+                                        jsEventKey.setSession(conditionJobsFilterSchema.getSession());
                                     }
-                                    
-                                    
+
                                     jsEventKey.setJobStream(outCondition.getJobStream());
                                     outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey));
                                     jsEventKey.setJobStream("");
