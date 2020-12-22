@@ -245,10 +245,10 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                                     jsConditionResolver.addEventsFromList(listOfNonContextEvents);
                                 }
 
-                                if (!conditionExpression.getJobStreamEvents().contains(jsCondition.getEventNameWithType())) {
+                                if (!conditionExpression.getJobStreamEvents().contains(jsCondition.getConditionValueShort())) {
                                     if (jsCondition.getConditionJobStream().isEmpty() || jsInCondition.getJobStream().equals(jsCondition
                                             .getConditionJobStream())) {
-                                        conditionExpression.getJobStreamEvents().add(jsCondition.getEventNameWithType());
+                                        conditionExpression.getJobStreamEvents().add(jsCondition.getConditionValueShort());
                                     }
                                 }
                             }
