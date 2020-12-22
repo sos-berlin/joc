@@ -239,7 +239,8 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             outConditionEvent.setEvent(jsOutConditionEvent.getEventValue());
                             outConditionEvent.setCommand(jsOutConditionEvent.getCommand());
                             outConditionEvent.setGlobalEvent(jsOutConditionEvent.isGlobal());
-                            jsEventKey.setEvent(jsOutConditionEvent.getEvent());
+                            
+                            
                             jsEventKey.setGlobalEvent(jsOutConditionEvent.isGlobal());
                             jsEventKey.setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
 
@@ -251,6 +252,32 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                                     outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey));
                                     outConditionEvent.setExists(jsConditionResolver.eventExists(jsEventKey));
                                 } else {
+                                    JSCondition j = new JSCondition(jsOutConditionEvent.getEventValue());
+                                    
+                                    if (j.isNonContextEvent()) {
+                                        FilterEvents filterEvents = j.getFilterEventsNonContextEvent(conditionJobsFilterSchema
+                                                .getJobschedulerId());
+                                        DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+                                        List<DBItemOutConditionWithEvent> listOfNonContextEvents = dbLayerEvents.getEventsList(filterEvents, 0);
+                                        jsConditionResolver.addEventsFromList(listOfNonContextEvents);
+                                    }
+
+                                    if (!conditionExpression.getJobStreamEvents().contains(j.getEventNameWithType())) {
+                                        if (j.getConditionJobStream().isEmpty() || outCondition.getJobStream().equals(j
+                                                .getConditionJobStream())) {
+                                            conditionExpression.getJobStreamEvents().add(j.getEventNameWithType());
+                                        }
+                                    }
+                                    
+                                    
+                                    if (j.isHaveDate()) {
+                                        jsEventKey.setEvent(j.getEventName());
+                                        jsEventKey.setSession(j.getConditionDate());
+                                    }else {
+                                        jsEventKey.setEvent(jsOutConditionEvent.getEvent());
+                                    }
+                                    
+                                    
                                     jsEventKey.setJobStream(outCondition.getJobStream());
                                     outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey));
                                     jsEventKey.setJobStream("");
