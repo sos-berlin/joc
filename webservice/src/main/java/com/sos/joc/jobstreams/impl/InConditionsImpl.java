@@ -248,7 +248,11 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                                 if (!conditionExpression.getJobStreamEvents().contains(jsCondition.getConditionValueShort())) {
                                     if (jsCondition.getConditionJobStream().isEmpty() || jsInCondition.getJobStream().equals(jsCondition
                                             .getConditionJobStream())) {
-                                        conditionExpression.getJobStreamEvents().add(jsCondition.getConditionValueShort());
+                                        if (jsCondition.haveCustomSession()) {
+                                            conditionExpression.getJobStreamEvents().add(jsCondition.getConditionValueShort());
+                                        } else {
+                                            conditionExpression.getJobStreamEvents().add(jsCondition.getEventName());
+                                        }
                                     }
                                 }
                             }
@@ -309,7 +313,12 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
         for (JSCondition jsCondition : listOfConditions) {
             if (jsCondition.typeIsEvent()) {
                 JSEventKey jsEventKey = new JSEventKey();
-                jsEventKey.setEvent(jsCondition.getEventName());
+                if (jsCondition.haveCustomSession()) {
+                    jsEventKey.setEvent(jsCondition.getConditionValueShort());
+                } else {
+                    jsEventKey.setEvent(jsCondition.getEventName());
+                }
+
                 jsEventKey.setJobStream(jsCondition.getConditionJobStream());
                 jsEventKey.setSchedulerId(schedulerId);
                 jsEventKey.setGlobalEvent(jsCondition.typeIsGlobalEvent());

@@ -261,7 +261,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
                                     if (!conditionExpression.getJobStreamEvents().contains(j.getEventNameWithType())) {
                                         if (j.getConditionJobStream().isEmpty() || outCondition.getJobStream().equals(j.getConditionJobStream())) {
-                                            conditionExpression.getJobStreamEvents().add(j.getEventNameWithType());
+                                            conditionExpression.getJobStreamEvents().add(j.getConditionValueShort());
                                         }
                                     }
 
@@ -319,6 +319,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
             for (OutConditionEvent event : outCondition.getOutconditionEvents()) {
                 boolean eventIsUsedInExpression = false;
+                JSCondition jsConditionEvent = new JSCondition(event.getEvent());
                 if ("create".equals(event.getCommand())) {
                     for (JSCondition jsCondition : listOfConditions) {
                         if (jsCondition.typeIsEvent() && (jsCondition.typeIsGlobalEvent() == event.getGlobalEvent())) {
@@ -328,7 +329,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             } else {
                                 jsConditionJobStream = jsCondition.getConditionJobStream();
                             }
-                            if (jsCondition.getEventName().equals(event.getEvent()) && (jobStream.equals(jsConditionJobStream) || outCondition
+                            if (jsCondition.getEventName().equals(jsConditionEvent.getEventName()) && (jobStream.equals(jsConditionJobStream) || outCondition
                                     .getJobStream().equals(jsCondition.getConditionJobStream()))) {
                                 eventIsUsedInExpression = true;
                                 continue;
