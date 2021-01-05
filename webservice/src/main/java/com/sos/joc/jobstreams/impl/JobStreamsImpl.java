@@ -207,7 +207,6 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                     oldId = listOfJobStreams.get(0).getId();
                 }
 
-                dbLayerJobStreams.deleteCascading(filterJobStreams, false);
                 sosHibernateSession.commit();
 
             }

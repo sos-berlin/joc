@@ -83,7 +83,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
 
             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerJobStreamStarters.deleteInsert(jobStreamStarters, dbItemInventoryInstance.getTimeZone());
+            dbLayerJobStreamStarters.saveOrUpdate(jobStreamStarters, dbItemInventoryInstance.getTimeZone());
             sosHibernateSession.commit();
 
             for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
