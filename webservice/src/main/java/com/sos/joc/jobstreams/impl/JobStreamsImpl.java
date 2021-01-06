@@ -15,6 +15,7 @@ import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
+import com.sos.jitl.jobstreams.db.DBLayerEvents;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
@@ -216,6 +217,11 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             if (oldId != null && oldId != newId) {
                 DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
                 dbLayerJobStreamHistory.updateHistoryWithJobStream(oldId, newId);
+                DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+                dbLayerEvents.updateEventsWithJobStream(jobStream.getOldJobStreamName(),jobStream.getJobStream());
+                FilterJobStreams filterJobStreams = new FilterJobStreams();
+                filterJobStreams.setJobStreamId(oldId);
+                dbLayerJobStreams.deleteCascading(filterJobStreams,true);                
             }
             sosHibernateSession.commit();
 
