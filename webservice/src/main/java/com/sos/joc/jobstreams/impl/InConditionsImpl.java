@@ -186,6 +186,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
             for (String job : listOfJobs) {
                 JobInCondition jobInCondition = new JobInCondition();
+                jobInCondition.setHaveReferenceToOtherFolders(false);
 
                 DBLayerConsumedInConditions dbLayerCoumsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
 
@@ -272,6 +273,17 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
 
                         inCondition.setOutconditions(getOutConditions(jsJobConditionKey, conditionJobsFilterSchema.getJobschedulerId(), jsInCondition,
                                 conditionJobsFilterSchema.getSession()));
+
+                        if ((conditionJobsFilterSchema.getFolder() != null) && !jobInCondition.getHaveReferenceToOtherFolders()) {
+                            for (JobstreamConditions jobstreamConditions : inCondition.getOutconditions()) {
+                                for (ConditionRef conditionRef : jobstreamConditions.getJobs()) {
+                                    if (!conditionRef.getJob().startsWith(conditionJobsFilterSchema.getFolder())) {
+                                        jobInCondition.setHaveReferenceToOtherFolders(true);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 
                         for (JSInConditionCommand jsInConditionCommand : jsInCondition.getListOfInConditionCommand()) {
                             InConditionCommand inConditionCommand = new InConditionCommand();

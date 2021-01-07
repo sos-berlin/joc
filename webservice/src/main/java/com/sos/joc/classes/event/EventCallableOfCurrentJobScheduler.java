@@ -328,6 +328,8 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                                 null);
 
                         String contextId = variables.getString("contextId", null);
+                        String taskEndState = variables.getString("taskEndState", null);
+
                         String path = variables.getString("path", null);
                         if (isAlive != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.IsAlive.name());
@@ -343,9 +345,10 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setPath(jobStreamCompleted);
                         } else if (taskEnded != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name());
-                            eventSnapshot.setState(contextId);
+                            eventSnapshot.setState(taskEndState);
                             eventSnapshot.setTaskId(taskEnded);
                             eventSnapshot.setPath(path);
+                            eventSnapshot.setNodeId(contextId);
                         } else if (eventCreated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name());
                             eventSnapshot.setState(contextId);
