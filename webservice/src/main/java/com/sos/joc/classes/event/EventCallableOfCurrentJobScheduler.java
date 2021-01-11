@@ -337,11 +337,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setPath(isAlive);
                         } else if (jobStreamStarted != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name());
-                            eventSnapshot.setState(contextId);
+                            eventSnapshot.setNodeId(contextId);
                             eventSnapshot.setPath(jobStreamStarted);
                         } else if (jobStreamCompleted != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamCompleted.name());
-                            eventSnapshot.setState(contextId);
+                            eventSnapshot.setNodeId(contextId);
                             eventSnapshot.setPath(jobStreamCompleted);
                         } else if (taskEnded != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name());
@@ -351,15 +351,15 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setNodeId(contextId);
                         } else if (eventCreated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name());
-                            eventSnapshot.setState(contextId);
+                            eventSnapshot.setNodeId(contextId);
                             eventSnapshot.setPath(path);
                         } else if (eventRemoved != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name());
-                            eventSnapshot.setState(contextId);
+                            eventSnapshot.setNodeId(contextId);
                             eventSnapshot.setPath(path);
                         } else if (inconditionValidated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated.name());
-                            eventSnapshot.setState(contextId);
+                            eventSnapshot.setNodeId(contextId);
                             eventSnapshot.setPath(inconditionValidated);
                         }
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
