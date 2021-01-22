@@ -952,7 +952,7 @@ traits:
       description7: !include documentation/job/filteredByJobs.md
       description8: !include documentation/job/orderJob.md
       description9: !include documentation/job/state.md
-      description10: " "
+      description10: !include documentation/common/withoutDuration.md
       description200: !include documentation/job/jobs_v.md
       schema: !include schemas/job/jobsFilter-schema.json
       schema200: jobs
@@ -1946,7 +1946,7 @@ traits:
         description10: " "
         description200: Returns the process class configuration in a Json representation
         schema: !include schemas/processClass/processClassConfigurationFilter-schema.json
-        schema200: !include schemas/agentCluster/configurationEdit-schema.json
+        schema200: !include schemas/joe/agentCluster/configurationEdit-schema.json
         example: " "
         example200: " "
   /save:
@@ -1955,14 +1955,14 @@ traits:
         description: add or overwrite process class configuration
         description1: |
           <tr><td>``configuration``</td><td>required, object</td><td>JSON repesentation of a process class</td><td></td><td></td></tr>
-        schema: !include schemas/agentCluster/configurationEdit-schema.json
+        schema: !include schemas/joe/agentCluster/configurationEdit-schema.json
         audit: !include documentation/audit/auditLog.md
   /delete: 
     type:
       editProcessClass:
         description: delete process class configuration
         description1: " " 
-        schema: !include schemas/agentCluster/configurationEdit-schema.json 
+        schema: !include schemas/joe/agentCluster/configurationEdit-schema.json 
         audit: !include documentation/audit/auditLog.md    
                    
 /plan:

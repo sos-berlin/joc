@@ -60,7 +60,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             List<DBItemInventoryJob> listOfJobs = processFilters(dbJobsLayer, jobsFilter);
             if (listOfJobs != null) {
                 for (DBItemInventoryJob inventoryJob : listOfJobs) {
-                    JobP job = JobPermanent.getJob(inventoryJob, dbJobsLayer, documentations.get(inventoryJob.getName()), jobsFilter.getCompact(), instanceId);
+                    JobP job = JobPermanent.getJob(inventoryJob, dbJobsLayer, documentations.get(inventoryJob.getName()), jobsFilter.getCompact(),jobsFilter.getWithoutDuration(), instanceId);
                     if (job != null) {
                         listJobs.add(job);
                     }

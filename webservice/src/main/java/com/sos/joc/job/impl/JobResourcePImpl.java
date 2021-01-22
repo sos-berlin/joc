@@ -61,7 +61,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
                     throw new DBMissingDataException("no entry found in DB for job: " + jobFilter.getJob());
                 }
             }
-            JobP job = JobPermanent.getJob(inventoryJob, dbJobsLayer, documentation, jobFilter.getCompact(), instanceId);
+            JobP job = JobPermanent.getJob(inventoryJob, dbJobsLayer, documentation, jobFilter.getCompact(),false, instanceId);
             JobP200 entity = new JobP200();
             entity.setJob(job);
             entity.setDeliveryDate(Date.from(Instant.now()));
