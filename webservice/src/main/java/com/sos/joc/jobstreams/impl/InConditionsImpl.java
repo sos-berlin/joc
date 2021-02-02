@@ -1,6 +1,9 @@
 package com.sos.joc.jobstreams.impl;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -184,6 +187,8 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                 jsConditionResolver.initEvents(sosHibernateSession, contextId);
             }
 
+            LocalDate today = LocalDate.now(ZoneId.of(Constants.settings.getTimezone()));
+
             for (String job : listOfJobs) {
                 JobInCondition jobInCondition = new JobInCondition();
                 jobInCondition.setHaveReferenceToOtherFolders(false);
@@ -269,7 +274,15 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         inCondition.setConsumed(jsInCondition.isConsumed(contextId));
                         inCondition.setMarkExpression(jsInCondition.isMarkExpression());
                         inCondition.setSkipOutCondition(jsInCondition.isSkipOutCondition());
-                        inCondition.setNextPeriod(jsInCondition.getNextPeriod());
+
+                        if (jsInCondition.getNextPeriod() != null) {
+                            LocalDate next = jsInCondition.getNextPeriod().toInstant().atZone(ZoneId.of(Constants.settings.getTimezone()))
+                                    .toLocalDate();
+
+                            if (!next.equals(today) || next.isBefore(today)) {
+                                inCondition.setNextPeriod(jsInCondition.getNextPeriod());
+                            }
+                        }
 
                         inCondition.setOutconditions(getOutConditions(jsJobConditionKey, conditionJobsFilterSchema.getJobschedulerId(), jsInCondition,
                                 conditionJobsFilterSchema.getSession()));
