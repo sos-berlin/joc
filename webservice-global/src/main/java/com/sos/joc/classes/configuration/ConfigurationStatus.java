@@ -188,7 +188,7 @@ public class ConfigurationStatus {
     }
 
     private static void setMessage(ConfigurationState confStatus, JsonObject jsonObj) {
-        confStatus.setMessage(jsonObj.getString("error"));
+        confStatus.setMessage(jsonObj.getString("error", "Unknown reason"));
     }
 
     private static void setSeverity(ConfigurationState confStatus, ConfigurationStateText text) {
