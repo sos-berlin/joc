@@ -86,6 +86,8 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
+            }
+            if (Constants.settings == null) {
                 Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
                 Constants.settings = new EventHandlerSettings();
                 Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
@@ -329,8 +331,8 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                             } else {
                                 jsConditionJobStream = jsCondition.getConditionJobStream();
                             }
-                            if (jsCondition.getEventName().equals(jsConditionEvent.getEventName()) && (jobStream.equals(jsConditionJobStream) || outCondition
-                                    .getJobStream().equals(jsCondition.getConditionJobStream()))) {
+                            if (jsCondition.getEventName().equals(jsConditionEvent.getEventName()) && (jobStream.equals(jsConditionJobStream)
+                                    || outCondition.getJobStream().equals(jsCondition.getConditionJobStream()))) {
                                 eventIsUsedInExpression = true;
                                 continue;
                             }

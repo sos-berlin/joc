@@ -132,6 +132,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
                 if (Globals.schedulerVariables == null) {
                     readJobSchedulerVariables();
+                }
+                if (Constants.settings == null) {
                     Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
                     Constants.settings = new EventHandlerSettings();
                     Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
@@ -192,10 +194,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
+            }
+
+            if (Constants.settings == null) {
                 Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
                 Constants.settings = new EventHandlerSettings();
                 Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
             }
+
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EXPRESSION_EVENTS);
 
@@ -376,6 +382,9 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
+            }
+
+            if (Constants.settings == null) {
                 Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
                 Constants.settings = new EventHandlerSettings();
                 Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
@@ -433,11 +442,10 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                     }
 
                     notifyEventHandler(accessToken, "AddEvent", conditionEvent.getSession(), filter);
-                    
+
                     conditionEvent.setEvent(filter.getEvent());
                     conditionEvent.setJobStream(filter.getJobStream());
                     conditionEvent.setSession(filter.getSession());
-
 
                 } catch (JocFolderPermissionsException e) {
                     LOGGER.debug("Folder permission for " + dbItemJobStream.getFolder() + " is missing. Event " + conditionEvent.getEvent()
@@ -445,7 +453,7 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 }
 
             }
-            
+
             return JOCDefaultResponse.responseStatus200(conditionEvent);
 
         } catch (Exception e) {
@@ -471,6 +479,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
+            }
+            if (Constants.settings == null) {
                 Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
                 Constants.settings = new EventHandlerSettings();
                 Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
@@ -519,13 +529,13 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                     filter.setGlobalEvent(conditionEvent.getGlobalEvent());
 
                     if (!"*".equals(j.getConditionDate())) {
-                        notifyEventHandler(accessToken, "RemoveEvent",conditionEvent.getSession(), filter);
+                        notifyEventHandler(accessToken, "RemoveEvent", conditionEvent.getSession(), filter);
                     }
-                    
+
                     conditionEvent.setEvent(filter.getEvent());
                     conditionEvent.setJobStream(filter.getJobStream());
                     conditionEvent.setSession(filter.getSession());
-                    
+
                 } catch (JocFolderPermissionsException e) {
                     LOGGER.debug("Folder permission for " + dbItemJobStream.getFolder() + " is missing. Event " + conditionEvent.getEvent()
                             + " not deleted.");
@@ -540,7 +550,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
         }
     }
 
-    private void notifyEventHandler(String accessToken, String eventKey, String session, FilterEvents filter) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken, String eventKey, String session, FilterEvents filter) throws JsonProcessingException,
+            JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ConditionEventsImpl.class.getName());
         Map<String, String> parameters = new HashMap<String, String>();
         if (filter != null) {
