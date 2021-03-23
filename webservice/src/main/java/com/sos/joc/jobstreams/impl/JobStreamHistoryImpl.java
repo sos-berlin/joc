@@ -68,7 +68,7 @@ public class JobStreamHistoryImpl extends JOCResourceImpl implements IJobStreamH
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(sosHibernateSession);
 
-            if (jobStreamFilter.getSession() == null && jobStreamFilter.getSession().isEmpty()) {
+            if (jobStreamFilter.getSession() == null || jobStreamFilter.getSession().isEmpty()) {
                 checkRequiredParameter("jobStream", jobStreamFilter.getJobStream());
                 DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
                 FilterInConditions filterInConditions = new FilterInConditions();
