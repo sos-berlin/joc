@@ -19,6 +19,18 @@
 		},
 		"skipOutCondition": {
 			"type": "boolean"
+		},
+		"jobsInconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "jobIncondition-schema.json"
+			}
+		},
+		"jobsOutconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "jobOutcondition-schema.json"
+			}
 		}
 	}
 }

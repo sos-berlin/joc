@@ -1,0 +1,31 @@
+{
+    "conditionEvents": [
+        {
+            "event": "xjob11",
+            "globalEvent": false,
+            "jobStream": "test1",
+            "outConditionId": 11515,
+            "path": "/jobstream/test1",
+            "session": "4d203337-19c5-488d-b9d9-ef67ae173b1f"
+        },
+        {
+            "event": "xjob2",
+            "globalEvent": false,
+            "jobStream": "test1",
+            "outConditionId": 11516,
+            "path": "/jobstream/test1",
+            "session": "4d203337-19c5-488d-b9d9-ef67ae173b1f"
+        },
+        {
+            "event": "xjob3",
+            "globalEvent": false,
+            "jobStream": "test1",
+            "outConditionId": 11517,
+            "path": "/jobstream/test1",
+            "session": "4d203337-19c5-488d-b9d9-ef67ae173b1f"
+        }
+    ],
+    "conditionMissingEvents": [],
+    "deliveryDate": "2021-03-23T15:01:29.728Z",
+    "session": "4d203337-19c5-488d-b9d9-ef67ae173b1f"
+}

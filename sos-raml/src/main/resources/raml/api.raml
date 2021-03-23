@@ -1544,6 +1544,105 @@ traits:
         description: This service unstops and unskips stopped and/or skipped nodes.
         audit: !include documentation/audit/auditLog.md
 
+/jobstreams:
+  description: This resource doesn't have a response.
+
+  /eventlist:
+    type:
+      postJSON:
+        description: A list of events for a given session.
+        description1: !include documentation/jobstreams/jobStream.md
+        description2: !include documentation/jobstreams/session.md
+        description3: !include documentation/jobstreams/outconditionId.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/jobstreams/conditionEventsFilter-schema.json
+        schema200: !include schemas/jobstreams/conditionEvents-schema.json
+        example: " "
+        example200: !include examples/jobstreams/eventlist-example.json
+  /history:
+    type:
+      postJSON:
+        description: A list of job task history entries for a given job stream or job stream instance.
+        description1: !include documentation/jobstreams/jobStream.md
+        description2: !include documentation/jobstreams/session.md
+        description3: !include documentation/common/limit.md
+        description4: "One jobStream or session must be specified."
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/jobstreams/jobStreams-schema.json
+        schema200: !include schemas/job/history-schema.json
+        example: " "
+        example200: !include examples/jobstreams/history-example.json
+  /list_jobstreams:
+    type:
+      postJSON:
+        description: A list of job streams.
+        description1: !include documentation/jobstreams/jobStream.md
+        description2: !include documentation/jobstreams/folder.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/jobstreams/jobstreamsFilter-schema.json
+        schema200: !include schemas/jobstreams/jobStreams-schema.json
+        example: " "
+        example200: !include examples/jobstreams/list_jobstreams-example.json
+  /sessions:
+    type:
+      postJSON:
+        description: A list of sessions.
+        description1: !include documentation/jobstreams/sessions/sessions.md
+        description2: !include documentation/jobstreams/sessions/jobStream.md
+        description3: !include documentation/jobstreams/sessions/jobStreamId.md
+        description4: !include documentation/jobstreams/sessions/jobStreamStarterId.md
+        description5: !include documentation/jobstreams/sessions/status.md
+        description6: !include documentation/jobstreams/sessions/dateFrom.md
+        description7: !include documentation/jobstreams/sessions/dateTo.md
+        description8: !include documentation/common/timeZone.md
+        description9: !include documentation/common/limit.md
+        description10: " "
+        description200: " "
+        schema: !include schemas/jobstreams/jobstreamSessionsFilter-schema.json
+        schema200: !include schemas/jobstreams/jobStreamSessions-schema.json
+        example: !include examples/jobstreams/sessions-example.json 
+        example200: " "             
+  /start_jobstream:
+    type:
+      postJSON:
+        description: Start job streams identified by the job stream titel.
+        description1: !include documentation/jobstreams/jobStreamStarters.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/jobstreams/jobstreamStarters-schema.json
+        schema200: !include schemas/jobstreams/jobstreamStarters-schema.json
+        example: !include examples/jobstreams/jobstreamStarters-example.json 
+        example200: " "
+
 /locks:
   type:
     postJSON:

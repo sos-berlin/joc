@@ -1,0 +1,119 @@
+{
+    "deliveryDate": "2021-03-23T19:11:14.884Z",
+    "jobstreamSessions": [
+        {
+            "ended": "2021-03-23T19:10:06Z",
+            "id": 18065,
+            "jobStream": "test1",
+            "jobStreamId": 1975,
+            "jobStreamStarter": {
+                "jobStreamStarterId": 1895,
+                "jobs": [],
+                "nextStart": "2021-03-23T20:05:00Z",
+                "params": [],
+                "state": "active",
+                "title": "aa"
+            },
+            "jobschedulerId": "scheduler_joc_cockpit",
+            "jobstreamTasks": [
+                {
+                    "created": "2021-03-23T19:10:04Z",
+                    "id": 121564,
+                    "job": "/jobstream/test1/xjob3",
+                    "taskId": 84459
+                },
+                {
+                    "created": "2021-03-23T19:10:02Z",
+                    "id": 121563,
+                    "job": "/jobstream/test1/xjob2",
+                    "taskId": 84458
+                },
+                {
+                    "created": "2021-03-23T19:10:00Z",
+                    "id": 121562,
+                    "job": "/jobstream/test1/xjob11",
+                    "taskId": 84457
+                }
+            ],
+            "running": false,
+            "session": "ab83570f-f6a7-4030-86b2-e62cccf01c19",
+            "started": "2021-03-23T19:10:00Z"
+        },
+        {
+            "ended": "2021-03-23T18:15:08Z",
+            "id": 18064,
+            "jobStream": "test1",
+            "jobStreamId": 1975,
+            "jobStreamStarter": {
+                "jobStreamStarterId": 1895,
+                "jobs": [],
+                "nextStart": "2021-03-23T20:05:00Z",
+                "params": [],
+                "state": "active",
+                "title": "aa"
+            },
+            "jobschedulerId": "scheduler_joc_cockpit",
+            "jobstreamTasks": [
+                {
+                    "created": "2021-03-23T18:15:06Z",
+                    "id": 121561,
+                    "job": "/jobstream/test1/xjob3",
+                    "taskId": 84456
+                },
+                {
+                    "created": "2021-03-23T18:15:04Z",
+                    "id": 121560,
+                    "job": "/jobstream/test1/xjob2",
+                    "taskId": 84455
+                },
+                {
+                    "created": "2021-03-23T18:15:02Z",
+                    "id": 121559,
+                    "job": "/jobstream/test1/xjob11",
+                    "taskId": 84454
+                }
+            ],
+            "running": false,
+            "session": "ffc39e0b-9125-4517-bb5b-1bff1db756fd",
+            "started": "2021-03-23T18:15:00Z"
+        },
+        {
+            "ended": "2021-03-23T17:20:06Z",
+            "id": 18063,
+            "jobStream": "test1",
+            "jobStreamId": 1975,
+            "jobStreamStarter": {
+                "jobStreamStarterId": 1895,
+                "jobs": [],
+                "nextStart": "2021-03-23T20:05:00Z",
+                "params": [],
+                "state": "active",
+                "title": "aa"
+            },
+            "jobschedulerId": "scheduler_joc_cockpit",
+            "jobstreamTasks": [
+                {
+                    "created": "2021-03-23T17:20:04Z",
+                    "id": 121558,
+                    "job": "/jobstream/test1/xjob3",
+                    "taskId": 84453
+                },
+                {
+                    "created": "2021-03-23T17:20:02Z",
+                    "id": 121557,
+                    "job": "/jobstream/test1/xjob2",
+                    "taskId": 84452
+                },
+                {
+                    "created": "2021-03-23T17:20:00Z",
+                    "id": 121556,
+                    "job": "/jobstream/test1/xjob11",
+                    "taskId": 84451
+                }
+            ],
+            "running": false,
+            "session": "1560cf56-c9f0-4dfe-8962-efb819360252",
+            "started": "2021-03-23T17:20:00Z"
+        }
+    ]
+}

@@ -35,6 +35,12 @@
 				"$ref": "jobstreamStarter-schema.json"
 			}
 		},
+		"jobs": {
+			"type": "array",
+			"items": {
+				"$ref": "jobstreamJob-schema.json"
+			}
+		},
 		"auditLog": {
 			"$ref": "../audit/auditParams-schema.json"
 		}
