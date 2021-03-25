@@ -407,5 +407,9 @@ public class SOSShiroCurrentUser {
             return "";
         }
     }
+    
+    public HttpServletRequest getHttpServletRequest() {
+        return httpServletRequest;
+    }
 
 }
