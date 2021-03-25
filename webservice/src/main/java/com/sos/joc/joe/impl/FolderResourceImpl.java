@@ -75,6 +75,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
 
             checkRequiredParameter("path", body.getPath());
             body.setPath(normalizeFolder(body.getPath()));
+            boolean accessDenied = false;
 
             if (ROOT_FOLDER.equals(body.getPath())) {
                 if (!folderPermissions.isPermittedForFolder(body.getPath())) {
@@ -86,7 +87,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
 
             } else {
                 if (!folderPermissions.isPermittedForFolder(body.getPath())) {
-                    return accessDeniedResponse();
+                    accessDenied = true;
                 }
             }
 
@@ -122,7 +123,7 @@ public class FolderResourceImpl extends JOCResourceImpl implements IFolderResour
             // doesn't know external files such as holidays and others
             InventoryFilesDBLayer dbInventoryFilesLayer = new InventoryFilesDBLayer(connection);
             List<DBItemInventoryFile> inventoryFiles = dbInventoryFilesLayer.getFiles(dbItemInventoryInstance.getId(), body.getPath());
-            if (inventoryFiles != null) {
+            if ((inventoryFiles != null) && (!accessDenied)) {
                 for (DBItemInventoryFile inventoryFile : inventoryFiles) {
                     String objectType = inventoryFile.getFileType().replaceAll("_", "").toUpperCase();
                     if (ROOT_FOLDER.equals(body.getPath()) && "PROCESSCLASS".equals(objectType) && "(default)".equals(inventoryFile.getFileBaseName())) {
