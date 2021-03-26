@@ -2,7 +2,6 @@ package com.sos.joc.jobstreams.impl;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -226,8 +225,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         }
                     }
                 }
-                EventHandlerSettings settings = new EventHandlerSettings();
-                settings.setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
+                
                 JSJobInConditions jsJobInConditions = new JSJobInConditions();
                 jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfCalendarUsages, listOfInConditions);
 

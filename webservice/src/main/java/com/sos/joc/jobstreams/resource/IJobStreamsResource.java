@@ -34,4 +34,16 @@ public interface IJobStreamsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse addJobStream(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamsFilter);
+    
+    @POST
+    @Path("import")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
+    public JOCDefaultResponse importJobStream(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamsSelector);
+
+    @POST
+    @Path("export")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    public JOCDefaultResponse exportJobStream(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamsSelector);
 }

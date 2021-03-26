@@ -20,16 +20,16 @@
 		"skipOutCondition": {
 			"type": "boolean"
 		},
-		"jobsInconditions": {
+		"inconditions": {
 			"type": "array",
 			"items": {
-				"$ref": "jobIncondition-schema.json"
+				"$ref": "incondition-schema.json"
 			}
 		},
-		"jobsOutconditions": {
+		"outconditions": {
 			"type": "array",
 			"items": {
-				"$ref": "jobOutcondition-schema.json"
+				"$ref": "outcondition-schema.json"
 			}
 		}
 	}
