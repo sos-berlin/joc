@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.ws.rs.Path;
 
@@ -26,24 +27,33 @@ import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarters;
 import com.sos.jitl.jobstreams.db.FilterJobStreams;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jobscheduler.model.event.CalendarEvent;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.EditJobStreamStarterAudit;
 import com.sos.joc.classes.audit.StartJobAudit;
+import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
+import com.sos.joc.db.calendars.CalendarUsedByWriter;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IJobStreamStartersResource;
+import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.job.StartJobs;
 import com.sos.joc.model.jobstreams.JobStream;
+import com.sos.joc.model.jobstreams.JobStreamStarted;
 import com.sos.joc.model.jobstreams.JobStreamStarter;
 import com.sos.joc.model.jobstreams.JobStreamStarters;
+import com.sos.joc.model.joe.schedule.RunTime;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
@@ -52,6 +62,31 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
     private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamStartersImpl.class);
     private static final String API_CALL_ADD_JOBSTREAM_STARTER = "./jobstreams/edit_jobstream_starter";
     private static final String API_CALL_START = "jobstreams/start_jobstream";
+
+    private void addCalendarUsage(SOSHibernateSession sosHibernateSession, List<DBItemInventoryInstance> clusterMembers, String jobStream,
+            JobStreamStarter jobstreamStarter) throws Exception {
+
+        RunTime runTime = XmlSerializer.serializeAbstractSchedule(jobstreamStarter.getRunTime());
+        String runTimeXml = Globals.xmlMapper.writeValueAsString(runTime);
+
+        List<String> listOfCalendarPaths = new ArrayList<String>();
+        for (Calendar calendar : jobstreamStarter.getCalendars()) {
+            listOfCalendarPaths.add(calendar.getBasedOn());
+        }
+
+        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
+                CalendarObjectType.JOBSTREAM, jobStream, runTimeXml, jobstreamStarter.getCalendars());
+        calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
+        CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
+        if (calEvt != null) {
+            if (clusterMembers != null) {
+                SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
+            } else {
+                SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
+            }
+
+        }
+    }
 
     @Override
     public JOCDefaultResponse editJobStreamStarters(String accessToken, byte[] filterBytes) {
@@ -84,9 +119,18 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
             sosHibernateSession.beginTransaction();
             dbLayerJobStreamStarters.saveOrUpdate(jobStreamStarters, dbItemInventoryInstance.getTimeZone());
+
+            List<DBItemInventoryInstance> clusterMembers = null;
+
+            if ("active".equals(dbItemInventoryInstance.getClusterType())) {
+                InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(sosHibernateSession);
+                clusterMembers = instanceLayer.getInventoryInstancesBySchedulerId(jobStreamStarters.getJobschedulerId());
+            }
             sosHibernateSession.commit();
 
             for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
+                addCalendarUsage(sosHibernateSession, clusterMembers, dbItemJobStream.getJobStream(), jobStreamStarter);
+
                 EditJobStreamStarterAudit editJobStreamStartersAudit = new EditJobStreamStarterAudit(dbItemJobStream.getJobStream(),
                         jobStreamStarters, jobStreamStarter);
                 logAuditMessage(editJobStreamStartersAudit);
@@ -165,6 +209,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
     public JOCDefaultResponse startJobStreamStarters(String accessToken, byte[] filterBytes) {
         SOSHibernateSession sosHibernateSession = null;
         JobStreamStarters jobStreamStarters = null;
+        JobStreamStarted jobStreamStarted = new JobStreamStarted();
         try {
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
             jobStreamStarters = Globals.objectMapper.readValue(filterBytes, JobStreamStarters.class);
@@ -174,6 +219,9 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            jobStreamStarted.setJobschedulerId(jobStreamStarters.getJobschedulerId());
+
             try {
 
                 if (jobStreamStarters.getJobStream() != null) {
@@ -209,13 +257,18 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                         }
                     }
                     setAudit(jobStreamStarter, jobStreamStarters);
-                    notifyEventHandlerStart(accessToken, jobStreamStarter);
+                    jobStreamStarted.setParams(jobStreamStarter.getParams());
+                    UUID contextId = UUID.randomUUID();
+                    String session = contextId.toString();
+
+                    jobStreamStarted.setSession(session);
+                    notifyEventHandlerStart(accessToken, contextId, jobStreamStarter);
                 }
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
                         "Add JobStreamStarter: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running.");
             }
-            return JOCDefaultResponse.responseStatus200(jobStreamStarters);
+            return JOCDefaultResponse.responseStatus200(jobStreamStarted);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
@@ -268,11 +321,14 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
         }
     }
 
-    private void notifyEventHandlerStart(String accessToken, JobStreamStarter jobStreamStarter) throws JsonProcessingException, JocException {
+    private void notifyEventHandlerStart(String accessToken, UUID contextId, JobStreamStarter jobStreamStarter) throws JsonProcessingException,
+            JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(JobStreamStartersImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("starterId", String.valueOf(jobStreamStarter.getJobStreamStarterId()));
+
+        parameters.put("session", contextId.toString());
 
         for (NameValuePair param : jobStreamStarter.getParams()) {
             parameters.put("#" + param.getName(), param.getValue());

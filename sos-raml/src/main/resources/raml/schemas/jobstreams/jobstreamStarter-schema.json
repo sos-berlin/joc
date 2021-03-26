@@ -15,7 +15,7 @@
 			"$ref": "../common/string255-schema.json"
 		},
 		"nextStart": {
-    	    "$ref": "../common/timestamp-schema.json"
+			"$ref": "../common/timestamp-schema.json"
 		},
 		"endOfJobStream": {
 			"$ref": "../common/path-schema.json"
@@ -31,6 +31,12 @@
 		},
 		"runTime": {
 			"$ref": "../joe/schedule/runTime-schema.json"
+		},
+		"calendars": {
+			"type": "array",
+			"items": {
+				"$ref": "../calendar/calendar-schema.json"
+			}
 		},
 		"params": {
 			"$ref": "../common/nameValuePairs-schema.json"
