@@ -55,6 +55,8 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
 			List<String> orders = new ArrayList<String>();
 			List<String> jobs = new ArrayList<String>();
 			List<String> schedules = new ArrayList<String>();
+	        List<String> jobStreams = new ArrayList<String>();
+
 			if (calendarUsages != null) {
 				for (DBItemInventoryClusterCalendarUsage item : calendarUsages) {
 					if (item.getObjectType() == null) {
@@ -67,9 +69,12 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
 					case "JOB":
 						jobs.add(item.getPath());
 						break;
-					case "SCHEDULE":
-						schedules.add(item.getPath());
-						break;
+                    case "SCHEDULE":
+                        schedules.add(item.getPath());
+                        break;
+                    case "JOBSTREAM":
+                        jobStreams.add(item.getPath());
+                        break;
 					}
 				}
 			}
@@ -81,9 +86,12 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
 			if (!jobs.isEmpty()) {
 				entity.setJobs(jobs);
 			}
-			if (!schedules.isEmpty()) {
-				entity.setSchedules(schedules);
-			}
+            if (!schedules.isEmpty()) {
+                entity.setSchedules(schedules);
+            }
+            if (!jobStreams.isEmpty()) {
+                entity.setJobstreams(jobStreams);
+            }
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);
 		} catch (JocException e) {

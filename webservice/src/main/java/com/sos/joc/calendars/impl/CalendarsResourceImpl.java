@@ -162,6 +162,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
         SortedSet<String> orders = new TreeSet<String>();
         SortedSet<String> jobs = new TreeSet<String>();
         SortedSet<String> schedules = new TreeSet<String>();
+        SortedSet<String> jobStreams = new TreeSet<String>();
         boolean usedByExist = false;
         if (calendarUsages != null) {
             for (DBItemInventoryClusterCalendarUsage item : calendarUsages) {
@@ -178,6 +179,9 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                     break;
                 case "SCHEDULE":
                     schedules.add(item.getPath());
+                    break;
+                case "JOBSTREAMS":
+                    jobStreams.add(item.getPath());
                     break;
                 }
             }

@@ -1,5 +1,6 @@
 package com.sos.joc.db.calendars;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,8 +41,8 @@ public class CalendarUsedByWriter {
         this.command = command;
     }
 
-    public CalendarUsedByWriter(SOSHibernateSession sosHibernateSession, String schedulerId, CalendarObjectType objectType, String path, String command,
-            List<Calendar> calendars) {
+    public CalendarUsedByWriter(SOSHibernateSession sosHibernateSession, String schedulerId, CalendarObjectType objectType, String path,
+            String command, List<Calendar> calendars) {
         super();
         this.sosHibernateSession = sosHibernateSession;
         this.schedulerId = schedulerId;
@@ -57,18 +58,16 @@ public class CalendarUsedByWriter {
         }
     }
 
-    public void updateUsedBy() throws Exception {
-        SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(command));
+    public void updateUsedByList(List<String> listOfCalendarPaths) throws Exception {
         Set<String> calendarPaths = new HashSet<String>();
-        NodeList calendarNodes = sosxml.selectNodeList("//date/@calendar|//holiday/@calendar");
         ObjectMapper om = new ObjectMapper();
 
         try {
             sosHibernateSession.beginTransaction();
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(this.sosHibernateSession);
             CalendarsDBLayer calendarsDBLayer = new CalendarsDBLayer(this.sosHibernateSession);
-            List<DBItemInventoryClusterCalendarUsage> dbCalendarUsage = calendarUsageDBLayer.getCalendarUsagesOfAnObject(schedulerId, objectType.name(),
-                    path);
+            List<DBItemInventoryClusterCalendarUsage> dbCalendarUsage = calendarUsageDBLayer.getCalendarUsagesOfAnObject(schedulerId, objectType
+                    .name(), path);
             calendarEventIsNecessary = dbCalendarUsage.size() + calendars.size() > 0;
             DBItemInventoryClusterCalendarUsage calendarUsageDbItem = new DBItemInventoryClusterCalendarUsage();
             calendarUsageDbItem.setSchedulerId(schedulerId);
@@ -76,8 +75,8 @@ public class CalendarUsedByWriter {
             calendarUsageDbItem.setEdited(false);
             calendarUsageDbItem.setPath(path);
 
-            for (int i = 0; i < calendarNodes.getLength(); i++) {
-                String calendarPath = calendarNodes.item(i).getNodeValue();
+            for (int i = 0; i < listOfCalendarPaths.size(); i++) {
+                String calendarPath = listOfCalendarPaths.get(i);
                 if (calendarPath != null && !calendarPaths.contains(calendarPath)) {
                     calendarPaths.add(calendarPath);
                     DBItemInventoryClusterCalendar calendarDbItem = calendarsDBLayer.getCalendar(schedulerId, calendarPath);
@@ -87,7 +86,7 @@ public class CalendarUsedByWriter {
                         if (calendar != null) {
                             calendar.setBasedOn(null);
                             calendar.setType(null);
-                            //check if periods exist for working day calendar
+                            // check if periods exist for working day calendar
                             calendarUsageDbItem.setConfiguration(om.writeValueAsString(calendar));
                         }
                         int index = dbCalendarUsage.indexOf(calendarUsageDbItem);
@@ -102,7 +101,7 @@ public class CalendarUsedByWriter {
                     }
                 }
             }
-            //TODO JOC-887 don't delete (empty) calendars
+            // TODO JOC-887 don't delete (empty) calendars
             for (DBItemInventoryClusterCalendarUsage dbItem : dbCalendarUsage) {
                 calendarUsageDBLayer.deleteCalendarUsage(dbItem);
             }
@@ -111,6 +110,16 @@ public class CalendarUsedByWriter {
             sosHibernateSession.rollback();
             throw e;
         }
+    }
+
+    public void updateUsedBy() throws Exception {
+        SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(command));
+        NodeList calendarNodes = sosxml.selectNodeList("//date/@calendar|//holiday/@calendar");
+        List<String> listOfCalendarPaths = new ArrayList<String>();
+        for (int i = 0; i < calendarNodes.getLength(); i++) {
+            listOfCalendarPaths.add(calendarNodes.item(i).getNodeValue());
+        }
+        this.updateUsedByList(listOfCalendarPaths);
     }
 
     public String getPublishEventCommand() throws JsonProcessingException {
@@ -124,7 +133,7 @@ public class CalendarUsedByWriter {
         xmlCommand = "<publish_event>" + xmlCommand + "</publish_event>";
         return xmlCommand;
     }
-    
+
     public CalendarEvent getCalendarEvent() throws JsonProcessingException {
         if (!calendarEventIsNecessary) {
             return null;
