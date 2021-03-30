@@ -32,12 +32,6 @@
 		"runTime": {
 			"$ref": "../joe/schedule/runTime-schema.json"
 		},
-		"calendars": {
-			"type": "array",
-			"items": {
-				"$ref": "../calendar/calendar-schema.json"
-			}
-		},
 		"params": {
 			"$ref": "../common/nameValuePairs-schema.json"
 		}

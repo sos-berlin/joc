@@ -70,6 +70,7 @@ import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IJobStreamsResource;
 import com.sos.joc.model.calendar.Calendar;
+import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.jobstreams.ConditionExpression;
 import com.sos.joc.model.jobstreams.InCondition;
@@ -83,6 +84,7 @@ import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.joc.model.jobstreams.JobStreamsSelector;
 import com.sos.joc.model.jobstreams.OutCondition;
 import com.sos.joc.model.jobstreams.OutConditionEvent;
+import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joe.common.XmlSerializer;
 import com.sos.schema.JsonValidator;
@@ -345,9 +347,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
 
             JobStreams jobStreams = getListOfJobstreams(sosHibernateSession, filterJobStreams, true);
-
-            return JOCDefaultResponse.responseStatus200(jobStreams);
-
+            return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(jobStreams));
+            // return JOCDefaultResponse.responseStatus200(jobStreams);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
@@ -359,23 +360,26 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             throws Exception {
         for (JobStreamStarter jobstreamStarter : jobStream.getJobstreamStarters()) {
 
-            RunTime runTime = XmlSerializer.serializeAbstractSchedule(jobstreamStarter.getRunTime());
-            String runTimeXml = Globals.xmlMapper.writeValueAsString(runTime);
+            if (jobstreamStarter.getRunTime() != null) {
+                RunTime runTime = XmlSerializer.serializeAbstractSchedule(jobstreamStarter.getRunTime());
+                String runTimeXml = Globals.xmlMapper.writeValueAsString(runTime);
+                Calendars calendars = Globals.objectMapper.readValue(runTime.getCalendars(), (Calendars.class));
 
-            List<String> listOfCalendarPaths = new ArrayList<String>();
-            for (Calendar calendar:jobstreamStarter.getCalendars()) {
-                listOfCalendarPaths.add(calendar.getBasedOn());
-            }
-            
-            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
-                    CalendarObjectType.JOBSTREAM, jobStream.getJobStream(), runTimeXml, jobstreamStarter.getCalendars());
-            calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
-            CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
-            if (calEvt != null) {
-                if (clusterMembers != null) {
-                    SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
-                } else {
-                    SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
+                List<String> listOfCalendarPaths = new ArrayList<String>();
+                for (Calendar calendar : calendars.getCalendars()) {
+                    listOfCalendarPaths.add(calendar.getBasedOn());
+                }
+
+                CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
+                        CalendarObjectType.JOBSTREAM, jobStream.getJobStream(), runTimeXml, calendars.getCalendars());
+                calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
+                CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
+                if (calEvt != null) {
+                    if (clusterMembers != null) {
+                        SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
+                    } else {
+                        SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
+                    }
                 }
             }
         }
