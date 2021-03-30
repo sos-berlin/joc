@@ -248,6 +248,7 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                                     .getSession() != null))) {
                                 if (jsOutConditionEvent.isGlobal()) {
                                     jsEventKey.setJobStream("");
+                                    jsEventKey.setEvent(jsOutConditionEvent.getEvent());
                                     jsEventKey.setSession(Constants.getSession());
                                     outConditionEvent.setExistsInJobStream(jsConditionResolver.eventExists(jsEventKey));
                                     outConditionEvent.setExists(jsConditionResolver.eventExists(jsEventKey));
