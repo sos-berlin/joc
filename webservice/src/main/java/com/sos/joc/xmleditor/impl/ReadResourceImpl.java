@@ -19,6 +19,8 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
+import com.sos.joc.classes.xmleditor.exceptions.XsdValidatorException;
+import com.sos.joc.classes.xmleditor.validator.XsdValidator;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -30,6 +32,7 @@ import com.sos.joc.model.xmleditor.read.other.AnswerConfiguration;
 import com.sos.joc.model.xmleditor.read.other.AnswerConfigurationState;
 import com.sos.joc.model.xmleditor.read.other.ReadOtherConfigurationAnswer;
 import com.sos.joc.model.xmleditor.read.standard.ReadStandardConfigurationAnswer;
+import com.sos.joc.model.xmleditor.validate.ValidateConfigurationAnswer;
 import com.sos.joc.xmleditor.common.Xml2JsonConverter;
 import com.sos.joc.xmleditor.common.standard.ReadConfigurationHandler;
 import com.sos.joc.xmleditor.resource.IReadResource;
@@ -107,7 +110,9 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
 
         ReadConfigurationHandler handler = new ReadConfigurationHandler(this, in.getObjectType());
         handler.readCurrent(item, in.getJobschedulerId(), (in.getForceLive() != null && in.getForceLive()));
-        return handler.getAnswer();
+        ReadStandardConfigurationAnswer answer = handler.getAnswer();
+        answer.setValidation(getValidation(JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType()), answer.getConfiguration()));
+        return answer;
     }
 
     private ReadOtherConfigurationAnswer handleOtherConfigurations(ReadConfiguration in) throws Exception {
@@ -184,10 +189,25 @@ public class ReadResourceImpl extends JOCResourceImpl implements IReadResource {
             answer.getConfiguration().getState().getMessage().setCode(JocXmlEditor.CODE_OBJECT_TYPE_OTHER);
             answer.getConfiguration().getState().setVersionState(ObjectVersionState.LIVE_NOT_EXIST);
 
+            answer.getConfiguration().setValidation(getValidation(JocXmlEditor.getOthersSchema(answer.getConfiguration().getSchemaIdentifier(),
+                    false), answer.getConfiguration().getConfiguration()));
+
             answer.getConfiguration().setModified(item.getModified());
 
         }
         return answer;
+    }
+
+    private ValidateConfigurationAnswer getValidation(java.nio.file.Path schema, String content) throws Exception {
+        XsdValidator validator = new XsdValidator(schema);
+        ValidateConfigurationAnswer validation = null;
+        try {
+            validator.validate(content);
+            validation = ValidateResourceImpl.getSuccess();
+        } catch (XsdValidatorException e) {
+            validation = ValidateResourceImpl.getError(e);
+        }
+        return validation;
     }
 
     private DBItemXmlEditorObject getItem(Integer id) throws Exception {
