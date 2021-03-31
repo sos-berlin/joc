@@ -96,26 +96,34 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
     private void addCalendarUsage(SOSHibernateSession sosHibernateSession, List<DBItemInventoryInstance> clusterMembers, String jobStream,
             JobStreamStarter jobstreamStarter) throws Exception {
 
-        if (jobstreamStarter.getRunTime() != null) {
+        List<Calendar> listOfCalendars = null;
+        String runTimeXml = "";
+        if ((jobstreamStarter.getRunTime() != null)) {
             RunTime runTime = XmlSerializer.serializeAbstractSchedule(jobstreamStarter.getRunTime());
-            String runTimeXml = Globals.xmlMapper.writeValueAsString(runTime);
-            Calendars calendars = Globals.objectMapper.readValue(runTime.getCalendars(), (Calendars.class));
-
-            List<String> listOfCalendarPaths = new ArrayList<String>();
-            for (Calendar calendar : calendars.getCalendars()) {
-                listOfCalendarPaths.add(calendar.getBasedOn());
+            runTimeXml = Globals.xmlMapper.writeValueAsString(runTime);
+            if (runTime.getCalendars() != null) {
+                Calendars calendars = Globals.objectMapper.readValue(runTime.getCalendars(), (Calendars.class));
+                listOfCalendars = calendars.getCalendars();
+            } else {
+                listOfCalendars = new ArrayList<Calendar>();
             }
+        }
 
-            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
-                    CalendarObjectType.JOBSTREAM, jobStream, runTimeXml, calendars.getCalendars());
-            calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
-            CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
-            if (calEvt != null) {
-                if (clusterMembers != null) {
-                    SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
-                } else {
-                    SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
-                }
+        List<String> listOfCalendarPaths = new ArrayList<String>();
+
+        for (Calendar calendar : listOfCalendars) {
+            listOfCalendarPaths.add(calendar.getBasedOn());
+        }
+
+        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
+                CalendarObjectType.JOBSTREAM, jobStream, runTimeXml, listOfCalendars);
+        calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
+        CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
+        if (calEvt != null) {
+            if (clusterMembers != null) {
+                SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
+            } else {
+                SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
             }
         }
     }
@@ -125,7 +133,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
         SOSHibernateSession sosHibernateSession = null;
         JobStreamStarters jobStreamStarters = null;
         try {
-           // JsonValidator.validateFailFast(filterBytes, JobStream.class);
+            // JsonValidator.validateFailFast(filterBytes, JobStream.class);
             jobStreamStarters = Globals.objectMapper.readValue(filterBytes, JobStreamStarters.class);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_JOBSTREAM_STARTER, jobStreamStarters, accessToken, jobStreamStarters

@@ -360,29 +360,38 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             throws Exception {
         for (JobStreamStarter jobstreamStarter : jobStream.getJobstreamStarters()) {
 
+            List<Calendar> listOfCalendars = null;
+            String runTimeXml = "";
             if (jobstreamStarter.getRunTime() != null) {
                 RunTime runTime = XmlSerializer.serializeAbstractSchedule(jobstreamStarter.getRunTime());
-                String runTimeXml = Globals.xmlMapper.writeValueAsString(runTime);
-                Calendars calendars = Globals.objectMapper.readValue(runTime.getCalendars(), (Calendars.class));
+                runTimeXml = Globals.xmlMapper.writeValueAsString(runTime);
 
-                List<String> listOfCalendarPaths = new ArrayList<String>();
-                for (Calendar calendar : calendars.getCalendars()) {
-                    listOfCalendarPaths.add(calendar.getBasedOn());
+                if (runTime.getCalendars() != null) {
+                    Calendars calendars = Globals.objectMapper.readValue(runTime.getCalendars(), (Calendars.class));
+                    listOfCalendars = calendars.getCalendars();
+                } else {
+                    listOfCalendars = new ArrayList<Calendar>();
                 }
+            }
 
-                CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
-                        CalendarObjectType.JOBSTREAM, jobStream.getJobStream(), runTimeXml, calendars.getCalendars());
-                calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
-                CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
-                if (calEvt != null) {
-                    if (clusterMembers != null) {
-                        SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
-                    } else {
-                        SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
-                    }
+            List<String> listOfCalendarPaths = new ArrayList<String>();
+            for (Calendar calendar : listOfCalendars) {
+                listOfCalendarPaths.add(calendar.getBasedOn());
+            }
+
+            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
+                    CalendarObjectType.JOBSTREAM, jobStream.getJobStream(), runTimeXml, listOfCalendars);
+            calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
+            CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
+            if (calEvt != null) {
+                if (clusterMembers != null) {
+                    SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
+                } else {
+                    SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
                 }
             }
         }
+
     }
 
     public JOCDefaultResponse jobStream(String accessToken, byte[] filterBytes, String apiCall) {
