@@ -64,34 +64,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
     private static final String API_CALL_ADD_JOBSTREAM_STARTER = "./jobstreams/edit_jobstream_starter";
     private static final String API_CALL_START = "jobstreams/start_jobstream";
 
-    private void addCalendarUsage(SOSHibernateSession sosHibernateSession, List<DBItemInventoryInstance> clusterMembers, JobStream jobStream)
-            throws Exception {
-        for (JobStreamStarter jobstreamStarter : jobStream.getJobstreamStarters()) {
 
-            if (jobstreamStarter.getRunTime() != null) {
-                RunTime runTime = XmlSerializer.serializeAbstractSchedule(jobstreamStarter.getRunTime());
-                String runTimeXml = Globals.xmlMapper.writeValueAsString(runTime);
-                Calendars calendars = Globals.objectMapper.readValue(runTime.getCalendars(), (Calendars.class));
-
-                List<String> listOfCalendarPaths = new ArrayList<String>();
-                for (Calendar calendar : calendars.getCalendars()) {
-                    listOfCalendarPaths.add(calendar.getBasedOn());
-                }
-
-                CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
-                        CalendarObjectType.JOBSTREAM, jobStream.getJobStream(), runTimeXml, calendars.getCalendars());
-                calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
-                CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
-                if (calEvt != null) {
-                    if (clusterMembers != null) {
-                        SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
-                    } else {
-                        SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
-                    }
-                }
-            }
-        }
-    }
 
     private void addCalendarUsage(SOSHibernateSession sosHibernateSession, List<DBItemInventoryInstance> clusterMembers, String jobStream,
             JobStreamStarter jobstreamStarter) throws Exception {
