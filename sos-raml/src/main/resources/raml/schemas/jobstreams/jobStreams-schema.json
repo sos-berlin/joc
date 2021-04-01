@@ -8,6 +8,9 @@
 		"deliveryDate": {
 			"$ref": "../common/deliveryDate-schema.json"
 		},
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
 		"jobstreams": {
 			"type": "array",
 			"items": {

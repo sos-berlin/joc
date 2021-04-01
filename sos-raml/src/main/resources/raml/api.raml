@@ -1585,6 +1585,47 @@ traits:
         schema200: !include schemas/job/history-schema.json
         example: " "
         example200: !include examples/jobstreams/history-example.json
+  /export:
+    type:
+      postJSON:
+        description: To export several job streams to a json export file.
+        description1: !include documentation/jobstreams/folders.md
+        description2: !include documentation/jobstreams/jobstreams.md
+        description3: !include documentation/common/limit.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/jobstreams/jobstreamsSelector-schema.json
+        schema200: !include schemas/jobstreams/jobStreams-schema.json
+        example: " "
+        example200: !include examples/jobstreams/export-example.json
+        
+  /import:
+    type:
+      postJSON:
+        description: Imports a given export to JobScheduler
+        description1: " "
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/jobstreams/jobStreams-schema.json
+        schema200: !include schemas/jobstreams/jobStreams-schema.json
+        example: !include examples/jobstreams/export-example.json
+        example200: " "
+        
+        
   /list_jobstreams:
     type:
       postJSON:
