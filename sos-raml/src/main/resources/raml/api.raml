@@ -1625,7 +1625,7 @@ traits:
         example: !include examples/jobstreams/export-example.json
         example200: " "      
         
-  /list_jobstreams:
+  /list:
     type:
       postJSON:
         description: A list of job streams.
@@ -1663,10 +1663,10 @@ traits:
         schema200: !include schemas/jobstreams/jobStreamSessions-schema.json
         example: !include examples/jobstreams/sessions-example.json 
         example200: " "             
-  /start_jobstream:
+  /start:
     type:
       postJSON:
-        description: Start job streams identified by the job stream titel.
+        description: Start job streams identified by the job stream starter name.
         description1: !include documentation/jobstreams/jobStreamStarters.md
         description2: !include documentation/audit/auditLog.md
         description3: " "

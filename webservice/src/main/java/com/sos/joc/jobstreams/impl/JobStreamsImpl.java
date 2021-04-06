@@ -91,12 +91,12 @@ import com.sos.schema.JsonValidator;
 @Path("jobstreams")
 public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResource {
 
-    private static final String API_CALL_LIST_JOBSTREAM = "./jobstreams/list_jobstreams";
-    private static final String API_CALL_EDIT_JOBSTREAM = "./jobstreams/edit_jobstream";
-    private static final String API_CALL_ADD_JOBSTREAM = "./jobstreams/add_jobstream";
-    private static final String API_CALL_DELETE_JOBSTREAM = "./jobstreams/delete_jobstreams";
-    private static final String API_CALL_IMPORT_JOBSTREAM = "./jobstreams/import";
-    private static final String API_CALL_EXPORT_JOBSTREAM = "./jobstreams/export";
+    private static final String API_CALL_LIST = "./jobstreams/list";
+    private static final String API_CALL_EDIT = "./jobstreams/edit";
+    private static final String API_CALL_ADD = "./jobstreams/add";
+    private static final String API_CALL_DELETE = "./jobstreams/delete";
+    private static final String API_CALL_IMPORT = "./jobstreams/import";
+    private static final String API_CALL_EXPORT = "./jobstreams/export";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamsImpl.class);
 
     private List<InCondition> getJobInconditions(SOSHibernateSession sosHibernateSession, Boolean forExport, String jobSchedulerId, String job)
@@ -339,12 +339,12 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             JsonValidator.validateFailFast(filterBytes, JobStreamsFilter.class);
             JobStreamsFilter jobStreamsFilter = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_LIST_JOBSTREAM, jobStreamsFilter, accessToken, jobStreamsFilter.getJobschedulerId(),
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_LIST, jobStreamsFilter, accessToken, jobStreamsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(jobStreamsFilter.getJobschedulerId(), accessToken).getJobStream().getView().isSetStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_LIST_JOBSTREAM);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_LIST);
 
             FilterJobStreams filterJobStreams = new FilterJobStreams();
 
@@ -434,7 +434,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 }
             }
 
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EDIT_JOBSTREAM);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EDIT);
             sosHibernateSession.setAutoCommit(false);
 
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
@@ -498,12 +498,12 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
     @Override
     public JOCDefaultResponse editJobStream(String accessToken, byte[] filterBytes) {
-        return jobStream(accessToken, filterBytes, API_CALL_EDIT_JOBSTREAM);
+        return jobStream(accessToken, filterBytes, API_CALL_EDIT);
     }
 
     @Override
     public JOCDefaultResponse addJobStream(String accessToken, byte[] filterBytes) {
-        return jobStream(accessToken, filterBytes, API_CALL_ADD_JOBSTREAM);
+        return jobStream(accessToken, filterBytes, API_CALL_ADD);
     }
 
     @Override
@@ -514,7 +514,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
             JobStream jobStream = Globals.objectMapper.readValue(filterBytes, JobStream.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE_JOBSTREAM, jobStream, accessToken, jobStream.getJobschedulerId(),
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_DELETE, jobStream, accessToken, jobStream.getJobschedulerId(),
                     getPermissonsJocCockpit(jobStream.getJobschedulerId(), accessToken).getJobStream().getChange().isJobStream());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -526,7 +526,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 checkRequiredParameter("jobStream", jobStream.getJobStream());
             }
 
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_DELETE_JOBSTREAM);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_DELETE);
             sosHibernateSession.setAutoCommit(false);
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
             sosHibernateSession.beginTransaction();
@@ -660,14 +660,14 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         try {
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
             JobStreams jobStreams = Globals.objectMapper.readValue(filterBytes, JobStreams.class);
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_IMPORT_JOBSTREAM);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_IMPORT);
             sosHibernateSession.setAutoCommit(false);
             sosHibernateSession.beginTransaction();
 
             for (JobStream jobStream : jobStreams.getJobstreams()) {
                 jobStream.setJobschedulerId(jobStreams.getJobschedulerId());
 
-                JOCDefaultResponse jocDefaultResponse = init(API_CALL_IMPORT_JOBSTREAM, jobStreams, accessToken, jobStream.getJobschedulerId(),
+                JOCDefaultResponse jocDefaultResponse = init(API_CALL_IMPORT, jobStreams, accessToken, jobStream.getJobschedulerId(),
                         getPermissonsJocCockpit(jobStream.getJobschedulerId(), accessToken).getJobStream().getChange().isJobStream());
                 if (jocDefaultResponse != null) {
                     return jocDefaultResponse;
@@ -712,7 +712,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             JsonValidator.validateFailFast(filterBytes, JobStreamsSelector.class);
             JobStreamsSelector jobStreamSelector = Globals.objectMapper.readValue(filterBytes, JobStreamsSelector.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EXPORT_JOBSTREAM, jobStreamSelector, accessToken, jobStreamSelector
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EXPORT, jobStreamSelector, accessToken, jobStreamSelector
                     .getJobschedulerId(), getPermissonsJocCockpit(jobStreamSelector.getJobschedulerId(), accessToken).getJobStream().getChange()
                             .isJobStream());
             if (jocDefaultResponse != null) {
@@ -737,7 +737,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             jobStreams.setJobstreams(new ArrayList<JobStream>());
             jobStreamsFolders.setJobstreams(new ArrayList<JobStream>());
 
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_DELETE_JOBSTREAM);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_DELETE);
             FilterJobStreams filterJobStreams = new FilterJobStreams();
             filterJobStreams.setSchedulerId(jobStreamSelector.getJobschedulerId());
 

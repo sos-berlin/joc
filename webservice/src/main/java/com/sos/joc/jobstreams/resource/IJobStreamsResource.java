@@ -12,25 +12,25 @@ import com.sos.joc.classes.JOCDefaultResponse;
 public interface IJobStreamsResource {
 
     @POST
-    @Path("list_jobstreams")
+    @Path("list")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse getJobStreams(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamsFilter);
 
     @POST
-    @Path("delete_jobstream")
+    @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse deleteJobStream(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamsFilter);
 
     @POST
-    @Path("edit_jobstream")
+    @Path("edit")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse editJobStream(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamsFilter);
 
     @POST
-    @Path("add_jobstream")
+    @Path("add")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse addJobStream(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamsFilter);
