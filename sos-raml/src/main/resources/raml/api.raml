@@ -1590,7 +1590,7 @@ traits:
       postJSON:
         description: To export several job streams to a json export file.
         description1: !include documentation/jobstreams/folders.md
-        description2: !include documentation/jobstreams/jobstreams.md
+        description2: !include documentation/jobstreams/jobStreams.md
         description3: !include documentation/common/limit.md
         description4: " "
         description5: " "
@@ -1609,7 +1609,7 @@ traits:
     type:
       postJSON:
         description: Imports a given export to JobScheduler
-        description1: " "
+        description1: !include documentation/audit/auditLog.md
         description2: " "
         description3: " "
         description4: " "
@@ -1623,8 +1623,7 @@ traits:
         schema: !include schemas/jobstreams/jobStreams-schema.json
         schema200: !include schemas/jobstreams/jobStreams-schema.json
         example: !include examples/jobstreams/export-example.json
-        example200: " "
-        
+        example200: " "      
         
   /list_jobstreams:
     type:
@@ -1669,7 +1668,7 @@ traits:
       postJSON:
         description: Start job streams identified by the job stream titel.
         description1: !include documentation/jobstreams/jobStreamStarters.md
-        description2: " "
+        description2: !include documentation/audit/auditLog.md
         description3: " "
         description4: " "
         description5: " "
