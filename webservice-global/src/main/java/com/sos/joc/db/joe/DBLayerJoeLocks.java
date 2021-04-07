@@ -102,7 +102,7 @@ public class DBLayerJoeLocks {
             Query<T> query = sosHibernateSession.createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             query.setParameter("isLocked", true);
-            query.setParameter("folders", folders.stream().map(T::getPath).collect(Collectors.toSet()));
+            query.setParameterList("folders", folders.stream().map(T::getPath).collect(Collectors.toSet()));
             final List<T> result = sosHibernateSession.getResultList(query);
             if (result == null) {
                 return folders;

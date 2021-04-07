@@ -223,7 +223,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     if (e.getCause() instanceof JocException) {
                         throw (JocException) e.getCause();
                     } else {
-                        throw (Exception) e.getCause();
+                        throw e.getCause();
                     }
                 } finally {
                     // Globals.forceClosingHttpClients(session);
@@ -266,7 +266,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         } catch (InvalidSessionException e) {
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             LOGGER.debug("./events ended");
