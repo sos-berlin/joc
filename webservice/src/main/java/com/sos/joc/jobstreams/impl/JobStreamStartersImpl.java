@@ -52,7 +52,9 @@ import com.sos.joc.model.job.StartJobs;
 import com.sos.joc.model.jobstreams.JobStream;
 import com.sos.joc.model.jobstreams.JobStreamStarted;
 import com.sos.joc.model.jobstreams.JobStreamStarter;
+import com.sos.joc.model.jobstreams.JobStreamStarterExist;
 import com.sos.joc.model.jobstreams.JobStreamStarters;
+import com.sos.joc.model.jobstreams.JobStreamStartersFilter;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joe.common.XmlSerializer;
 import com.sos.schema.JsonValidator;
@@ -62,9 +64,8 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamStartersImpl.class);
     private static final String API_CALL_ADD_JOBSTREAM_STARTER = "./jobstreams/edit_jobstream_starter";
+    private static final String API_CALL_GET_JOBSTREAM_STARTER = "./jobstreams/get_jobstream_starter";
     private static final String API_CALL_START = "jobstreams/start_jobstream";
-
-
 
     private void addCalendarUsage(SOSHibernateSession sosHibernateSession, List<DBItemInventoryInstance> clusterMembers, String jobStream,
             JobStreamStarter jobstreamStarter) throws Exception {
@@ -157,6 +158,63 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                         "Add JobStreamStarter: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Data are stored in Database");
             }
             return JOCDefaultResponse.responseStatus200(jobStreamStarters);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+        }
+    }
+
+    @Override
+    public JOCDefaultResponse getJobStreamStarter(String accessToken, byte[] filterBytes) {
+        SOSHibernateSession sosHibernateSession = null;
+        JobStreamStartersFilter jobStreamStarterFilter = null;
+        try {
+            // JsonValidator.validateFailFast(filterBytes, JobStream.class);
+            jobStreamStarterFilter = Globals.objectMapper.readValue(filterBytes, JobStreamStartersFilter.class);
+
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_ADD_JOBSTREAM_STARTER, jobStreamStarterFilter, accessToken, jobStreamStarterFilter
+                    .getJobschedulerId(), getPermissonsJocCockpit(jobStreamStarterFilter.getJobschedulerId(), accessToken).getJobStream().getChange()
+                            .isJobStream());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_GET_JOBSTREAM_STARTER);
+
+            if (jobStreamStarterFilter.getJobStreamId() != null) {
+                DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+                DBItemJobStream dbItemJobStream = dbLayerJobStreams.getJobStreamsDbItem(jobStreamStarterFilter.getJobStreamId());
+
+                if (dbItemJobStream == null) {
+                    throw new JobSchedulerObjectNotExistException(String.format("Could not find jobstream with ith '%1'", jobStreamStarterFilter
+                            .getJobStreamId()));
+                } else {
+                    jobStreamStarterFilter.setJobStream(dbItemJobStream.getJobStream());
+                }
+            }
+
+            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+            FilterJobStreamStarters filterJobStreamStarters = new FilterJobStreamStarters();
+            filterJobStreamStarters.setJobStream(jobStreamStarterFilter.getJobStream());
+            filterJobStreamStarters.setStarterName(jobStreamStarterFilter.getStarterName());
+            List<DBItemJobStreamStarter> l = dbLayerJobStreamStarters.getJobStreamStartersList(filterJobStreamStarters, 0);
+
+            JobStreamStarterExist jobStreamStarterExist = new JobStreamStarterExist();
+            if (l.size() > 0) {
+                jobStreamStarterExist.setExist(true);
+                jobStreamStarterExist.setJobStreamStarterId(l.get(0).getId());
+                jobStreamStarterExist.setNextStart(l.get(0).getNextStart());
+                jobStreamStarterExist.setRequiredJob(l.get(0).getRequiredJob());
+                jobStreamStarterExist.setStarterName(l.get(0).getStarterName());
+                jobStreamStarterExist.setState(l.get(0).getState());
+                jobStreamStarterExist.setTitle(l.get(0).getTitle());
+            }else {
+                jobStreamStarterExist.setExist(false);
+                jobStreamStarterExist.setStarterName(filterJobStreamStarters.getStarterName());
+                jobStreamStarterExist.setEndOfJobStream(filterJobStreamStarters.getJobStream());
+            }
+            return JOCDefaultResponse.responseStatus200(jobStreamStarterExist);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {

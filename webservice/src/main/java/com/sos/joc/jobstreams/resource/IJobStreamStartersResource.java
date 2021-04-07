@@ -12,7 +12,13 @@ import com.sos.joc.classes.JOCDefaultResponse;
 public interface IJobStreamStartersResource {
 
    
-   
+
+    @POST
+    @Path("get_jobstream_starter")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
+    public JOCDefaultResponse getJobStreamStarter(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamStartersFilter);
+
 
     @POST
     @Path("edit_jobstream_starters")

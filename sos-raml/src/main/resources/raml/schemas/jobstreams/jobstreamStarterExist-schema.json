@@ -1,0 +1,34 @@
+{
+	"title": "jobStreamStarter",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "List of all jobStream starters",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreamStarterExist",
+	"type": "object",
+	"properties": {
+		"state": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"jobStreamStarterId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
+		"starterName": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"exist":{
+			"type": "boolean"
+		},
+		"title": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"nextStart": {
+			"$ref": "../common/timestamp-schema.json"
+		},
+		"endOfJobStream": {
+			"$ref": "../common/path-schema.json"
+		},
+		"requiredJob": {
+			"$ref": "../common/path-schema.json"
+		}
+		 
+	}
+}
