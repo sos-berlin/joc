@@ -28,7 +28,7 @@ public interface IJobStreamStartersResource {
     
 
     @POST
-    @Path("start_jobstream")
+    @Path("start")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse startJobStreamStarters(@HeaderParam("X-Access-Token") String accessToken, byte[] jobstreamStartersFilter);

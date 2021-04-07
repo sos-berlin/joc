@@ -11,6 +11,9 @@
 		"jobStreamStarterId": {
 			"$ref": "../common/nonNegativeLong-schema.json"
 		},
+		"starterName": {
+			"$ref": "../common/string255-schema.json"
+		},
 		"title": {
 			"$ref": "../common/string255-schema.json"
 		},

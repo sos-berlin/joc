@@ -259,7 +259,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_START);
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             FilterJobStreamStarters filter = new FilterJobStreamStarters();
-                            filter.setTitle(jobStreamStarter.getTitle());
+                            filter.setStarterName(jobStreamStarter.getStarterName());
                             filter.setJobStreamId(jobStreamStarters.getJobStreamId());
                             List<DBItemJobStreamStarter> listOfStartes = dbLayerJobStreamStarters.getJobStreamStartersList(filter, 0);
                             if (listOfStartes.size() > 0) {

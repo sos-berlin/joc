@@ -262,6 +262,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                     jobstreamStarter.setRunTime(runTime);
                 }
                 jobstreamStarter.setState(dbItemJobStreamStarter.getState());
+                jobstreamStarter.setStarterName(dbItemJobStreamStarter.getStarterName());
                 jobstreamStarter.setTitle(dbItemJobStreamStarter.getTitle());
                 jobstreamStarter.setEndOfJobStream(dbItemJobStreamStarter.getEndOfJobStream());
                 jobstreamStarter.setRequiredJob(dbItemJobStreamStarter.getRequiredJob());
@@ -276,8 +277,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                     jobStreamJob.setSkipOutCondition(dbItemJobStreamStarterJobs.getSkipOutCondition());
                     if (forExport) {
                         jobStreamJob.setNextPeriod(dbItemJobStreamStarterJobs.getNextPeriod());
-                        jobStreamJob.setInconditions(getJobInconditions(sosHibernateSession, forExport, jobStreams.getJobschedulerId(), dbItemJobStreamStarterJobs
-                                .getJob()));
+                        jobStreamJob.setInconditions(getJobInconditions(sosHibernateSession, forExport, jobStreams.getJobschedulerId(),
+                                dbItemJobStreamStarterJobs.getJob()));
                         jobStreamJob.setOutconditions(getJobOutConditions(sosHibernateSession, forExport, jobStreams.getJobschedulerId(),
                                 dbItemJobStreamStarterJobs.getJob()));
                     }
@@ -320,7 +321,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                     JobStreamJob jobStreamJob = new JobStreamJob();
                     jobStreamJob.setJob(job);
                     jobStreamJob.setInconditions(getJobInconditions(sosHibernateSession, forExport, jobStreams.getJobschedulerId(), job));
-                    jobStreamJob.setOutconditions(getJobOutConditions(sosHibernateSession,forExport,  jobStreams.getJobschedulerId(), job));
+                    jobStreamJob.setOutconditions(getJobOutConditions(sosHibernateSession, forExport, jobStreams.getJobschedulerId(), job));
                     jobStreamJobs.add(jobStreamJob);
                 }
                 jobStream.setJobs(jobStreamJobs);
@@ -573,6 +574,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             dbItemJobStreamStarter.setRunTime(Globals.objectMapper.writeValueAsString(jobStreamStarter.getRunTime()));
             dbItemJobStreamStarter.setState(jobStreamStarter.getState());
             dbItemJobStreamStarter.setTitle(jobStreamStarter.getTitle());
+            dbItemJobStreamStarter.setStarterName(jobStreamStarter.getStarterName());
             sosHibernateSession.save(dbItemJobStreamStarter);
 
             for (NameValuePair nameValuePair : jobStreamStarter.getParams()) {
@@ -712,9 +714,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             JsonValidator.validateFailFast(filterBytes, JobStreamsSelector.class);
             JobStreamsSelector jobStreamSelector = Globals.objectMapper.readValue(filterBytes, JobStreamsSelector.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EXPORT, jobStreamSelector, accessToken, jobStreamSelector
-                    .getJobschedulerId(), getPermissonsJocCockpit(jobStreamSelector.getJobschedulerId(), accessToken).getJobStream().getChange()
-                            .isJobStream());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_EXPORT, jobStreamSelector, accessToken, jobStreamSelector.getJobschedulerId(),
+                    getPermissonsJocCockpit(jobStreamSelector.getJobschedulerId(), accessToken).getJobStream().getChange().isJobStream());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
