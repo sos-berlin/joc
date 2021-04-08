@@ -36,6 +36,7 @@ import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.deploy.DeployConfiguration;
 import com.sos.joc.model.xmleditor.deploy.DeployConfigurationAnswer;
+import com.sos.joc.xmleditor.common.Utils;
 import com.sos.joc.xmleditor.resource.IDeployResource;
 import com.sos.schema.JsonValidator;
 
@@ -149,7 +150,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             item.setObjectType(in.getObjectType().name());
             item.setName(JocXmlEditor.getConfigurationName(in.getObjectType()));
             item.setConfigurationDraft(in.getConfiguration());
-            item.setConfigurationDraftJson(in.getConfigurationJson());
+            item.setConfigurationDraftJson(Utils.serialize(in.getConfigurationJson()));
             item.setSchemaLocation(JocXmlEditor.getStandardRelativeSchemaLocation(in.getObjectType()));
 
             item.setAuditLogId(new Long(0));// TODO
@@ -159,7 +160,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             dbLayer.getSession().save(item);
         } else {
             item.setConfigurationDraft(in.getConfiguration());
-            item.setConfigurationDraftJson(in.getConfigurationJson());
+            item.setConfigurationDraftJson(Utils.serialize(in.getConfigurationJson()));
             item.setAccount(getAccount());
             item.setModified(new Date());
             dbLayer.getSession().update(item);

@@ -24,24 +24,25 @@ public class Xml2JsonResourceImpl extends JOCResourceImpl implements IXml2JsonRe
         try {
             JsonValidator.validateFailFast(filterBytes, Xml2JsonConfiguration.class);
             Xml2JsonConfiguration in = Globals.objectMapper.readValue(filterBytes, Xml2JsonConfiguration.class);
-            
+
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
-            if (response == null) {
-                JocXmlEditor.parseXml(in.getConfiguration());
-
-                java.nio.file.Path schema = null;
-                if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    schema = JocXmlEditor.getOthersSchema(in.getSchemaIdentifier(), false);
-                } else {
-                    schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
-                }
-
-                Xml2JsonConverter converter = new Xml2JsonConverter();
-                response = JOCDefaultResponse.responseStatus200(getSuccess(converter.convert(in.getObjectType(), schema, in.getConfiguration())));
+            if (response != null) {
+                return response;
             }
-            return response;
+
+            JocXmlEditor.parseXml(in.getConfiguration());
+            java.nio.file.Path schema = null;
+            if (in.getObjectType().equals(ObjectType.OTHER)) {
+                schema = JocXmlEditor.getOthersSchema(in.getSchemaIdentifier(), false);
+            } else {
+                schema = JocXmlEditor.getStandardAbsoluteSchemaLocation(in.getObjectType());
+            }
+
+            Xml2JsonConverter converter = new Xml2JsonConverter();
+            return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(getSuccess(converter.convert(in.getObjectType(),
+                    schema, in.getConfiguration()))));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

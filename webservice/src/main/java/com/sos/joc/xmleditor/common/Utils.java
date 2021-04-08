@@ -11,6 +11,8 @@ import javax.json.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import sos.util.SOSSerializer;
+
 public class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
@@ -45,5 +47,16 @@ public class Utils {
 
             throw ex;
         }
+    }
+
+    public static String serialize(String content) throws Exception {
+        return SOSSerializer.serializeString(content);
+    }
+
+    public static String deserializeJson(String content) throws Exception {
+        if (content == null || content.startsWith("{")) {
+            return content;
+        }
+        return SOSSerializer.deserializeString(content);
     }
 }
