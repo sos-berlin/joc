@@ -22,14 +22,15 @@ import com.sos.joc.model.yade.FileTransferStateText;
 import com.sos.joc.model.yade.ModifyTransfer;
 import com.sos.joc.model.yade.TransferFile;
 
+import sos.util.SOSString;
 
 public class TransferFileUtils {
 
-    public static TransferFile initTransferFileFromDbItem(DBItemYadeFiles file) {
+    public static TransferFile initTransferFileFromDbItem(DBItemYadeFiles file, boolean normalizeErrorMessage) {
         TransferFile transferFile = new TransferFile();
-        if (file.getErrorMessage() != null && !file.getErrorMessage().isEmpty()){
+        if (file.getErrorMessage() != null && !file.getErrorMessage().isEmpty()) {
             Err error = new Err();
-            error.setMessage(file.getErrorMessage());
+            error.setMessage(normalizeErrorMessage ? TransferFileUtils.normalizeErrorMessage(file.getErrorMessage()) : file.getErrorMessage());
             transferFile.setError(error);
         }
         transferFile.setId(file.getId());
@@ -37,10 +38,10 @@ public class TransferFileUtils {
         transferFile.setInterventionTransferId(file.getInterventionTransferId());
         transferFile.setModificationDate(file.getModificationDate());
         transferFile.setSize(file.getSize());
-        transferFile.setSourceName(Paths.get(file.getSourcePath()).getFileName().toString());
+        transferFile.setSourceName(getBasenameFromPath(file.getSourcePath()));
         transferFile.setSourcePath(file.getSourcePath());
-        if (file.getTargetPath() != null && !file.getTargetPath().isEmpty()) {
-            transferFile.setTargetName(Paths.get(file.getTargetPath()).getFileName().toString());
+        if (!SOSString.isEmpty(file.getTargetPath())) {
+            transferFile.setTargetName(getBasenameFromPath(file.getTargetPath()));
             transferFile.setTargetPath(file.getTargetPath());
         }
         transferFile.setTransferId(file.getTransferId());
@@ -50,10 +51,10 @@ public class TransferFileUtils {
         transferFile.setSurveyDate(file.getModificationDate());
         return transferFile;
     }
-    
+
     public static FileTransferState initFileTransferStateFromDBItemState(Integer dbItemState) {
         FileTransferState state = new FileTransferState();
-        switch(dbItemState) {
+        switch (dbItemState) {
         case 1:
             state.set_text(FileTransferStateText.UNDEFINED);
             state.setSeverity(3);
@@ -117,7 +118,7 @@ public class TransferFileUtils {
         }
         return state;
     }
-    
+
     public static Integer initDbItemStateFromFileTransferState(FileTransferStateText fileTransferStateText) {
         switch (fileTransferStateText) {
         case UNDEFINED:
@@ -154,7 +155,7 @@ public class TransferFileUtils {
         }
         return null;
     }
-    
+
     public static OrderV getOrderForResume(JocDBLayerYade yadeDbLayer, ModifyTransfer transfer, JOCResourceImpl jocResourceImpl) throws JocException {
         if (transfer.getTransferId() == null) {
             throw new JocMissingRequiredParameterException("undefined 'transferId'");
@@ -163,8 +164,9 @@ public class TransferFileUtils {
         List<String> files = yadeDbLayer.getSourceFilesByIdsAndTransferId(transfer.getTransferId(), transfer.getFileIds());
         return getOrderForResume(dbTransferItem, files, jocResourceImpl);
     }
-        
-    public static OrderV getOrderForResume(DBItemYadeTransfers dbTransferItem, List<String> sourceFiles, JOCResourceImpl jocResourceImpl) throws JocException {
+
+    public static OrderV getOrderForResume(DBItemYadeTransfers dbTransferItem, List<String> sourceFiles, JOCResourceImpl jocResourceImpl)
+            throws JocException {
         if (dbTransferItem.getState() == 0) {
             throw new YADERequestException("The original transfer was successful.");
         }
@@ -173,16 +175,17 @@ public class TransferFileUtils {
         }
         OrderV order = OrderVolatile.getOrder(dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), false, jocResourceImpl);
         if (order == null || order.getState() == null) {
-            throw new YADERequestException(String.format("The original transfer order %1$s,%2$s was not found on node %3$s!",
-                    dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), dbTransferItem.getJobChainNode()));
+            throw new YADERequestException(String.format("The original transfer order %1$s,%2$s was not found on node %3$s!", dbTransferItem
+                    .getJobChain(), dbTransferItem.getOrderId(), dbTransferItem.getJobChainNode()));
         } else {
             if (!order.getState().equals(dbTransferItem.getJobChainNode())) {
-                throw new YADERequestException(String.format("The original transfer order %1$s,%2$s is on the job chain node %3$s but the node %4$s is expected.",
-                        dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), order.getState(), dbTransferItem.getJobChainNode()));
+                throw new YADERequestException(String.format(
+                        "The original transfer order %1$s,%2$s is on the job chain node %3$s but the node %4$s is expected.", dbTransferItem
+                                .getJobChain(), dbTransferItem.getOrderId(), order.getState(), dbTransferItem.getJobChainNode()));
             }
             if (order.getProcessingState().get_text() != OrderStateText.SUSPENDED) {
-                throw new YADERequestException(String.format("The original transfer order %1$s,%2$s has to be suspended", dbTransferItem.getJobChain(),
-                        dbTransferItem.getOrderId()));
+                throw new YADERequestException(String.format("The original transfer order %1$s,%2$s has to be suspended", dbTransferItem
+                        .getJobChain(), dbTransferItem.getOrderId()));
             }
         }
         NameValuePair param = new NameValuePair();
@@ -190,13 +193,25 @@ public class TransferFileUtils {
         if (sourceFiles != null && !sourceFiles.isEmpty()) {
             param.setValue(Joiner.on(";").join(sourceFiles));
         } else {
-            param.setValue(""); 
+            param.setValue("");
         }
         if (order.getParams() == null) {
             order.setParams(new ArrayList<NameValuePair>());
         }
         order.getParams().add(param);
-        
+
         return order;
+    }
+
+    public static String normalizeErrorMessage(String val) {
+        if (val != null && val.length() > 100) {
+            val = val.substring(0, 97) + "...";
+        }
+        return val;
+    }
+
+    private static String getBasenameFromPath(String path) {
+        int li = path.lastIndexOf("/");
+        return li > -1 ? path.substring(li + 1) : path;
     }
 }
