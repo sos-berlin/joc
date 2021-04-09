@@ -1,6 +1,5 @@
 package com.sos.joc.classes.yade;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class TransferFileUtils {
 
     public static TransferFile initTransferFileFromDbItem(DBItemYadeFiles file, boolean normalizeErrorMessage) {
         TransferFile transferFile = new TransferFile();
-        if (file.getErrorMessage() != null && !file.getErrorMessage().isEmpty()) {
+        if (!SOSString.isEmpty(file.getErrorMessage())) {
             Err error = new Err();
             error.setMessage(normalizeErrorMessage ? TransferFileUtils.normalizeErrorMessage(file.getErrorMessage()) : file.getErrorMessage());
             transferFile.setError(error);

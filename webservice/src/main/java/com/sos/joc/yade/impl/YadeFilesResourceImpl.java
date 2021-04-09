@@ -43,11 +43,17 @@ public class YadeFilesResourceImpl extends JOCResourceImpl implements IYadeFiles
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Integer limit = filterBody.getLimit();
+            Integer maxLimit = 1_000; // tmp solution
             if (limit == null) {
-                limit = 10000; // default
+                // limit = 10000; // default
+                limit = maxLimit;
             } else if (limit == -1) {
-                limit = null; // unlimited
+                // limit = null; // unlimited
+                limit = maxLimit;
+            } else if (limit > maxLimit) {
+                limit = maxLimit;
             }
+
             JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
             List<DBItemYadeFiles> dbFiles = dbLayer.getFilteredTransferFiles(filterBody.getTransferIds(), filterBody.getStates(), filterBody
                     .getSourceFiles(), filterBody.getTargetFiles(), filterBody.getInterventionTransferIds(), limit);
