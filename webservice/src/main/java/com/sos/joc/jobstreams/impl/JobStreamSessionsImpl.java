@@ -150,6 +150,7 @@ public class JobStreamSessionsImpl extends JOCResourceImpl implements IJobStream
                             .getJobStreamStarter());
                     if (dbItemJobStreamStarter != null) {
                         jobStreamSesssion.getJobStreamStarter().setTitle(dbItemJobStreamStarter.getTitle());
+                        jobStreamSesssion.getJobStreamStarter().setStarterName(dbItemJobStreamStarter.getStarterName());
                         jobStreamSesssion.getJobStreamStarter().setJobStreamStarterId(dbItemJobStreamHistory.getJobStreamStarter());
                         jobStreamSesssion.getJobStreamStarter().setNextStart(dbItemJobStreamStarter.getNextStart());
                         jobStreamSesssion.getJobStreamStarter().setEndOfJobStream(dbItemJobStreamStarter.getEndOfJobStream());
