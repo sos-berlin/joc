@@ -203,8 +203,8 @@ public class TransferFileUtils {
     }
 
     public static String normalizeErrorMessage(String val) {
-        if (val != null && val.length() > 100) {
-            val = val.substring(0, 97) + "...";
+        if (val != null && val.length() > 200) {
+            val = val.substring(0, 197) + "...";
         }
         return val;
     }
