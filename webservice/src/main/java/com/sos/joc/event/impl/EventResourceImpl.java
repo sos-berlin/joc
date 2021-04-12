@@ -260,6 +260,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 LOGGER.warn("./events concurrent call was started");
                 entity.setDeliveryDate(Date.from(Instant.now()));
             }
+        } catch (SessionNotExistException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatus434JSError(e);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
