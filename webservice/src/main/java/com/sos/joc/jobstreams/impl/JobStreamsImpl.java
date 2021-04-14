@@ -592,7 +592,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             dbItemJobStreamStarter.setRunTime(Globals.objectMapper.writeValueAsString(jobStreamStarter.getRunTime()));
             dbItemJobStreamStarter.setState(jobStreamStarter.getState());
             dbItemJobStreamStarter.setTitle(jobStreamStarter.getTitle());
-            dbItemJobStreamStarter.setStarterName(getUniqueStarterName(sosHibernateSession,jobStream.getJobschedulerId(),jobStreamStarter.getStarterName()));
+            dbItemJobStreamStarter.setStarterName(getUniqueStarterName(sosHibernateSession, jobStream.getJobschedulerId(), jobStreamStarter
+                    .getStarterName()));
             sosHibernateSession.save(dbItemJobStreamStarter);
 
             for (NameValuePair nameValuePair : jobStreamStarter.getParams()) {
@@ -714,7 +715,9 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
             sosHibernateSession.commit();
 
-            notifyEventHandler(accessToken);
+            if (dbItemInventoryInstance != null) {
+                notifyEventHandler(accessToken);
+            }
             return JOCDefaultResponse.responseStatus200(jobStreams);
 
         } catch (Exception e) {
