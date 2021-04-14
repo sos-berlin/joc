@@ -681,7 +681,12 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         try {
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
             JobStreams jobStreams = Globals.objectMapper.readValue(filterBytes, JobStreams.class);
+            JobStreams importedJobStreams = new JobStreams();
+            importedJobStreams.setDeliveryDate(new Date());
+            importedJobStreams.setJobschedulerId(jobStreams.getJobschedulerId());
+            importedJobStreams.setJobstreams(new ArrayList<JobStream>());
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_IMPORT);
+
             sosHibernateSession.setAutoCommit(false);
             sosHibernateSession.beginTransaction();
 
@@ -712,13 +717,14 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 } while (listOfJobStreams.size() > 0);
                 jobStream.setJobStream(filterJobStreams.getJobStream());
                 importJobStream(sosHibernateSession, jobStream);
+                importedJobStreams.getJobstreams().add(jobStream);
             }
             sosHibernateSession.commit();
 
             if (dbItemInventoryInstance != null) {
                 notifyEventHandler(accessToken);
             }
-            return JOCDefaultResponse.responseStatus200(jobStreams);
+            return JOCDefaultResponse.responseStatus200(importedJobStreams);
 
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
