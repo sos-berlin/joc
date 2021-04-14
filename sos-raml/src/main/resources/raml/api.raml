@@ -1609,8 +1609,8 @@ traits:
     type:
       postJSON:
         description: Imports a given export to JobScheduler
-        description1: !include documentation/audit/auditLog.md
-        description2: " "
+        description1: !include documentation/jobstreams/importJobStreams.md
+        description2: !include documentation/audit/auditLog.md
         description3: " "
         description4: " "
         description5: " "
@@ -1622,7 +1622,7 @@ traits:
         description200: " "
         schema: !include schemas/jobstreams/jobStreams-schema.json
         schema200: !include schemas/jobstreams/jobStreams-schema.json
-        example: !include examples/jobstreams/export-example.json
+        example: !include examples/jobstreams/import-example.json
         example200: " "      
         
   /list:
@@ -1631,7 +1631,7 @@ traits:
         description: A list of job streams.
         description1: !include documentation/jobstreams/jobStream.md
         description2: !include documentation/jobstreams/folder.md
-        description3: " "
+        description3: One of jobstream or folder must be specified
         description4: " "
         description5: " "
         description6: " "
@@ -1678,8 +1678,8 @@ traits:
         description9: " "
         description10: " "
         description200: " "
-        schema: !include schemas/jobstreams/jobstreamStarters-schema.json
-        schema200: !include schemas/jobstreams/jobstreamStarted-schema.json
+        schema: !include schemas/jobstreams/jobstreamStartersFilter-schema.json
+        schema200: !include schemas/jobstreams/jobstreamStartersStarted-schema.json
         example: !include examples/jobstreams/jobstreamStarters-example.json 
         example200: " "
 

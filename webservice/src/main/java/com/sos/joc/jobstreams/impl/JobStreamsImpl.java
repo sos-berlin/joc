@@ -73,6 +73,7 @@ import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.jobstreams.ConditionExpression;
+import com.sos.joc.model.jobstreams.ImportJobStreams;
 import com.sos.joc.model.jobstreams.InCondition;
 import com.sos.joc.model.jobstreams.InConditionCommand;
 import com.sos.joc.model.jobstreams.JobStream;
@@ -680,11 +681,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
         try {
             JsonValidator.validateFailFast(filterBytes, JobStream.class);
-            JobStreams jobStreams = Globals.objectMapper.readValue(filterBytes, JobStreams.class);
-            JobStreams importedJobStreams = new JobStreams();
-            importedJobStreams.setDeliveryDate(new Date());
-            importedJobStreams.setJobschedulerId(jobStreams.getJobschedulerId());
-            importedJobStreams.setJobstreams(new ArrayList<JobStream>());
+            ImportJobStreams jobStreams = Globals.objectMapper.readValue(filterBytes, ImportJobStreams.class);
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_IMPORT);
 
             sosHibernateSession.setAutoCommit(false);
@@ -717,14 +714,13 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 } while (listOfJobStreams.size() > 0);
                 jobStream.setJobStream(filterJobStreams.getJobStream());
                 importJobStream(sosHibernateSession, jobStream);
-                importedJobStreams.getJobstreams().add(jobStream);
             }
             sosHibernateSession.commit();
 
             if (dbItemInventoryInstance != null) {
                 notifyEventHandler(accessToken);
             }
-            return JOCDefaultResponse.responseStatus200(importedJobStreams);
+            return JOCDefaultResponse.responseStatusJSOk(null);
 
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());

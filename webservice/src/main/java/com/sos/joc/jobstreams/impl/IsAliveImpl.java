@@ -29,9 +29,9 @@ public class IsAliveImpl extends JOCResourceImpl implements IIsAliveResource {
     public JOCDefaultResponse isAlive(String accessToken, byte[] filterBytes) {
         try {
             JsonValidator.validateFailFast(filterBytes, JobStreamsFilter.class);
-            JobStreamsFilter startJob = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
+            JobStreamsFilter jobStreamsFilter = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, startJob, accessToken, startJob.getJobschedulerId(),
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobStreamsFilter, accessToken, jobStreamsFilter.getJobschedulerId(),
                     true);            
             
             if (jocDefaultResponse != null) {
@@ -39,7 +39,7 @@ public class IsAliveImpl extends JOCResourceImpl implements IIsAliveResource {
             }
 
             try {
-                notifyEventHandler(accessToken, startJob);
+                notifyEventHandler(accessToken);
                 
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
@@ -48,7 +48,7 @@ public class IsAliveImpl extends JOCResourceImpl implements IIsAliveResource {
 
             }
 
-            return JOCDefaultResponse.responseStatus200(startJob);
+            return JOCDefaultResponse.responseStatus200(jobStreamsFilter);
 
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
@@ -57,7 +57,7 @@ public class IsAliveImpl extends JOCResourceImpl implements IIsAliveResource {
         }
     }
 
-    private void notifyEventHandler(String accessToken, JobStreamsFilter startJob) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(IsAliveImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
