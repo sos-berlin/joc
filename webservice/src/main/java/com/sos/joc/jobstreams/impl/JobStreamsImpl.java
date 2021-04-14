@@ -554,6 +554,24 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         }
     }
 
+    private String getUniqueStarterName(SOSHibernateSession sosHibernateSession, String schedulerId, String starterName)
+            throws SOSHibernateException {
+        DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+        FilterJobStreamStarters filterJobStreamStarters = new FilterJobStreamStarters();
+        int size = 0;
+        int index = 0;
+        String uniqueStarterName = starterName;
+        do {
+            filterJobStreamStarters.setStarterName(uniqueStarterName);
+            size = dbLayerJobStreamStarters.getJobStreamStartersList(filterJobStreamStarters, 0).size();
+            if (size > 0) {
+                index = index + 1;
+                uniqueStarterName = starterName + "(" + index + ")";
+            }
+        } while (size > 0);
+        return uniqueStarterName;
+    }
+
     private void importJobStream(SOSHibernateSession sosHibernateSession, JobStream jobStream) throws SOSHibernateException, JsonProcessingException {
 
         DBItemJobStream dbIemJobStream = new DBItemJobStream();
@@ -574,7 +592,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             dbItemJobStreamStarter.setRunTime(Globals.objectMapper.writeValueAsString(jobStreamStarter.getRunTime()));
             dbItemJobStreamStarter.setState(jobStreamStarter.getState());
             dbItemJobStreamStarter.setTitle(jobStreamStarter.getTitle());
-            dbItemJobStreamStarter.setStarterName(jobStreamStarter.getStarterName());
+            dbItemJobStreamStarter.setStarterName(getUniqueStarterName(sosHibernateSession,jobStream.getJobschedulerId(),jobStreamStarter.getStarterName()));
             sosHibernateSession.save(dbItemJobStreamStarter);
 
             for (NameValuePair nameValuePair : jobStreamStarter.getParams()) {

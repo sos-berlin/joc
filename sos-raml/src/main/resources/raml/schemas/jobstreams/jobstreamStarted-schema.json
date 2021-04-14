@@ -8,8 +8,14 @@
 		"jobschedulerId"
 	],
 	"properties": {
-		"jobschedulerId": {
-			"$ref": "../common/filename100-schema.json"
+		"jobStreamStarterId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
+		"starterName": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"starterExists": {
+			"type": "boolean"
 		},
 		"session": {
 			"$ref": "../common/string255-schema.json"
@@ -19,4 +25,5 @@
 		}
 	}
 }
+      
       
