@@ -350,30 +350,42 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_LIST);
 
-            FilterJobStreams filterJobStreams = new FilterJobStreams();
-
-            filterJobStreams.setJobStream(jobStreamsFilter.getJobStream());
-            filterJobStreams.setSchedulerId(jobStreamsFilter.getJobschedulerId());
-            filterJobStreams.setStatus(jobStreamsFilter.getStatus());
-            filterJobStreams.setFolder(jobStreamsFilter.getFolder());
-            filterJobStreams.setLimit(jobStreamsFilter.getLimit());
-
             JobStreamMigrator jobStreamMigrator = new JobStreamMigrator();
+
             if (jobStreamMigrator.migrate(sosHibernateSession)) {
                 notifyEventHandler(accessToken);
             }
 
-            JobStreams jobStreams = getListOfJobstreams(sosHibernateSession, filterJobStreams, false);
-                       
-            filterJobStreams.setFolder(null);
-            filterJobStreams.setJobStream(null);
+            JobStreams jobStreams = new JobStreams();
+            jobStreams.setJobstreams(new ArrayList<JobStream>());
+            FilterJobStreams filterJobStreams = new FilterJobStreams();
 
-            for (Folder folder: jobStreamsFilter.getFolders()) {
+            if ((jobStreamsFilter.getJobStream() != null) || (jobStreamsFilter.getFolder() != null)) {
+                filterJobStreams.setJobStream(jobStreamsFilter.getJobStream());
+                filterJobStreams.setSchedulerId(jobStreamsFilter.getJobschedulerId());
+                filterJobStreams.setStatus(jobStreamsFilter.getStatus());
+                filterJobStreams.setLimit(jobStreamsFilter.getLimit());
+
+                if (jobStreamsFilter.getJobStream() != null) {
+                    jobStreams = getListOfJobstreams(sosHibernateSession, filterJobStreams, false);
+                }
+
+                if (jobStreamsFilter.getFolder() != null) {
+                    filterJobStreams.setJobStream(null);
+                    filterJobStreams.setFolder(jobStreamsFilter.getFolder());
+                    jobStreams.getJobstreams().addAll(getListOfJobstreams(sosHibernateSession, filterJobStreams, false).getJobstreams());
+                }
+
+                filterJobStreams.setFolder(null);
+                filterJobStreams.setJobStream(null);
+            }
+
+            for (Folder folder : jobStreamsFilter.getFolders()) {
                 filterJobStreams.setFolderItem(folder);
                 JobStreams jobStreamsFromFolders = getListOfJobstreams(sosHibernateSession, filterJobStreams, false);
                 jobStreams.getJobstreams().addAll(jobStreamsFromFolders.getJobstreams());
             }
-            
+
             return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(jobStreams));
             // return JOCDefaultResponse.responseStatus200(jobStreams);
         } catch (Exception e) {
@@ -585,15 +597,16 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         return uniqueStarterName;
     }
 
-    private String getJobPath(String folder,String job) {
+    private String getJobPath(String folder, String job) {
         if (job == null) {
             return null;
         }
         if (folder == null) {
             return job;
         }
-       return folder + "/" + Paths.get(job).getFileName().toString();
+        return folder + "/" + Paths.get(job).getFileName().toString();
     }
+
     private void importJobStream(SOSHibernateSession sosHibernateSession, JobStream jobStream) throws SOSHibernateException, JsonProcessingException {
 
         DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
@@ -612,9 +625,9 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         for (JobStreamStarter jobStreamStarter : jobStream.getJobstreamStarters()) {
             DBItemJobStreamStarter dbItemJobStreamStarter = new DBItemJobStreamStarter();
             dbItemJobStreamStarter.setCreated(new Date());
-            dbItemJobStreamStarter.setEndOfJobStream(getJobPath(jobStream.getFolder(),jobStreamStarter.getEndOfJobStream()));
+            dbItemJobStreamStarter.setEndOfJobStream(getJobPath(jobStream.getFolder(), jobStreamStarter.getEndOfJobStream()));
             dbItemJobStreamStarter.setJobStream(dbItemJobStream.getId());
-            dbItemJobStreamStarter.setRequiredJob(getJobPath(jobStream.getFolder(),jobStreamStarter.getRequiredJob()));
+            dbItemJobStreamStarter.setRequiredJob(getJobPath(jobStream.getFolder(), jobStreamStarter.getRequiredJob()));
             dbItemJobStreamStarter.setRunTime(Globals.objectMapper.writeValueAsString(jobStreamStarter.getRunTime()));
             dbItemJobStreamStarter.setState(jobStreamStarter.getState());
             dbItemJobStreamStarter.setTitle(jobStreamStarter.getTitle());
@@ -633,7 +646,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
 
             for (JobStreamJob jobStreamJob : jobStreamStarter.getJobs()) {
-                String jobPath = getJobPath(jobStream.getFolder(),jobStreamJob.getJob());
+                String jobPath = getJobPath(jobStream.getFolder(), jobStreamJob.getJob());
                 FilterJobStreamStarterJobs filterJobStreamStarterJobs = new FilterJobStreamStarterJobs();
                 filterJobStreamStarterJobs.setJob(jobPath);
                 if (dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(filterJobStreamStarterJobs, 0).size() == 0) {
@@ -653,7 +666,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
         for (JobStreamJob jobStreamJob : listOfJobStreamJobs) {
             for (OutCondition outCondition : jobStreamJob.getOutconditions()) {
-                String jobPath = getJobPath(jobStream.getFolder(),jobStreamJob.getJob());
+                String jobPath = getJobPath(jobStream.getFolder(), jobStreamJob.getJob());
 
                 FilterOutConditions filterOutConditions = new FilterOutConditions();
                 filterOutConditions.setJob(jobPath);
@@ -679,7 +692,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 }
             }
             for (InCondition inCondition : jobStreamJob.getInconditions()) {
-                String jobPath = getJobPath(jobStream.getFolder(),jobStreamJob.getJob());
+                String jobPath = getJobPath(jobStream.getFolder(), jobStreamJob.getJob());
 
                 FilterInConditions filterInConditions = new FilterInConditions();
                 filterInConditions.setJob(jobPath);
