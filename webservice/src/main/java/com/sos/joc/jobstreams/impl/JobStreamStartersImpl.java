@@ -314,12 +314,14 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
 
                 jobStreamStartesStarted.setJobstreamStarted(new ArrayList<JobStreamStarted>());
                 for (JobStreamStarter jobStreamStarter : jobStreamStarters.getJobstreamStarters()) {
-                    JobStreamStarted jobStreamStarted = new JobStreamStarted();
-                    if (jobStreamStarter.getJobStreamStarterId() == null) {
+                    if ((jobStreamStarter.getJobStreamStarterId() != null) || (jobStreamStarter.getStarterName() != null)) {
+
+                        JobStreamStarted jobStreamStarted = new JobStreamStarted();
                         try {
                             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_START);
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             FilterJobStreamStarters filter = new FilterJobStreamStarters();
+                            filter.setId(jobStreamStarter.getJobStreamStarterId());
                             filter.setStarterName(jobStreamStarter.getStarterName());
                             filter.setJobStreamId(jobStreamStarters.getJobStreamId());
                             List<DBItemJobStreamStarter> listOfStartes = dbLayerJobStreamStarters.getJobStreamStartersList(filter, 0);
@@ -327,7 +329,7 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                                 jobStreamStarted.setStarterExists(true);
                                 jobStreamStarted.setStarterName(listOfStartes.get(0).getStarterName());
                                 jobStreamStarted.setJobStreamStarterId(listOfStartes.get(0).getId());
-                                
+
                                 jobStreamStarter.setJobStreamStarterId(listOfStartes.get(0).getId());
                                 setAudit(jobStreamStarter, jobStreamStarters);
                                 jobStreamStarted.setParams(jobStreamStarter.getParams());
@@ -335,19 +337,20 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
                                 String session = contextId.toString();
                                 jobStreamStarted.setSession(session);
                                 notifyEventHandlerStart(accessToken, contextId, jobStreamStarter);
-                            }else {
+                            } else {
                                 jobStreamStarted.setParams(null);
                                 jobStreamStarted.setJobStreamStarterId(jobStreamStarter.getJobStreamStarterId());
                                 jobStreamStarted.setStarterName(jobStreamStarter.getStarterName());
                                 jobStreamStarted.setStarterExists(false);
                             }
                             jobStreamStartesStarted.getJobstreamStarted().add(jobStreamStarted);
+
                         } finally {
                             Globals.disconnect(sosHibernateSession);
                         }
                     }
-
                 }
+
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
                         "Add JobStreamStarter: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running.");
