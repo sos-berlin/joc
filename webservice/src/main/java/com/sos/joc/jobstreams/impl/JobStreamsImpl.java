@@ -601,7 +601,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         for (JobStreamStarter jobStreamStarter : jobStream.getJobstreamStarters()) {
             DBItemJobStreamStarter dbItemJobStreamStarter = new DBItemJobStreamStarter();
             dbItemJobStreamStarter.setCreated(new Date());
-            dbItemJobStreamStarter.setEndOfJobStream(jobStreamStarter.getEndOfJobStream());
+            dbItemJobStreamStarter.setEndOfJobStream(getJobPath(jobStream.getFolder(),jobStreamStarter.getEndOfJobStream()));
             dbItemJobStreamStarter.setJobStream(dbItemJobStream.getId());
             dbItemJobStreamStarter.setRequiredJob(getJobPath(jobStream.getFolder(),jobStreamStarter.getRequiredJob()));
             dbItemJobStreamStarter.setRunTime(Globals.objectMapper.writeValueAsString(jobStreamStarter.getRunTime()));
