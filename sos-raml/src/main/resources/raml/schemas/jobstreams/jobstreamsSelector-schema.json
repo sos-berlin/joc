@@ -8,17 +8,11 @@
 		"jobschedulerId"
 	],
 	"properties": {
-		"deliveryDate": {
-			"$ref": "../common/deliveryDate-schema.json"
-		},
 		"jobschedulerId": {
 			"$ref": "../common/filename100-schema.json"
 		},
 		"folders": {
-			"type": "array",
-			"items": {
-				"$ref": "../common/path-schema.json"
-			}
+			"$ref": "../common/folders-schema.json"
 		},
 		"jobStreams": {
 			"type": "array",

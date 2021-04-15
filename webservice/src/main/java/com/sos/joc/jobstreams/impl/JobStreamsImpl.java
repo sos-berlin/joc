@@ -72,6 +72,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobstreams.resource.IJobStreamsResource;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendars;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.jobstreams.ConditionExpression;
 import com.sos.joc.model.jobstreams.ImportJobStreams;
@@ -806,8 +807,9 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 }
             }
 
-            for (String folder : jobStreamSelector.getFolders()) {
-                filterJobStreams.setFolder(folder);
+            filterJobStreams = new FilterJobStreams();
+            for (Folder folder : jobStreamSelector.getFolders()) {
+                filterJobStreams.setFolderItem(folder);
                 jobStreamsFolders = getListOfJobstreams(sosHibernateSession, filterJobStreams, true);
                 for (JobStream jobStream : jobStreamsFolders.getJobstreams()) {
                     jobStreams.getJobstreams().add(jobStream);
