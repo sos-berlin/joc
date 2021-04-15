@@ -1,6 +1,7 @@
 package com.sos.joc.jobstreams.impl;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -573,23 +574,36 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         return uniqueStarterName;
     }
 
+    private String getJobPath(String folder,String job) {
+        if (job == null) {
+            return null;
+        }
+        if (folder == null) {
+            return job;
+        }
+       return folder + "/" + Paths.get(job).getFileName().toString();
+    }
     private void importJobStream(SOSHibernateSession sosHibernateSession, JobStream jobStream) throws SOSHibernateException, JsonProcessingException {
 
-        DBItemJobStream dbIemJobStream = new DBItemJobStream();
-        dbIemJobStream.setCreated(new Date());
-        dbIemJobStream.setFolder(jobStream.getFolder());
-        dbIemJobStream.setJobStream(jobStream.getJobStream());
-        dbIemJobStream.setSchedulerId(jobStream.getJobschedulerId());
-        dbIemJobStream.setState(jobStream.getState());
-        sosHibernateSession.save(dbIemJobStream);
+        DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+        DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
+        DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
+
+        DBItemJobStream dbItemJobStream = new DBItemJobStream();
+        dbItemJobStream.setCreated(new Date());
+        dbItemJobStream.setFolder(jobStream.getFolder());
+        dbItemJobStream.setJobStream(jobStream.getJobStream());
+        dbItemJobStream.setSchedulerId(jobStream.getJobschedulerId());
+        dbItemJobStream.setState(jobStream.getState());
+        sosHibernateSession.save(dbItemJobStream);
         List<JobStreamJob> listOfJobStreamJobs = new ArrayList<JobStreamJob>();
 
         for (JobStreamStarter jobStreamStarter : jobStream.getJobstreamStarters()) {
             DBItemJobStreamStarter dbItemJobStreamStarter = new DBItemJobStreamStarter();
             dbItemJobStreamStarter.setCreated(new Date());
             dbItemJobStreamStarter.setEndOfJobStream(jobStreamStarter.getEndOfJobStream());
-            dbItemJobStreamStarter.setJobStream(dbIemJobStream.getId());
-            dbItemJobStreamStarter.setRequiredJob(jobStreamStarter.getRequiredJob());
+            dbItemJobStreamStarter.setJobStream(dbItemJobStream.getId());
+            dbItemJobStreamStarter.setRequiredJob(getJobPath(jobStream.getFolder(),jobStreamStarter.getRequiredJob()));
             dbItemJobStreamStarter.setRunTime(Globals.objectMapper.writeValueAsString(jobStreamStarter.getRunTime()));
             dbItemJobStreamStarter.setState(jobStreamStarter.getState());
             dbItemJobStreamStarter.setTitle(jobStreamStarter.getTitle());
@@ -608,16 +622,19 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
 
             for (JobStreamJob jobStreamJob : jobStreamStarter.getJobs()) {
-                DBItemJobStreamStarterJob dbItemJobStreamStarterJob = new DBItemJobStreamStarterJob();
-                dbItemJobStreamStarterJob.setCreated(new Date());
-                dbItemJobStreamStarterJob.setDelay(jobStreamJob.getStartDelay());
-                dbItemJobStreamStarterJob.setJob(jobStreamJob.getJob());
-                dbItemJobStreamStarterJob.setJobStreamStarter(dbItemJobStreamStarter.getId());
-                dbItemJobStreamStarterJob.setSkipOutCondition(jobStreamJob.getSkipOutCondition());
-                sosHibernateSession.save(dbItemJobStreamStarterJob);
+                String jobPath = getJobPath(jobStream.getFolder(),jobStreamJob.getJob());
+                FilterJobStreamStarterJobs filterJobStreamStarterJobs = new FilterJobStreamStarterJobs();
+                filterJobStreamStarterJobs.setJob(jobPath);
+                if (dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(filterJobStreamStarterJobs, 0).size() == 0) {
+                    DBItemJobStreamStarterJob dbItemJobStreamStarterJob = new DBItemJobStreamStarterJob();
+                    dbItemJobStreamStarterJob.setCreated(new Date());
+                    dbItemJobStreamStarterJob.setDelay(jobStreamJob.getStartDelay());
+                    dbItemJobStreamStarterJob.setJob(jobPath);
+                    dbItemJobStreamStarterJob.setJobStreamStarter(dbItemJobStreamStarter.getId());
+                    dbItemJobStreamStarterJob.setSkipOutCondition(jobStreamJob.getSkipOutCondition());
+                    sosHibernateSession.save(dbItemJobStreamStarterJob);
+                }
             }
-
-            listOfJobStreamJobs.addAll(jobStreamStarter.getJobs());
 
         }
 
@@ -625,45 +642,58 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
         for (JobStreamJob jobStreamJob : listOfJobStreamJobs) {
             for (OutCondition outCondition : jobStreamJob.getOutconditions()) {
-                DBItemOutCondition dbItemOutCondition = new DBItemOutCondition();
-                dbItemOutCondition.setCreated(new Date());
-                dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
-                dbItemOutCondition.setFolder(jobStream.getFolder());
-                dbItemOutCondition.setJob(jobStreamJob.getJob());
-                dbItemOutCondition.setJobStream(jobStream.getJobStream());
-                dbItemOutCondition.setSchedulerId(jobStream.getJobschedulerId());
-                sosHibernateSession.save(dbItemOutCondition);
-                for (OutConditionEvent outConditionEvent : outCondition.getOutconditionEvents()) {
-                    DBItemOutConditionEvent dbItemOutConditionEvent = new DBItemOutConditionEvent();
-                    dbItemOutConditionEvent.setCreated(new Date());
-                    dbItemOutConditionEvent.setCommand(outConditionEvent.getCommand());
-                    dbItemOutConditionEvent.setEvent(outConditionEvent.getEvent());
-                    dbItemOutConditionEvent.setGlobalEvent(outConditionEvent.getGlobalEvent());
-                    dbItemOutConditionEvent.setOutConditionId(dbItemOutCondition.getId());
-                    sosHibernateSession.save(dbItemOutConditionEvent);
-                }
+                String jobPath = getJobPath(jobStream.getFolder(),jobStreamJob.getJob());
 
+                FilterOutConditions filterOutConditions = new FilterOutConditions();
+                filterOutConditions.setJob(jobPath);
+                if (dbLayerOutConditions.getSimpleOutConditionsList(filterOutConditions, 0).size() == 0) {
+
+                    DBItemOutCondition dbItemOutCondition = new DBItemOutCondition();
+                    dbItemOutCondition.setCreated(new Date());
+                    dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
+                    dbItemOutCondition.setFolder(jobStream.getFolder());
+                    dbItemOutCondition.setJob(jobPath);
+                    dbItemOutCondition.setJobStream(jobStream.getJobStream());
+                    dbItemOutCondition.setSchedulerId(jobStream.getJobschedulerId());
+                    sosHibernateSession.save(dbItemOutCondition);
+                    for (OutConditionEvent outConditionEvent : outCondition.getOutconditionEvents()) {
+                        DBItemOutConditionEvent dbItemOutConditionEvent = new DBItemOutConditionEvent();
+                        dbItemOutConditionEvent.setCreated(new Date());
+                        dbItemOutConditionEvent.setCommand(outConditionEvent.getCommand());
+                        dbItemOutConditionEvent.setEvent(outConditionEvent.getEvent());
+                        dbItemOutConditionEvent.setGlobalEvent(outConditionEvent.getGlobalEvent());
+                        dbItemOutConditionEvent.setOutConditionId(dbItemOutCondition.getId());
+                        sosHibernateSession.save(dbItemOutConditionEvent);
+                    }
+                }
             }
             for (InCondition inCondition : jobStreamJob.getInconditions()) {
-                DBItemInCondition dbItemInCondition = new DBItemInCondition();
-                dbItemInCondition.setCreated(new Date());
-                dbItemInCondition.setExpression(inCondition.getConditionExpression().getExpression());
-                dbItemInCondition.setJobStream(inCondition.getJobStream());
-                dbItemInCondition.setFolder(jobStream.getFolder());
-                dbItemInCondition.setJob(jobStreamJob.getJob());
-                dbItemInCondition.setJobStream(jobStream.getJobStream());
-                dbItemInCondition.setMarkExpression(inCondition.getMarkExpression());
+                String jobPath = getJobPath(jobStream.getFolder(),jobStreamJob.getJob());
 
-                dbItemInCondition.setSchedulerId(jobStream.getJobschedulerId());
-                dbItemInCondition.setSkipOutCondition(inCondition.getSkipOutCondition());
-                sosHibernateSession.save(dbItemInCondition);
-                for (InConditionCommand inConditionCommand : inCondition.getInconditionCommands()) {
-                    DBItemInConditionCommand dbItemInConditionCommand = new DBItemInConditionCommand();
-                    dbItemInConditionCommand.setCreated(new Date());
-                    dbItemInConditionCommand.setCommand(inConditionCommand.getCommand());
-                    dbItemInConditionCommand.setCommandParam(inConditionCommand.getCommandParam());
-                    dbItemInConditionCommand.setInConditionId(dbItemInCondition.getId());
-                    sosHibernateSession.save(dbItemInConditionCommand);
+                FilterInConditions filterInConditions = new FilterInConditions();
+                filterInConditions.setJob(jobPath);
+                if (dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0).size() == 0) {
+
+                    DBItemInCondition dbItemInCondition = new DBItemInCondition();
+                    dbItemInCondition.setCreated(new Date());
+                    dbItemInCondition.setExpression(inCondition.getConditionExpression().getExpression());
+                    dbItemInCondition.setJobStream(inCondition.getJobStream());
+                    dbItemInCondition.setFolder(jobStream.getFolder());
+                    dbItemInCondition.setJob(jobPath);
+                    dbItemInCondition.setJobStream(jobStream.getJobStream());
+                    dbItemInCondition.setMarkExpression(inCondition.getMarkExpression());
+
+                    dbItemInCondition.setSchedulerId(jobStream.getJobschedulerId());
+                    dbItemInCondition.setSkipOutCondition(inCondition.getSkipOutCondition());
+                    sosHibernateSession.save(dbItemInCondition);
+                    for (InConditionCommand inConditionCommand : inCondition.getInconditionCommands()) {
+                        DBItemInConditionCommand dbItemInConditionCommand = new DBItemInConditionCommand();
+                        dbItemInConditionCommand.setCreated(new Date());
+                        dbItemInConditionCommand.setCommand(inConditionCommand.getCommand());
+                        dbItemInConditionCommand.setCommandParam(inConditionCommand.getCommandParam());
+                        dbItemInConditionCommand.setInConditionId(dbItemInCondition.getId());
+                        sosHibernateSession.save(dbItemInConditionCommand);
+                    }
                 }
 
             }
@@ -766,11 +796,13 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             filterJobStreams.setSchedulerId(jobStreamSelector.getJobschedulerId());
 
             for (JobStreamLocation jobStreamLocation : jobStreamSelector.getJobStreams()) {
-                filterJobStreams.setJobStream(jobStreamLocation.getJobStream());
-                filterJobStreams.setFolder(jobStreamLocation.getFolder());
-                jobStreamsLocation = getListOfJobstreams(sosHibernateSession, filterJobStreams, true);
-                for (JobStream jobStream : jobStreamsLocation.getJobstreams()) {
-                    jobStreams.getJobstreams().add(jobStream);
+                if (jobStreamLocation.getJobStream() != null) {
+                    filterJobStreams.setJobStream(jobStreamLocation.getJobStream());
+                    filterJobStreams.setFolder(jobStreamLocation.getFolder());
+                    jobStreamsLocation = getListOfJobstreams(sosHibernateSession, filterJobStreams, true);
+                    for (JobStream jobStream : jobStreamsLocation.getJobstreams()) {
+                        jobStreams.getJobstreams().add(jobStream);
+                    }
                 }
             }
 
