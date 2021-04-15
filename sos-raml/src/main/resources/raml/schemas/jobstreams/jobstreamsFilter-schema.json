@@ -21,6 +21,9 @@
 		"folder": {
 			"$ref": "../common/path-schema.json"
 		},
+		"folders": {
+			"$ref": "../common/folders-schema.json"
+		},
 		"jobStream": {
 			"$ref": "../common/string255-schema.json"
 		},

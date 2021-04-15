@@ -364,6 +364,16 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
 
             JobStreams jobStreams = getListOfJobstreams(sosHibernateSession, filterJobStreams, false);
+                       
+            filterJobStreams.setFolder(null);
+            filterJobStreams.setJobStream(null);
+
+            for (Folder folder: jobStreamsFilter.getFolders()) {
+                filterJobStreams.setFolderItem(folder);
+                JobStreams jobStreamsFromFolders = getListOfJobstreams(sosHibernateSession, filterJobStreams, false);
+                jobStreams.getJobstreams().addAll(jobStreamsFromFolders.getJobstreams());
+            }
+            
             return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(jobStreams));
             // return JOCDefaultResponse.responseStatus200(jobStreams);
         } catch (Exception e) {
