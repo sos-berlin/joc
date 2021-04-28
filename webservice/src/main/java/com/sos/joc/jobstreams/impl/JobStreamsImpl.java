@@ -831,6 +831,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
             }
 
             filterJobStreams = new FilterJobStreams();
+            filterJobStreams.setSchedulerId(jobStreamSelector.getJobschedulerId());
+
             for (Folder folder : jobStreamSelector.getFolders()) {
                 filterJobStreams.setFolderItem(folder);
                 jobStreamsFolders = getListOfJobstreams(sosHibernateSession, filterJobStreams, true);
