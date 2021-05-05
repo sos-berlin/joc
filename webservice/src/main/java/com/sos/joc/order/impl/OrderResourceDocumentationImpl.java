@@ -38,19 +38,19 @@ public class OrderResourceDocumentationImpl extends JOCResourceImpl implements I
     public JOCDefaultResponse postDocumentation(String xAccessToken, String jobschedulerId, String jobChain, String orderId) {
         SOSHibernateSession connection = null;
         try {
-            //String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, jobChain + "," + orderId);
+            // String json = String.format("{\"jobschedulerId\": \"%s\", \"path\": \"%s\"}", jobschedulerId, jobChain + "," + orderId);
             JsonObjectBuilder builder = Json.createObjectBuilder();
-            if(jobschedulerId != null) {
+            if (jobschedulerId != null) {
                 builder.add("jobschedulerId", jobschedulerId);
             }
-            if(jobChain != null && orderId != null) {
+            if (jobChain != null && orderId != null) {
                 builder.add("path", jobChain + "," + orderId);
             }
             String json = builder.build().toString();
             JsonValidator.validateFailFast(json.getBytes(), DocumentationShowFilter.class);
             DocumentationShowFilter documentationFilter = Globals.objectMapper.readValue(json, DocumentationShowFilter.class);
             documentationFilter.setType(JobSchedulerObjectType.ORDER);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, documentationFilter, xAccessToken, documentationFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(jobschedulerId, xAccessToken).getOrder().getView().isDocumentation());
             if (jocDefaultResponse != null) {
@@ -60,8 +60,9 @@ public class OrderResourceDocumentationImpl extends JOCResourceImpl implements I
             checkRequiredParameter("jobschedulerId", jobschedulerId);
             checkRequiredParameter("jobChain", jobChain);
             checkRequiredParameter("orderId", orderId);
-
             documentationFilter.setPath(normalizePath(documentationFilter.getPath()));
+            checkFolderPermissions(documentationFilter.getPath());
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             String docPath = dbLayer.getDocumentationPath(documentationFilter);
@@ -89,16 +90,20 @@ public class OrderResourceDocumentationImpl extends JOCResourceImpl implements I
         try {
             JsonValidator.validateFailFast(filterBytes, OrderDocuFilter.class);
             OrderDocuFilter filter = Globals.objectMapper.readValue(filterBytes, OrderDocuFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_ASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getOrder().isAssignDocumentation());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            String jobChainPath = normalizePath(filter.getJobChain());
+            checkFolderPermissions(jobChainPath);
+
             AssignmentOrderDocuAudit assignAudit = new AssignmentOrderDocuAudit(filter);
             logAuditMessage(assignAudit);
-            Documentation.assignDocu(filter.getJobschedulerId(), normalizePath(filter.getJobChain()) + "," + filter.getOrderId(), filter
-                    .getDocumentation(), JobSchedulerObjectType.ORDER, API_CALL_ASSIGN);
+            Documentation.assignDocu(filter.getJobschedulerId(), jobChainPath + "," + filter.getOrderId(), filter.getDocumentation(),
+                    JobSchedulerObjectType.ORDER, API_CALL_ASSIGN);
             storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -115,16 +120,20 @@ public class OrderResourceDocumentationImpl extends JOCResourceImpl implements I
         try {
             JsonValidator.validateFailFast(filterBytes, OrderDocuFilter.class);
             OrderDocuFilter filter = Globals.objectMapper.readValue(filterBytes, OrderDocuFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL_UNASSIGN, filter, xAccessToken, filter.getJobschedulerId(), getPermissonsJocCockpit(
                     filter.getJobschedulerId(), xAccessToken).getOrder().isAssignDocumentation());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            String jobChainPath = normalizePath(filter.getJobChain());
+            checkFolderPermissions(jobChainPath);
+
             AssignmentOrderDocuAudit unassignAudit = new AssignmentOrderDocuAudit(filter);
             logAuditMessage(unassignAudit);
-            Documentation.unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getJobChain()) + "," + filter.getOrderId(),
-                    JobSchedulerObjectType.ORDER, API_CALL_UNASSIGN);
+            Documentation.unassignDocu(filter.getJobschedulerId(), jobChainPath + "," + filter.getOrderId(), JobSchedulerObjectType.ORDER,
+                    API_CALL_UNASSIGN);
             storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

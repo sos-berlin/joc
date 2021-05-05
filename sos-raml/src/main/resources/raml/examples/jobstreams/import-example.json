@@ -1,0 +1,370 @@
+{
+  "jobschedulerId" : "scheduler_joc_cockpit",
+  "jobstreams" : [ {
+    "jobStream" : "test1",
+    "folder" : "/jobstream/test1",
+    "state" : "active",
+    "jobstreamStarters" : [ {
+      "state" : "active",
+      "jobStreamStarterId" : 1927,
+      "title" : "aa",
+      "nextStart" : "2021-04-02T10:00:00.0Z",
+      "jobs" : [ {
+        "job" : "/jobstream/test1/xjob11",
+        "startDelay" : 0,
+        "skipOutCondition" : false,
+        "inconditions" : [ ],
+        "outconditions" : [ {
+          "conditionExpression" : {
+            "expression" : "rc:0"
+          },
+          "outconditionEvents" : [ {
+            "command" : "create",
+            "event" : "xjob11",
+            "globalEvent" : false
+          } ],
+          "inconditions" : [ ]
+        }, {
+          "conditionExpression" : {
+            "expression" : "rc:0"
+          },
+          "outconditionEvents" : [ {
+            "command" : "create",
+            "event" : "xjob11",
+            "globalEvent" : false
+          } ],
+          "inconditions" : [ ]
+        }, {
+          "conditionExpression" : {
+            "expression" : "rc:0"
+          },
+          "outconditionEvents" : [ {
+            "command" : "create",
+            "event" : "xjob11",
+            "globalEvent" : false
+          } ],
+          "inconditions" : [ ]
+        }, {
+          "conditionExpression" : {
+            "expression" : "rc:0"
+          },
+          "outconditionEvents" : [ {
+            "command" : "create",
+            "event" : "xjob11",
+            "globalEvent" : false
+          } ],
+          "inconditions" : [ ]
+        } ]
+      } ],
+      "runTime" : {
+        "timeZone" : "Europe/Berlin",
+        "letRun" : "false",
+        "runOnce" : "false",
+        "dates" : [ {
+          "date" : "2021-04-01",
+          "calendar" : "/Every Day",
+          "periods" : [ {
+            "singleStart" : "12:00:00",
+            "letRun" : "false",
+            "runOnce" : "false",
+            "whenHoliday" : "suppress"
+          } ]
+        }, {
+          "date" : "2021-04-02",
+          "calendar" : "/Every Day",
+          "periods" : [ {
+            "singleStart" : "12:00:00",
+            "letRun" : "false",
+            "runOnce" : "false",
+            "whenHoliday" : "suppress"
+          } ]
+        } ],
+        "calendars" : "{\"calendars\":[{\"basedOn\":\"/Every Day\",\"includes\":{},\"type\":\"WORKING_DAYS\",\"periods\":[{\"singleStart\":\"12:00:00\",\"letRun\":\"false\",\"runOnce\":\"false\",\"whenHoliday\":\"suppress\"}]}]}"
+      },
+      "params" : [ ]
+    } ],
+    "jobs" : [ {
+      "job" : "/jobstream/test1/xjob11",
+      "inconditions" : [ ],
+      "outconditions" : [ {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "xjob11",
+          "globalEvent" : false
+        } ],
+        "inconditions" : [ ]
+      }, {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "xjob11",
+          "globalEvent" : false
+        } ],
+        "inconditions" : [ ]
+      }, {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "xjob11",
+          "globalEvent" : false
+        } ],
+        "inconditions" : [ ]
+      }, {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "xjob11",
+          "globalEvent" : false
+        } ],
+        "inconditions" : [ ]
+      } ]
+    }, {
+      "job" : "/jobstream/test1/xjob2",
+      "inconditions" : [ {
+        "markExpression" : true,
+        "skipOutCondition" : false,
+        "conditionExpression" : {
+          "expression" : "xjob11   "
+        },
+        "inconditionCommands" : [ {
+          "command" : "startjob",
+          "commandParam" : "now"
+        } ],
+        "outconditions" : [ ]
+      } ],
+      "outconditions" : [ {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "xjob2",
+          "globalEvent" : false
+        } ],
+        "inconditions" : [ ]
+      } ]
+    }, {
+      "job" : "/jobstream/test1/xjob3",
+      "inconditions" : [ {
+        "markExpression" : true,
+        "skipOutCondition" : false,
+        "conditionExpression" : {
+          "expression" : "xjob2    "
+        },
+        "inconditionCommands" : [ {
+          "command" : "startjob",
+          "commandParam" : "now"
+        } ],
+        "outconditions" : [ ]
+      } ],
+      "outconditions" : [ {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "xjob3",
+          "globalEvent" : false
+        } ],
+        "inconditions" : [ ]
+      } ]
+    } ]
+  }, {
+    "jobStream" : "xxxxx",
+    "folder" : "/jobstream/test2",
+    "state" : "active",
+    "jobstreamStarters" : [ {
+      "state" : "active",
+      "jobStreamStarterId" : 1926,
+      "jobs" : [ {
+        "job" : "/jobstream/test2/job1",
+        "startDelay" : 0,
+        "skipOutCondition" : false,
+        "inconditions" : [ ],
+        "outconditions" : [ {
+          "conditionExpression" : {
+            "expression" : "rc:0"
+          },
+          "outconditionEvents" : [ {
+            "command" : "create",
+            "event" : "x",
+            "globalEvent" : true
+          }, {
+            "command" : "create",
+            "event" : "job1",
+            "globalEvent" : false
+          } ],
+          "inconditions" : [ ]
+        }, {
+          "conditionExpression" : {
+            "expression" : "rc:0"
+          },
+          "outconditionEvents" : [ {
+            "command" : "create",
+            "event" : "job1",
+            "globalEvent" : false
+          }, {
+            "command" : "create",
+            "event" : "x",
+            "globalEvent" : true
+          } ],
+          "inconditions" : [ ]
+        }, {
+          "conditionExpression" : {
+            "expression" : "rc:0"
+          },
+          "outconditionEvents" : [ {
+            "command" : "create",
+            "event" : "job1",
+            "globalEvent" : false
+          }, {
+            "command" : "create",
+            "event" : "x",
+            "globalEvent" : true
+          } ],
+          "inconditions" : [ ]
+        }, {
+          "conditionExpression" : {
+            "expression" : "rc:0"
+          },
+          "outconditionEvents" : [ {
+            "command" : "create",
+            "event" : "job1",
+            "globalEvent" : false
+          }, {
+            "command" : "create",
+            "event" : "x",
+            "globalEvent" : true
+          } ],
+          "inconditions" : [ ]
+        } ]
+      } ],
+      "runTime" : {
+        "timeZone" : "Europe/Berlin",
+        "letRun" : "false",
+        "runOnce" : "false"
+      },
+      "params" : [ ]
+    } ],
+    "jobs" : [ {
+      "job" : "/jobstream/test2/job3",
+      "inconditions" : [ {
+        "markExpression" : true,
+        "skipOutCondition" : false,
+        "conditionExpression" : {
+          "expression" : "global:job2   "
+        },
+        "inconditionCommands" : [ {
+          "command" : "startjob",
+          "commandParam" : "now"
+        } ],
+        "outconditions" : [ ]
+      } ],
+      "outconditions" : [ {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "job3",
+          "globalEvent" : false
+        } ],
+        "inconditions" : [ ]
+      } ]
+    }, {
+      "job" : "/jobstream/test2/job2",
+      "inconditions" : [ {
+        "markExpression" : true,
+        "skipOutCondition" : false,
+        "conditionExpression" : {
+          "expression" : "job1   "
+        },
+        "inconditionCommands" : [ {
+          "command" : "startjob",
+          "commandParam" : "now"
+        } ],
+        "outconditions" : [ ]
+      } ],
+      "outconditions" : [ {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "job2",
+          "globalEvent" : true
+        } ],
+        "inconditions" : [ ]
+      } ]
+    }, {
+      "job" : "/jobstream/test2/job1",
+      "inconditions" : [ ],
+      "outconditions" : [ {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "x",
+          "globalEvent" : true
+        }, {
+          "command" : "create",
+          "event" : "job1",
+          "globalEvent" : false
+        } ],
+        "inconditions" : [ ]
+      }, {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "job1",
+          "globalEvent" : false
+        }, {
+          "command" : "create",
+          "event" : "x",
+          "globalEvent" : true
+        } ],
+        "inconditions" : [ ]
+      }, {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "job1",
+          "globalEvent" : false
+        }, {
+          "command" : "create",
+          "event" : "x",
+          "globalEvent" : true
+        } ],
+        "inconditions" : [ ]
+      }, {
+        "conditionExpression" : {
+          "expression" : "rc:0"
+        },
+        "outconditionEvents" : [ {
+          "command" : "create",
+          "event" : "job1",
+          "globalEvent" : false
+        }, {
+          "command" : "create",
+          "event" : "x",
+          "globalEvent" : true
+        } ],
+        "inconditions" : [ ]
+      } ]
+    } ]
+  } ]
+}

@@ -1,0 +1,38 @@
+{
+	"title": "JobStreamStartJob",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Reset Workflow, unconsume expressions",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreamStartJob",
+	"type": "object",
+	"required": [
+		"jobschedulerId"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"job": {
+			"$ref": "../common/path-schema.json"
+		},
+		"jobStream": {
+			"$ref": "../common/path-schema.json"
+		},
+		"session": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"at": {
+			"$ref": "../common/timestampWithNow-schema.json"
+		},
+		"timeZone": {
+			"description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+			"$ref": "../common/string255-schema.json"
+		},
+		"params": {
+			"$ref": "../common/nameValuePairs-schema.json"
+		},
+		"auditLog": {
+			"$ref": "../audit/auditParams-schema.json"
+		}
+	}
+}
+      

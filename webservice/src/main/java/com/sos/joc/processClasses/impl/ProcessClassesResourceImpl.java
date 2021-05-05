@@ -58,21 +58,23 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
             Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(processClassFilter.getProcessClasses());
             boolean withFolderFilter = processClassFilter.getFolders() != null && !processClassFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(processClassFilter.getFolders());
 
             List<ProcessClassV> listProcessClasses = new ArrayList<ProcessClassV>();
             ProcessClassesV entity = new ProcessClassesV();
             if (processClasses != null && !processClasses.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (ProcessClassPath processClass : processClasses) {
-                    checkRequiredParameter("processClass", processClass.getProcessClass());
-                    if (processClass != null && canAdd(processClass.getProcessClass(), permittedFolders)) {
-                        tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken,
-                                jobViewStatusEnabled));
+                    if (processClass != null) {
+                        checkRequiredParameter("processClass", processClass.getProcessClass());
+                        String processClassPath = normalizePath(processClass.getProcessClass());
+                        if (canAdd(processClassPath, permittedFolders)) {
+                            tasks.add(new ProcessClassesVCallable(processClassPath, new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
+                        }
                     }
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));

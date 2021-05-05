@@ -3,6 +3,7 @@ package com.sos.joc.schedules.impl;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -55,13 +56,21 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
             List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
             boolean withFolderFilter = schedulesFilter.getFolders() != null && !schedulesFilter.getFolders().isEmpty();
             boolean hasPermission = true;
-            List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(schedulesFilter.getFolders());
 
             Set<String> setOfSchedules = new HashSet<String>();
             if (schedulesFilter.getSchedules() != null && !schedulesFilter.getSchedules().isEmpty()) {
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                hasPermission = false;
                 for (SchedulePath schedule : schedulesFilter.getSchedules()) {
-                    checkRequiredParameter("schedules.schedule", schedule.getSchedule());
-                    setOfSchedules.add(normalizePath(schedule.getSchedule()));
+                    if (schedule != null) {
+                        checkRequiredParameter("schedules.schedule", schedule.getSchedule());
+                        String schedulePath = normalizePath(schedule.getSchedule());
+                        if (canAdd(schedulePath, permittedFolders)) {
+                            setOfSchedules.add(schedulePath);
+                            hasPermission = true;
+                        }
+                    }
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 hasPermission = false;
@@ -124,7 +133,7 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
         }
     }
 
-    private boolean isInFolderList(List<Folder> folders, String path) throws JocMissingRequiredParameterException {
+    private boolean isInFolderList(Collection<Folder> folders, String path) throws JocMissingRequiredParameterException {
         if (folders == null || folders.isEmpty()) {
             return true;
         }

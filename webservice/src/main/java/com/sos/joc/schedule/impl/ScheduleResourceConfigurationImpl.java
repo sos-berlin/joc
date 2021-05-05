@@ -8,6 +8,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
+import com.sos.joe.common.XmlDeserializer;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -19,7 +20,6 @@ import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.configuration.CalendarUsageConfiguration;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.Configuration;
 import com.sos.joc.model.common.ConfigurationMime;
@@ -31,6 +31,7 @@ import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
 import com.sos.schema.JsonValidator;
 
+ 
 @Path("schedule")
 public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implements IScheduleResourceConfiguration {
 
@@ -51,9 +52,10 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             }
 
             checkRequiredParameter("schedule", scheduleBody.getSchedule());
+            String schedulePath = normalizePath(scheduleBody.getSchedule());
+            checkFolderPermissions(schedulePath);
 
             Configuration200 entity = new Configuration200();
-            String schedulePath = normalizePath(scheduleBody.getSchedule());
             boolean responseInHtml = scheduleBody.getMime() == ConfigurationMime.HTML;
             if (versionIsOlderThan("1.13.1")) {
                 entity.setConfiguration(getConfiguration(schedulePath, responseInHtml));
@@ -92,11 +94,12 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             }
 
             checkRequiredParameter("schedule", scheduleBody.getSchedule());
+            String schedulePath = normalizePath(scheduleBody.getSchedule());
+            checkFolderPermissions(schedulePath);
 
             RunTime200 runTimeAnswer = new RunTime200();
 
             Configuration conf = new Configuration();
-            String schedulePath = normalizePath(scheduleBody.getSchedule());
             if (versionIsOlderThan("1.13.1")) {
                 conf = getConfiguration(schedulePath, false);
             } else {

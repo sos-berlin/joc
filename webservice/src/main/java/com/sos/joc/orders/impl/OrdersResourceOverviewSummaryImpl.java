@@ -1,8 +1,6 @@
 package com.sos.joc.orders.impl;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Path;
@@ -14,6 +12,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.order.OrderPath;
@@ -52,7 +51,7 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
             boolean withFolderFilter = ordersFilter.getFolders() != null && !ordersFilter.getFolders().isEmpty();
             boolean hasPermission = true;
-            List<Folder> folders = addPermittedFolder(ordersFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(ordersFilter.getFolders());
 
             if (ordersFilter.getDateFrom() != null) {
                 reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter
@@ -62,17 +61,21 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
                 reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
             }
 
-            if (ordersFilter.getOrders().size() > 0) {
+            if (ordersFilter.getOrders() != null && !ordersFilter.getOrders().isEmpty()) {
+                hasPermission = false;
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
-                    if (orderPath != null && canAdd(orderPath.getJobChain(), permittedFolders)) {
-                        reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
+                    if (orderPath != null) {
+                        if (canAdd(orderPath.getJobChain(), permittedFolders)) {
+                            reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
+                            hasPermission = true;
+                        }
                     }
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
                 hasPermission = false;
             } else if (folders != null && !folders.isEmpty()) {
-                reportTriggerDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(folders));
+                reportTriggerDBLayer.getFilter().addFolderPaths(folders);
             }
 
             OrdersOverView entity = new OrdersOverView();

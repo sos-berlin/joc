@@ -1,0 +1,7 @@
+{
+  "title": "withoutDuration parameter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "controls if the duration should be estimated",
+  "type": "boolean",
+  "default": false
+}

@@ -58,8 +58,10 @@ public class CalendarResourceDocumentationImpl extends JOCResourceImpl implement
 
             checkRequiredParameter("jobschedulerId", jobschedulerId);
             checkRequiredParameter("calendar", path);
-
+            
             documentationFilter.setPath(normalizePath(documentationFilter.getPath()));
+            checkCalendarFolderPermissions(documentationFilter.getPath());
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             DocumentationDBLayer dbLayer = new DocumentationDBLayer(connection);
             String docPath = dbLayer.getDocumentationPath(documentationFilter);
@@ -92,10 +94,15 @@ public class CalendarResourceDocumentationImpl extends JOCResourceImpl implement
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            checkRequiredParameter("calendar", filter.getCalendar());
+            String calendarPath = filter.getCalendar();
+            checkCalendarFolderPermissions(calendarPath);
+
             AssignmentCalendarDocuAudit assignAudit = new AssignmentCalendarDocuAudit(filter);
             logAuditMessage(assignAudit);
-            Documentation.assignDocu(filter.getJobschedulerId(), normalizePath(filter.getCalendar()), filter.getDocumentation(),
-                    JobSchedulerObjectType.WORKINGDAYSCALENDAR, API_CALL_ASSIGN);
+            Documentation.assignDocu(filter.getJobschedulerId(), calendarPath, filter.getDocumentation(), JobSchedulerObjectType.WORKINGDAYSCALENDAR,
+                    API_CALL_ASSIGN);
             storeAuditLogEntry(assignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -104,7 +111,6 @@ public class CalendarResourceDocumentationImpl extends JOCResourceImpl implement
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
-
     }
 
     @Override
@@ -117,10 +123,14 @@ public class CalendarResourceDocumentationImpl extends JOCResourceImpl implement
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            checkRequiredParameter("calendar", filter.getCalendar());
+            String calendarPath = filter.getCalendar();
+            checkCalendarFolderPermissions(calendarPath);
+
             AssignmentCalendarDocuAudit unassignAudit = new AssignmentCalendarDocuAudit(filter);
             logAuditMessage(unassignAudit);
-            Documentation.unassignDocu(filter.getJobschedulerId(), normalizePath(filter.getCalendar()), JobSchedulerObjectType.WORKINGDAYSCALENDAR,
-                    API_CALL_UNASSIGN);
+            Documentation.unassignDocu(filter.getJobschedulerId(), calendarPath, JobSchedulerObjectType.WORKINGDAYSCALENDAR, API_CALL_UNASSIGN);
             storeAuditLogEntry(unassignAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

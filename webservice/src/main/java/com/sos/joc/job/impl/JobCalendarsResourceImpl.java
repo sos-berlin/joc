@@ -25,7 +25,7 @@ public class JobCalendarsResourceImpl extends JOCResourceImpl implements IJobCal
         try {
             JsonValidator.validateFailFast(jobFilterBytes, JobFilter.class);
             JobFilter jobFilter = Globals.objectMapper.readValue(jobFilterBytes, JobFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -33,10 +33,12 @@ public class JobCalendarsResourceImpl extends JOCResourceImpl implements IJobCal
             }
 
             checkRequiredParameter("job", jobFilter.getJob());
+            String jobPath = normalizePath(jobFilter.getJob());
+            checkFolderPermissions(jobPath);
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getSchedulerId(), CalendarType.JOB, normalizePath(jobFilter
-                    .getJob()), jobFilter.getCompact());
+            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getSchedulerId(), CalendarType.JOB, jobPath, jobFilter
+                    .getCompact());
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

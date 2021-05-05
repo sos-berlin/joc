@@ -17,15 +17,15 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
     @JsonIgnore
     private String folder;
 
-//    //@JsonIgnore
-//    private String jobChain;
+    // //@JsonIgnore
+    // private String jobChain;
 
-//    //@JsonIgnore
-//    private String orderId;
+    // //@JsonIgnore
+    // private String orderId;
 
     @JsonIgnore
     private Date startTime;
-    
+
     @JsonIgnore
     private String comment;
 
@@ -34,8 +34,8 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
 
     @JsonIgnore
     private String ticketLink;
-    
-    //@JsonIgnore
+
+    // @JsonIgnore
     private String jobschedulerId;
 
     public ModifyOrderAudit(ModifyOrder modifyOrder, ModifyOrders modifyOrders) {
@@ -57,8 +57,8 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
             if (modifyOrder.getJobChain() != null) {
                 Path p = Paths.get(modifyOrder.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                //this.jobChain = p.toString().replace('\\', '/');
-                //this.orderId = modifyOrder.getOrderId();
+                // this.jobChain = p.toString().replace('\\', '/');
+                // this.orderId = modifyOrder.getOrderId();
             }
         }
         if (modifyOrders != null) {
@@ -66,7 +66,7 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
             this.jobschedulerId = modifyOrders.getJobschedulerId();
         }
     }
-    
+
     public ModifyOrderAudit(ModifyOrder modifyOrder, ModifyTransfers modifyTransfers) {
         if (modifyOrder != null) {
             setAt(modifyOrder.getAt());
@@ -86,8 +86,8 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
             if (modifyOrder.getJobChain() != null) {
                 Path p = Paths.get(modifyOrder.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                //this.jobChain = p.toString().replace('\\', '/');
-                //this.orderId = modifyOrder.getOrderId();
+                // this.jobChain = p.toString().replace('\\', '/');
+                // this.orderId = modifyOrder.getOrderId();
             }
         }
         if (modifyTransfers != null) {
@@ -95,7 +95,7 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
             this.jobschedulerId = modifyTransfers.getJobschedulerId();
         }
     }
-    
+
     public ModifyOrderAudit(OrderV order, ModifyTransfers modifyTransfers) {
         if (order != null) {
             setEndState(order.getEndState());
@@ -109,15 +109,15 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
             startTime = null;
             Path p = Paths.get(order.getJobChain());
             this.folder = p.getParent().toString().replace('\\', '/');
-            //this.jobChain = p.toString().replace('\\', '/');
-            //this.orderId = order.getOrderId();
+            // this.jobChain = p.toString().replace('\\', '/');
+            // this.orderId = order.getOrderId();
         }
         if (modifyTransfers != null) {
             setAuditParams(modifyTransfers.getAuditLog());
             this.jobschedulerId = modifyTransfers.getJobschedulerId();
         }
     }
-    
+
     private void setAuditParams(AuditParams auditParams) {
         if (auditParams != null) {
             this.comment = auditParams.getComment();
@@ -156,22 +156,22 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
         return null;
     }
 
-//    @Override
-//    //@JsonIgnore
-//    public String getJobChain() {
-//        return jobChain;
-//    }
+    // @Override
+    // //@JsonIgnore
+    // public String getJobChain() {
+    // return jobChain;
+    // }
 
-//    @Override
-//    //@JsonIgnore
-//    public String getOrderId() {
-//        return orderId;
-//    }
-    
-//    @JsonIgnore
-//    public void setOrderId(String orderId) {
-//        this.orderId = orderId;
-//    }
+    // @Override
+    // //@JsonIgnore
+    // public String getOrderId() {
+    // return orderId;
+    // }
+
+    // @JsonIgnore
+    // public void setOrderId(String orderId) {
+    // this.orderId = orderId;
+    // }
 
     @Override
     @JsonIgnore
@@ -180,7 +180,7 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
     }
 
     @Override
-    //@JsonIgnore
+    // @JsonIgnore
     public String getJobschedulerId() {
         return jobschedulerId;
     }
@@ -190,7 +190,7 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
     public Date getStartTime() {
         return startTime;
     }
-    
+
     @JsonIgnore
     public void setStartTime(Instant startTime) {
         if (startTime != null) {
@@ -198,5 +198,11 @@ public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
         } else {
             this.startTime = null;
         }
+    }
+
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
     }
 }

@@ -56,24 +56,26 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
             List<ProcessClassPath> processClassPaths = processClassFilter.getProcessClasses();
             boolean withFolderFilter = processClassFilter.getFolders() != null && !processClassFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(processClassFilter.getFolders());
 
             if (processClassPaths != null && !processClassPaths.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                for (ProcessClassPath processClassPath : processClassPaths) {
-                    checkRequiredParameter("processClass", processClassPath.getProcessClass());
-                    if (processClassPath != null && canAdd(processClassPath.getProcessClass(), permittedFolders)) {
-                        DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(normalizePath(processClassPath.getProcessClass()),
-                                dbItemInventoryInstance.getId());
-                        if (processClassFromDb == null) {
-                            continue;
+                for (ProcessClassPath processClass : processClassPaths) {
+                    if (processClass != null) {
+                        checkRequiredParameter("processClass", processClass.getProcessClass());
+                        String processClassPath = normalizePath(processClass.getProcessClass());
+                        if (canAdd(processClassPath, permittedFolders)) {
+                            DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(processClassPath, dbItemInventoryInstance.getId());
+                            if (processClassFromDb == null) {
+                                continue;
+                            }
+                            listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, documentations.get(processClassFromDb.getName()),
+                                    processClassFromDb));
                         }
-                        listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, documentations.get(processClassFromDb.getName()),
-                                processClassFromDb));
                     }
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 Map<String, ProcessClassP> mapOfProcessClasses = new HashMap<String, ProcessClassP>();
                 for (Folder folder : folders) {

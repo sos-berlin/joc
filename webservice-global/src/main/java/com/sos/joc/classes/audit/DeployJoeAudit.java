@@ -155,4 +155,10 @@ public class DeployJoeAudit extends FilterDeploy implements IAuditLog {
     public void setToDelete(Boolean toDelete) {
         this.toDelete = toDelete;
     }
+    
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

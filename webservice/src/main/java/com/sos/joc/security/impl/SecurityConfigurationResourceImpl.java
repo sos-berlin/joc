@@ -12,6 +12,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.security.SOSSecurityConfiguration;
 import com.sos.joc.classes.security.SOSSecurityConfigurationMasters;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
+import com.sos.joc.db.configuration.JocConfigurationFilter;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.security.SecurityConfiguration;
 import com.sos.joc.security.resource.ISecurityConfigurationResourceRead;
@@ -44,7 +45,10 @@ public class SecurityConfigurationResourceImpl extends JOCResourceImpl implement
 			
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL_READ);
             JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
-            entity.setProfiles(jocConfigurationDBLayer.getJocConfigurationProfiles());
+            JocConfigurationFilter filter = new JocConfigurationFilter();
+            filter.setConfigurationType("PROFILE");
+     
+            entity.setProfiles(jocConfigurationDBLayer.getJocConfigurationProfiles(filter));
 			
             entity.setDeliveryDate(Date.from(Instant.now()));
 

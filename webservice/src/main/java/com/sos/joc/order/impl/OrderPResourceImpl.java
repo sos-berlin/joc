@@ -36,7 +36,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
         try {
             JsonValidator.validateFailFast(orderFilterBytes, OrderFilter.class);
             OrderFilter orderFilter = Globals.objectMapper.readValue(orderFilterBytes, OrderFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken, orderFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     orderFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -45,17 +45,17 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
 
             checkRequiredParameter("orderId", orderFilter.getOrderId());
             checkRequiredParameter("jobChain", orderFilter.getJobChain());
+            String jobChainPath = normalizePath(orderFilter.getJobChain());
+            checkFolderPermissions(jobChainPath);
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Long instanceId = dbItemInventoryInstance.getId();
             Boolean compact = orderFilter.getCompact();
             OrderP200 entity = new OrderP200();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
-            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(normalizePath(orderFilter.getJobChain()), orderFilter
-                    .getOrderId(), instanceId);
+            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(jobChainPath, orderFilter.getOrderId(), instanceId);
             if (dbItemInventoryOrder == null) {
-                throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", orderFilter.getJobChain(), orderFilter
-                        .getOrderId()));
+                throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", jobChainPath, orderFilter.getOrderId()));
             }
             DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
             OrderP order = new OrderP();

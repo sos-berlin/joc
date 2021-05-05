@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,7 +54,7 @@ public class YadeOverviewSnapshotResourceImpl extends JOCResourceImpl implements
 			OrdersFilter ordersBody = new OrdersFilter();
 			ordersBody.setOrders(new ArrayList<OrderPath>());
 			ordersBody.setCompact(true);
-			List<Folder> folders = addPermittedFolder(null);
+			Set<Folder> folders = folderPermissions.getListOfFolders();
 
 			JOCJsonCommand command = new JOCJsonCommand(this);
 			command.setUriBuilderForOrders();

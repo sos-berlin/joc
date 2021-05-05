@@ -26,7 +26,7 @@ public class AuditLogDBLayer extends DBLayer {
         String where = "";
         String and = "";
 
-        if (filter.getSchedulerId() != null && !"".equals(filter.getSchedulerId())) {
+        if (filter.getSchedulerId() != null && !filter.getSchedulerId().isEmpty()) {
             where += and + " schedulerId = :schedulerId";
             and = " and ";
         } else {
@@ -40,6 +40,10 @@ public class AuditLogDBLayer extends DBLayer {
         }
         if (filter.getCreatedTo() != null) {
             where += and + " created < :to";
+            and = " and ";
+        }
+        if (filter.getRequests() != null && !filter.getRequests().isEmpty()) {
+            where += and + SearchStringHelper.getStringListPathSql(filter.getRequests(), "request");
             and = " and ";
         }
         if (filter.getTicketLink() != null && !filter.getTicketLink().isEmpty()) {
@@ -60,8 +64,13 @@ public class AuditLogDBLayer extends DBLayer {
             and = " and ";
         }
 
+        if (filter.getListOfJobStreams() != null && !filter.getListOfJobStreams().isEmpty()) {
+            where += and + SearchStringHelper.getStringListPathSql(filter.getListOfJobStreams(), "jobStream");
+            and = " and ";
+        }
+
         if (filter.getListOfFolders() != null && !filter.getListOfFolders().isEmpty()) {
-            where += and + SearchStringHelper.getStringListPathSql(filter.getStringListOfFolders(), "folder");
+            where += and + SearchStringHelper.getStringListPathSql(filter.getListOfFolders(), "folder");
             and = " and ";
         }
 
@@ -133,7 +142,7 @@ public class AuditLogDBLayer extends DBLayer {
 
             bindParameters(query, auditLogDBFilter);
 
-            if (limit != null) {
+            if (limit != null && limit > 0) {
                 query.setMaxResults(limit);
             }
             return getSession().getResultList(query);

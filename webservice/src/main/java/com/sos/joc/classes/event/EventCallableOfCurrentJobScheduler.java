@@ -320,14 +320,46 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         String eventRemoved = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name(), null);
                         String inconditionValidated = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated
                                 .name(), null);
-                        if (eventCreated != null) {
+                        String taskEnded = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name(), null);
+                        String isAlive = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.IsAlive.name(), null);
+                        String jobStreamStarted = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name(),
+                                null);
+                        String jobStreamCompleted = variables.getString(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamCompleted.name(),
+                                null);
+
+                        String contextId = variables.getString("contextId", null);
+                        String taskEndState = variables.getString("taskEndState", null);
+
+                        String path = variables.getString("path", null);
+                        if (isAlive != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.IsAlive.name());
+                            eventSnapshot.setState("Job Stream Plugin is active");
+                            eventSnapshot.setPath(isAlive);
+                        } else if (jobStreamStarted != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamStarted.name());
+                            eventSnapshot.setNodeId(contextId);
+                            eventSnapshot.setPath(jobStreamStarted);
+                        } else if (jobStreamCompleted != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.JobStreamCompleted.name());
+                            eventSnapshot.setNodeId(contextId);
+                            eventSnapshot.setPath(jobStreamCompleted);
+                        } else if (taskEnded != null) {
+                            eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.TaskEnded.name());
+                            eventSnapshot.setState(taskEndState);
+                            eventSnapshot.setTaskId(taskEnded);
+                            eventSnapshot.setPath(path);
+                            eventSnapshot.setNodeId(contextId);
+                        } else if (eventCreated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventCreated.name());
-                            eventSnapshot.setPath(eventCreated);
+                            eventSnapshot.setNodeId(contextId);
+                            eventSnapshot.setPath(path);
                         } else if (eventRemoved != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.EventRemoved.name());
-                            eventSnapshot.setPath(eventRemoved);
+                            eventSnapshot.setNodeId(contextId);
+                            eventSnapshot.setPath(path);
                         } else if (inconditionValidated != null) {
                             eventSnapshot.setEventType(JobSchedulerJobStreamsEventHandler.CustomEventType.InconditionValidated.name());
+                            eventSnapshot.setNodeId(contextId);
                             eventSnapshot.setPath(inconditionValidated);
                         }
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);

@@ -91,7 +91,7 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
                     try {
                         doc = reader.read(new StringReader(jitlDoc.getContent()));
                     } catch (DocumentException e) {
-                        Throwable nested = e.getNestedException();
+                        Throwable nested = e.getCause();
                         if (nested != null && SAXParseException.class.isInstance(nested)) {
                             // On Apache, this should be thrown when disallowing DOCTYPE
                             throw new SAXException("A DOCTYPE was passed into the XML document", e);
@@ -187,7 +187,7 @@ public class WizardResourceImpl extends JOCResourceImpl implements IWizardResour
             job.setTitle(jobNode.attributeValue("title"));
             List<Param> params = new ArrayList<Param>();
             
-            for (Object paramObj : xpathParam.selectNodes(doc)) {
+            for (Node paramObj : xpathParam.selectNodes(doc)) {
                 Element paramElem = (Element) paramObj;
                 Param param = new Param();
                 param.setDefaultValue(paramElem.attributeValue("default_value"));

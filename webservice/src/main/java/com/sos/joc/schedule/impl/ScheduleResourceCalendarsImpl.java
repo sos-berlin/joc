@@ -26,7 +26,7 @@ public class ScheduleResourceCalendarsImpl extends JOCResourceImpl implements IS
         try {
             JsonValidator.validateFailFast(scheduleFilterBytes, ScheduleFilter.class);
             ScheduleFilter scheduleFilter = Globals.objectMapper.readValue(scheduleFilterBytes, ScheduleFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleFilter, accessToken, scheduleFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(scheduleFilter.getJobschedulerId(), accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -34,10 +34,12 @@ public class ScheduleResourceCalendarsImpl extends JOCResourceImpl implements IS
             }
 
             checkRequiredParameter("schedule", scheduleFilter.getSchedule());
+            String schedulePath = normalizePath(scheduleFilter.getSchedule());
+            checkFolderPermissions(schedulePath);
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getSchedulerId(), CalendarType.SCHEDULE, normalizePath(
-                    scheduleFilter.getSchedule()), scheduleFilter.getCompact());
+            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getSchedulerId(), CalendarType.SCHEDULE, schedulePath,
+                    scheduleFilter.getCompact());
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

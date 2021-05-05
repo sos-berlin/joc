@@ -54,6 +54,8 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
             }
 
             checkRequiredParameter("job", taskHistoryFilter.getJob());
+            checkFolderPermissions(taskHistoryFilter.getJob());
+            
             List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
             if (taskHistoryFilter.getMaxLastHistoryItems() == null) {
                 taskHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);

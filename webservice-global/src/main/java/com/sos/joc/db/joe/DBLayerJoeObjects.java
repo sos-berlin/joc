@@ -18,6 +18,7 @@ import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.tree.JoeTree;
 import com.sos.joc.model.tree.Tree;
 
@@ -302,6 +303,14 @@ public class DBLayerJoeObjects {
             throw new DBInvalidDataException(ex);
         }
     }
+    
+    public DBItemJoeObject getJoeObject(String jobSchedulerId, String path, JobSchedulerObjectType type) throws DBConnectionRefusedException, DBInvalidDataException {
+        FilterJoeObjects filter = new FilterJoeObjects();
+        filter.setSchedulerId(jobSchedulerId);
+        filter.setPath(path);
+        filter.setObjectType(type);
+        return getJoeObject(filter);
+    }
 
     public void update(DBItemJoeObject item) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
@@ -347,6 +356,22 @@ public class DBLayerJoeObjects {
         } catch (Exception ex) {
             throw new DBInvalidDataException(ex);
         }
+    }
+    
+    public List<DBItemJoeObject> getOrdersAndNodeParams(DBItemJoeObject jobChain) throws DBConnectionRefusedException, DBInvalidDataException {
+        FilterJoeObjects filter = new FilterJoeObjects();
+        filter.setJobChainWithOrders(jobChain.getPath());
+        filter.setSchedulerId(jobChain.getSchedulerId());
+        filter.setObjectTypes(JobSchedulerObjectType.ORDER.value(), JobSchedulerObjectType.NODEPARAMS.value());
+        return getJoeObjectList(filter, 0);
+    }
+    
+    public List<DBItemJoeObject> getNodeParams(DBItemJoeObject order) throws DBConnectionRefusedException, DBInvalidDataException {
+        FilterJoeObjects filter = new FilterJoeObjects();
+        filter.setPath(order.getPath());
+        filter.setSchedulerId(order.getSchedulerId());
+        filter.setObjectType(JobSchedulerObjectType.NODEPARAMS);
+        return getJoeObjectList(filter, 0);
     }
 
 }

@@ -1,17 +1,17 @@
 package com.sos.joc.xmleditor.common;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 import java.net.ConnectException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,27 +34,32 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.joc.classes.xmleditor.JocXmlEditor;
 import com.sos.joc.classes.xmleditor.exceptions.XmlNotMatchSchemaException;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 
+import sos.util.SOSString;
+
 public class Xml2JsonConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Xml2JsonConverter.class);
-    private static boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
     private XPath xpathSchema;
     private XPath xpathXml;
     private Node rootSchema;
     private Node rootXml;
     private String rootElementNameXml;
+    private Map<String, String> xsdDocs;
     private List<String> elements;
     private long uuid;
 
     public String convert(ObjectType type, Path schema, String xml) throws Exception {
         if (Files.exists(schema) && Files.isReadable(schema)) {
-            if (isDebugEnabled) {
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("[schema][use local file]%s", schema));
             }
         } else {
@@ -78,18 +83,41 @@ public class Xml2JsonConverter {
             LOGGER.error(String.format("[%s][%s]%s", schema.toString(), xml, e.toString()), e);
             throw new Exception(String.format("XML can't be loaded: %s", e.getMessage()));
         }
+
+        ByteArrayOutputStream baos = null;
+        JsonGenerator gen = null;
         try {
             uuid = -1;
+            xsdDocs = new HashMap<String, String>();
             elements = new ArrayList<String>();
             elements.add(rootElementNameXml);
 
-            JsonObjectBuilder builder = Json.createObjectBuilder();
-            builder = buildElements(builder, null, rootXml, 0, 0);
-            builder.add("lastUuid", uuid);
+            baos = new ByteArrayOutputStream();
+            gen = new JsonFactory().createGenerator(baos, JsonEncoding.UTF8);
+            writeElements(gen, null, rootXml, 0, 0);
+            gen.writeNumberField("lastUuid", uuid);
+            gen.writeEndObject();
+            gen.close();
+            gen = null;
 
-            return builder.build().toString();
+            return new String(baos.toByteArray(), "UTF-8");
         } catch (Exception ex) {
             throw new Exception(ex.toString(), ex);
+        } finally {
+            if (gen != null) {
+                try {
+                    gen.close();
+                } catch (Throwable e) {
+                    LOGGER.warn(e.toString(), e);
+                }
+            }
+            if (baos != null) {
+                try {
+                    baos.close();
+                } catch (Throwable e) {
+                    LOGGER.warn(e.toString(), e);
+                }
+            }
         }
     }
 
@@ -125,7 +153,6 @@ public class Xml2JsonConverter {
         if (elements.contains(elementName)) {
             return true;
         }
-
         try {
             String xpath = String.format("//xs:element[@name='%s']", elementName);
             XPathExpression ex = xpathSchema.compile(xpath);
@@ -137,149 +164,164 @@ public class Xml2JsonConverter {
         } catch (Throwable e) {
             LOGGER.error(String.format("[%s]%s", elementName, e.toString()), e);
         }
-
         return false;
     }
 
-    private JsonObjectBuilder buildElements(JsonObjectBuilder parentBuilder, Node parent, Node current, long level, long parentId) throws Exception {
+    private void writeElements(JsonGenerator gen, Node parent, Node current, long level, long parentId) throws Exception {
         String parentName = parent == null ? "#" : parent.getNodeName();
         boolean expanded = level < 2 ? true : false;
+        boolean writeEndObject = level == 0 ? false : true;
 
         uuid++;
         long currentUuid = uuid;
 
-        if (isDebugEnabled) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[%s][level=%s][parentId=%s][uuid=%s]expanded=%s", current.getNodeName(), level, parentId, uuid, expanded));
         }
-        parentBuilder.add("ref", current.getNodeName());
-        parentBuilder.add("xsd", fromXsd(current.getNodeName()));
-        parentBuilder.add("parent", parentName);
-        parentBuilder.add("uuid", currentUuid);
-
+        gen.writeStartObject();
+        gen.writeStringField("ref", current.getNodeName());
+        gen.writeBooleanField("xsd", fromXsd(current.getNodeName()));
+        gen.writeStringField("parent", parentName);
+        gen.writeNumberField("uuid", currentUuid);
+        gen.writeBooleanField("expanded", expanded);
         if (parent != null) {
-            parentBuilder.add("parentId", parentId);
+            gen.writeNumberField("parentId", parentId);
         }
-        parentBuilder = writeDoc(parentBuilder, current, null);
-        parentBuilder.add("expanded", expanded);
+        writeDoc(gen, current, null);
 
-        JsonArrayBuilder nodesBuilder = Json.createArrayBuilder();
         NodeList childs = current.getChildNodes();
         level++;
         String cdata = null;
         String textValue = null;
+
+        gen.writeFieldName("nodes");
+        gen.writeStartArray();
         for (int i = 0; i < childs.getLength(); i++) {
             Node child = childs.item(i);
-            if (child.getNodeType() == Node.ELEMENT_NODE) {
-                JsonObjectBuilder b = buildElements(Json.createObjectBuilder(), current, child, level, currentUuid);
-                nodesBuilder.add(b);
-            } else if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
+            switch (child.getNodeType()) {
+            case Node.ELEMENT_NODE:
+                writeElements(gen, current, child, level, currentUuid);
+                break;
+            case Node.CDATA_SECTION_NODE:
                 cdata = child.getTextContent();
-
-            } else if (child.getNodeType() == Node.TEXT_NODE) {
+                break;
+            case Node.TEXT_NODE:
                 textValue = child.getNodeValue();
+                break;
             }
         }
+        gen.writeEndArray();
+
+        boolean show = true;
+        NamedNodeMap attributes = current.getAttributes();
+        if (attributes != null && attributes.getLength() > 0) {
+            gen.writeFieldName("attributes");
+            gen.writeStartArray();
+            for (int i = 0; i < attributes.getLength(); i++) {
+                Node attribute = attributes.item(i);
+
+                gen.writeStartObject();
+                gen.writeStringField("name", attribute.getNodeName());
+                gen.writeStringField("data", attribute.getNodeValue());
+                gen.writeStringField("parent", current.getNodeName());
+                uuid++;
+                gen.writeNumberField("id", uuid);
+                writeDoc(gen, current, attribute);
+                gen.writeEndObject();
+            }
+            gen.writeEndArray();
+            show = false;
+        }
+
         if (cdata == null) {
             if (textValue != null && textValue.trim().length() > 0) {
                 cdata = textValue;
             }
         }
-
-        parentBuilder.add("nodes", nodesBuilder);
-
-        boolean show = true;
-        NamedNodeMap attributes = current.getAttributes();
-        if (attributes != null && attributes.getLength() > 0) {
-            JsonArrayBuilder attributesBuilder = Json.createArrayBuilder();
-            for (int i = 0; i < attributes.getLength(); i++) {
-                Node attribute = attributes.item(i);
-
-                JsonObjectBuilder builder = Json.createObjectBuilder();
-                builder.add("name", attribute.getNodeName());
-                builder.add("data", attribute.getNodeValue());
-                builder.add("parent", current.getNodeName());
-                uuid++;
-                builder.add("id", uuid);
-                builder = writeDoc(builder, current, attribute);
-                attributesBuilder.add(builder);
-            }
-            parentBuilder.add("attributes", attributesBuilder);
-            show = false;
-        }
-
         if (cdata != null) {
-            JsonObjectBuilder builder = Json.createObjectBuilder();
-            builder.add("parent", current.getNodeName());
-            builder.add("data", cdata);
+            gen.writeFieldName("values");
+            gen.writeStartArray();
+            gen.writeStartObject();
+            gen.writeStringField("parent", current.getNodeName());
+            gen.writeStringField("data", cdata);
             uuid++;
-            builder.add("uuid", uuid);
+            gen.writeNumberField("uuid", uuid);
+            gen.writeEndObject();
+            gen.writeEndArray();
 
-            JsonArrayBuilder cdataBuilder = Json.createArrayBuilder();
-            cdataBuilder.add(builder);
-            parentBuilder.add("values", cdataBuilder);
             show = false;
         }
-        parentBuilder.add("show", show);
-        return parentBuilder;
+        gen.writeBooleanField("show", show);
+        if (writeEndObject) {
+            gen.writeEndObject();
+        }
     }
 
-    private JsonObjectBuilder writeDoc(JsonObjectBuilder parentBuilder, Node parent, Node attribute) throws Exception {
+    private void writeDoc(JsonGenerator gen, Node parent, Node attribute) throws Exception {
         Node node = null;
         String doc = null;
         String attrDefaultValue = null;
+        String mapKey = null;
         if (attribute == null) {
-            String xpath = String.format("./xs:element[@name='%s']/xs:annotation/xs:documentation", parent.getNodeName());
-            XPathExpression ex = xpathSchema.compile(xpath);
-            node = (Node) ex.evaluate(rootSchema, XPathConstants.NODE);
-
-        } else {
-            String xpath = String.format("./xs:element[@name='%s']//xs:attribute[@name='%s']/xs:annotation/xs:documentation", parent.getNodeName(),
-                    attribute.getNodeName());
-            XPathExpression ex = xpathSchema.compile(xpath);
-            node = (Node) ex.evaluate(rootSchema, XPathConstants.NODE);
-
-            try {
-                Node xsdAttr = node.getParentNode().getParentNode();
-                NamedNodeMap attrs = xsdAttr.getAttributes();
-                if (attrs != null && attrs.getNamedItem("default") != null) {
-                    attrDefaultValue = attrs.getNamedItem("default").getNodeValue();
-                }
-            } catch (Throwable e) {
-
+            mapKey = new StringBuilder("sosel_").append(parent.getNodeName()).toString();
+            doc = xsdDocs.get(mapKey);
+            if (doc == null) {
+                String xpath = String.format("./xs:element[@name='%s']/xs:annotation/xs:documentation", parent.getNodeName());
+                XPathExpression ex = xpathSchema.compile(xpath);
+                node = (Node) ex.evaluate(rootSchema, XPathConstants.NODE);
             }
-        }
-        if (node != null) {
-            if (node.hasChildNodes()) {
-                Node currentChild = node.getFirstChild();
-                while (currentChild != null) {
-                    if (currentChild.getNodeType() == Node.ELEMENT_NODE) {
-                        break;
+        } else {
+            mapKey = new StringBuilder("sosattr_").append(parent.getNodeName()).append("_").append(attribute.getNodeName()).toString();
+            doc = xsdDocs.get(mapKey);
+            if (doc == null) {
+                String xpath = String.format("./xs:element[@name='%s']//xs:attribute[@name='%s']/xs:annotation/xs:documentation", parent
+                        .getNodeName(), attribute.getNodeName());
+                XPathExpression ex = xpathSchema.compile(xpath);
+                node = (Node) ex.evaluate(rootSchema, XPathConstants.NODE);
+                try {
+                    Node xsdAttr = node.getParentNode().getParentNode();
+                    NamedNodeMap attrs = xsdAttr.getAttributes();
+                    if (attrs != null && attrs.getNamedItem("default") != null) {
+                        attrDefaultValue = attrs.getNamedItem("default").getNodeValue();
                     }
-                    currentChild = currentChild.getNextSibling();
-                }
+                } catch (Throwable e) {
 
-                String content = nodeToString(currentChild).trim();
-                if (content != null) {
-                    doc = content;
                 }
-            }
-
-            if (attrDefaultValue != null) {
-                doc += "<br />Default: " + attrDefaultValue;
             }
         }
-
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("parent", parent.getNodeName());
-
         if (doc == null) {
-            builder.add("doc", Json.createArrayBuilder());
-        } else {
-            builder.add("doc", doc);
-            // builder.add("doc", Json.createArrayBuilder());
+            if (node != null) {
+                if (node.hasChildNodes()) {
+                    Node currentChild = node.getFirstChild();
+                    while (currentChild != null) {
+                        if (currentChild.getNodeType() == Node.ELEMENT_NODE) {
+                            break;
+                        }
+                        currentChild = currentChild.getNextSibling();
+                    }
+                    String content = nodeToString(currentChild).trim();
+                    if (content != null) {
+                        doc = content;
+                    }
+                }
+                if (attrDefaultValue != null) {
+                    doc += "<br />Default: " + attrDefaultValue;
+                }
+            }
+            xsdDocs.put(mapKey, SOSString.isEmpty(doc) ? "" : doc);
         }
-        parentBuilder.add("text", builder);
-        return parentBuilder;
+        gen.writeFieldName("text");
+
+        gen.writeStartObject();
+        gen.writeStringField("parent", parent.getNodeName());
+        if (SOSString.isEmpty(doc)) {
+            gen.writeFieldName("doc");
+            gen.writeStartArray();
+            gen.writeEndArray();
+        } else {
+            gen.writeStringField("doc", doc);
+        }
+        gen.writeEndObject();
     }
 
     private static String nodeToString(Node node) {

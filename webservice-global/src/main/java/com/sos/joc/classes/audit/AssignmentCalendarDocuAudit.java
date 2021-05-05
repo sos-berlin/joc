@@ -89,4 +89,10 @@ public class AssignmentCalendarDocuAudit extends CalendarDocuFilter implements I
         return null;
     }
 
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
+
 }

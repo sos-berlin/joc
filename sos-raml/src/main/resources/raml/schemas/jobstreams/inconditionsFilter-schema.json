@@ -1,0 +1,37 @@
+{
+	"title": "condition Jobs Filter",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Reset Workflow, unconsume expressions",
+	"javaType": "com.sos.joc.model.jobstreams.ConditionJobsFilter",
+	"type": "object",
+	"required": [
+		"jobschedulerId"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"folder": {
+			"$ref": "../common/path-schema.json"
+		},
+		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"jobs": {
+			"type": "array",
+			"items": {
+				"$ref": "../job/jobPath-schema.json"
+			}
+		},
+		"compact": {
+			"type": "boolean"
+		},
+		"expression": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"session": {
+			"$ref": "../common/string255-schema.json"
+		}
+	}
+}
+      

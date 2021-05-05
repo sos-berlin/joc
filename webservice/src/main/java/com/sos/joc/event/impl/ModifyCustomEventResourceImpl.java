@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.jitl.eventing.db.SchedulerEventDBLayer;
 import com.sos.jitl.eventing.db.SchedulerEventFilter;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -33,6 +34,8 @@ import com.sos.joc.model.order.ModifyOrders;
 import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
 
+import sos.scheduler.job.JobSchedulerEventJob;
+
 @Path("events")
 public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IModifyCustomEventResource {
 
@@ -40,6 +43,8 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModifyCustomEventResourceImpl.class);
 
+    private static final String EXPIRATION_CYCLE_DATE_FORMAT = "HH:mm:ss";
+    private static final String EXPIRES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final String JOB_CHAIN_EVENT_SERVICE = "/sos/events/scheduler_event_service";
     private static final String REMOVE = "remove";
     private static final String ADD = "add";
@@ -87,7 +92,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
         try {
             JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + request, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
                     getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getJobChain().getExecute().isAddOrder());
             if (jocDefaultResponse != null) {
@@ -114,6 +119,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
                 logAuditMessage(orderAudit);
 
                 schedulerEventDBLayer.beginTransaction();
+                String timeZone = "";
                 ModifyEvent modifyEvent = new ModifyEvent();
                 if (order.getParams() != null && !order.getParams().isEmpty()) {
                     for (NameValuePair param : order.getParams()) {
@@ -133,6 +139,10 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
                         }
                         if ("expires".equals(param.getName()) && !param.getValue().isEmpty()) {
                             modifyEvent.setExpires(param.getValue());
+                        }
+
+                        if ("expires_timezone".equals(param.getName()) && !param.getValue().isEmpty()) {
+                            timeZone = param.getValue();
                         }
 
                         if ("expiration_cycle".equals(param.getName()) && !param.getValue().isEmpty()) {
@@ -157,6 +167,23 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
                         }
 
                     }
+
+                    if (!"".equals(timeZone) && timeZone != null) {
+                        if ((!"".equals(modifyEvent.getExpirationCycle()) && modifyEvent.getExpirationCycle() != null)) {
+                            String expirationCycle = modifyEvent.getExpirationCycle() + ":00:00:00";
+                            expirationCycle = expirationCycle.substring(0, 8);
+                            expirationCycle = UtcTimeHelper.convertTimeZoneToTimeZone(EXPIRATION_CYCLE_DATE_FORMAT, timeZone, "UTC", expirationCycle);
+                            modifyEvent.setExpirationCycle(expirationCycle);
+                        }
+                        if ((!"".equals(modifyEvent.getExpires()) && modifyEvent.getExpires() != null)) {
+                            String expires = modifyEvent.getExpires() + ":00:00:00";
+                            expires = expires.substring(0, 8);
+                            expires = UtcTimeHelper.convertTimeZoneToTimeZone(EXPIRES_DATE_FORMAT, timeZone, "UTC", expires);
+                            modifyEvent.setExpires(expires);
+
+                        }
+                    }
+
                     performEventRequest(request, modifyEvent);
                     schedulerEventDBLayer.commit();
                     storeAuditLogEntry(orderAudit);
@@ -197,19 +224,34 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
         schedulerEventFilter.setEventId(modifyEvent.getEventId());
         schedulerEventFilter.setEventClass(modifyEvent.getEventClass());
 
+        String timeZone = modifyEvent.getExpiresTimezone();
+
+        if (!"".equals(timeZone) && timeZone != null) {
+            if ((!"".equals(modifyEvent.getExpirationCycle()) && modifyEvent.getExpirationCycle() != null)) {
+                String expirationCycle = modifyEvent.getExpirationCycle() + ":00:00:00";
+                expirationCycle = expirationCycle.substring(0, 8);
+                expirationCycle = UtcTimeHelper.convertTimeZoneToTimeZone(EXPIRATION_CYCLE_DATE_FORMAT, timeZone, "UTC", expirationCycle);
+                modifyEvent.setExpirationCycle(expirationCycle);
+            }
+            if ((!"".equals(modifyEvent.getExpires()) && modifyEvent.getExpires() != null)) {
+                String expires = modifyEvent.getExpires();
+                expires = UtcTimeHelper.convertTimeZoneToTimeZone(EXPIRES_DATE_FORMAT, timeZone, "UTC", expires);
+                modifyEvent.setExpires(expires);
+            }
+        }
+
         if (modifyEvent.getExpirationCycle() != null && !modifyEvent.getExpirationCycle().isEmpty()) {
             schedulerEventFilter.setExpirationCycle(modifyEvent.getExpirationCycle());
-        }
-
-        if (modifyEvent.getExpirationPeriod() != null && !modifyEvent.getExpirationPeriod().isEmpty()) {
-            schedulerEventFilter.setExpirationPeriod(modifyEvent.getExpirationPeriod());
         } else {
-            schedulerEventFilter.setExpirationPeriod("24:00:00");
-        }
-
-        if (modifyEvent.getExpires() != null) {
-            Date expiresUtc = JobSchedulerDate.getDateFromISO8601String(modifyEvent.getExpires());
-            schedulerEventFilter.setExpires(expiresUtc);
+            if (modifyEvent.getExpires() != null) {
+                schedulerEventFilter.setExpires(modifyEvent.getExpires());
+            } else {
+                if (modifyEvent.getExpirationPeriod() != null && !modifyEvent.getExpirationPeriod().isEmpty()) {
+                    schedulerEventFilter.setExpirationPeriod(modifyEvent.getExpirationPeriod());
+                } else {
+                    schedulerEventFilter.setExpirationPeriod("24:00:00");
+                }
+            }
         }
 
         schedulerEventFilter.setJobName(modifyEvent.getJob());
@@ -283,7 +325,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             if (eventIdsFilter.getIds() == null || eventIdsFilter.getIds().isEmpty()) {
                 throw new JocMissingRequiredParameterException("'ids' are undefined or not convertible to a collection of number");
             }

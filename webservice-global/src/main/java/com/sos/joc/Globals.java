@@ -38,7 +38,7 @@ import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 
-public class Globals {
+ public class Globals {
 
     private static final String SHIRO_INI_FILENAME = "shiro.ini";
     private static final String HIBERNATE_CONFIGURATION_FILE = "hibernate_configuration_file";
@@ -61,7 +61,7 @@ public class Globals {
     public static long maxSizeOfLogsToDisplay = 1024 * 1024 * 10L; // 10MB
     public static JocWebserviceDataContainer jocWebserviceDataContainer = JocWebserviceDataContainer.getInstance();
     public static JocCockpitProperties jocConfigurationProperties;
-    public static IniSecurityManagerFactory factory = null;
+    public static IniSecurityManagerFactory shiroSecurityManagerfactory = null;
     public static long timeoutToDeleteTempFiles = 1000 * 60 * 3L;
     public static TimeZone jocTimeZone = TimeZone.getDefault();
     public static boolean rollbackJobHistoryWithJSON = false;
@@ -72,7 +72,9 @@ public class Globals {
     public static String servletContextContextPath = null; // /joc
     public static Path servletContextRealPath = null;
     public static URI servletBaseUri = null;
-    
+    public static Map<String, String> schedulerVariables = null;
+    public static String loginClientId="";
+
     public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null || sosHibernateFactory.getSessionFactory() == null) {
             try {
@@ -80,6 +82,7 @@ public class Globals {
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
+                sosHibernateFactory.addClassMapping(DBLayer.getJobStreamClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getYadeClassMapping());
                 sosHibernateFactory.setAutoCommit(true);
                 sosHibernateFactory.build();
@@ -124,28 +127,30 @@ public class Globals {
         }
     }
 
-    public static IniSecurityManagerFactory getShiroIniSecurityManagerFactory() {
-        String iniFile = getShiroIniInClassPath();
-        if (factory == null) {
-            factory = new IniSecurityManagerFactory(getIniFileForShiro(iniFile));
-        } else {
-            Ini oldShiroIni = factory.getIni();
-            Ini currentShiroIni = Ini.fromResourcePath(getIniFileForShiro(iniFile));
-            if (!oldShiroIni.equals(currentShiroIni)) {
-                LOGGER.debug(getIniFileForShiro(iniFile) + " is changed");
-                factory = new IniSecurityManagerFactory();
-                factory.setIni(currentShiroIni);
-            }
-        }
-        return factory;
-    }
-
+ 
+     
+     public static IniSecurityManagerFactory getShiroIniSecurityManagerFactory() {
+         String iniFile = getShiroIniInClassPath();
+         if (shiroSecurityManagerfactory == null) {
+             shiroSecurityManagerfactory = new IniSecurityManagerFactory(getIniFileForShiro(iniFile));
+         } else {
+             Ini oldShiroIni = shiroSecurityManagerfactory.getIni();
+             Ini currentShiroIni = Ini.fromResourcePath(getIniFileForShiro(iniFile));
+             if (!oldShiroIni.equals(currentShiroIni)) {
+                 LOGGER.debug(getIniFileForShiro(iniFile) + " is changed");
+                 shiroSecurityManagerfactory = new IniSecurityManagerFactory();
+                 shiroSecurityManagerfactory.setIni(currentShiroIni);
+             }
+         }
+         return shiroSecurityManagerfactory;
+     }
+     
     public static Ini getIniFromSecurityManagerFactory() {
-        if (factory == null) {
+        if (shiroSecurityManagerfactory == null) {
             String iniFile = getShiroIniInClassPath();
-            factory = new IniSecurityManagerFactory(getIniFileForShiro(iniFile));
+            shiroSecurityManagerfactory = new IniSecurityManagerFactory(getIniFileForShiro(iniFile));
         }
-        return factory.getIni();
+        return shiroSecurityManagerfactory.getIni();
     }
 
     public static String getIniFileForShiro(String iniFile) {

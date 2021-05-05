@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ public class JocServletContainer extends ServletContainer {
     public void init() throws ServletException {
         LOGGER.debug("----> init on starting JOC");
         super.init();
-
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         try {
             cleanupOldDeployedFolders(false);
         } catch (Exception e) {

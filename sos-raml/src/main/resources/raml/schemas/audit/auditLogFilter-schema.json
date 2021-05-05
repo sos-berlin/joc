@@ -13,14 +13,29 @@
     "jobs": {
       "type": "array",
       "items": {
-        "javaType": "com.sos.joc.model.job.JobPath",
+        "javaType": "com.sos.joc.model.audit.JobPath",
         "type": "object",
         "required": [
           "job"
         ],
         "properties": {
           "job": {
-            "$ref": "../common/path-schema.json"
+            "$ref": "../common/searchPath-schema.json"
+          }
+        }
+      }
+    },
+     "jobStreams": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.audit.JobStreamPath",
+        "type": "object",
+        "required": [
+          "jobStream"
+        ],
+        "properties": {
+          "jobStream": {
+            "$ref": "../common/searchPath-schema.json"
           }
         }
       }
@@ -28,14 +43,11 @@
     "orders": {
       "type": "array",
       "items": {
-        "javaType": "com.sos.joc.model.order.OrderPath",
+        "javaType": "com.sos.joc.model.audit.OrderPath",
         "type": "object",
-        "required": [
-          "jobChain"
-        ],
         "properties": {
           "jobChain": {
-            "$ref": "../common/path-schema.json"
+            "$ref": "../common/searchPath-schema.json"
           },
           "orderId": {
             "description": "if orderId undefined or empty then all orders of specified job chain are requested",
@@ -47,7 +59,7 @@
     "calendars": {
       "type": "array",
       "items": {
-        "$ref": "../common/path-schema.json"
+        "$ref": "../common/searchPath-schema.json"
       }
     },
     "folders": {
@@ -55,6 +67,12 @@
     },
     "account": {
       "$ref": "../common/string255-schema.json"
+    },
+    "requests": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/searchPath-schema.json"
+      }
     },
     "regex": {
       "$ref": "../common/regexFilter-schema.json"

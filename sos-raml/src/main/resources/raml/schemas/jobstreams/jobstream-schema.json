@@ -1,0 +1,49 @@
+{
+	"title": "JobStream",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Reset Workflow, unconsume expressions",
+	"javaType": "com.sos.joc.model.jobstreams.JobStream",
+	"type": "object",
+	"required": [
+		"jobschedulerId"
+	],
+	"properties": {
+		"deliveryDate": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"jobStreamId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
+		"oldJobStreamName": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"folder": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"state": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"jobstreamStarters": {
+			"type": "array",
+			"items": {
+				"$ref": "jobstreamStarter-schema.json"
+			}
+		},
+		"jobs": {
+			"type": "array",
+			"items": {
+				"$ref": "jobstreamJob-schema.json"
+			}
+		},
+		"auditLog": {
+			"$ref": "../audit/auditParams-schema.json"
+		}
+	}
+}
+      

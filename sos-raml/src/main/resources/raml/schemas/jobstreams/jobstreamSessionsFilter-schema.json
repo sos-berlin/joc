@@ -1,0 +1,48 @@
+{
+	"title": "JobStreamSessions Filter",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Reset Workflow, unconsume expressions",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreamSessionsFilter",
+	"type": "object",
+	"required": [
+		"jobschedulerId"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"session": {
+			"type": "array",
+			"items": {
+				"$ref": "../common/string255-schema.json"
+			}
+		},
+		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"jobStreamId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
+		"jobStreamStarterId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
+		"status": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"dateFrom": {
+			"$ref": "../common/dateFromTo-schema.json"
+		},
+		"dateTo": {
+			"$ref": "../common/dateFromTo-schema.json"
+		},
+		"timeZone": {
+			"description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+			"$ref": "../common/string255-schema.json"
+		},
+		"limit": {
+			"type": "integer",
+			"default": 10000
+		}
+	}
+}
+      

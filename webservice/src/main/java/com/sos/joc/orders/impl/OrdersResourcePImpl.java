@@ -56,22 +56,24 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             String regex = ordersFilter.getRegex();
             List<OrderPath> orderPaths = ordersFilter.getOrders();
             boolean withFolderFilter = ordersFilter.getFolders() != null && !ordersFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(ordersFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(ordersFilter.getFolders());
             
             List<DBItemInventoryOrder> ordersFromDB = new ArrayList<DBItemInventoryOrder>();
             if (orderPaths != null && !orderPaths.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (OrderPath order : orderPaths) {
-                    if (order != null && canAdd(order.getJobChain(), permittedFolders)) {
-                        List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(normalizePath(order.getJobChain()), order
-                                .getOrderId(), instanceId);
-                        if (filteredOrders != null && !filteredOrders.isEmpty()) {
-                            ordersFromDB.addAll(filteredOrders);
+                    if (order != null) {
+                        if (canAdd(order.getJobChain(), permittedFolders)) {
+                            List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(normalizePath(order.getJobChain()),
+                                    order.getOrderId(), instanceId);
+                            if (filteredOrders != null && !filteredOrders.isEmpty()) {
+                                ordersFromDB.addAll(filteredOrders);
+                            }
                         }
                     }
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(normalizeFolder(folder.getFolder()),

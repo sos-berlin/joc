@@ -40,6 +40,8 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
 			}
 			checkRequiredParameter("job", jobFilter.getJob());
 			String jobPath = normalizePath(jobFilter.getJob());
+			checkFolderPermissions(jobPath);
+            
 			JobV200 entity = new JobV200();
 			JobV job = null;
 			

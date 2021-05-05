@@ -67,7 +67,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             // JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
             List<JobPath> jobs = jobsFilter.getJobs();
             boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(jobsFilter.getFolders());
 
             if (versionIsOlderThan("1.12.6")) {
                 JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
@@ -76,15 +76,17 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                     List<JobPath> permittedJobs = new ArrayList<JobPath>();
                     Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                     for (JobPath job : jobs) {
-                        if (job != null && canAdd(job.getJob(), permittedFolders)) {
-                            permittedJobs.add(job);
+                        if (job != null) {
+                            if (canAdd(job.getJob(), permittedFolders)) {
+                                permittedJobs.add(job);
+                            }
                         }
                     }
                     if (!permittedJobs.isEmpty()) {
                         listOfJobs = jocXmlCommand.getJobsFromShowJob(permittedJobs, jobsFilter);
                     }
                 } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                    // no permission
+                 // no folder permissions
                 } else if (folders != null && !folders.isEmpty()) {
                     listOfJobs = jocXmlCommand.getJobsFromShowState(folders, jobsFilter);
                 } else {
@@ -117,8 +119,10 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                     } else {
                         Set<String> jobPaths = new HashSet<String>();
                         for (JobPath job : jobs) {
-                            if (job != null && canAdd(job.getJob(), permittedFolders)) {
-                                jobPaths.add(job.getJob());
+                            if (job != null) {
+                                if (canAdd(job.getJob(), permittedFolders)) {
+                                    jobPaths.add(job.getJob());
+                                }
                             }
                         }
                         if (!jobPaths.isEmpty()) {
@@ -127,7 +131,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                         }
                     }
                 } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                    // no permission
+                    // no folder permissions
                 } else if (folders != null && !folders.isEmpty()) {
                     for (Folder folder : folders) {
                         folder.setFolder(normalizeFolder(folder.getFolder()));
@@ -173,7 +177,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 if (connection == null) {
                     connection = Globals.createSosHibernateStatelessConnection(API_CALL);
                 }
-                List<String> criticalities = jobsFilter.getCriticality().stream().map(c -> c.value().toLowerCase()).collect(Collectors.toList());
+                Set<String> criticalities = jobsFilter.getCriticality().stream().map(c -> c.value().toLowerCase()).collect(Collectors.toSet());
                 final InventoryJobsDBLayer dbInventoryLayer = new InventoryJobsDBLayer(connection);
                 listOfJobs = listOfJobs.stream().filter(j -> dbInventoryLayer.hasCriticality(dbItemInventoryInstance.getId(), criticalities, j.getPath())).collect(Collectors.toList());
             }

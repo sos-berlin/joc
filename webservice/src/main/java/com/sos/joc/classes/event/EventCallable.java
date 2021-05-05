@@ -218,9 +218,13 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             if (session == null) {
                 throw new SessionNotExistException("session is invalid");
             }
-            long l = session.getTimeout()-1000;
-            if (l < 0) {
-                return 0;
+            long timeout = session.getTimeout();
+            if (timeout < 0) {
+                return Integer.MAX_VALUE;
+            }
+            long l = timeout-1000;
+            if (l <= 0) {
+                throw new SessionNotExistException("session expired");
             }
             if (l >= Integer.MAX_VALUE) {
                 return Integer.MAX_VALUE;

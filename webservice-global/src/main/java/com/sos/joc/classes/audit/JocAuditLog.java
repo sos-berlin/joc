@@ -79,6 +79,8 @@ public class JocAuditLog {
             auditLogToDb.setJob(body.getJob());
             auditLogToDb.setJobChain(body.getJobChain());
             auditLogToDb.setOrderId(body.getOrderId());
+            auditLogToDb.setJobStream(body.getJobStream());
+
             auditLogToDb.setFolder(body.getFolder());
             auditLogToDb.setComment(body.getComment());
             auditLogToDb.setTicketLink(body.getTicketLink());

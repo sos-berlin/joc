@@ -64,7 +64,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 			Map<String, List<OrderHistoryItem>> historyChildren = new HashMap<String, List<OrderHistoryItem>>();
 			boolean withFolderFilter = ordersFilter.getFolders() != null && !ordersFilter.getFolders().isEmpty();
 			boolean hasPermission = true;
-			List<Folder> folders = addPermittedFolder(ordersFilter.getFolders());
+			Set<Folder> folders = addPermittedFolders(ordersFilter.getFolders());
 
 			ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
 			reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
@@ -105,20 +105,23 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 						instanceId = dbItemInventoryInstance.getId();
 					}
 					Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-					for (OrderPath orderPath : ordersFilter.getOrders()) {
-						if (orderPath != null && canAdd(orderPath.getJobChain(), permittedFolders)) {
-							String normalizeJobChain = normalizePath(orderPath.getJobChain());
-							List<String> innerChains = jobChainDbLayer.getInnerJobChains(normalizeJobChain, instanceId);
-							if (innerChains == null) {
-								reportTriggerDBLayer.getFilter().addOrderPath(normalizeJobChain,
-										orderPath.getOrderId());
-							} else {
-								for (String innerChain : innerChains) {
-									reportTriggerDBLayer.getFilter().addOrderPath(innerChain, orderPath.getOrderId());
-								}
-							}
-						}
-					}
+					hasPermission = false;
+                    for (OrderPath orderPath : ordersFilter.getOrders()) {
+                        if (orderPath != null) {
+                            if (canAdd(orderPath.getJobChain(), permittedFolders)) {
+                                String normalizeJobChain = normalizePath(orderPath.getJobChain());
+                                List<String> innerChains = jobChainDbLayer.getInnerJobChains(normalizeJobChain, instanceId);
+                                if (innerChains == null) {
+                                    reportTriggerDBLayer.getFilter().addOrderPath(normalizeJobChain, orderPath.getOrderId());
+                                } else {
+                                    for (String innerChain : innerChains) {
+                                        reportTriggerDBLayer.getFilter().addOrderPath(innerChain, orderPath.getOrderId());
+                                    }
+                                }
+                                hasPermission = true;
+                            }
+                        }
+                    }
 					ordersFilter.setRegex("");
 				} else if (withFolderFilter && (folders == null || folders.isEmpty())) {
 					hasPermission = false;
@@ -155,18 +158,23 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 				}
 
 				Matcher childOrderMatcher = Pattern.compile(CHILD_ORDER_PATTERN).matcher("");
+				Map<String, Set<Folder>> permittedFoldersMap = folderPermissions.getListOfFoldersForInstance();
 
 				for (DBItemReportTrigger dbItemReportTrigger : listOfDBItemReportTrigger) {
 
 					OrderHistoryItem history = new OrderHistoryItem();
 					if (ordersFilter.getJobschedulerId().isEmpty()) {
-						history.setJobschedulerId(dbItemReportTrigger.getSchedulerId());
 						if (!getPermissonsJocCockpit(dbItemReportTrigger.getSchedulerId(), accessToken).getHistory()
 								.getView().isStatus()) {
 							continue;
-						}
+                        }
+                        if (!folderPermissions.isPermittedForFolder(dbItemReportTrigger.getParentFolder(), permittedFoldersMap.get(dbItemReportTrigger
+                                .getSchedulerId()))) {
+                            continue;
+                        }
 					}
 
+					history.setJobschedulerId(dbItemReportTrigger.getSchedulerId());
 					history.setEndTime(dbItemReportTrigger.getEndTime());
 					history.setHistoryId(String.valueOf(dbItemReportTrigger.getHistoryId()));
 					history.setJobChain(dbItemReportTrigger.getParentName());
@@ -176,9 +184,10 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 					history.setStartTime(dbItemReportTrigger.getStartTime());
 					HistoryState state = new HistoryState();
 					
-					boolean resultError = dbItemReportTrigger.getResultError() && !dbItemReportTrigger.getState().toLowerCase().contains("success");
+                    boolean resultError = dbItemReportTrigger.getResultError() && (dbItemReportTrigger.getState() == null || !dbItemReportTrigger
+                            .getState().toLowerCase().contains("success"));
 
-					if (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null) {
+                    if (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null) {
 						state.setSeverity(1);
 						state.set_text(HistoryStateText.INCOMPLETE);
 					} else {

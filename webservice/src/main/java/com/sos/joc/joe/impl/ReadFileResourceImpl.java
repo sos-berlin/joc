@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joe.common.XmlDeserializer;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
@@ -22,7 +23,6 @@ import com.sos.joc.db.joe.FilterJoeObjects;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.joe.resource.IReadFileResource;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.joe.common.EmptyConfiguration;
@@ -34,6 +34,7 @@ import com.sos.joc.model.joe.common.JoeObjectStatus;
 import com.sos.joc.model.joe.common.VersionStateText;
 import com.sos.schema.JsonValidator;
 
+ 
 @Path("joe")
 public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileResource {
 
@@ -48,8 +49,8 @@ public class ReadFileResourceImpl extends JOCResourceImpl implements IReadFileRe
             Filter body = Globals.objectMapper.readValue(filterBytes, Filter.class);
             
             SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(body.getJobschedulerId(), accessToken);
-            boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().isView();
-
+            boolean permission = sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().isInventory();
+ 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, body, accessToken, body.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

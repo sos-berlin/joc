@@ -1,6 +1,7 @@
 package com.sos.joc.classes.jobs;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +91,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         return getJobs(xml.toString(), jobsFilter, "/spooler/answer/job");
     }
     
-    public List<JobV> getJobsFromShowState(List<Folder> folders, JobsFilter jobsFilter) throws Exception {
+    public List<JobV> getJobsFromShowState(Collection<Folder> folders, JobsFilter jobsFilter) throws Exception {
         StringBuilder xml = new StringBuilder();
         xml.append("<commands>");
         for (Folder folder : folders) {

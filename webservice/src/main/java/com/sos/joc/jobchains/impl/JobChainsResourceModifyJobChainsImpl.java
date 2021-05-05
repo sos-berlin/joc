@@ -3,6 +3,7 @@ package com.sos.joc.jobchains.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -16,6 +17,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobchains.resource.IJobChainsResourceModifyJobChains;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.ModifyJobChain;
 import com.sos.joc.model.jobChain.ModifyJobChains;
 import com.sos.schema.JsonValidator;
@@ -76,9 +78,11 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 		if (modifyJobChains.getJobChains().size() == 0) {
 			throw new JocMissingRequiredParameterException("undefined 'jobChains'");
 		}
+		
+		Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
 		Date surveyDate = new Date();
 		for (ModifyJobChain jobChain : modifyJobChains.getJobChains()) {
-			surveyDate = executeModifyJobChainCommand(jobChain, modifyJobChains, command);
+			surveyDate = executeModifyJobChainCommand(jobChain, modifyJobChains, command, permittedFolders);
 		}
 		if (listOfErrors.size() > 0) {
 			return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -86,12 +90,14 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 		return JOCDefaultResponse.responseStatusJSOk(surveyDate);
 	}
 
-	private Date executeModifyJobChainCommand(ModifyJobChain jobChain, ModifyJobChains modifyJobChains, String cmd) {
+	private Date executeModifyJobChainCommand(ModifyJobChain jobChain, ModifyJobChains modifyJobChains, String cmd, Set<Folder> permittedFolders) {
 		try {
 			ModifyJobChainAudit jobChainAudit = new ModifyJobChainAudit(jobChain, modifyJobChains);
 			logAuditMessage(jobChainAudit);
 
 			checkRequiredParameter("jobChain", jobChain.getJobChain());
+			checkFolderPermissions(jobChain.getJobChain(), permittedFolders);
+			
 			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 			XMLBuilder xml = new XMLBuilder("job_chain.modify");
 			xml.addAttribute("job_chain", normalizePath(jobChain.getJobChain()));

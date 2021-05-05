@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,7 +25,6 @@ import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrderV;
@@ -58,7 +58,7 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
             Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
             List<OrderPath> orders = ordersBody.getOrders();
             boolean withFolderFilter = ordersBody.getFolders() != null && !ordersBody.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(ordersBody.getFolders());
+            Set<Folder> folders = addPermittedFolders(ordersBody.getFolders());
 
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
@@ -70,27 +70,29 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
             if (orders != null && !orders.isEmpty()) {
                 InventoryJobChainsDBLayer dbJCLayer = new InventoryJobChainsDBLayer(connection);
                 List<String> outerJobChains = dbJCLayer.getOuterJobChains(dbItemInventoryInstance.getId());
+                Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (OrderPath order : orders) {
-                    if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
-                        throw new JocMissingRequiredParameterException("jobChain");
-                    } else {
+                    if (order != null) {
+                        checkRequiredParameter("jobChain", order.getJobChain());
                         order.setJobChain(normalizePath(order.getJobChain()));
-                    }
-                    OrdersPerJobChain opj;
-                    if (ordersLists.containsKey(order.getJobChain())) {
-                        opj = ordersLists.get(order.getJobChain());
-                        if (opj.containsOrder(order.getOrderId())) {
-                            continue;
-                        } else {
-                            opj.addOrder(order.getOrderId());
+                        if (canAdd(order.getJobChain(), permittedFolders)) {
+                            OrdersPerJobChain opj;
+                            if (ordersLists.containsKey(order.getJobChain())) {
+                                opj = ordersLists.get(order.getJobChain());
+                                if (opj.containsOrder(order.getOrderId())) {
+                                    continue;
+                                } else {
+                                    opj.addOrder(order.getOrderId());
+                                }
+                            } else {
+                                opj = new OrdersPerJobChain();
+                                opj.setJobChain(order.getJobChain());
+                                opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain()));
+                                opj.addOrder(order.getOrderId());
+                            }
+                            ordersLists.put(order.getJobChain(), opj);
                         }
-                    } else {
-                        opj = new OrdersPerJobChain();
-                        opj.setJobChain(order.getJobChain());
-                        opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain()));
-                        opj.addOrder(order.getOrderId());
                     }
-                    ordersLists.put(order.getJobChain(), opj);
                 }
             }
 
@@ -99,7 +101,7 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
                     tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken, yadeJobs));
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));

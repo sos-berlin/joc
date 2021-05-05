@@ -223,7 +223,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     if (e.getCause() instanceof JocException) {
                         throw (JocException) e.getCause();
                     } else {
-                        throw (Exception) e.getCause();
+                        throw e.getCause();
                     }
                 } finally {
                     // Globals.forceClosingHttpClients(session);
@@ -260,13 +260,16 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 LOGGER.warn("./events concurrent call was started");
                 entity.setDeliveryDate(Date.from(Instant.now()));
             }
+        } catch (SessionNotExistException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatus434JSError(e);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (InvalidSessionException e) {
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             LOGGER.debug("./events ended");

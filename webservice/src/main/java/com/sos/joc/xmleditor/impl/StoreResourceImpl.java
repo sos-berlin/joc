@@ -18,6 +18,7 @@ import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.store.StoreConfiguration;
 import com.sos.joc.model.xmleditor.store.StoreConfigurationAnswer;
+import com.sos.joc.xmleditor.common.Utils;
 import com.sos.joc.xmleditor.resource.IStoreResource;
 import com.sos.schema.JsonValidator;
 
@@ -32,38 +33,39 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         try {
             JsonValidator.validateFailFast(filterBytes, StoreConfiguration.class);
             StoreConfiguration in = Globals.objectMapper.readValue(filterBytes, StoreConfiguration.class);
-            
+
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
-            if (response == null) {
-                JocXmlEditor.parseXml(in.getConfiguration());
-
-                session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
-                session.beginTransaction();
-                DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
-
-                DBItemXmlEditorObject item = null;
-                String name = null;
-                if (in.getObjectType().equals(ObjectType.OTHER)) {
-                    name = in.getName();
-                    item = getOthersObject(dbLayer, in, name);
-                } else {
-                    name = JocXmlEditor.getConfigurationName(in.getObjectType());
-                    item = getStandardObject(dbLayer, in);
-                }
-
-                if (item == null) {
-                    item = create(session, in, name);
-
-                } else {
-                    item = update(session, in, item, name);
-                }
-
-                session.commit();
-                response = JOCDefaultResponse.responseStatus200(getSuccess(in.getObjectType(), item.getId(), item.getModified(), item.getDeployed()));
+            if (response != null) {
+                return response;
             }
-            return response;
+
+            JocXmlEditor.parseXml(in.getConfiguration());
+
+            session = Globals.createSosHibernateStatelessConnection(IMPL_PATH);
+            session.beginTransaction();
+            DbLayerXmlEditor dbLayer = new DbLayerXmlEditor(session);
+
+            DBItemXmlEditorObject item = null;
+            String name = null;
+            if (in.getObjectType().equals(ObjectType.OTHER)) {
+                name = in.getName();
+                item = getOthersObject(dbLayer, in, name);
+            } else {
+                name = JocXmlEditor.getConfigurationName(in.getObjectType());
+                item = getStandardObject(dbLayer, in);
+            }
+
+            if (item == null) {
+                item = create(session, in, name);
+
+            } else {
+                item = update(session, in, item, name);
+            }
+            session.commit();
+            return JOCDefaultResponse.responseStatus200(Globals.objectMapper.writeValueAsBytes(getSuccess(in.getObjectType(), item.getId(), item
+                    .getModified(), item.getDeployed())));
         } catch (JocException e) {
             Globals.rollback(session);
             e.addErrorMetaInfo(getJocError());
@@ -98,7 +100,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         item.setObjectType(in.getObjectType().name());
         item.setName(name.trim());
         item.setConfigurationDraft(in.getConfiguration());
-        item.setConfigurationDraftJson(in.getConfigurationJson());
+        item.setConfigurationDraftJson(Utils.serialize(in.getConfigurationJson()));
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             item.setSchemaLocation(in.getSchemaIdentifier());
         } else {
@@ -116,7 +118,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
             throws Exception {
         item.setName(name.trim());
         item.setConfigurationDraft(SOSString.isEmpty(in.getConfiguration()) ? null : in.getConfiguration());
-        item.setConfigurationDraftJson(in.getConfigurationJson());
+        item.setConfigurationDraftJson(Utils.serialize(in.getConfigurationJson()));
         if (in.getObjectType().equals(ObjectType.OTHER)) {
             item.setSchemaLocation(in.getSchemaIdentifier());
         } else {
@@ -126,6 +128,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         item.setAccount(getAccount());
         item.setModified(new Date());
         session.update(item);
+
         return item;
     }
 
@@ -145,7 +148,7 @@ public class StoreResourceImpl extends JOCResourceImpl implements IStoreResource
         SOSPermissionJocCockpit permissions = getPermissonsJocCockpit(in.getJobschedulerId(), accessToken);
         boolean permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
         JOCDefaultResponse response = init(IMPL_PATH, in, accessToken, in.getJobschedulerId(), permission);
-        if (response == null) {
+        if (permission && response == null) {
             if (versionIsOlderThan(JocXmlEditor.AVAILABILITY_STARTING_WITH)) {
                 throw new JobSchedulerBadRequestException(JocXmlEditor.MESSAGE_UNSUPPORTED_WEB_SERVICE);
             }

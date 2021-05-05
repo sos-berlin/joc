@@ -3,6 +3,7 @@ package com.sos.joc.classes.jobchains;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -131,7 +132,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         return getJobChains(xml.toString(), jobChainsFilter, "/spooler/answer/job_chain");
     }
     
-    public List<JobChainV> getJobChainsFromShowState(List<Folder> folders, JobChainsFilter jobChainsFilter) throws Exception {
+    public List<JobChainV> getJobChainsFromShowState(Collection<Folder> folders, JobChainsFilter jobChainsFilter) throws Exception {
         StringBuilder xml = new StringBuilder();
         xml.append("<commands>");
         for (Folder folder : folders) {

@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -51,16 +52,17 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
-import com.sos.joc.joe.common.XmlDeserializer;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.joe.order.Order;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
+import com.sos.joe.common.XmlDeserializer;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
 
@@ -79,7 +81,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
-            
+
             return postOrdersCommand(accessToken, "start", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isStart(), modifyOrders);
         } catch (JocException e) {
@@ -95,7 +97,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
-            
+
             return postOrdersCommand(accessToken, "suspend", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isSuspend(), modifyOrders);
         } catch (JocException e) {
@@ -111,7 +113,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
-            
+
             SOSPermissionJocCockpit perm = getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken);
             boolean hasResumeOrderPerm = perm.getOrder().getExecute().isResume() || perm.getYADE().getExecute().isTransferStart();
             return postOrdersCommand(accessToken, "resume", hasResumeOrderPerm, modifyOrders);
@@ -128,7 +130,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
-            
+
             return postOrdersCommand(accessToken, "reset", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isReset(), modifyOrders);
         } catch (JocException e) {
@@ -144,7 +146,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
-            
+
             return postOrdersCommand(accessToken, "set_state", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getChange().isState(), modifyOrders);
         } catch (JocException e) {
@@ -160,7 +162,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
-            
+
             return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getChange().isRunTime(), modifyOrders);
         } catch (JocException e) {
@@ -176,7 +178,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             JsonValidator.validateFailFast(modifyOrdersBytes, ModifyOrders.class);
             ModifyOrders modifyOrders = Globals.objectMapper.readValue(modifyOrdersBytes, ModifyOrders.class);
-            
+
             return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(modifyOrders.getJobschedulerId(), accessToken).getOrder()
                     .getExecute().isRemoveSetback(), modifyOrders);
         } catch (JocException e) {
@@ -187,7 +189,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
     }
 
-    private Date executeModifyOrderCommand(ModifyOrder order, ModifyOrders modifyOrders, String command, List<DBItemInventoryInstance> clusterMembers) {
+    private Date executeModifyOrderCommand(ModifyOrder order, ModifyOrders modifyOrders, String command, List<DBItemInventoryInstance> clusterMembers,
+            Set<Folder> permittedFolders) {
 
         try {
             if (order.getParams() != null && order.getParams().isEmpty()) {
@@ -201,6 +204,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
+            checkFolderPermissions(order.getJobChain(), permittedFolders);
+            
             XMLBuilder xml = new XMLBuilder("modify_order");
             if ("set_run_time".equals(command) && order.getRunTime() == null) {
                 throw new JocMissingRequiredParameterException("undefined 'runTime'");
@@ -288,7 +293,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
                         updateDailyPlan(dailyPlanCalender2DBFilter);
                     } else {
-                        
+
                         Document doc = ValidateXML.validateAgainstJobSchedulerSchema(configuration.getRunTimeXml());
                         if (versionIsOlderThan("1.13.1")) {
 
@@ -301,14 +306,18 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                             }
                             jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
                         } else {
+                            
+                            JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                            Order orderPojo = XmlDeserializer.deserialize(jocHotFolder.getFile(jobChainPath + "," + order.getOrderId()
+                                    + ".order.xml"), Order.class);
+                            orderPojo.setRunTime(runTime);
+                            ValidateXML.validateAgainstJobSchedulerSchema(Globals.xmlMapper.writeValueAsString(orderPojo));
 
-                            Order orderPojo = XmlDeserializer.deserialize(configuration.getRunTimeXml(), Order.class);
-                            if (orderPojo.getRunTime() != null && order.getCalendars() != null && !order.getCalendars().isEmpty()) {
+                            if (runTime != null && order.getCalendars() != null && !order.getCalendars().isEmpty()) {
                                 Calendars calendars = new Calendars();
                                 calendars.setCalendars(order.getCalendars());
                                 orderPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(calendars));
                             }
-                            JOCHotFolder jocHotFolder = new JOCHotFolder(this);
                             jocHotFolder.putFile(jobChainPath + "," + order.getOrderId() + ".order.xml", XmlSerializer.serializeToStringWithHeader(
                                     XmlSerializer.serializeOrder(orderPojo)));
                         }
@@ -336,7 +345,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 }
                 break;
             }
-            
+
             Instant plannedStart = getPlannedStartOfOrder(orderAudit, command);
             DBItemAuditLog dbItemAuditLog = storeAuditLogEntry(orderAudit);
             try {
@@ -347,8 +356,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 }
             }
             sendOrderStartedEvent(order, plannedStart, command, jocXmlCommand);
-            
-            
+
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), order));
@@ -370,7 +378,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             if (modifyOrders.getOrders().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'orders'");
             }
-            
+
             List<DBItemInventoryInstance> clusterMembers = null;
             if (session == null && ("set_run_time".equals(command) || "start".equals(command))) {
                 session = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -381,9 +389,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     clusterMembers = instanceLayer.getInventoryInstancesBySchedulerId(modifyOrders.getJobschedulerId());
                 }
             }
-            
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             for (ModifyOrder order : modifyOrders.getOrders()) {
-                surveyDate = executeModifyOrderCommand(order, modifyOrders, command, clusterMembers);
+                surveyDate = executeModifyOrderCommand(order, modifyOrders, command, clusterMembers, permittedFolders);
             }
         } finally {
             Globals.disconnect(session);
@@ -448,7 +456,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
     private Instant getPlannedStartOfOrder(ModifyOrderAudit orderAudit, String command) throws JobSchedulerBadRequestException {
         if ("start".equals(command)) {
             String timeZone = orderAudit.getTimeZone();
@@ -461,9 +469,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
         return null;
     }
-    
-    private Instant savePlannedStartOfOrder(ModifyOrder order, Instant plannedStart, Long auditLogId, String command) throws DBConnectionRefusedException,
-            DBInvalidDataException {
+
+    private Instant savePlannedStartOfOrder(ModifyOrder order, Instant plannedStart, Long auditLogId, String command)
+            throws DBConnectionRefusedException, DBInvalidDataException {
         if ("start".equals(command)) {
             try {
                 if (dbLayerReporting == null) {
@@ -504,7 +512,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
         return plannedStart;
     }
-    
+
     private void sendOrderStartedEvent(ModifyOrder order, Instant plannedStart, String command, JOCXmlCommand jocXmlCommand)
             throws JsonProcessingException, JocException {
         if ("start".equals(command) || "resume".equals(command)) {

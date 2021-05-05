@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -30,16 +31,19 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
-import com.sos.joc.joe.common.XmlDeserializer;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
-import com.sos.schema.JsonValidator;
 import com.sos.joc.model.joe.job.Job;
 import com.sos.joc.model.joe.schedule.RunTime;
+import com.sos.joe.common.XmlDeserializer;
+import com.sos.joe.common.XmlSerializer;
+import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
+
+ 
 
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {
@@ -144,7 +148,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     private Date executeModifyJobCommand(ModifyJob modifyJob, ModifyJobs modifyJobs, String command, List<DBItemInventoryInstance> clusterMembers,
-            SOSHibernateSession connection) {
+            SOSHibernateSession connection, Set<Folder> permittedFolders) {
 
         try {
             if (modifyJob.getCalendars() != null && modifyJob.getCalendars().isEmpty()) {
@@ -154,6 +158,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             logAuditMessage(jobAudit);
 
             checkRequiredParameter("job", modifyJob.getJob());
+            checkFolderPermissions(modifyJob.getJob(), permittedFolders);
+            
             if (SET_RUN_TIME.equals(command) && modifyJob.getRunTime() == null) {
                 throw new JocMissingRequiredParameterException("undefined 'runTime'");
             }
@@ -165,12 +171,12 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                 try {
                     RunTime runTime = XmlSerializer.serializeAbstractSchedule(modifyJob.getRunTime());
                     modifyJob.setRunTimeXml(Globals.xmlMapper.writeValueAsString(runTime));
-                    JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
-                    String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTimeXml(), this, jobPath);
-                    Document doc = ValidateXML.validateAgainstJobSchedulerSchema(configuration);
                     
                     if (versionIsOlderThan("1.13.1")) {
 
+                        JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
+                        String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTimeXml(), this, jobPath);
+                        Document doc = ValidateXML.validateAgainstJobSchedulerSchema(configuration);
                         XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
                         if (doc != null) {
                             Element jobElement = doc.getRootElement();
@@ -180,13 +186,16 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                         jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
                     } else {
                         
-                        Job jobPojo = XmlDeserializer.deserialize(configuration, Job.class);
-                        if (jobPojo.getRunTime() != null && modifyJob.getCalendars() != null && !modifyJob.getCalendars().isEmpty()) {
+                        JOCHotFolder jocHotFolder = new JOCHotFolder(this);
+                        Job jobPojo = XmlDeserializer.deserialize(jocHotFolder.getFile(jobPath + ".job.xml"), Job.class);
+                        jobPojo.setRunTime(runTime);
+                        ValidateXML.validateAgainstJobSchedulerSchema(Globals.xmlMapper.writeValueAsString(jobPojo));
+
+                        if (runTime != null && modifyJob.getCalendars() != null && !modifyJob.getCalendars().isEmpty()) {
                             Calendars calendars = new Calendars();
                             calendars.setCalendars(modifyJob.getCalendars());
                             jobPojo.getRunTime().setCalendars(Globals.objectMapper.writeValueAsString(calendars)); 
                         }
-                        JOCHotFolder jocHotFolder = new JOCHotFolder(this);
                         jocHotFolder.putFile(jobPath + ".job.xml", XmlSerializer.serializeToStringWithHeader(XmlSerializer.serializeJob(jobPojo)));
                     }
 
@@ -248,10 +257,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     clusterMembers = instanceLayer.getInventoryInstancesBySchedulerId(modifyJobs.getJobschedulerId());
                 }
             }
-
+            
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             Date surveyDate = new Date();
             for (ModifyJob job : modifyJobs.getJobs()) {
-                surveyDate = executeModifyJobCommand(job, modifyJobs, command, clusterMembers, connection);
+                surveyDate = executeModifyJobCommand(job, modifyJobs, command, clusterMembers, connection, permittedFolders);
             }
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);

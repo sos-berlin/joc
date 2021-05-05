@@ -1,5 +1,6 @@
 package com.sos.joc.jobstreams.impl;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,8 +16,9 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobstreams.resource.IResetJobStreamResource;
-import com.sos.joc.model.jobstreams.ResetJobStream;
+import com.sos.joc.model.jobstreams.JobStreamsFilter;
 import com.sos.schema.JsonValidator;
 
 @Path("jobstreams")
@@ -28,20 +30,28 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
     @Override
     public JOCDefaultResponse resetJobStream(String accessToken, byte[] filterBytes) {
         try {
-            JsonValidator.validateFailFast(filterBytes, ResetJobStream.class);
-            ResetJobStream resetJobStream = Globals.objectMapper.readValue(filterBytes, ResetJobStream.class);
-            
+            JsonValidator.validateFailFast(filterBytes, JobStreamsFilter.class);
+            JobStreamsFilter resetJobStream = Globals.objectMapper.readValue(filterBytes, JobStreamsFilter.class);
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, resetJobStream, accessToken, resetJobStream.getJobschedulerId(),
                     getPermissonsJocCockpit(resetJobStream.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
+            checkRequiredParameter("session", resetJobStream.getSession());
+            checkRequiredParameter("job", resetJobStream.getJob());
+ 
             try {
+                checkFolderPermissions(resetJobStream.getJob());
                 notifyEventHandler(accessToken, resetJobStream);
+            } catch (JocFolderPermissionsException e) {
+                LOGGER.debug("Folder permission for " + resetJobStream.getJob() + " is missing. Reset job stream for job " + resetJobStream.getJob() + " ignored.");
+
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
                         "Reset Job Stream: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Job Stream not resetted");
+                return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+
             }
 
             return JOCDefaultResponse.responseStatus200(resetJobStream);
@@ -53,22 +63,18 @@ public class ResetJobStreamImpl extends JOCResourceImpl implements IResetJobStre
         }
     }
 
-    private String notifyEventHandler(String accessToken, ResetJobStream resetJobStream) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken, JobStreamsFilter resetJobStream) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(ResetJobStreamImpl.class.getName());
 
         Map<String, String> parameters = new HashMap<String, String>();
-        if (resetJobStream.getJob() != null) {
-            parameters.put("job", resetJobStream.getJob());
-        }
-        parameters.put("session", com.sos.jitl.jobstreams.Constants.getSession());
-        if (resetJobStream.getJobStream() != null) {
-            parameters.put("jobStream", resetJobStream.getJobStream());
-        }
+        parameters.put("job", resetJobStream.getJob());
+        parameters.put("session", resetJobStream.getSession());
 
         customEventsUtil.addEvent("ResetConditionResolver", parameters);
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
-        return jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.throwJobSchedulerError();
     }
 
 }

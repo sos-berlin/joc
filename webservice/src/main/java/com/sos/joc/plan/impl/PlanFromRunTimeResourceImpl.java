@@ -1,9 +1,12 @@
 package com.sos.joc.plan.impl;
 
+import java.util.ArrayList;
+
 import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
+import com.sos.joe.common.XmlSerializer;
 import com.sos.jobscheduler.RuntimeResolver;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -11,7 +14,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.plan.RunTime;
 import com.sos.joc.model.plan.RunTimePlanFilter;
 import com.sos.joc.plan.resource.IPlanFromRunTimeResource;
@@ -25,21 +27,32 @@ public class PlanFromRunTimeResourceImpl extends JOCResourceImpl implements IPla
     private static final String API_CALL = "./plan/from_run_time";
 
     @Override
-	public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) {
+    public JOCDefaultResponse postPlan(String accessToken, byte[] planFilterBytes) {
         try {
-		    JsonValidator.validateFailFast(planFilterBytes, RunTimePlanFilter.class);
-		    RunTimePlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, RunTimePlanFilter.class);
-            
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken,
-					planFilter.getJobschedulerId(), getPermissonsJocCockpit(planFilter.getJobschedulerId(), accessToken)
-							.getOrder().getView().isStatus());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
+            JsonValidator.validateFailFast(planFilterBytes, RunTimePlanFilter.class);
+            RunTimePlanFilter planFilter = Globals.objectMapper.readValue(planFilterBytes, RunTimePlanFilter.class);
+
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    planFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             checkRequiredParameter("dateTo", planFilter.getDateTo());
             if (planFilter.getRunTime() == null) {
                 throw new JocMissingRequiredParameterException("undefined 'runTime'");
+            }
+
+            if (planFilter.getRunTime().getDates() != null) {
+                for (com.sos.joc.model.joe.schedule.Date date : planFilter.getRunTime().getDates()) {
+                    if (date.getPeriods() == null || date.getPeriods().size() == 0) {
+                        date.setPeriods(new ArrayList<com.sos.joc.model.joe.schedule.Period>());
+                        com.sos.joc.model.joe.schedule.Period period = new com.sos.joc.model.joe.schedule.Period();
+                        period.setBegin("00:00:00");
+                        period.setEnd("24:00:00");
+                        date.getPeriods().add(period);
+                    }
+                }
             }
 
             RunTime entity = null;

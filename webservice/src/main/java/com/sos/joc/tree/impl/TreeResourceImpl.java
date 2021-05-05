@@ -58,13 +58,13 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             SortedSet<Tree> folders = TreePermanent.initFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId(), dbItemInventoryInstance
                     .getSchedulerId(), treeForJoe);
             folderPermissions.setForce(treeBody.getForce());
-
-            if (treeBody.getTypes().size() > 0 && treeBody.getTypes().get(0) == JobSchedulerObjectType.WORKINGDAYSCALENDAR) {
-                folderPermissions = jobschedulerUser.getSosShiroCurrentUser().getSosShiroCalendarFolderPermissions();
-                folderPermissions.setSchedulerId(treeBody.getJobschedulerId());
+            Tree root = null;
+            if (treeBody.getTypes().size() > 0 && (treeBody.getTypes().get(0) == JobSchedulerObjectType.WORKINGDAYSCALENDAR || treeBody.getTypes()
+                    .get(0) == JobSchedulerObjectType.NONWORKINGDAYSCALENDAR)) {
+                root = TreePermanent.getTree(folders, getCalendarFolderPermissions());
+            } else {
+                root = TreePermanent.getTree(folders, folderPermissions);
             }
-
-            Tree root = TreePermanent.getTree(folders, folderPermissions);
 
             TreeView entity = new TreeView();
             if (root != null) {
@@ -97,7 +97,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             
             List<JobSchedulerObjectType> types = null;
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(treeBody.getJobschedulerId(), accessToken);
-            boolean permission = sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().isView();
+            boolean permission = sosPermission.getJobschedulerMaster().getAdministration().getConfigurations().getView().isInventory();
 
             if (treeBody.getTypes() == null || treeBody.getTypes().isEmpty()) {
                 treeBody.setTypes(Arrays.asList(JobSchedulerObjectType.JOE));

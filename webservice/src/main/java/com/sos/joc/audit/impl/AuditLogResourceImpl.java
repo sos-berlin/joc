@@ -1,11 +1,16 @@
 package com.sos.joc.audit.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.ws.rs.Path;
+
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
@@ -19,7 +24,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.audit.AuditLog;
 import com.sos.joc.model.audit.AuditLogFilter;
 import com.sos.joc.model.audit.AuditLogItem;
-import com.sos.joc.model.order.OrderPath;
+import com.sos.joc.model.common.Folder;
 import com.sos.schema.JsonValidator;
 
 @Path("audit_log")
@@ -29,7 +34,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
 
     @Override
     public JOCDefaultResponse postAuditLog(String accessToken, byte[] auditLogFilterBytes) {
-        
+
         SOSHibernateSession connection = null;
         try {
             JsonValidator.validateFailFast(auditLogFilterBytes, AuditLogFilter.class);
@@ -42,29 +47,27 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             AuditLogDBFilter auditLogDBFilter = new AuditLogDBFilter(auditLogFilter);
-             
-            if (auditLogFilter.getOrders() != null && !auditLogFilter.getOrders().isEmpty()) {
-                for (OrderPath order : auditLogFilter.getOrders()) {
-                    checkRequiredParameter("jobChain", order.getJobChain());
-                }
+
+            if (SearchStringHelper.isDBWildcardSearch(auditLogFilter.getRegex())) {
+                auditLogDBFilter.setReason(auditLogFilter.getRegex());
+                auditLogFilter.setRegex("");
             }
+
+            AuditLog entity = new AuditLog();
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
-            String filterRegex = auditLogFilter.getRegex();
-            if (SearchStringHelper.isDBWildcardSearch(filterRegex)) {
-            	auditLogDBFilter.setReason(filterRegex);
-            	filterRegex = "";
-            }
-            List<DBItemAuditLog> auditLogs = dbLayer.getAuditLogs(auditLogDBFilter,auditLogFilter.getLimit());
+            List<DBItemAuditLog> auditLogs = dbLayer.getAuditLogs(auditLogDBFilter, auditLogFilter.getLimit());
 
-            if (filterRegex != null && !filterRegex.isEmpty()) {
-                auditLogs = filterComment(auditLogs, filterRegex);
+            Matcher regExMatcher = null;
+            if (auditLogFilter.getRegex() != null && !auditLogFilter.getRegex().isEmpty()) {
+                regExMatcher = Pattern.compile(auditLogFilter.getRegex()).matcher("");
             }
-            AuditLog entity = new AuditLog();
-            entity.setAuditLog(fillAuditLogItems(auditLogs, auditLogFilter.getJobschedulerId()));
-            entity.setDeliveryDate(new Date());
+            entity.setAuditLog(fillAuditLogItems(auditLogs, auditLogFilter.getJobschedulerId(), regExMatcher));
+
+            entity.setDeliveryDate(Date.from(Instant.now()));
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -77,35 +80,39 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
         }
     }
 
-    private List<DBItemAuditLog> filterComment(List<DBItemAuditLog> auditLogsUnfiltered, String regex) {
-        List<DBItemAuditLog> filteredAuditLogs = new ArrayList<DBItemAuditLog>();
-        for (DBItemAuditLog auditLogUnfiltered : auditLogsUnfiltered) {
-            if (auditLogUnfiltered.getComment() != null && !auditLogUnfiltered.getComment().isEmpty()) {
-                Matcher regExMatcher = Pattern.compile(regex).matcher(auditLogUnfiltered.getComment());
-                if (regExMatcher.find()) {
-                    filteredAuditLogs.add(auditLogUnfiltered);
-                }
-            }
-        }
-        return filteredAuditLogs;
-    }
+    private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb, String jobschedulerId, Matcher regExMatcher) throws JocException {
 
-    private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb, String jobschedulerId) throws JocException {
+        Map<String, Set<Folder>> permittedFoldersMap = folderPermissions.getListOfFoldersForInstance();
         List<AuditLogItem> audits = new ArrayList<AuditLogItem>();
         for (DBItemAuditLog auditLogFromDb : auditLogsFromDb) {
             AuditLogItem auditLogItem = new AuditLogItem();
+            if (auditLogFromDb.getFolder() != null && !auditLogFromDb.getFolder().isEmpty()) {
+                if (!folderPermissions.isPermittedForFolder(auditLogFromDb.getFolder(), permittedFoldersMap.get(""))) {
+                    continue;
+                }
+                if (!folderPermissions.isPermittedForFolder(auditLogFromDb.getFolder(), permittedFoldersMap.get(auditLogFromDb.getSchedulerId()))) {
+                    continue;
+                }
+            }
             if (jobschedulerId.isEmpty()) {
                 if (!getPermissonsJocCockpit(auditLogFromDb.getSchedulerId(), getAccessToken()).getAuditLog().getView().isStatus()) {
                     continue;
                 }
                 auditLogItem.setJobschedulerId(auditLogFromDb.getSchedulerId());
             }
+            if (regExMatcher != null && (auditLogFromDb.getComment() == null || auditLogFromDb.getComment().isEmpty())) {
+                continue;
+            }
+            if (regExMatcher != null && !regExMatcher.reset(auditLogFromDb.getComment()).find()) {
+                continue;
+            }
             auditLogItem.setAccount(auditLogFromDb.getAccount());
             auditLogItem.setRequest(auditLogFromDb.getRequest());
-            //sanitizing
+            // sanitizing
             auditLogItem.setParameters(auditLogFromDb.getParameters().replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
             auditLogItem.setJob(auditLogFromDb.getJob());
             auditLogItem.setJobChain(auditLogFromDb.getJobChain());
+            auditLogItem.setJobStream(auditLogFromDb.getJobStream());
             auditLogItem.setOrderId(auditLogFromDb.getOrderId());
             auditLogItem.setComment(auditLogFromDb.getComment());
             auditLogItem.setCreated(auditLogFromDb.getCreated());

@@ -18,6 +18,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocFolderPermissionsException;
 import com.sos.joc.jobstreams.resource.IEditOutConditionsResource;
 import com.sos.joc.model.jobstreams.JobOutCondition;
 import com.sos.joc.model.jobstreams.OutConditions;
@@ -35,11 +36,20 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
         try {
             JsonValidator.validateFailFast(filterBytes, OutConditions.class);
             OutConditions outConditions = Globals.objectMapper.readValue(filterBytes, OutConditions.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, outConditions, accessToken, outConditions.getJobschedulerId(),
                     getPermissonsJocCockpit(outConditions.getJobschedulerId(), accessToken).getJobStream().getChange().isConditions());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
+            }
+
+            for (JobOutCondition jobOutCondition : outConditions.getJobsOutconditions()) {
+                try {
+                    checkFolderPermissions(jobOutCondition.getJob());
+                } catch (JocFolderPermissionsException e) {
+                    jobOutCondition.setJob("");
+                    LOGGER.debug("Folder permission for " + jobOutCondition.getJob() + " is missing. Edit Inconditon " + jobOutCondition.getJob() + " ignored.");
+                }
             }
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -74,6 +84,7 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
                         "Edit Out Conditon: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Data are stored in Database");
+                return JOCDefaultResponse.responseStatusJSError(e, getJocError());
             }
             return JOCDefaultResponse.responseStatus200(outConditions);
 
@@ -94,5 +105,6 @@ public class EditOutConditionsImpl extends JOCResourceImpl implements IEditOutCo
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
         jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.throwJobSchedulerError();
     }
 }

@@ -45,40 +45,61 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
-            jocXmlCommand = new JOCXmlCommand(this);
-            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(createLocksPostCommand(locksFilter), accessToken);
-            NodeList locks = jocXmlCommand.selectNodelist("//locks/lock");
+            
+            boolean withFolderFilter = locksFilter.getFolders() != null && !locksFilter.getFolders().isEmpty();
+            final Set<Folder> folders = addPermittedFolders(locksFilter.getFolders());
             boolean filteredByLocks = (locksFilter.getLocks() != null && locksFilter.getLocks().size() > 0);
             Set<String> lockPathFilter = new HashSet<String>();
-            if (filteredByLocks) {
-                for (LockPath lockPath : locksFilter.getLocks()) {
-                    lockPathFilter.add(normalizePath(lockPath.getLock()));
-                }
-            }
-
-            List<LockV> locksV = new ArrayList<LockV>();
             Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-            for (int i = 0; i < locks.getLength(); i++) {
-                Element lock = (Element) locks.item(i);
+            jocXmlCommand = new JOCXmlCommand(this);
+            String command = null;
+            if (filteredByLocks) {
+                Set<Folder> filteredFolders = new HashSet<Folder>();
+                for (LockPath l : locksFilter.getLocks()) {
+                    l.setLock(normalizePath(l.getLock()));
+                    if (canAdd(l.getLock(), permittedFolders)) {
+                        Folder folder = new Folder();
+                        folder.setFolder(getParent(l.getLock()));
+                        folder.setRecursive(false);
+                        folders.add(folder);
+                        filteredFolders.add(folder);
+                        lockPathFilter.add(l.getLock());
+                    }
+                }
+                if (!filteredFolders.isEmpty()) {
+                    command = createLocksPostCommand(filteredFolders);
+                }
+            } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
+                // no folder permissions
+            } else if (folders != null && !folders.isEmpty()) {
+                command = createLocksPostCommand(folders);
+            } else {
+                command = createLocksPostCommand(permittedFolders);
+            }
+            
+            LocksV entity = new LocksV();
+            if (command != null) {
+                jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
+                NodeList locks = jocXmlCommand.selectNodelist("//locks/lock");
 
-                if (filteredByLocks && !lockPathFilter.contains(lock.getAttribute("path"))) {
-                    continue;
-                }
-                if (filteredByLocks && !canAdd(lock.getAttribute("path"), permittedFolders)) {
-                    continue;
-                }
-                if (!FilterAfterResponse.matchRegex(locksFilter.getRegex(), lock.getAttribute("path"))) {
-                    continue;
-                }
+                List<LockV> locksV = new ArrayList<LockV>();
+                for (int i = 0; i < locks.getLength(); i++) {
+                    Element lock = (Element) locks.item(i);
 
-                LockVolatile lockV = new LockVolatile(lock, jocXmlCommand);
-                lockV.setFields();
-                locksV.add(lockV);
+                    if (filteredByLocks && !lockPathFilter.contains(lock.getAttribute("path"))) {
+                        continue;
+                    }
+                    if (!FilterAfterResponse.matchRegex(locksFilter.getRegex(), lock.getAttribute("path"))) {
+                        continue;
+                    }
+
+                    LockVolatile lockV = new LockVolatile(lock, jocXmlCommand);
+                    lockV.setFields();
+                    locksV.add(lockV);
+                }
+                entity.setLocks(locksV);
             }
 
-            LocksV entity = new LocksV();
-            entity.setLocks(locksV);
             entity.setDeliveryDate(Date.from(Instant.now()));
 
             return JOCDefaultResponse.responseStatus200(entity);
@@ -87,22 +108,6 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
-
-    private String createLocksPostCommand(LocksFilter lockFilter) throws JocMissingRequiredParameterException {
-        List<LockPath> locks = lockFilter.getLocks();
-        if (locks == null || locks.size() == 0) {
-            return createLocksPostCommand(new HashSet<Folder>(lockFilter.getFolders()));
-        } else {
-            Set<Folder> folders = new HashSet<Folder>();
-            for (LockPath lockPath : locks) {
-                Folder folder = new Folder();
-                folder.setFolder(getParent(normalizePath(lockPath.getLock())));
-                folder.setRecursive(false);
-                folders.add(folder);
-            }
-            return createLocksPostCommand(folders);
         }
     }
 

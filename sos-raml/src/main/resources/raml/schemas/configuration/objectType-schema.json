@@ -16,6 +16,7 @@
     "DAILYPLAN",
     "TASK_HISTORY",
     "ORDER_HISTORY",
+    "JOBSTREAM_HISTORY",
     "YADE", 
     "YADE_HISTORY",
     "EVENT",

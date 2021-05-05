@@ -36,6 +36,8 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
 
 			checkRequiredParameter("job", jobFilter.getJob());
 			String jobPath = normalizePath(jobFilter.getJob());
+			checkFolderPermissions(jobPath);
+			
 			JobV200 entity = new JobV200();
 			if (versionIsOlderThan("1.12.6")) {
 			    JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);

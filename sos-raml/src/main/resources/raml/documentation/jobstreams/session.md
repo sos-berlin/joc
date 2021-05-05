@@ -1,0 +1,1 @@
+<tr><td>``session``</td><td>required, string</td><td>The session id of a job stream instance. The call will return events assigned to this session instance.</td><td>4d203337-19c5-488d-b9d9-ef67ae173b1f</td><td></td></tr>

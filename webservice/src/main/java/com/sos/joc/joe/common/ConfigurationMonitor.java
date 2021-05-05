@@ -1,6 +1,5 @@
 package com.sos.joc.joe.common;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -13,8 +12,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sos.joe.common.XmlDeserializer;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joe.DBItemJoeObject;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
@@ -33,6 +31,7 @@ import com.sos.joc.model.joe.nodeparams.Config;
 import com.sos.joc.model.joe.nodeparams.ConfigNode;
 import com.sos.joc.model.joe.nodeparams.ConfigOrder;
 
+ 
 public class ConfigurationMonitor {
 
     private static final String NAME = "configuration_monitor";

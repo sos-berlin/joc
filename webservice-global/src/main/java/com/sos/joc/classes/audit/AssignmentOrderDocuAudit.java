@@ -15,16 +15,16 @@ public class AssignmentOrderDocuAudit extends OrderDocuFilter implements IAuditL
 
     @JsonIgnore
     private Integer timeSpent;
-    
+
     @JsonIgnore
     private String ticketLink;
-    
+
     @JsonIgnore
     private String documentation;
-    
+
     @JsonIgnore
     private String folder;
-    
+
     public AssignmentOrderDocuAudit(OrderDocuFilter orderDocuFilter) {
         setAuditParams(orderDocuFilter.getAuditLog());
         setJobschedulerId(orderDocuFilter.getJobschedulerId());
@@ -41,7 +41,7 @@ public class AssignmentOrderDocuAudit extends OrderDocuFilter implements IAuditL
         if (auditParams != null) {
             this.comment = auditParams.getComment();
             this.timeSpent = auditParams.getTimeSpent();
-            this.ticketLink = auditParams.getTicketLink(); 
+            this.ticketLink = auditParams.getTicketLink();
         }
     }
 
@@ -87,4 +87,9 @@ public class AssignmentOrderDocuAudit extends OrderDocuFilter implements IAuditL
         return null;
     }
 
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

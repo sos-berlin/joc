@@ -1,0 +1,32 @@
+{
+	"title": "JobStreams Filter",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Reset Workflow, unconsume expressions",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreamsSelector",
+	"type": "object",
+	"required": [
+		"jobschedulerId"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"folders": {
+			"$ref": "../common/folders-schema.json"
+		},
+		"jobStreams": {
+			"type": "array",
+			"items": {
+				"$ref": "jobstreamLocation-schema.json"
+			}
+		},
+		"limit": {
+			"type": "integer",
+			"default": 10000
+		},
+		"auditLog": {
+			"$ref": "../audit/auditParams-schema.json"
+		}
+	}
+}
+      

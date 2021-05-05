@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.joe.common.XmlDeserializer;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.ClusterMemberHandler;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -14,14 +16,13 @@ import com.sos.joc.classes.audit.ModifyProcessClassAudit;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.joe.common.XmlDeserializer;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.processclass.resource.IAgentConfigurationResource;
 import com.sos.joc.model.joe.processclass.ProcessClass;
 import com.sos.joc.model.joe.processclass.ProcessClassEdit;
 import com.sos.joc.model.processClass.ConfigurationEdit;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 import com.sos.schema.JsonValidator;
+ 
 
 @Path("process_class")
 public class AgentConfigurationResourceImpl extends JOCResourceImpl implements IAgentConfigurationResource {
@@ -101,8 +102,9 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             storeAuditLogEntry(audit);
 
-            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, API_CALL);
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance);
             clusterMemberHandler.updateAtOtherClusterMembers(processClassPath, false, xmlContent);
+            clusterMemberHandler.executeHandlerCalls(API_CALL + "save");
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
@@ -141,9 +143,9 @@ public class AgentConfigurationResourceImpl extends JOCResourceImpl implements I
 
             storeAuditLogEntry(audit);
 
-            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance, API_CALL);
+            ClusterMemberHandler clusterMemberHandler = new ClusterMemberHandler(dbItemInventoryInstance);
             clusterMemberHandler.deleteAtOtherClusterMembers(processClassPath, false);
-            clusterMemberHandler.executeHandlerCalls();
+            clusterMemberHandler.executeHandlerCalls(API_CALL + "delete");
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

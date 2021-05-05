@@ -23,7 +23,6 @@ import com.networknt.schema.NonValidationKeyword;
 import com.networknt.schema.SchemaValidatorsConfig;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
-import com.sos.exception.SOSInvalidDataException;
 import com.sos.schema.exception.SOSJsonSchemaException;
 
 public class JsonValidator {
@@ -31,7 +30,6 @@ public class JsonValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonValidator.class);
     private static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     private static final SpecVersion.VersionFlag JSONDRAFT = SpecVersion.VersionFlag.V4;
-    // private static final Path RESOURCE_DIR = Paths.get("classpath:raml/schema", "schemas");
     private static final List<NonValidationKeyword> NON_VALIDATION_KEYS = Arrays.asList(new NonValidationKeyword("javaType"),
             new NonValidationKeyword("javaInterfaces"), new NonValidationKeyword("javaEnumNames"), new NonValidationKeyword("extends"),
             new NonValidationKeyword("xmlElement"), new NonValidationKeyword("isXmlCData"), new NonValidationKeyword("isXmlAttribute"));
@@ -133,9 +131,9 @@ public class JsonValidator {
             put("ConditionEvent", "jobstreams/conditionEvent-schema.json");
             put("InConditions", "jobstreams/inconditions-schema.json");
             put("OutConditions", "jobstreams/outconditions-schema.json");
+            put("JobStream", "jobstreams/jobstream-schema.json");
             put("JobStreams", "jobstreams/jobStreams-schema.json");
-            put("JobStreamFilter", "jobstreams/jobstreamFilter-schema.json");
-            put("ResetJobStream", "jobstreams/reset_jobstream-schema.json");
+            put("JobStreamsFilter", "jobstreams/jobstreamsFilter-schema.json");
 
             put("ApplyConfiguration", "xmleditor/apply/apply-configuration-schema.json");
             put("SchemaAssignConfiguration", "xmleditor/schema/assign/schema-assign-configuration-schema.json");
@@ -163,7 +161,7 @@ public class JsonValidator {
      * @param json
      * @param schemaPath - path relative to ./resources/raml/schemas directory
      * @throws IOException
-     * @throws SOSInvalidDataException */
+     * @throws SOSJsonSchemaException */
     public static void validate(byte[] json, String schemaPath) throws IOException, SOSJsonSchemaException {
         if (schemaPath != null) {
             validate(json, URI.create("classpath:/raml/schemas/" + schemaPath), false);
@@ -175,7 +173,7 @@ public class JsonValidator {
      * @param json
      * @param clazz
      * @throws IOException
-     * @throws SOSInvalidDataException */
+     * @throws SOSJsonSchemaException */
     public static void validate(byte[] json, Class<?> clazz) throws IOException, SOSJsonSchemaException {
         validate(json, getSchemaPath(clazz));
     }
@@ -185,7 +183,7 @@ public class JsonValidator {
      * @param json
      * @param schemaUri
      * @throws IOException
-     * @throws SOSInvalidDataException */
+     * @throws SOSJsonSchemaException */
     public static void validate(byte[] json, URI schemaUri) throws IOException, SOSJsonSchemaException {
         if (schemaUri != null) {
             validate(json, schemaUri, false);
@@ -197,7 +195,7 @@ public class JsonValidator {
      * @param json
      * @param schemaPath - path relative to ./resources/raml/schemas directory
      * @throws IOException
-     * @throws SOSInvalidDataException */
+     * @throws SOSJsonSchemaException */
     public static void validateFailFast(byte[] json, String schemaPath) throws IOException, SOSJsonSchemaException {
         if (schemaPath != null) {
             validate(json, URI.create("classpath:/raml/schemas/" + schemaPath), true);
@@ -209,7 +207,7 @@ public class JsonValidator {
      * @param json
      * @param clazz
      * @throws IOException
-     * @throws SOSInvalidDataException */
+     * @throws SOSJsonSchemaException */
     public static void validateFailFast(byte[] json, Class<?> clazz) throws IOException, SOSJsonSchemaException {
         validateFailFast(json, getSchemaPath(clazz));
     }
@@ -219,7 +217,7 @@ public class JsonValidator {
      * @param json
      * @param schemaUri
      * @throws IOException
-     * @throws SOSInvalidDataException */
+     * @throws SOSJsonSchemaException */
     public static void validateFailFast(byte[] json, URI schemaUri) throws IOException, SOSJsonSchemaException {
         if (schemaUri != null) {
             validate(json, schemaUri, true);

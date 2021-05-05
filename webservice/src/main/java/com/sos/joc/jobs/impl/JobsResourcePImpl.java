@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Path;
 
@@ -59,7 +60,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             List<DBItemInventoryJob> listOfJobs = processFilters(dbJobsLayer, jobsFilter);
             if (listOfJobs != null) {
                 for (DBItemInventoryJob inventoryJob : listOfJobs) {
-                    JobP job = JobPermanent.getJob(inventoryJob, dbJobsLayer, documentations.get(inventoryJob.getName()), jobsFilter.getCompact(), instanceId);
+                    JobP job = JobPermanent.getJob(inventoryJob, dbJobsLayer, documentations.get(inventoryJob.getName()), jobsFilter.getCompact(),jobsFilter.getWithoutDuration(), instanceId);
                     if (job != null) {
                         listJobs.add(job);
                     }
@@ -98,31 +99,38 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         List<DBItemInventoryJob> listOfJobs = null;
         List<JobPath> jobs = jobsFilter.getJobs();
         boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
-        List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+        Set<Folder> folders = addPermittedFolders(jobsFilter.getFolders());
         String regex = jobsFilter.getRegex();
+        
+        Set<String> criticalities = null;
+        if (jobsFilter.getCriticality() != null && !jobsFilter.getCriticality().isEmpty()) {
+            criticalities = jobsFilter.getCriticality().stream().map(c -> c.value().toLowerCase()).collect(Collectors.toSet());
+        }
 
         if (jobs != null && !jobs.isEmpty()) {
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;
-
+            
             Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             for (JobPath job : jobs) {
-                if (job != null && canAdd(job.getJob(), permittedFolders)) {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePath(job.getJob()), jobsFilter.getIsOrderJob(),jobsFilter.getCriticality(),
-                            dbItemInventoryInstance.getId());
-                    if (filteredJobs != null) {
-                        listOfJobs.addAll(filteredJobs);
+                if (job != null) {
+                    if (canAdd(job.getJob(), permittedFolders)) {
+                        filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePath(job.getJob()), jobsFilter.getIsOrderJob(),
+                                criticalities, dbItemInventoryInstance.getId());
+                        if (filteredJobs != null) {
+                            listOfJobs.addAll(filteredJobs);
+                        }
                     }
                 }
             }
         } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-            // no permission
+            // no folder permissions
         } else if (folders != null && !folders.isEmpty()) {
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;
             for (Folder folderFilter : folders) {
-                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(normalizeFolder(folderFilter.getFolder()), jobsFilter.getIsOrderJob(),jobsFilter.getCriticality(),
-                        folderFilter.getRecursive(), dbItemInventoryInstance.getId());
+                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(normalizeFolder(folderFilter.getFolder()), jobsFilter.getIsOrderJob(),
+                        criticalities, folderFilter.getRecursive(), dbItemInventoryInstance.getId());
                 if (filteredJobs != null && !filteredJobs.isEmpty()) {
                     if (regex != null && !regex.isEmpty()) {
                         List<DBItemInventoryJob> jobsFilteredByRegex = filterByRegex(filteredJobs, regex);

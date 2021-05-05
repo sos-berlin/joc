@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
+import com.google.common.base.Charsets;
 import com.sos.DataExchange.converter.JadeXml2IniConverter;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -20,6 +21,7 @@ import com.sos.jitl.reporting.db.DBItemXmlEditorObject;
 import com.sos.jitl.xmleditor.common.JobSchedulerXmlEditor;
 import com.sos.jitl.xmleditor.db.DbLayerXmlEditor;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.ClusterMemberHandler;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCHotFolder;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -34,6 +36,7 @@ import com.sos.joc.model.xmleditor.common.AnswerMessage;
 import com.sos.joc.model.xmleditor.common.ObjectType;
 import com.sos.joc.model.xmleditor.deploy.DeployConfiguration;
 import com.sos.joc.model.xmleditor.deploy.DeployConfigurationAnswer;
+import com.sos.joc.xmleditor.common.Utils;
 import com.sos.joc.xmleditor.resource.IDeployResource;
 import com.sos.schema.JsonValidator;
 
@@ -83,7 +86,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                 DBItemXmlEditorObject item = getItem(dbLayer, in);
 
                 // step 3 - deploy
-                Map<Date, String> result = putFile(in, item.getConfigurationDraft());
+                Map<Date, String> result = putFile(session, in, item.getConfigurationDraft());
 
                 // step 4 - update db
                 Date deployed = result.keySet().iterator().next();
@@ -129,7 +132,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         SOSPermissionJocCockpit permissions = getPermissonsJocCockpit(in.getJobschedulerId(), accessToken);
         boolean permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().isXmlEditor();
         JOCDefaultResponse response = init(IMPL_PATH, in, accessToken, in.getJobschedulerId(), permission);
-        if (response == null) {
+        if (permission && response == null) {
             if (versionIsOlderThan(JocXmlEditor.AVAILABILITY_STARTING_WITH)) {
                 throw new JobSchedulerBadRequestException(JocXmlEditor.MESSAGE_UNSUPPORTED_WEB_SERVICE);
             }
@@ -147,7 +150,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             item.setObjectType(in.getObjectType().name());
             item.setName(JocXmlEditor.getConfigurationName(in.getObjectType()));
             item.setConfigurationDraft(in.getConfiguration());
-            item.setConfigurationDraftJson(in.getConfigurationJson());
+            item.setConfigurationDraftJson(Utils.serialize(in.getConfigurationJson()));
             item.setSchemaLocation(JocXmlEditor.getStandardRelativeSchemaLocation(in.getObjectType()));
 
             item.setAuditLogId(new Long(0));// TODO
@@ -157,7 +160,7 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             dbLayer.getSession().save(item);
         } else {
             item.setConfigurationDraft(in.getConfiguration());
-            item.setConfigurationDraftJson(in.getConfigurationJson());
+            item.setConfigurationDraftJson(Utils.serialize(in.getConfigurationJson()));
             item.setAccount(getAccount());
             item.setModified(new Date());
             dbLayer.getSession().update(item);
@@ -175,10 +178,13 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
         return answer;
     }
 
-    private Map<Date, String> putFile(DeployConfiguration in, String configuration) throws Exception {
-        String file = null;// for exception
+    private Map<Date, String> putFile(SOSHibernateSession session, DeployConfiguration in, String configuration) throws Exception {
+        JOCHotFolder hotFolder = new JOCHotFolder(this);
+        hotFolder.setAutoCloseHttpClient(false);
+        ClusterMemberHandler clusterHandler = new ClusterMemberHandler(dbItemInventoryInstance);
+
+        String file = null;
         try {
-            JOCHotFolder hotFolder = new JOCHotFolder(this);
             Date deployed = new Date();
             String deployedDateTime = "unknown";
             try {
@@ -189,9 +195,13 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
             String content = getXmlFileContent(in.getObjectType(), configuration, deployedDateTime);
             file = JocXmlEditor.getJobSchedulerLivePathXml(in.getObjectType());
             hotFolder.putFile(file, content.getBytes(JocXmlEditor.CHARSET));
+            clusterHandler.updateAtOtherClusterMembers(file, false, content);
+
             if (in.getObjectType().equals(ObjectType.YADE)) {
                 file = JocXmlEditor.getJobSchedulerLivePathYadeIni();
-                hotFolder.putFile(file, convertXml2Ini(configuration, deployedDateTime));
+                byte[] ini = convertXml2Ini(configuration, deployedDateTime);
+                hotFolder.putFile(file, ini);
+                clusterHandler.updateAtOtherClusterMembers(file, false, new String(ini, Charsets.UTF_8));
             }
             return Collections.singletonMap(deployed, content);
         } catch (Throwable e) {
@@ -199,6 +209,10 @@ public class DeployResourceImpl extends JOCResourceImpl implements IDeployResour
                     JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, e.toString()), e);
             throw new JocException(new JocError(JocXmlEditor.ERROR_CODE_DEPLOY_ERROR, String.format(
                     "[%s]Could't put configuration. Is the JobScheduler \"%s\" running?", file, in.getJobschedulerId())));
+        } finally {
+            hotFolder.closeHttpClient();
+
+            clusterHandler.executeHandlerCalls(session);
         }
     }
 

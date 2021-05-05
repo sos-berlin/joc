@@ -19,9 +19,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.joe.common.XmlDeserializer;
 import com.sos.joc.model.common.RunTime200;
+import com.sos.joe.common.XmlDeserializer;
 
+ 
 public class RunTime {
     
     public static RunTime200 set(String path, JOCXmlCommand jocXmlCommand, String postCommand, String xPath, String accessToken) throws Exception {
@@ -71,10 +72,12 @@ public class RunTime {
             if (schedule != null && !schedule.isEmpty() && path != null) {
                 runtimeElem.setAttribute("schedule", path.resolve(schedule).normalize().toString().replace('\\', '/'));
             }
+            String encoding = "UTF-8";
             Source source = new DOMSource(runtimeElem);
             Result result = new StreamResult(writer);
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
             transformer.transform(source, result);

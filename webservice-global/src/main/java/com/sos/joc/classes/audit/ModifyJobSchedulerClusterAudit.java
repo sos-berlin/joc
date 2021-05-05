@@ -87,4 +87,10 @@ public class ModifyJobSchedulerClusterAudit extends TimeoutParameter implements 
     public Date getStartTime() {
         return null;
     }
+
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

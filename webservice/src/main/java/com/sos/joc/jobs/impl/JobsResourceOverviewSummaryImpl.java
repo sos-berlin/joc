@@ -2,7 +2,6 @@ package com.sos.joc.jobs.impl;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Path;
@@ -51,7 +50,7 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
 
             boolean withFolderFilter = jobsFilter.getFolders() != null && !jobsFilter.getFolders().isEmpty();
             boolean hasPermission = true;
-            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(jobsFilter.getFolders());
 
             if (jobsFilter.getDateFrom() != null) {
                 reportTaskExecDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
@@ -62,9 +61,13 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
 
             if (jobsFilter.getJobs().size() > 0) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
+                hasPermission = false;
                 for (JobPath jobPath : jobsFilter.getJobs()) {
-                    if (jobPath != null && canAdd(jobPath.getJob(), permittedFolders)) {
-                        reportTaskExecDBLayer.getFilter().addJobPath(normalizePath(jobPath.getJob()));
+                    if (jobPath != null) {
+                        if (canAdd(jobPath.getJob(), permittedFolders)) {
+                            reportTaskExecDBLayer.getFilter().addJobPath(normalizePath(jobPath.getJob()));
+                            hasPermission = true;
+                        }
                     }
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
@@ -79,6 +82,9 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
             if (hasPermission) {
                 jobsHistoricSummary.setFailed(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(false).intValue());
                 jobsHistoricSummary.setSuccessful(reportTaskExecDBLayer.getCountSchedulerJobHistoryListFromTo(true).intValue());
+            } else {
+                jobsHistoricSummary.setFailed(0);
+                jobsHistoricSummary.setSuccessful(0);
             }
             entity.setDeliveryDate(new Date());
 

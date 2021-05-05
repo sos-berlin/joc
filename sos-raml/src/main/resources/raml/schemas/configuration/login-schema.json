@@ -7,6 +7,9 @@
 		"defaultProfileAccount": {
 			"$ref": "../common/string255-schema.json"
 		},
+		"enableRememberMe": {
+			"type": "boolean"
+		},
 		"customLogo": {
 			"$ref": "loginLogo-schema.json"
 		}

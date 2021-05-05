@@ -1,23 +1,14 @@
 package com.sos.patch;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.CopyOption;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Comparator;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 
 public class ExecutePatch {
@@ -33,8 +24,7 @@ public class ExecutePatch {
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING };
 
     public static void main(String[] args) throws Exception {
-        Path workDir = Paths.get(System.getProperty("user.dir"));
-        Path executable = workDir.resolve(System.getProperty("java.class.path"));
+        Path executable = Paths.get(System.getProperty("java.class.path")).toAbsolutePath().normalize();
         Path patchDir = executable.getParent().getParent();
         Path archivePath = patchDir.getParent().resolve(ARCHIVE_DIR_NAME);
         Path webAppDir = patchDir.getParent().resolve("webapps");
@@ -80,69 +70,65 @@ public class ExecutePatch {
         // archive only once if the original file not already exists in archive directory
         if (Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME))) {
             copiedPath = Files.copy(archivePath.resolve(JOC_WAR_FILE_NAME), tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
-            System.out.println("joc.war not archived, because an archive file of the original joc.war already exists!");
+            System.out.println("joc.war has not been archived again, because an archive file of the original joc.war already exists.");
         } else {
             Path copiedArchivePath = Files.copy(webAppJocWarPath, archivePath.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS); 
-            System.out.println("joc.war was archived before processing the patch(es)!");
+            System.out.println("joc.war has been successfully archived before processing the patch.");
             copiedPath = Files.copy(copiedArchivePath, tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
         }
 
         // Target
-        FileSystem targetFileSystem = FileSystems.newFileSystem(copiedPath, null);
-        // sort the patches ascending
-        File[] files = patchDir.toFile().listFiles(new FileFilter() {
-            
-            @Override
-            public boolean accept(File pathname) {
-                return !pathname.isDirectory() && pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$");
-            }
-        });
-
-        Comparator<File> fileNameComparator = new Comparator<File>() {
-            
-            @Override
-            public int compare(File o1, File o2) {
-                String timestamp1 = o1.getName().replaceFirst("(\\d{8})", "$1");
-                String timestamp2 = o2.getName().replaceFirst("(\\d{8})", "$1");
-                return timestamp1.compareTo(timestamp2);
-            }
-        };
-
-        Set<File> patchFiles = new TreeSet<File>(fileNameComparator);
-        
-        for(int i = 0; i < files.length; i++) {
-            patchFiles.add(files[i]);
-        }
-        
-        // process a new zip-file-system for each zip-file in patches folder
+        // filter to read only patches which have the file name format joc.[VERSION]-patch[PATCH_VERSION if > 1].war
+        Predicate<Path> fileNameFilterAccepted = 
+                filePath -> !Files.isDirectory(filePath) && filePath.getFileName().toString().matches("^joc\\.\\d\\.\\d{2}\\.\\d{1,2}-patch\\d*\\.war$"); 
+        Predicate<Path> fileNameFilterNotAccepted = 
+                filePath -> !Files.isDirectory(filePath) && !filePath.getFileName().toString().matches("^joc\\.\\d\\.\\d{2}\\.\\d{1,2}-patch\\d*\\.war$"); 
+        // create a set of Path objects of not accepted patch files
+        Set<Path> notAcceptedFiles = Files.list(patchDir).filter(fileNameFilterNotAccepted).collect(Collectors.toSet());
+        // create a set of Path objects of accepted patch files
+        Set<Path> patchFilePaths = Files.list(patchDir).filter(fileNameFilterAccepted).collect(Collectors.toSet());
         try {
-            if ((patchFiles.isEmpty() && Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME)))
-                    || rollback) {
+            if (rollback) {
+                System.out.println("Rollback will be processed!");
                 rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
-            } else {
-                for (File patchFile : patchFiles) {
-                    System.out.println(patchFile.getAbsolutePath());
-                    FileSystem sourceFileSystem = null;
-                    sourceFileSystem = FileSystems.newFileSystem(patchFile.toPath(), null);
-                    processPatchZipFile(sourceFileSystem, targetFileSystem);
+            } else if (patchFilePaths.isEmpty()) {
+                System.out.println("No patches found, nothing to do!");
+                if (!notAcceptedFiles.isEmpty()) {
+                    for (Path patchFile : notAcceptedFiles) {
+                        System.out.println(
+                                String.format("File %1$s found, but does not meet the expected file name format of joc.[VERSION]-patch[PATCH_VERSION].war.\n"
+                                        + "File %1$s will not be applied as a patch.", patchFile.getFileName().toString()));
+                    }
                 }
-                // After everything from patches folder is processed, copy back from temp directory
-                targetFileSystem.close();
+            } else if (!patchFilePaths.isEmpty()) {
+                if (!notAcceptedFiles.isEmpty()) {
+                    for (Path patchFile : notAcceptedFiles) {
+                        System.out.println(
+                                String.format("File %1$s found, but does not meet the expected file name format of patch-YYYYMMDD-PATCHNAME.zip.\n"
+                                        + "File %1$s will not be applied as a patch.", patchFile.getFileName().toString()));
+                    }
+                }
+                if (patchFilePaths.size() > 1) {
+                    System.out.println(
+                            String.format("%1$d patches found in patches folder! Only one patch is allowed, please remove unused patches first!", 
+                                    patchFilePaths.size()));
+                } else {
+                    System.out.println(String.format("File %1$s found. Patching JOC Cockpit ...", patchFilePaths.iterator().next().getFileName().toString()));
+                   // copy the patch to temp dir and rename it
+                    Files.copy(patchDir.resolve(patchFilePaths.iterator().next().getFileName()), tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
+                }
+                // After patch from patches folder is processed, copy back from temp directory
                 Path copyBack = Files.copy(tempDir.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath, COPYOPTIONS);
                 if (copyBack != null && !copyBack.toString().isEmpty()) {
                     System.out.println(String.format("%1$s was updated successfully!", copyBack));
                 }
+                // after successful update remove the temp files from temp dir
+                Files.delete(tempDir.resolve(JOC_WAR_FILE_NAME));
             }
         } catch (IOException e) {
             e.printStackTrace(System.err);
             System.exit(1);
-        } finally {
-            // close target file system after all patches are processed!
-            if (targetFileSystem.isOpen()) {
-                targetFileSystem.close();
-            }
         }
-
     }
     
     private static void rollbackPatch (Path archiveFilePath, Path webappFolderPath) throws IOException {
@@ -150,62 +136,9 @@ public class ExecutePatch {
         System.out.println(String.format("rollback processed on file '%1$s'", p.toString(), JOC_WAR_FILE_NAME));
     }
     
-    private static void processPatchZipFile (FileSystem sourceFileSystem, FileSystem targetFileSystem) throws IOException {
-        Path sourceRootPath = sourceFileSystem.getPath("/");
-        Path targetRootPath = targetFileSystem.getPath("/");
-        Files.walkFileTree(sourceFileSystem.getPath("/"), new FileVisitor<Path>() {
-
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                Path targetDir = targetRootPath.resolve(sourceRootPath.relativize(dir));
-                try {
-                    Path p = Files.copy(dir, targetDir.resolve(dir), COPYOPTIONS);
-                    System.out.println("processing directory '" + p.toString() + "'");
-                } catch (FileAlreadyExistsException | DirectoryNotEmptyException e) {
-                } catch (IOException e) {
-                    System.out.println("error processing directory tree '" + targetDir + "'" + e.getMessage());
-                    return FileVisitResult.SKIP_SUBTREE;
-                }
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Path targetFile = targetRootPath.resolve(sourceRootPath.relativize(file));
-                boolean alreadyExists = false;
-                if (Files.exists(targetFile)) {
-                    alreadyExists = true;
-                }
-                try {
-                    Path p = Files.copy(file, targetFile, COPYOPTIONS);
-                    if (alreadyExists) {
-                        System.out.println(String.format("file '%1$s updated in %2$s'", p.toString(), JOC_WAR_FILE_NAME));
-                    } else {
-                        System.out.println(String.format("file '%1$s added to %2$s'", p.toString(), JOC_WAR_FILE_NAME));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace(System.err);
-                    return FileVisitResult.TERMINATE;
-                }
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-        });
-        sourceFileSystem.close();
-    }
-
     private static void printUsage(Path patchDir){
         System.out.println();
-        System.out.println("Executes one or more patches on JOC from the patches folder.\n"
+        System.out.println("Executes one patch on JOC from the patches folder.\n"
                 + "The paths of the needed folders are resolved automatically.\n"
                 + "If you want to set the paths differently use the options below.\n");
         System.out.println();

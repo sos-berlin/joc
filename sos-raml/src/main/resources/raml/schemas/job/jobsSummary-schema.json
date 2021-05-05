@@ -18,6 +18,9 @@
     },
     "tasks": {
       "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "queuedTasks": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
     }
   }
 }

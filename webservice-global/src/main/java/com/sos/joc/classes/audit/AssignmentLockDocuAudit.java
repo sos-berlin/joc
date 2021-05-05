@@ -95,4 +95,9 @@ public class AssignmentLockDocuAudit extends LockDocuFilter implements IAuditLog
         return null;
     }
 
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

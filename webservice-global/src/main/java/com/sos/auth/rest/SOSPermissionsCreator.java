@@ -13,6 +13,9 @@ import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.DefaultSessionKey;
+import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +30,14 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMasters;
 import com.sos.auth.rest.permission.model.SOSPermissionRoles;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JocCockpitProperties;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JocAuthenticationException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.security.SecurityConfigurationMaster;
+
+import sos.util.SOSSerializerUtil;
 
 public class SOSPermissionsCreator {
 
@@ -75,40 +80,58 @@ public class SOSPermissionsCreator {
                 SecurityUtils.setSecurityManager(securityManager);
                 LOGGER.debug("loginFromAccessToken --> securityManager created");
 
-                Subject subject = new Subject.Builder().sessionId(accessToken).buildSubject();
-                LOGGER.debug("loginFromAccessToken --> subject created");
-                if (subject.isAuthenticated()) {
-                    LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject is authenticated");
-                    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-                    currentUser = new SOSShiroCurrentUser((String) subject.getPrincipals().getPrimaryPrincipal(), "", "");
+                SessionKey s = new DefaultSessionKey(accessToken);
+                Session session = SecurityUtils.getSecurityManager().getSession(s);
 
-                    if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
-                        Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
-                    }
+                if (session != null) {
+                    Subject subject = new Subject.Builder(securityManager).sessionId(accessToken).session(session).buildSubject();
+                    LOGGER.debug("loginFromAccessToken --> subject created");
+                    if (subject.isAuthenticated()) {
 
-                    LOGGER.debug("loginFromAccessToken --> removeTimedOutUser");
-                    Globals.jocWebserviceDataContainer.getCurrentUsersList().removeTimedOutUser(currentUser.getUsername());
+                        LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> subject is authenticated");
+                        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+                        currentUser = new SOSShiroCurrentUser((String) subject.getPrincipals().getPrimaryPrincipal(), "", "");
 
-                    currentUser.setCurrentSubject(subject);
-                    currentUser.setAccessToken(accessToken);
-
-                    SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = createJocCockpitPermissionMasterObjectList(accessToken);
-                    LOGGER.debug("loginFromAccessToken --> JocCockpitPermissionMasterObjectList created");
-                    currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
-                    currentUser.initFolders();
-                    LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> folders initialized");
-
-                    Section section = getIni().getSection("folders");
-                    if (section != null) {
-                        for (String role : section.keySet()) {
-                            currentUser.addFolder(role, section.get(role));
+                        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
+                            Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
                         }
-                    }
-                    SOSPermissionCommandsMasters sosPermissionCommandsMasters = createCommandsPermissionMasterObjectList(accessToken);
-                    LOGGER.debug("loginFromAccessToken --> CommandsPermissionMasterObjectList created");
 
-                    currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
-                    Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
+                        LOGGER.debug("loginFromAccessToken --> removeTimedOutUser");
+                        Globals.jocWebserviceDataContainer.getCurrentUsersList().removeTimedOutUser(currentUser.getUsername());
+
+                        currentUser.setCurrentSubject(subject);
+                        currentUser.setAccessToken(accessToken);
+
+                        SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = null;
+                        if (subject.getSession().getAttribute("username_joc_permissions") != null) {
+                            sosPermissionJocCockpitMasters = (SOSPermissionJocCockpitMasters) SOSSerializerUtil.fromString(subject.getSession()
+                                    .getAttribute("username_joc_permissions").toString());
+                        } else {
+                            LOGGER.warn("Could not read username_joc_permissions after fail over in the session object for access token "
+                                    + accessToken);
+                        }
+
+                        LOGGER.debug("loginFromAccessToken --> JocCockpitPermissionMasterObjectList created");
+                        currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
+                        currentUser.initFolders();
+                        LOGGER.debug(getClass().getName() + ": loginFromAccessToken --> folders initialized");
+
+                        Section section = getIni().getSection("folders");
+                        if (section != null) {
+                            for (String role : section.keySet()) {
+                                currentUser.addFolder(role, section.get(role));
+                            }
+                        }
+
+                        if (subject.getSession().getAttribute("username_command_permissions") != null) {
+                            SOSPermissionCommandsMasters sosPermissionCommandsMasters = (SOSPermissionCommandsMasters) SOSSerializerUtil.fromString(
+                                    subject.getSession().getAttribute("username_command_permissions").toString());
+                            LOGGER.debug("loginFromAccessToken --> CommandsPermissionMasterObjectList created");
+                            currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
+                        }
+
+                        Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
+                    }
                 }
             }
         } finally {
@@ -131,67 +154,53 @@ public class SOSPermissionsCreator {
         }
     }
 
-    public SOSPermissionJocCockpitMasters createJocCockpitPermissionMasterObjectList(String accessToken) throws JocException {
+    public SOSPermissionJocCockpitMasters createJocCockpitPermissionMasterObjectList(String accessToken,
+            List<SecurityConfigurationMaster> listOfMasters) throws JocException {
 
         Set<String> unique = new HashSet<String>();
-        SOSHibernateSession session = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");
         SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = new SOSPermissionJocCockpitMasters();
-        try {
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
-            Globals.beginTransaction(session);
-            List<DBItemInventoryInstance> listOfInstances = dbLayer.getInventoryInstances();
-            Globals.rollback(session);
-            session.close();
-            SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
-            SOSPermissionRoles sosPermissionRoles = sosPermissionsCreator.getRoles(true);
+        SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
+        SOSPermissionRoles sosPermissionRoles = sosPermissionsCreator.getRoles(true);
 
-            addSosPermissionJocCockpit("", sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
-           
-            for (DBItemInventoryInstance instance : listOfInstances) {
-                addSosPermissionJocCockpit(instance.getSchedulerId(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
+        addSosPermissionJocCockpit("", sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
+
+        for (SecurityConfigurationMaster instance : listOfMasters) {
+            if (!"".equals(instance.getMaster())) {
+                addSosPermissionJocCockpit(instance.getMaster(), sosPermissionRoles, unique, sosPermissionJocCockpitMasters);
             }
-        } finally {
-            Globals.disconnect(session);
-            session = null;
         }
+
         return sosPermissionJocCockpitMasters;
     }
 
-    public SOSPermissionCommandsMasters createCommandsPermissionMasterObjectList(String accessToken) throws JocException {
+    public SOSPermissionCommandsMasters createCommandsPermissionMasterObjectList(String accessToken, List<SecurityConfigurationMaster> listOfMasters)
+            throws JocException {
         Map<String, String> unique = new HashMap<String, String>();
-        SOSHibernateSession session = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");
         SOSPermissionCommandsMasters sosPermissionCommandsMasters = new SOSPermissionCommandsMasters();
-        try {
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
-            Globals.beginTransaction(session);
-            List<DBItemInventoryInstance> listOfInstances = dbLayer.getInventoryInstances();
-            Globals.rollback(session);
-            session.close();
-            SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
 
-            SOSPermissionCommands sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands("");
-            SOSPermissionCommandsMaster sosPermissionCommandsMaster = new SOSPermissionCommandsMaster();
-            sosPermissionCommandsMaster.setSOSPermissionCommands(sosPermissionCommands);
-            sosPermissionCommandsMaster.setJobSchedulerMaster("");
-            sosPermissionCommandsMasters.getSOSPermissionCommandsMaster().add(sosPermissionCommandsMaster);
-            unique.put("", "");
+        SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
 
-            for (DBItemInventoryInstance instance : listOfInstances) {
+        SOSPermissionCommands sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands("");
+        SOSPermissionCommandsMaster sosPermissionCommandsMaster = new SOSPermissionCommandsMaster();
+        sosPermissionCommandsMaster.setSOSPermissionCommands(sosPermissionCommands);
+        sosPermissionCommandsMaster.setJobSchedulerMaster("");
+        sosPermissionCommandsMasters.getSOSPermissionCommandsMaster().add(sosPermissionCommandsMaster);
+        unique.put("", "");
+
+        for (SecurityConfigurationMaster instance : listOfMasters) {
+            if (!"".equals(instance.getMaster())) {
                 sosPermissionCommandsMaster = new SOSPermissionCommandsMaster();
 
-                sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands(instance.getSchedulerId());
+                sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands(instance.getMaster());
                 sosPermissionCommandsMaster.setSOSPermissionCommands(sosPermissionCommands);
-                sosPermissionCommandsMaster.setJobSchedulerMaster(instance.getSchedulerId());
+                sosPermissionCommandsMaster.setJobSchedulerMaster(instance.getMaster());
                 if (unique.get(sosPermissionCommandsMaster.getJobSchedulerMaster()) == null) {
                     sosPermissionCommandsMasters.getSOSPermissionCommandsMaster().add(sosPermissionCommandsMaster);
                     unique.put(sosPermissionCommandsMaster.getJobSchedulerMaster(), "");
                 }
             }
-
-        } finally {
-            Globals.disconnect(session);
-            session = null;
         }
+
         return sosPermissionCommandsMasters;
     }
 
@@ -242,9 +251,13 @@ public class SOSPermissionsCreator {
 
             sosPermissionJocCockpit.getJobschedulerMaster().setView(o.createSOSPermissionJocCockpitJobschedulerMasterView());
             sosPermissionJocCockpit.getJobschedulerMaster().setAdministration(o.createSOSPermissionJocCockpitJobschedulerMasterAdministration());
-            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().setConfigurations(o.createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurations());
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().setConfigurations(o
+                    .createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurations());
             sosPermissionJocCockpit.getJobschedulerMaster().setExecute(o.createSOSPermissionJocCockpitJobschedulerMasterExecute());
-            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setDeploy(o.createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurationsDeploy());
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setDeploy(o
+                    .createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurationsDeploy());
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setView(o
+                    .createSOSPermissionJocCockpitJobschedulerMasterAdministrationConfigurationsView());
 
             sosPermissionJocCockpit.getJobschedulerMaster().getExecute().setRestart(o
                     .createSOSPermissionJocCockpitJobschedulerMasterExecuteRestart());
@@ -320,8 +333,16 @@ public class SOSPermissionsCreator {
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:delete"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setEdit(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:edit"));
-            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().setView(haveRight(masterId,
-                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view"));
+
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setNotification(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:notification"));
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setYade(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:yade"));
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setOthers(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:others"));
+            sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getView().setInventory(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:view:inventory"));
+
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().setJob(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:job"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().setJobChain(haveRight(masterId,
@@ -338,7 +359,7 @@ public class SOSPermissionsCreator {
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:schedule"));
             sosPermissionJocCockpit.getJobschedulerMaster().getAdministration().getConfigurations().getDeploy().setXmlEditor(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:xml_editor"));
-            
+
             sosPermissionJocCockpit.getJobschedulerMasterCluster().getView().setStatus(haveRight(masterId,
                     "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status"));
             sosPermissionJocCockpit.getJobschedulerMasterCluster().getExecute().setTerminateFailSafe(haveRight(masterId,
@@ -509,6 +530,8 @@ public class SOSPermissionsCreator {
             sosPermissionJocCockpit.getJobStream().getView().setStatus(haveRight(masterId, "sos:products:joc_cockpit:jobstream:view:status"));
             sosPermissionJocCockpit.getJobStream().getChange().setConditions(haveRight(masterId,
                     "sos:products:joc_cockpit:jobstream:change:conditions"));
+            sosPermissionJocCockpit.getJobStream().getChange().setJobStream(haveRight(masterId,
+                    "sos:products:joc_cockpit:jobstream:change:jobstream"));
             sosPermissionJocCockpit.getJobStream().getChange().getEvents().setAdd(haveRight(masterId,
                     "sos:products:joc_cockpit:jobstream:change:events:add"));
             sosPermissionJocCockpit.getJobStream().getChange().getEvents().setRemove(haveRight(masterId,
@@ -541,6 +564,9 @@ public class SOSPermissionsCreator {
             sosPermissionCommands.setProcessClass(o.createSOSPermissionCommandsProcessClass());
             sosPermissionCommands.setSchedule(o.createSOSPermissionCommandsSchedule());
             sosPermissionCommands.setLock(o.createSOSPermissionCommandsLock());
+
+            sosPermissionCommands.setSubsystemShow(o.createSOSPermissionCommandsSubsystemShow());
+            sosPermissionCommands.getSubsystemShow().setView((o.createSOSPermissionCommandsSubsystemShowView()));
 
             sosPermissionCommands.getJobschedulerMaster().setView(o.createSOSPermissionCommandsJobschedulerMasterView());
             sosPermissionCommands.getJobschedulerMaster().setExecute(o.createSOSPermissionCommandsJobschedulerMasterExecute());
@@ -661,6 +687,8 @@ public class SOSPermissionsCreator {
             sosPermissionCommands.getLock().getView().setStatus(haveRight(masterId, "sos:products:commands:lock:view:status"));
             sosPermissionCommands.getLock().setRemove(haveRight(masterId, "sos:products:commands:lock:remove"));
             sosPermissionCommands.getLock().getChange().setHotFolder(haveRight(masterId, "sos:products:commands:lock:change:hot_folder"));
+
+            sosPermissionCommands.getSubsystemShow().getView().setStatus(haveRight(masterId, "sos:products:commands:subsystem:view:status"));
         }
         return sosPermissionCommands;
     }

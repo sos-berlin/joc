@@ -71,7 +71,7 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
 
             List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
             boolean withFolderFilter = jobChainsFilter.getFolders() != null && !jobChainsFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(jobChainsFilter.getFolders());
             List<JobChainV> listOfJobChains = null;
 
             if (getJobChainFromXMLCommand) {
@@ -140,7 +140,7 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
                             listOrders = new OrdersVCallable(commonFolder, new JOCJsonCommand(jsonOrdersCommand), orderDocs, accessToken).call(); 
                         }
                     } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                        // no permission
+                        // no folder permission
                     } else if (folders != null && !folders.isEmpty()) {
                         for (Folder folder : folders) {
                             orderTasks.add(new OrdersVCallable(folder, new JOCJsonCommand(jsonOrdersCommand), orderDocs, accessToken));
@@ -184,13 +184,15 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
                 if (jobChains != null && !jobChains.isEmpty()) {
                     Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                     for (JobChainPath jobChain : jobChains) {
-                        if (jobChain != null && canAdd(jobChain.getJobChain(), permittedFolders)) {
-                            tasks.add(new JobChainsVCallable(jobChain.getJobChain(), jobChainsFilter, new JOCJsonCommand(this), accessToken,
-                                    jobDocs, jobChainDocs, orders));
+                        if (jobChain != null) {
+                            if (canAdd(jobChain.getJobChain(), permittedFolders)) {
+                                tasks.add(new JobChainsVCallable(jobChain.getJobChain(), jobChainsFilter, new JOCJsonCommand(this), accessToken,
+                                        jobDocs, jobChainDocs, orders));
+                            }
                         }
                     }
                 } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                    // no permission
+                    // no folder permissions
                 } else if (folders != null && !folders.isEmpty()) {
                     for (Folder folder : folders) {
                         tasks.add(new JobChainsVCallable(folder, jobChainsFilter, new JOCJsonCommand(this), accessToken, jobDocs, jobChainDocs,

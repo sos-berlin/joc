@@ -1,0 +1,8 @@
+{
+  "title": "searchPath",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "path with possibly % for sql like syntax in search requests",
+  "type": "string",
+  "pattern": "^[^\\<>?:\"|*]+$",
+  "maxLength": 255
+}

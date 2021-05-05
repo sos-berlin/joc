@@ -1,0 +1,47 @@
+{
+    "deliveryDate": "2021-03-23T15:56:27.869Z",
+    "history": [
+        {
+            "criticality": "normal",
+            "endTime": "2021-03-23T15:30:06Z",
+            "exitCode": 0,
+            "job": "/jobstream/test1/xjob3",
+            "jobschedulerId": "scheduler_joc_cockpit",
+            "startTime": "2021-03-23T15:30:04Z",
+            "state": {
+                "_text": "SUCCESSFUL",
+                "severity": 0
+            },
+            "surveyDate": "2021-03-23T15:30:06Z",
+            "taskId": "84447"
+        },
+        {
+            "criticality": "normal",
+            "endTime": "2021-03-23T15:30:04Z",
+            "exitCode": 0,
+            "job": "/jobstream/test1/xjob2",
+            "jobschedulerId": "scheduler_joc_cockpit",
+            "startTime": "2021-03-23T15:30:02Z",
+            "state": {
+                "_text": "SUCCESSFUL",
+                "severity": 0
+            },
+            "surveyDate": "2021-03-23T15:30:03Z",
+            "taskId": "84446"
+        },
+        {
+            "criticality": "normal",
+            "endTime": "2021-03-23T15:30:02Z",
+            "exitCode": 0,
+            "job": "/jobstream/test1/xjob11",
+            "jobschedulerId": "scheduler_joc_cockpit",
+            "startTime": "2021-03-23T15:30:00Z",
+            "state": {
+                "_text": "SUCCESSFUL",
+                "severity": 0
+            },
+            "surveyDate": "2021-03-23T15:30:00Z",
+            "taskId": "84445"
+        }
+    ]
+}

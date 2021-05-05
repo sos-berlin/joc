@@ -111,19 +111,24 @@ public class JobSchedulerDate {
         if (!at.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) {
             throw new JobSchedulerBadRequestException(String.format("date format yyyy-MM-dd HH:mm:ss expected for \"Start time\": %1$s", at));
         }
+        if (userTimezone == null) {
+            return at;
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return formatter.format(ZonedDateTime.of(LocalDateTime.parse(at, formatter), ZoneId.of(userTimezone)).withZoneSameInstant(ZoneId.of(jobSchedulerTimezone)));
     }
     
     public static String getAtInUTCISO8601(String at, String userTimezone) throws JobSchedulerBadRequestException {
-        if(at == null || at.toLowerCase().contains("now")) {
+        if(at == null || at.isEmpty() || at.toLowerCase().contains("now")) {
             return getAtWithNowInUTCISO8601(at, userTimezone);
         }
         return getAtWithoutNowInUTCISO8601(at, userTimezone);
     }
     
     public static String getAtWithNowInUTCISO8601(String at, String userTimezone) throws JobSchedulerBadRequestException {
-        if (at == null || !at.trim().toLowerCase().matches("now|now\\s*\\+\\s*(\\d+|\\d{2}:\\d{2}(:\\d{2})?)")) {
+        if (at == null || at.isEmpty()) {
+            at = "now";
+        } else if (!at.trim().toLowerCase().matches("now|now\\s*\\+\\s*(\\d+|\\d{2}:\\d{2}(:\\d{2})?)")) {
             throw new JobSchedulerBadRequestException(String.format("formats 'now', 'now + HH:mm:[ss]' or 'now + SECONDS' expected for \"Start time\": %1$s", at));
         }
         

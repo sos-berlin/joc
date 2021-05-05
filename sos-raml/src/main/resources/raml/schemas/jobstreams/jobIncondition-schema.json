@@ -8,6 +8,10 @@
 		"job": {
 			"$ref": "../common/path-schema.json"
 		},
+		
+		"haveReferenceToOtherFolders": {
+			"type": "boolean"
+		},
 		"inconditions": {
 			"type": "array",
 			"items": {

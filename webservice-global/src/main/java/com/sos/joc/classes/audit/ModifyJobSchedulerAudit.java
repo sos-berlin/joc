@@ -99,4 +99,10 @@ public class ModifyJobSchedulerAudit extends HostPortTimeOutParameter implements
     public Date getStartTime() {
         return null;
     }
+    
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

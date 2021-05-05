@@ -37,15 +37,17 @@ public class PropertiesImpl extends JOCResourceImpl implements IPropertiesResour
             entity.setComments(readCommentsFromJocProperties());
             ShowViewProperties showViewProps = new ShowViewProperties();
             showViewProps.setAuditLog(readShowViewFromJocProperties("auditlog"));
+            showViewProps.setConditions(readShowViewFromJocProperties("conditions"));
+            showViewProps.setConfiguration(readShowViewFromJocProperties("configuration"));
             showViewProps.setDailyPlan(readShowViewFromJocProperties("dailyplan"));
             showViewProps.setDashboard(readShowViewFromJocProperties("dashboard"));
             showViewProps.setFileTransfers(readShowViewFromJocProperties("filetransfers"));
             showViewProps.setHistory(readShowViewFromJocProperties("history"));
             showViewProps.setJobChains(readShowViewFromJocProperties("jobchains"));
             showViewProps.setJobs(readShowViewFromJocProperties("jobs"));
+            showViewProps.setJobStreams(readShowViewFromJocProperties("jobstreams"));
             showViewProps.setOrders(readShowViewFromJocProperties("orders"));
             showViewProps.setResources(readShowViewFromJocProperties("resources"));
-            showViewProps.setConditions(readShowViewFromJocProperties("conditions"));
             entity.setShowViews(showViewProps);
             entity.setDeliveryDate(Date.from(Instant.now()));
             

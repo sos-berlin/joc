@@ -38,6 +38,8 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
                 return jocDefaultResponse;
             }
             checkRequiredParameter("jobChain", jobChainBody.getJobChain());
+            checkFolderPermissions(jobChainBody.getJobChain());
+            
             Configuration200 entity = new Configuration200();
             boolean responseInHtml = jobChainBody.getMime() == ConfigurationMime.HTML;
             if (versionIsOlderThan("1.13.1")) {

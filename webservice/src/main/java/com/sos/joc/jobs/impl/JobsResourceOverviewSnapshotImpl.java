@@ -1,6 +1,7 @@
 package com.sos.joc.jobs.impl;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -41,19 +42,23 @@ import com.sos.schema.JsonValidator;
 public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements IJobsResourceOverviewSnapshot {
 
     private static final String API_CALL = "./jobs/overview/snapshot";
+    private static Set<Folder> permittedFolders;
     public class SummaryStatistics {
 
         private int count = 0;
         private int countRunningTasks = 0;
+        private int countQueuedTasks = 0;
 
         public void accept(JsonValue jv) {
             ++count;
             countRunningTasks += ((JsonObject) jv).getInt("usedTaskCount", 0);
+            countQueuedTasks += ((JsonObject) jv).getInt("queuedTaskCount", 0);
         }
         
         public SummaryStatistics combine(SummaryStatistics other) {
             this.count += other.count;
             this.countRunningTasks += other.countRunningTasks;
+            this.countQueuedTasks += other.countQueuedTasks;
             return this;
         }
         
@@ -63,6 +68,10 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
         
         public final int getCountRunningTasks() {
             return countRunningTasks;
+        }
+        
+        public final int getCountQueuedTasks() {
+            return countQueuedTasks;
         }
     }
 
@@ -138,6 +147,7 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
                 jobs.setStopped(countStopped);
                 jobs.setWaitingForResource(countWaitingForResource);
                 jobs.setTasks(countRunningTasks);
+                jobs.setQueuedTasks(curQueuedTasks);
 
                 entity.setSurveyDate(jocXmlCommand.getSurveyDate());
             } else {
@@ -149,10 +159,34 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
                 entity.setSurveyDate(JobSchedulerDate.getDateFromEventId(json.getJsonNumber("eventId").longValue()));
                 JsonArray elements = json.getJsonArray("elements");
                 
+                permittedFolders = folderPermissions.getListOfFolders();
+                
+                Predicate<JsonValue> jobIsEnabled = p -> {
+                    try {
+                        JsonObject overview = ((JsonObject) p);
+                        String path = overview.getString("path", "");
+                        if (path.isEmpty() || path.equals("/scheduler_file_order_sink") || path.equals("/scheduler_service_forwarder") || !overview
+                                .getBoolean("enabled", true)) {
+                            return false;
+                        } else {
+                            if (!isPermittedForFolder(getParent(path))) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                };
+                
                 Map<String, SummaryStatistics> summary = elements.stream().filter(jobIsEnabled).collect(Collectors.groupingBy(p -> {
                     JsonObject overview = ((JsonObject) p);
                     JsonArray obstacles = overview.getJsonArray("obstacles");
                     String stateText = overview.getString("state", "UNKNOWN").toUpperCase();
+                    ConfigurationState confState = ConfigurationStatus.getConfigurationStatus(overview.getJsonArray("obstacles"));
+                    if (confState != null && confState.getSeverity() == 2) {
+                        stateText = "ERROR";
+                    }
                     switch (stateText) {
                     case "STOPPED":
                         return "stopped";
@@ -187,16 +221,15 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
                     return "unknown";
                 }, Collector.of(SummaryStatistics::new, SummaryStatistics::accept, SummaryStatistics::combine)));
                 
-                summary.putIfAbsent("pending", new SummaryStatistics());
-                summary.putIfAbsent("stopped", new SummaryStatistics());
-                summary.putIfAbsent("running", new SummaryStatistics());
-                summary.putIfAbsent("waitingForResource", new SummaryStatistics());
-                
+                Arrays.asList("pending", "stopped", "running", "waitingForResource").stream().forEach(state -> summary.putIfAbsent(state,
+                        new SummaryStatistics()));
+
                 jobs.setPending(summary.get("pending").getCount());
                 jobs.setRunning(summary.get("running").getCount());
                 jobs.setStopped(summary.get("stopped").getCount());
                 jobs.setWaitingForResource(summary.get("waitingForResource").getCount());
                 jobs.setTasks(summary.get("running").getCountRunningTasks() + summary.get("waitingForResource").getCountRunningTasks());
+                jobs.setQueuedTasks(summary.values().stream().mapToInt(SummaryStatistics::getCountQueuedTasks).sum());
             }
             entity.setJobs(jobs);
             entity.setDeliveryDate(Date.from(Instant.now()));
@@ -214,28 +247,14 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
 
     }
     
-    public static Predicate<JsonValue> jobIsEnabled = new Predicate<JsonValue>() {
-
-        @Override
-        public boolean test(JsonValue p) {
-            try {
-                JsonObject overview = ((JsonObject) p);
-                String path = overview.getString("path", "");
-                if (path.isEmpty() || path.equals("/scheduler_file_order_sink") || path.equals("/scheduler_service_forwarder") || !overview.getBoolean("enabled", true)) {
-                    return false;
-                } else {
-                    ConfigurationState confState = ConfigurationStatus.getConfigurationStatus(overview.getJsonArray("obstacles"));
-                    if (confState != null && confState.getSeverity() == 2) {
-                        return false;
-                    }
-                }
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
+    private static boolean isPermittedForFolder(String folder) {
+        if (permittedFolders == null || permittedFolders.isEmpty()) {
+            return true;
         }
-        
-    };
+        Predicate<Folder> filter = f -> f.getFolder().equals(folder) || (f.getRecursive() && ("/".equals(f.getFolder()) || folder.startsWith(f
+                .getFolder() + "/")));
+        return permittedFolders.stream().parallel().anyMatch(filter);
+    }
     
     public static boolean isWaitingForAgent(JsonObject taskObstacles) {
         if (taskObstacles != null) {

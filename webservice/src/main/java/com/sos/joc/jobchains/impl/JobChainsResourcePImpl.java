@@ -57,7 +57,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
 
             List<JobChainPath> jobChainPaths = jobChainsFilter.getJobChains();
             boolean withFolderFilter = jobChainsFilter.getFolders() != null && !jobChainsFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(jobChainsFilter.getFolders());
             Long instanceId = dbItemInventoryInstance.getId();
 
             JobChainsP entity = new JobChainsP();
@@ -76,20 +76,23 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             if (jobChainPaths != null && !jobChainPaths.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (JobChainPath jobChainPath : jobChainPaths) {
-                    if (jobChainPath != null && canAdd(jobChainPath.getJobChain(), permittedFolders)) {
-                        DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(normalizePath(jobChainPath.getJobChain()), instanceId);
-                        if (jobChainFromDb == null) {
-                            continue;
-                        }
-                        JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, documentations.get(jobChainFromDb.getName()), processClassJobs, compact, instanceId);
-                        if (jobChain != null) {
-                            jobChains.add(jobChain);
-                            initNestedJobChainsIfExists(dbLayer, documentations, jobChain, processClassJobs, compact);
+                    if (jobChainPath != null) {
+                        if (canAdd(jobChainPath.getJobChain(), permittedFolders)) {
+                            DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(normalizePath(jobChainPath.getJobChain()), instanceId);
+                            if (jobChainFromDb == null) {
+                                continue;
+                            }
+                            JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, documentations.get(jobChainFromDb
+                                    .getName()), processClassJobs, compact, instanceId);
+                            if (jobChain != null) {
+                                jobChains.add(jobChain);
+                                initNestedJobChainsIfExists(dbLayer, documentations, jobChain, processClassJobs, compact);
+                            }
                         }
                     }
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChainsByFolder(normalizeFolder(folder.getFolder()), folder

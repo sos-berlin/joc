@@ -52,7 +52,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             List<LockPath> locks = locksFilter.getLocks();
             String regex = locksFilter.getRegex();
             boolean withFolderFilter = locksFilter.getFolders() != null && !locksFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(locksFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(locksFilter.getFolders());
             DocumentationDBLayer dbDocLayer = new DocumentationDBLayer(connection);
             Map<String, String> documentations = dbDocLayer.getDocumentationPaths(locksFilter.getJobschedulerId(), JobSchedulerObjectType.LOCK);
             InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(connection);
@@ -61,20 +61,22 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             if (locks != null && !locks.isEmpty()) {
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
                 for (LockPath lockPath : locks) {
-                    if (lockPath != null && canAdd(lockPath.getLock(), permittedFolders)) {
-                        DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePath(lockPath.getLock()), dbItemInventoryInstance.getId());
-                        if (lockFromDb == null) {
-                            continue;
+                    if (lockPath != null) {
+                        if (lockPath != null && canAdd(lockPath.getLock(), permittedFolders)) {
+                            DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePath(lockPath.getLock()), dbItemInventoryInstance.getId());
+                            if (lockFromDb == null) {
+                                continue;
+                            }
+                            LockP lock = LockPermanent.getLockP(dbLayer, documentations.get(lockFromDb.getName()), lockFromDb);
+                            if (lockFromDb.getMaxNonExclusive() != null) {
+                                lock.setMaxNonExclusive(lockFromDb.getMaxNonExclusive());
+                            }
+                            listOfLocks.add(lock);
                         }
-                        LockP lock = LockPermanent.getLockP(dbLayer, documentations.get(lockFromDb.getName()), lockFromDb);
-                        if (lockFromDb.getMaxNonExclusive() != null) {
-                            lock.setMaxNonExclusive(lockFromDb.getMaxNonExclusive());
-                        }
-                        listOfLocks.add(lock);
                     }
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventoryLock> locksFromDb = dbLayer.getLocksByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance

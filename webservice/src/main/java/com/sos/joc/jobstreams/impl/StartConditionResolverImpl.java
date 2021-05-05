@@ -20,7 +20,7 @@ import com.sos.schema.JsonValidator;
 public class StartConditionResolverImpl extends JOCResourceImpl implements IStartConditionResolverResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StartConditionResolverImpl.class);
-    private static final String API_CALL = "./conditions/startConditionResolver";
+    private static final String API_CALL = "./conditions/start_condition_resolver";
 
     @Override
     public JOCDefaultResponse startConditionResolver(String accessToken, byte[] filterBytes) {
@@ -38,7 +38,8 @@ public class StartConditionResolverImpl extends JOCResourceImpl implements IStar
                 notifyEventHandler(accessToken);
             } catch (JobSchedulerConnectionRefusedException e) {
                 LOGGER.warn(
-                        "Start Condition Resolver: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Conditions not resolved");
+                        "Start Condition Resolver: Could not send custom event to Job Stream Event Handler as JobScheduler seems not to be up and running. Jobstream not started");
+                JOCDefaultResponse.responseStatusJSError(e, getJocError());
             }
 
             return JOCDefaultResponse.responseStatusJSOk(null);
@@ -50,12 +51,13 @@ public class StartConditionResolverImpl extends JOCResourceImpl implements IStar
         }
     }
 
-    private String notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
+    private void notifyEventHandler(String accessToken) throws JsonProcessingException, JocException {
         CustomEventsUtil customEventsUtil = new CustomEventsUtil(StartConditionResolverImpl.class.getName());
         customEventsUtil.addEvent("StartConditionResolver");
         String notifyCommand = customEventsUtil.getEventCommandAsXml();
         com.sos.joc.classes.JOCXmlCommand jocXmlCommand = new com.sos.joc.classes.JOCXmlCommand(dbItemInventoryInstance);
-        return jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.executePost(notifyCommand, accessToken);
+        jocXmlCommand.throwJobSchedulerError();
     }
 
 }

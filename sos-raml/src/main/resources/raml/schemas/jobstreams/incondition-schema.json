@@ -20,6 +20,9 @@
 		"skipOutCondition": {
 			"type": "boolean"
 		},
+		"haveReferenceToOtherFolders": {
+			"type": "boolean"
+		},
 		"conditionExpression": {
 			"$ref": "condition_expression-schema.json"
 		},

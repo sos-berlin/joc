@@ -113,4 +113,11 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNode implements IAudi
     public Date getStartTime() {
         return null;
     }
+    
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
+
 }

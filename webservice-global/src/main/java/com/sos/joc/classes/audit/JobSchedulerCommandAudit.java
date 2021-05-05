@@ -130,4 +130,10 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
     public Date getStartTime() {
         return null;
     }
+    
+    @Override
+    @JsonIgnore
+    public String getJobStream() {
+        return null;
+    }
 }

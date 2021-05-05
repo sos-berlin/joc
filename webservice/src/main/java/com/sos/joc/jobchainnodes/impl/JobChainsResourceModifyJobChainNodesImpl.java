@@ -3,6 +3,7 @@ package com.sos.joc.jobchainnodes.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -16,6 +17,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobchainnodes.resources.IJobChainsResourceModifyJobChainNodes;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.ModifyJobChainNode;
 import com.sos.joc.model.jobChain.ModifyJobChainNodes;
 import com.sos.schema.JsonValidator;
@@ -96,9 +98,10 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl
 		if (jobChainNodes.getNodes().size() == 0) {
 			throw new JocMissingRequiredParameterException("undefined 'nodes'");
 		}
+		Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
 		Date surveyDate = new Date();
 		for (ModifyJobChainNode jobChainNode : jobChainNodes.getNodes()) {
-			surveyDate = executeModifyJobChainNodeCommand(jobChainNode, jobChainNodes, command);
+			surveyDate = executeModifyJobChainNodeCommand(jobChainNode, jobChainNodes, command, permittedFolders);
 		}
 		if (listOfErrors.size() > 0) {
 			return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -107,13 +110,15 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl
 	}
 
 	private Date executeModifyJobChainNodeCommand(ModifyJobChainNode jobChainNode, ModifyJobChainNodes jobChainNodes,
-			String cmd) {
+			String cmd, Set<Folder> permittedFolders) {
 		try {
 			ModifyJobChainNodeAudit jobChainNodeAudit = new ModifyJobChainNodeAudit(jobChainNode, jobChainNodes);
 			logAuditMessage(jobChainNodeAudit);
 
 			checkRequiredParameter("jobChain", jobChainNode.getJobChain());
 			checkRequiredParameter("node", jobChainNode.getNode());
+			checkFolderPermissions(jobChainNode.getJobChain(), permittedFolders);
+			
 			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 			XMLBuilder xml = new XMLBuilder("job_chain_node.modify");
 			xml.addAttribute("job_chain", normalizePath(jobChainNode.getJobChain())).addAttribute("state",

@@ -61,8 +61,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                 return jocDefaultResponse;
             }
             
-            folderPermissions = jobschedulerUser.getSosShiroCurrentUser().getSosShiroCalendarFolderPermissions();
-            folderPermissions.setSchedulerId(calendarsFilter.getJobschedulerId());
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
@@ -71,7 +70,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
 
             boolean withFolderFilter = calendarsFilter.getFolders() != null && !calendarsFilter.getFolders().isEmpty();
             boolean hasPermission = true;
-            List<Folder> folders = addPermittedFolder(calendarsFilter.getFolders());
+            Set<Folder> folders = getCalendarFolderPermissions().getPermittedFolders(calendarsFilter.getFolders());
             
             if (calendarsFilter.getCalendars() != null && !calendarsFilter.getCalendars().isEmpty()) {
                 calendarsFilter.setRegex(null);
@@ -124,21 +123,25 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                     compact = false;
                 }
                 for (DBItemInventoryClusterCalendar dbCalendar : dbCalendars) {
-                    if (FilterAfterResponse.matchRegex(calendarsFilter.getRegex(), dbCalendar.getName())) {
-                        Calendar calendar = om.readValue(dbCalendar.getConfiguration(), Calendar.class);
-                        calendar.setId(dbCalendar.getId());
-                        calendar.setPath(dbCalendar.getName());
-                        calendar.setName(dbCalendar.getBaseName());
-                        calendar.setDocumentation(documentations.get(dbCalendar.getName()));
-                        if (compact) {
-                            calendar.setIncludes(null);
-                            calendar.setExcludes(null);
-                        }
-                        if (withUsedBy) {
-                            calendar.setUsedBy(getUsedBy(dbCalendarLayer.getCalendarUsages(dbCalendar.getId())));
-                        }
-                        calendarList.add(calendar);
+                    if (!canAdd(dbCalendar.getName(), permittedFolders)) {
+                        continue;
                     }
+                    if (!FilterAfterResponse.matchRegex(calendarsFilter.getRegex(), dbCalendar.getName())) {
+                        continue;
+                    }
+                    Calendar calendar = om.readValue(dbCalendar.getConfiguration(), Calendar.class);
+                    calendar.setId(dbCalendar.getId());
+                    calendar.setPath(dbCalendar.getName());
+                    calendar.setName(dbCalendar.getBaseName());
+                    calendar.setDocumentation(documentations.get(dbCalendar.getName()));
+                    if (compact) {
+                        calendar.setIncludes(null);
+                        calendar.setExcludes(null);
+                    }
+                    if (withUsedBy) {
+                        calendar.setUsedBy(getUsedBy(dbCalendarLayer.getCalendarUsages(dbCalendar.getId())));
+                    }
+                    calendarList.add(calendar);
                 }
             }
             Calendars entity = new Calendars();
@@ -159,6 +162,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
         SortedSet<String> orders = new TreeSet<String>();
         SortedSet<String> jobs = new TreeSet<String>();
         SortedSet<String> schedules = new TreeSet<String>();
+        SortedSet<String> jobStreams = new TreeSet<String>();
         boolean usedByExist = false;
         if (calendarUsages != null) {
             for (DBItemInventoryClusterCalendarUsage item : calendarUsages) {
@@ -175,6 +179,9 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                     break;
                 case "SCHEDULE":
                     schedules.add(item.getPath());
+                    break;
+                case "JOBSTREAMS":
+                    jobStreams.add(item.getPath());
                     break;
                 }
             }

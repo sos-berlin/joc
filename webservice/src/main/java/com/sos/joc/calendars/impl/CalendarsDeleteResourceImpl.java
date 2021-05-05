@@ -36,6 +36,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.CalendarsFilter;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.schema.JsonValidator;
 
 @Path("calendars")
@@ -69,14 +70,16 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
             
+            Set<Folder> permittedFolders = getCalendarFolderPermissions().getListOfFolders();
+            
             if (calendarsFilter.getCalendars() == null || calendarsFilter.getCalendars().size() == 0) {
                 for (Long calendarId : new HashSet<Long>(calendarsFilter.getCalendarIds())) {
-                    executeDeleteCalendar(connection, calendarDbLayer.getCalendar(calendarId), calendarsFilter, calendarDbLayer, accessToken);
+                    executeDeleteCalendar(connection, calendarDbLayer.getCalendar(calendarId), calendarsFilter, calendarDbLayer, accessToken, permittedFolders);
                 }
             } else {
                 for (String calendarPath : new HashSet<String>(calendarsFilter.getCalendars())) {
                     executeDeleteCalendar(connection, calendarDbLayer.getCalendar(dbItemInventoryInstance.getSchedulerId(), calendarPath), calendarsFilter,
-                            calendarDbLayer, accessToken);
+                            calendarDbLayer, accessToken, permittedFolders);
                 }
             }
             if(eventCommands != null && !eventCommands.isEmpty() && "active".equals(dbItemInventoryInstance.getClusterType())) {
@@ -113,9 +116,10 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
     }
 
     private void executeDeleteCalendar(SOSHibernateSession connection, DBItemInventoryClusterCalendar calendarDbItem, CalendarsFilter calendarsFilter,
-            CalendarsDBLayer calendarDbLayer, String accessToken) {
+            CalendarsDBLayer calendarDbLayer, String accessToken, Set<Folder> permittedFolders) {
         if (calendarDbItem != null) {
             try {
+                checkFolderPermissions(calendarDbItem.getName(), permittedFolders);
                 ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendarDbItem.getId(), calendarDbItem.getName(), calendarsFilter
                         .getAuditLog(), calendarsFilter.getJobschedulerId());
                 logAuditMessage(calendarAudit);

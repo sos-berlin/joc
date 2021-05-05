@@ -25,7 +25,7 @@ public class OrderCalendarsResourceImpl extends JOCResourceImpl implements IOrde
         try {
             JsonValidator.validateFailFast(orderFilterBytes, OrderFilter.class);
             OrderFilter orderFilter = Globals.objectMapper.readValue(orderFilterBytes, OrderFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken, orderFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     orderFilter.getJobschedulerId(), accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -34,10 +34,12 @@ public class OrderCalendarsResourceImpl extends JOCResourceImpl implements IOrde
 
             checkRequiredParameter("orderId", orderFilter.getOrderId());
             checkRequiredParameter("jobChain", orderFilter.getJobChain());
+            String jobChainPath = normalizePath(orderFilter.getJobChain());
+            checkFolderPermissions(jobChainPath);
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getSchedulerId(), CalendarType.ORDER, normalizePath(orderFilter
-                    .getJobChain()) + "," + orderFilter.getOrderId(), orderFilter.getCompact());
+            Calendars entity = CalendarsOfAnObject.get(connection, dbItemInventoryInstance.getSchedulerId(), CalendarType.ORDER, jobChainPath + ","
+                    + orderFilter.getOrderId(), orderFilter.getCompact());
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

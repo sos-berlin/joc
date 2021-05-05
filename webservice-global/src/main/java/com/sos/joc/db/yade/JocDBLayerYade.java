@@ -1,8 +1,9 @@
 package com.sos.joc.db.yade;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.persistence.TemporalType;
 
@@ -18,6 +19,7 @@ import com.sos.jade.db.DBItemYadeTransfers;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.yade.FileTransferStateText;
 
 public class JocDBLayerYade extends DBLayer {
@@ -26,6 +28,7 @@ public class JocDBLayerYade extends DBLayer {
 	private static final String DBITEM_YADE_PROTOCOLS = DBItemYadeProtocols.class.getSimpleName();
 	private static final String DBITEM_YADE_FILES = DBItemYadeFiles.class.getSimpleName();
 	private static final String YADE_SOURCE_TARGET_FILES = YadeSourceTargetFiles.class.getName();
+	private static final String YADE_GROUPED_SUMMARY = YadeGroupedSummary.class.getName();
 
 	public JocDBLayerYade(SOSHibernateSession session) {
 		super(session);
@@ -324,7 +327,7 @@ public class JocDBLayerYade extends DBLayer {
 			if (filter.getDateTo() != null) {
 				query.setParameter("dateTo", filter.getDateTo(), TemporalType.TIMESTAMP);
 			}
-			if (!onlyTransferIds && filter.getLimit() != null) {
+			if (!onlyTransferIds && filter.getLimit() != null && filter.getLimit() > 0) {
 				query.setMaxResults(filter.getLimit());
 			}
 			return getSession().getResultList(query);
@@ -446,7 +449,7 @@ public class JocDBLayerYade extends DBLayer {
 				}
 			}
 			Query<DBItemYadeFiles> query = getSession().createQuery(sql.toString());
-			if (limit != null) {
+			if (limit != null && limit > 0) {
 				query.setMaxResults(limit);
 			}
 			return getSession().getResultList(query);
@@ -568,11 +571,53 @@ public class JocDBLayerYade extends DBLayer {
 			throw new DBInvalidDataException(ex);
 		}
 	}
-
+	
 	private Integer getTransfersCount(String jobschedulerId, boolean successFull, Date from, Date to)
+            throws SOSHibernateException, DBInvalidDataException, DBConnectionRefusedException {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select count(*) from ");
+        sql.append(DBITEM_YADE_TRANSFERS).append(" transfer");
+        if (successFull) {
+            sql.append(" where state = 1");
+        } else {
+            sql.append(" where state = 3");
+        }
+        if (jobschedulerId != null) {
+            sql.append(" and jobschedulerId = :jobschedulerId");
+        }
+        if (from != null) {
+            sql.append(" and transfer.end >= :from");
+        }
+        if (to != null) {
+            sql.append(" and transfer.end < :to");
+        }
+        Query<Long> query = getSession().createQuery(sql.toString());
+        if (from != null) {
+            query.setParameter("from", from, TemporalType.TIMESTAMP);
+        }
+        if (to != null) {
+            query.setParameter("to", to, TemporalType.TIMESTAMP);
+        }
+        if (jobschedulerId != null) {
+            query.setParameter("jobschedulerId", jobschedulerId);
+        }
+
+        try {
+            return getSession().getSingleResult(query).intValue();
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+	private Integer getTransfersCount(String jobschedulerId, boolean successFull, Date from, Date to, Collection<Folder> permittedFolders)
 			throws SOSHibernateException, DBInvalidDataException, DBConnectionRefusedException {
+	    if (permittedFolders == null || permittedFolders.isEmpty()) {
+	        return getTransfersCount(jobschedulerId, successFull, from, to);
+	    }
 		StringBuilder sql = new StringBuilder();
-		sql.append("select count(*) from ");
+		sql.append("select new ").append(YADE_GROUPED_SUMMARY).append("(count(*), jobChain, job) from ");
 		sql.append(DBITEM_YADE_TRANSFERS).append(" transfer");
 		if (successFull) {
 			sql.append(" where state = 1");
@@ -588,7 +633,8 @@ public class JocDBLayerYade extends DBLayer {
 		if (to != null) {
 			sql.append(" and transfer.end < :to");
 		}
-		Query<Long> query = getSession().createQuery(sql.toString());
+		sql.append(" group by jobChain, job");
+		Query<YadeGroupedSummary> query = getSession().createQuery(sql.toString());
 		if (from != null) {
 			query.setParameter("from", from, TemporalType.TIMESTAMP);
 		}
@@ -598,24 +644,40 @@ public class JocDBLayerYade extends DBLayer {
 		if (jobschedulerId != null) {
 			query.setParameter("jobschedulerId", jobschedulerId);
 		}
-
+		
 		try {
-			return getSession().getSingleResult(query).intValue();
+		    List<YadeGroupedSummary> result = getSession().getResultList(query);
+		    if (result != null) {
+		        return result.stream().filter(s -> isPermittedForFolder(s.getFolder(), permittedFolders)).mapToInt(s -> s.getCount()).sum();
+		    }
+			return 0;
 		} catch (SOSHibernateInvalidSessionException ex) {
 			throw new DBConnectionRefusedException(ex);
 		} catch (Exception ex) {
 			throw new DBInvalidDataException(ex);
 		}
 	}
+	
+	private static boolean isPermittedForFolder(String folder, Collection<Folder> permittedFolders) {
+	    if (folder == null || folder.isEmpty()) {
+            return true;
+        }
+	    if (permittedFolders == null || permittedFolders.isEmpty()) {
+            return true;
+        }
+        Predicate<Folder> filter = f -> f.getFolder().equals(folder) || (f.getRecursive() && ("/".equals(f.getFolder()) || folder.startsWith(f
+                .getFolder() + "/")));
+        return permittedFolders.stream().parallel().anyMatch(filter);
+    }
 
-	public Integer getSuccessFulTransfersCount(String jobschedulerId, Date from, Date to)
+	public Integer getSuccessFulTransfersCount(String jobschedulerId, Date from, Date to, Collection<Folder> folders)
 			throws SOSHibernateException, DBInvalidDataException, DBConnectionRefusedException {
-		return getTransfersCount(jobschedulerId, true, from, to);
+		return getTransfersCount(jobschedulerId, true, from, to, folders);
 	}
 
-	public Integer getFailedTransfersCount(String jobschedulerId, Date from, Date to)
+	public Integer getFailedTransfersCount(String jobschedulerId, Date from, Date to, Collection<Folder> folders)
 			throws SOSHibernateException, DBInvalidDataException, DBConnectionRefusedException {
-		return getTransfersCount(jobschedulerId, false, from, to);
+		return getTransfersCount(jobschedulerId, false, from, to, folders);
 	}
 
 }

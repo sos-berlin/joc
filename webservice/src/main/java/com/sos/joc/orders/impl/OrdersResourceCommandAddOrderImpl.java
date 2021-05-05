@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +16,7 @@ import org.dom4j.Element;
 import org.hibernate.exception.ConstraintViolationException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
@@ -39,8 +41,8 @@ import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.joc.model.order.AddedOrders;
@@ -50,6 +52,7 @@ import com.sos.joc.model.order.OrderPath200;
 import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
 import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
+
 
 @Path("orders")
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
@@ -76,8 +79,9 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 throw new JocMissingRequiredParameterException("undefined 'orders'");
             }
             AddedOrders entity = new AddedOrders();
+            Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
             for (ModifyOrder order : modifyOrders.getOrders()) {
-                executeAddOrderCommand(order, modifyOrders);
+                executeAddOrderCommand(order, modifyOrders, permittedFolders);
             }
             entity.setOrders(orderPaths);
             if (orderPaths.isEmpty()) {
@@ -103,7 +107,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         }
     }
 
-    private void executeAddOrderCommand(ModifyOrder order, ModifyOrders modifyOrders) {
+    private void executeAddOrderCommand(ModifyOrder order, ModifyOrders modifyOrders, Set<Folder> permittedFolders) {
 
         try {
             Instant plannedStart = null;
@@ -117,6 +121,8 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             logAuditMessage(orderAudit);
 
             checkRequiredParameter("jobChain", order.getJobChain());
+            checkFolderPermissions(order.getJobChain(), permittedFolders);
+            
             XMLBuilder xml = new XMLBuilder("add_order");
             xml.addAttribute("job_chain", normalizePath(order.getJobChain()));
 

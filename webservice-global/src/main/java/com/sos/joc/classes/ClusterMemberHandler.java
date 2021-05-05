@@ -2,10 +2,13 @@ package com.sos.joc.classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -25,20 +28,18 @@ import com.sos.joc.exceptions.JocConfigurationException;
 
 public class ClusterMemberHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClusterMemberHandler.class);
     private DBItemInventoryInstance dbItemInventoryInstance;
-    private String apiCall;
     private Map<Long, Boolean> successfulConnections = new HashMap<Long, Boolean>();
     private List<HandlerCall> handlerCalls = new ArrayList<HandlerCall>();
     
     private class HandlerCall {
         private boolean isFolder = false;
-        private String path;
         private String action;
         private DBItemSubmittedObject dbItem;
         
-        public HandlerCall(String action, String path, boolean isFolder, DBItemSubmittedObject dbItem) {
+        public HandlerCall(String action, boolean isFolder, DBItemSubmittedObject dbItem) {
             this.isFolder = isFolder;
-            this.path = path;
             this.action = action;
             this.dbItem = dbItem;
         }
@@ -51,18 +52,13 @@ public class ClusterMemberHandler {
             return action;
         }
         
-        public String getPath() {
-            return path;
-        }
-        
         public DBItemSubmittedObject getDbItem() {
             return dbItem;
         }
     }
 
-    public ClusterMemberHandler(DBItemInventoryInstance dbItemInventoryInstance, String apiCall) {
+    public ClusterMemberHandler(DBItemInventoryInstance dbItemInventoryInstance) {
         this.dbItemInventoryInstance = dbItemInventoryInstance;
-        this.apiCall = apiCall;
     }
     
     public void deleteAtOtherClusterMembers(String path, boolean isFolder) throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException,
@@ -76,8 +72,7 @@ public class ClusterMemberHandler {
             dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
             dbItem.setPath(path);
             dbItem.setToDelete(true);
-            //updateOtherClusterMembers("delete", dbItem, path, isFolder);
-            handlerCalls.add(new HandlerCall("delete", path, isFolder, dbItem));
+            handlerCalls.add(new HandlerCall("delete", isFolder, dbItem));
         }
     }
 
@@ -93,102 +88,128 @@ public class ClusterMemberHandler {
             dbItem.setPath(path);
             dbItem.setToDelete(false);
             dbItem.setContent(content);
-            //updateOtherClusterMembers("save", dbItem, path, isFolder);
-            handlerCalls.add(new HandlerCall("save", path, isFolder, dbItem));
+            handlerCalls.add(new HandlerCall("save", isFolder, dbItem));
         }
     }
     
-    public void executeHandlerCalls() throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException, DBConnectionRefusedException {
-        for (HandlerCall handlerCall : handlerCalls) {
-            updateOtherClusterMembers(handlerCall.getAction(), handlerCall.getDbItem(), handlerCall.getPath(), handlerCall.getIsFolder());
+    public void executeHandlerCalls(String apiCall) throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException, DBConnectionRefusedException {
+        SOSHibernateSession connection = null;
+        try {
+            connection = Globals.createSosHibernateStatelessConnection(apiCall);
+            executeHandlerCalls(connection);
+        } finally {
+            Globals.disconnect(connection);
+        }
+    }
+    
+    public void executeHandlerCalls(SOSHibernateSession connection) throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException,
+            DBConnectionRefusedException {
+        if (!handlerCalls.isEmpty()) {
+            InventoryInstancesDBLayer dbInstancesLayer = new InventoryInstancesDBLayer(connection);
+            List<DBItemInventoryInstance> clusterMembers = dbInstancesLayer.getInventoryInstancesBySchedulerId(dbItemInventoryInstance
+                    .getSchedulerId());
+            Map<Long, JOCHotFolder> httpClientPerMember = null;
+            if (clusterMembers != null) {
+                httpClientPerMember = clusterMembers.stream().map(cm -> {
+                    if (Globals.jocConfigurationProperties != null) {
+                        return Globals.jocConfigurationProperties.setUrlMapping(cm);
+                    } else {
+                        return cm;
+                    }
+                }).collect(Collectors.toMap(DBItemInventoryInstance::getId, cm -> new JOCHotFolder(cm)));
+            }
+            SubmissionsDBLayer dbSubmissionsLayer = new SubmissionsDBLayer(connection);
+            for (HandlerCall handlerCall : handlerCalls) {
+                updateOtherClusterMembers(handlerCall, httpClientPerMember, dbSubmissionsLayer);
+            }
+            if (httpClientPerMember != null) {
+                httpClientPerMember.values().stream().forEach(httpCLient -> httpCLient.closeHttpClient());
+            }
         }
     }
 
-    private void updateOtherClusterMembers(String sessionIdentifier, DBItemSubmittedObject dbItem, String path, boolean isFolder) throws JocConfigurationException,
-            DBOpenSessionException, DBInvalidDataException, DBConnectionRefusedException {
+    private void updateOtherClusterMembers(HandlerCall handlerCall, Map<Long, JOCHotFolder> httpClientPerMember,
+            SubmissionsDBLayer dbSubmissionsLayer) throws JocConfigurationException, DBOpenSessionException, DBInvalidDataException,
+            DBConnectionRefusedException {
         // ask db for other cluster members
-        SOSHibernateSession connection = null;
-        JOCHotFolder httpClient = null;
+        // JOCHotFolder httpClient = null;
         boolean isUpdated = false;
-        try {
-            connection = Globals.createSosHibernateStatelessConnection(apiCall + sessionIdentifier);
-            InventoryInstancesDBLayer dbInstancesLayer = new InventoryInstancesDBLayer(connection);
-            List<DBItemInventoryInstance> clusterMembers = dbInstancesLayer.getInventoryInstancesBySchedulerId(dbItem.getSchedulerId());
-            SubmissionsDBLayer dbSubmissionsLayer = new SubmissionsDBLayer(connection);
-            DBItemSubmittedObject oldDbItem = dbSubmissionsLayer.getSubmittedObject(dbItem.getSchedulerId(), dbItem.getPath());
-            List<DBItemSubmission> submissions = new ArrayList<DBItemSubmission>();
-            if (oldDbItem != null) {
-                dbItem.setId(oldDbItem.getId());
-                submissions = dbSubmissionsLayer.getSubmissionsBySubmissionId(oldDbItem.getId());
-            }
-            if (clusterMembers != null) {
-                for (DBItemInventoryInstance clusterMember : clusterMembers) {
-                    if (dbItemInventoryInstance.getId() == clusterMember.getId()) {
-                        // current JobScheduler is already updated (see above)
-                        continue;
+        DBItemSubmittedObject dbItem = handlerCall.getDbItem();
+        DBItemSubmittedObject oldDbItem = dbSubmissionsLayer.getSubmittedObject(dbItem.getSchedulerId(), dbItem.getPath());
+        List<DBItemSubmission> submissions = new ArrayList<DBItemSubmission>();
+        if (oldDbItem != null) {
+            dbItem.setId(oldDbItem.getId());
+            submissions = dbSubmissionsLayer.getSubmissionsBySubmissionId(oldDbItem.getId());
+        }
+        if (httpClientPerMember != null) {
+            for (Entry<Long, JOCHotFolder> clusterMember : httpClientPerMember.entrySet()) {
+                if (dbItemInventoryInstance.getId().equals(clusterMember.getKey())) {
+                    // current JobScheduler is already updated
+                    continue;
+                }
+                try {
+//                    if (Globals.jocConfigurationProperties != null) {
+//                        clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
+//                    }
+                    successfulConnections.putIfAbsent(clusterMember.getKey(), true);
+                    if (!successfulConnections.get(clusterMember.getKey())) {
+                        throw new JobSchedulerConnectionRefusedException();
                     }
-                    try {
-                        clusterMember = Globals.jocConfigurationProperties.setUrlMapping(clusterMember);
-                        successfulConnections.putIfAbsent(clusterMember.getId(), true);
-                        if (!successfulConnections.get(clusterMember.getId())) {
-                            throw new JobSchedulerConnectionRefusedException();
-                        }
-                        httpClient = new JOCHotFolder(clusterMember);
-                        if ("save".equals(sessionIdentifier)) {
-                            if (isFolder) {
-                                httpClient.putFolder(path);
-                            } else {
-                                httpClient.putFile(path, dbItem.getContent());
-                            }
+                    //httpClient = new JOCHotFolder(clusterMember);
+                    clusterMember.getValue().setAutoCloseHttpClient(false);
+                    if ("save".equals(handlerCall.getAction())) {
+                        if (handlerCall.getIsFolder()) {
+                            clusterMember.getValue().putFolder(dbItem.getPath());
                         } else {
-                            if (isFolder) {
-                                httpClient.deleteFolder(path);
-                            } else {
-                                httpClient.deleteFile(path);
-                            }
+                            clusterMember.getValue().putFile(dbItem.getPath(), dbItem.getContent());
                         }
-                    } catch (JobSchedulerObjectNotExistException e) {
-                        //
-                    } catch (JobSchedulerConnectionResetException | JobSchedulerConnectionRefusedException e) {
-                        successfulConnections.put(clusterMember.getId(), false);
-                        // if error then store object conf in db for inventory plugin
-                        if (!isUpdated) {
-                            dbItem = dbSubmissionsLayer.saveOrUpdateSubmittedObject(dbItem);
-                            isUpdated = true;
+                    } else {
+                        if (handlerCall.getIsFolder()) {
+                            clusterMember.getValue().deleteFolder(dbItem.getPath());
+                        } else {
+                            clusterMember.getValue().deleteFile(dbItem.getPath());
                         }
-                        DBItemSubmission dbItemSubmission = new DBItemSubmission();
-                        dbItemSubmission.setInstanceId(clusterMember.getId());
-                        dbItemSubmission.setSubmissionId(dbItem.getId());
-                        if (!submissions.remove(dbItemSubmission)) {
-                            dbItemSubmission = dbSubmissionsLayer.saveSubmission(dbItemSubmission);
-                        }
-                    } catch (Exception e) {
-                        // if error then store object conf in db for inventory plugin
-                        if (!isUpdated) {
-                            dbItem = dbSubmissionsLayer.saveOrUpdateSubmittedObject(dbItem);
-                            isUpdated = true;
-                        }
-                        DBItemSubmission dbItemSubmission = new DBItemSubmission();
-                        dbItemSubmission.setInstanceId(clusterMember.getId());
-                        dbItemSubmission.setSubmissionId(dbItem.getId());
-                        if (!submissions.remove(dbItemSubmission)) {
-                            dbItemSubmission = dbSubmissionsLayer.saveSubmission(dbItemSubmission);
-                        }
+                    }
+                } catch (JobSchedulerObjectNotExistException e) {
+                    //
+                } catch (JobSchedulerConnectionResetException | JobSchedulerConnectionRefusedException e) {
+                    successfulConnections.put(clusterMember.getKey(), false);
+                    // if error then store object conf in db for inventory plugin
+                    if (!isUpdated) {
+                        dbItem = dbSubmissionsLayer.saveOrUpdateSubmittedObject(dbItem);
+                        isUpdated = true;
+                    }
+                    DBItemSubmission dbItemSubmission = new DBItemSubmission();
+                    dbItemSubmission.setInstanceId(clusterMember.getKey());
+                    dbItemSubmission.setSubmissionId(dbItem.getId());
+                    if (!submissions.remove(dbItemSubmission)) {
+                        dbItemSubmission = dbSubmissionsLayer.saveSubmission(dbItemSubmission);
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("", e);
+                    // if error then store object conf in db for inventory plugin
+                    if (!isUpdated) {
+                        dbItem = dbSubmissionsLayer.saveOrUpdateSubmittedObject(dbItem);
+                        isUpdated = true;
+                    }
+                    DBItemSubmission dbItemSubmission = new DBItemSubmission();
+                    dbItemSubmission.setInstanceId(clusterMember.getKey());
+                    dbItemSubmission.setSubmissionId(dbItem.getId());
+                    if (!submissions.remove(dbItemSubmission)) {
+                        dbItemSubmission = dbSubmissionsLayer.saveSubmission(dbItemSubmission);
                     }
                 }
             }
-            if (isUpdated) {
-                for (DBItemSubmission submission : submissions) {
-                    dbSubmissionsLayer.deleteSubmission(submission);
-                }
-            } else if (oldDbItem != null) {
-                dbSubmissionsLayer.deleteSubmittedObject(oldDbItem);
-                for (DBItemSubmission submission : submissions) {
-                    dbSubmissionsLayer.deleteSubmission(submission);
-                }
+        }
+        if (isUpdated) {
+            for (DBItemSubmission submission : submissions) {
+                dbSubmissionsLayer.deleteSubmission(submission);
             }
-        } finally {
-            Globals.disconnect(connection);
+        } else if (oldDbItem != null) {
+            dbSubmissionsLayer.deleteSubmittedObject(oldDbItem);
+            for (DBItemSubmission submission : submissions) {
+                dbSubmissionsLayer.deleteSubmission(submission);
+            }
         }
     }
 

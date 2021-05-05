@@ -42,7 +42,7 @@
 			"$ref": "../common/string255-schema.json"
 		},
 		"jobStream": {
-			"type": "string"
+			"$ref": "../common/string255-schema.json"
 		},
 		"isJobStream": {
 			"type": "boolean"

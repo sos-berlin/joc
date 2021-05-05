@@ -34,7 +34,7 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
         try {
             JsonValidator.validateFailFast(filterBytes, ValidateConfiguration.class);
             ValidateConfiguration in = Globals.objectMapper.readValue(filterBytes, ValidateConfiguration.class);
-            
+
             checkRequiredParameters(in);
 
             JOCDefaultResponse response = checkPermissions(accessToken, in);
@@ -83,7 +83,7 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
         SOSPermissionJocCockpit permissions = getPermissonsJocCockpit(in.getJobschedulerId(), accessToken);
         boolean permission = permissions.getJobschedulerMaster().getAdministration().getConfigurations().isEdit();
         JOCDefaultResponse response = init(IMPL_PATH, in, accessToken, in.getJobschedulerId(), permission);
-        if (response == null) {
+        if (permission && response == null) {
             if (versionIsOlderThan(JocXmlEditor.AVAILABILITY_STARTING_WITH)) {
                 throw new JobSchedulerBadRequestException(JocXmlEditor.MESSAGE_UNSUPPORTED_WEB_SERVICE);
             }
@@ -114,7 +114,7 @@ public class ValidateResourceImpl extends JOCResourceImpl implements IValidateRe
         return m;
     }
 
-    private ValidateConfigurationAnswer getSuccess() {
+    public static ValidateConfigurationAnswer getSuccess() {
         ValidateConfigurationAnswer answer = new ValidateConfigurationAnswer();
         answer.setValidated(new Date());
         return answer;

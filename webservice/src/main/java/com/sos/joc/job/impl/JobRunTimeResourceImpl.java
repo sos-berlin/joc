@@ -39,9 +39,11 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 				return jocDefaultResponse;
 			}
 			checkRequiredParameter("job", jobFilter.getJob());
-			RunTime200 runTimeAnswer = new RunTime200();
 			String jobPath = normalizePath(jobFilter.getJob());
-			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+			checkFolderPermissions(jobPath);
+			
+			RunTime200 runTimeAnswer = new RunTime200();
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 			String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
 			runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, false);
 

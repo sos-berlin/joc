@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -17,6 +18,7 @@ import com.sos.joc.classes.audit.ModifyTaskAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.ModifyTasks;
 import com.sos.joc.model.job.TaskId;
 import com.sos.joc.model.job.TasksFilter;
@@ -40,7 +42,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 		    JsonValidator.validateFailFast(modifyTasksBytes, ModifyTasks.class);
 		    ModifyTasks modifyTasks = Globals.objectMapper.readValue(modifyTasksBytes, ModifyTasks.class);
             
-			return postTasksCommand(accessToken, TERMINATE,
+            return postTasksCommand(accessToken, TERMINATE,
 					getPermissonsJocCockpit(modifyTasks.getJobschedulerId(), accessToken).getJob().getExecute()
 							.isTerminate(),
 					modifyTasks);
@@ -115,11 +117,12 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 		}
 		checkRequiredComment(modifyTasks.getAuditLog());
 		Date surveyDate = Date.from(Instant.now());
+		Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
 		for (TasksFilter job : modifyTasks.getJobs()) {
 			List<TaskId> taskIds = job.getTaskIds();
 			if (taskIds == null || taskIds.isEmpty()) {
 				// terminate all tasks of job
-				taskIds = getTaskIds(job);
+				taskIds = getTaskIds(job, permittedFolders);
 			}
 			if (taskIds != null) {
 				for (TaskId task : taskIds) {
@@ -133,11 +136,13 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 		return JOCDefaultResponse.responseStatusJSOk(surveyDate);
 	}
 
-	private List<TaskId> getTaskIds(TasksFilter job) {
+	private List<TaskId> getTaskIds(TasksFilter job, Set<Folder> permittedFolders) {
 		try {
 			checkRequiredParameter("job", job.getJob());
+			String jobPath = normalizePath(job.getJob());
+			checkFolderPermissions(jobPath, permittedFolders);
 			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-			String command = jocXmlCommand.getShowJobCommand(normalizePath(job.getJob()), null);
+			String command = jocXmlCommand.getShowJobCommand(jobPath, null);
 			jocXmlCommand.executePostWithThrowBadRequest(command, getAccessToken());
 
 			List<TaskId> taskIds = new ArrayList<TaskId>();

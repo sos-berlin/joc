@@ -15,11 +15,13 @@ public class TestJocConfigurationDbLayer {
 
     private JocConfigurationDbLayer jocConfigurationDBLayer;
     private static SOSHibernateSession sosHibernateSession;
-
+    private JocConfigurationFilter filter;
+    
     @Before
     public void setUp() throws Exception {
         sosHibernateSession = TestEnvWebserviceGlobalsTest.getSession();
         jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
+        filter = new JocConfigurationFilter(); 
     }
 
     @AfterClass
@@ -30,17 +32,17 @@ public class TestJocConfigurationDbLayer {
 
     private void initFilter() {
         // jocConfigurationDBLayer.getFilter().setObjectType("customization");
-        jocConfigurationDBLayer.getFilter().setConfigurationType("PROFILE");
-        jocConfigurationDBLayer.getFilter().setSchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        filter.setConfigurationType("PROFILE");
+        filter.setSchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
         // jocConfigurationDBLayer.getFilter().setName("test");
-        jocConfigurationDBLayer.getFilter().setAccount("root");
+        filter.setAccount("root");
     }
 
     @Test
     public void testJocConfigurationDBLayerGetList() throws Exception {
         initFilter();
 
-        List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(11);
+        List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(filter,11);
         JocConfigurationDbItem jocConfigurationDbItem = l.get(0);
         assertEquals("testJocConfigurationDBLayerGetList", "root", jocConfigurationDbItem.getAccount());
 
@@ -64,12 +66,12 @@ public class TestJocConfigurationDbLayer {
 
     @Test
     public void testJocConfigurationDeleteRecord() throws Exception {
-        jocConfigurationDBLayer.getFilter().setSchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
-        jocConfigurationDBLayer.getFilter().setAccount("root");
-        jocConfigurationDBLayer.getFilter().setConfigurationType("profil");
-        jocConfigurationDBLayer.getFilter().setName("profil");
-        jocConfigurationDBLayer.getFilter().setObjectType("profil");
-        jocConfigurationDBLayer.deleteConfiguration();
+        filter.setSchedulerId(TestEnvWebserviceGlobalsTest.SCHEDULER_ID);
+        filter.setAccount("root");
+        filter.setConfigurationType("profil");
+        filter.setName("profil");
+        filter.setObjectType("profil");
+        jocConfigurationDBLayer.deleteConfiguration(filter);
     }
 
 }

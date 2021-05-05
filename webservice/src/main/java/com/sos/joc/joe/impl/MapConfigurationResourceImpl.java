@@ -8,6 +8,8 @@ import javax.ws.rs.core.MediaType;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 
+import com.sos.joe.common.XmlDeserializer;
+import com.sos.joe.common.XmlSerializer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -15,10 +17,10 @@ import com.sos.joc.classes.JOEHelper;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.joe.common.XmlDeserializer;
-import com.sos.joc.joe.common.XmlSerializer;
 import com.sos.joc.joe.resource.IMapConfigurationResource;
 import com.sos.xml.XMLBuilder;
+
+ 
 
 @Path("joe")
 public class MapConfigurationResourceImpl extends JOCResourceImpl implements IMapConfigurationResource {

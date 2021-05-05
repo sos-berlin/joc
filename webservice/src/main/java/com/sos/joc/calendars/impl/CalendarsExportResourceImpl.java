@@ -44,7 +44,7 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
         try {
             JsonValidator.validateFailFast(filterBytes, CalendarsFilter.class);
             CalendarsFilter calendarsFilter = Globals.objectMapper.readValue(filterBytes, CalendarsFilter.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarsFilter, accessToken, calendarsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(calendarsFilter.getJobschedulerId(), accessToken).getCalendar().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -62,9 +62,10 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
             objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'"));
 
             List<Calendar> calendarList = new ArrayList<Calendar>();
-            List<DBItemInventoryClusterCalendar> calendarsFromDb = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getSchedulerId(), new HashSet<String>(calendarsFilter
-                    .getCalendars()));
-            Set<Folder> folders = folderPermissions.getListOfFolders();
+            List<DBItemInventoryClusterCalendar> calendarsFromDb = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getSchedulerId(),
+                    new HashSet<String>(calendarsFilter.getCalendars()));
+
+            Set<Folder> folders = getCalendarFolderPermissions().getListOfFolders();
             if (calendarsFromDb != null && !calendarsFromDb.isEmpty()) {
                 for (DBItemInventoryClusterCalendar dbCalendar : calendarsFromDb) {
                     if (dbCalendar.getConfiguration() != null) {

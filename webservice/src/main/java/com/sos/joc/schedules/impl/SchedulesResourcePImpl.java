@@ -51,7 +51,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             // FILTER
             boolean withFolderFilter = schedulesFilter.getFolders() != null && !schedulesFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(schedulesFilter.getFolders());
             List<SchedulePath> schedules = schedulesFilter.getSchedules();
 
             Globals.beginTransaction(connection);
@@ -64,16 +64,19 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             if (schedules != null && !schedules.isEmpty()) {
                 List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
                 Set<Folder> permittedFolders = folderPermissions.getListOfFolders();
-                for (SchedulePath schedulePath : schedules) {
-                    if (schedulePath != null && canAdd(schedulePath.getSchedule(), permittedFolders)) {
-                        DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePath(schedulePath.getSchedule()),
-                                dbItemInventoryInstance.getId());
-                        if (scheduleFromDb == null) {
-                            continue;
-                        }
-                        ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, documentations.get(scheduleFromDb.getName()),  dbItemInventoryInstance);
-                        if (scheduleP != null) {
-                            schedulesToAdd.add(scheduleP);
+                for (SchedulePath schedule : schedules) {
+                    if (schedule != null) {
+                        String schedulePath = normalizePath(schedule.getSchedule());
+                        if (canAdd(schedulePath, permittedFolders)) {
+                            DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(schedulePath, dbItemInventoryInstance.getId());
+                            if (scheduleFromDb == null) {
+                                continue;
+                            }
+                            ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, documentations.get(scheduleFromDb
+                                    .getName()), dbItemInventoryInstance);
+                            if (scheduleP != null) {
+                                schedulesToAdd.add(scheduleP);
+                            }
                         }
                     }
                 }
@@ -81,7 +84,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                     listOfSchedules.addAll(schedulesToAdd);
                 }
             } else if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                // no permission
+                // no folder permissions
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventorySchedule> schedulesFromDb = null;

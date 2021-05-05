@@ -62,7 +62,8 @@ public class JobPermanent {
         return dbLayer.getJobChainsByJobId(job.getId(), instanceId);
     }
 
-    public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, String documentation, Boolean compact, Long instanceId) throws Exception {
+    public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, String documentation, Boolean compact,
+            Boolean withoutDuration, Long instanceId) throws Exception {
         JobP job = new JobP();
         if ("/scheduler_file_order_sink".equals(inventoryJob.getName())) {
             job.setIsOrderJob(true);
@@ -84,12 +85,16 @@ public class JobPermanent {
             } else {
                 job.setIsShellJob(false);
             }
-            Integer estimatedDuration = JobPermanent.getEstimatedDurationInSeconds(inventoryJob);
-            if (estimatedDuration != null) {
-                job.setEstimatedDuration(estimatedDuration);
-            } else {
-                job.setEstimatedDuration(0);
+
+            if (!withoutDuration) {
+                Integer estimatedDuration = JobPermanent.getEstimatedDurationInSeconds(inventoryJob);
+                if (estimatedDuration != null) {
+                    job.setEstimatedDuration(estimatedDuration);
+                } else {
+                    job.setEstimatedDuration(0);
+                }
             }
+
             if (inventoryJob.getProcessClassName() != null && !inventoryJob.getProcessClassName().isEmpty() && !inventoryJob.getProcessClassName()
                     .equalsIgnoreCase(DBLayer.DEFAULT_NAME)) {
                 job.setProcessClass(inventoryJob.getProcessClassName());

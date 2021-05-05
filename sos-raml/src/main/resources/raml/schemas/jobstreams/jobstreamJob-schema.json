@@ -1,0 +1,36 @@
+{
+	"title": "jobStreamJob",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "A job started by the jobstream starter",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreamJob",
+	"type": "object",
+	"properties": {
+		"jobId": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
+		"job": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"startDelay": {
+			"$ref": "../common/nonNegativeLong-schema.json"
+		},
+		"nextPeriod": {
+			"$ref": "../common/deliveryDate-schema.json"
+		},
+		"skipOutCondition": {
+			"type": "boolean"
+		},
+		"inconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "incondition-schema.json"
+			}
+		},
+		"outconditions": {
+			"type": "array",
+			"items": {
+				"$ref": "outcondition-schema.json"
+			}
+		}
+	}
+}

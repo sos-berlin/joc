@@ -38,9 +38,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         /** check general required parameters */
         checkRequiredParameter("id", configuration.getId());
 
-        /** set general filter */
-        jocConfigurationDBLayer.getFilter().setId(configuration.getId().longValue());
-        jocConfigurationDBLayer.getFilter().setSchedulerId(configuration.getJobschedulerId());
+      
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.sos.joc.orders.impl;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -53,16 +54,22 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 			}
 
             boolean withFolderFilter = jobChainsFilter.getFolders() != null && !jobChainsFilter.getFolders().isEmpty();
-            List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
+            Set<Folder> folders = addPermittedFolders(jobChainsFilter.getFolders());
             OrdersSnapshot entity = new OrdersSnapshot();
             
             if (withFolderFilter && (folders == null || folders.isEmpty())) {
-                entity.setOrders(null);
+                OrdersSummary summary = new OrdersSummary();
+                summary.setBlacklist(0);
+                summary.setPending(0);
+                summary.setRunning(0);
+                summary.setSetback(0);
+                summary.setSuspended(0);
+                summary.setWaitingForResource(0);
+                entity.setOrders(summary);
                 entity.setSurveyDate(Date.from(Instant.now()));
                 entity.setDeliveryDate(entity.getSurveyDate());
             } else {
-                jobChainsFilter.setFolders(folders);
-                entity = getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter);
+                entity = getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter.getJobChains(), folders);
             }
 
             return JOCDefaultResponse.responseStatus200(entity);
@@ -79,20 +86,22 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 
     }
 	
-	private OrdersSnapshot getSnapshot(JOCJsonCommand command, String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
+	private OrdersSnapshot getSnapshot(JOCJsonCommand command, String accessToken, List<JobChainPath> jobChainPaths, Set<Folder> permittedFolders) throws Exception {
         command.setUriBuilderForOrders();
         command.addOrderStatisticsQuery();
         //command.createHttpClient();
 
-        Set<String> jobChains = getJobChainsWithoutDuplicates(jobChainsFilter.getJobChains());
-        Set<String> folders = getFoldersWithoutDuplicatesAndSubfolders(jobChainsFilter.getFolders());
+        Set<String> jobChains = getJobChainsWithoutDuplicates(jobChainPaths);
+        Set<String> folders = getFoldersWithoutDuplicatesAndSubfolders(permittedFolders);
         Set<OrdersSnapshotCallable> tasks = new HashSet<OrdersSnapshotCallable>();
 
         OrdersSnapshot entity = new OrdersSnapshot();
 
         if (jobChains.size() > 0) {
             for (String jobChain : jobChains) {
-                tasks.add(new OrdersSnapshotCallable(jobChain, new JOCJsonCommand(command), accessToken));
+                if (canAdd(jobChain, permittedFolders)) {
+                    tasks.add(new OrdersSnapshotCallable(jobChain, new JOCJsonCommand(command), accessToken));
+                }
             }
         } else if (folders.size() > 0) {
             for (String folder : folders) {
@@ -101,6 +110,16 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         } else {
             tasks.add(new OrdersSnapshotCallable("/", command, accessToken));
         }
+        
+        OrdersSummary summary = new OrdersSummary();
+        summary.setBlacklist(0);
+        summary.setPending(0);
+        summary.setRunning(0);
+        summary.setSetback(0);
+        summary.setSuspended(0);
+        summary.setWaitingForResource(0);
+        entity.setOrders(summary);
+        entity.setDeliveryDate(Date.from(Instant.now()));
 
         if (!tasks.isEmpty()) {
             if (tasks.size() == 1) {
@@ -109,14 +128,6 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                 entity.setOrders(oe);
             } else {
                 Long eventId = 0L;
-                OrdersSummary summary = new OrdersSummary();
-                summary.setBlacklist(0);
-                summary.setPending(0);
-                summary.setRunning(0);
-                summary.setSetback(0);
-                summary.setSuspended(0);
-                summary.setWaitingForResource(0);
-
                 ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
                 try {
                     for (Future<OrdersSnapshotEvent> result : executorService.invokeAll(tasks)) {
@@ -168,7 +179,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         return path;
     }
 
-    private Set<String> getFoldersWithoutDuplicatesAndSubfolders(List<Folder> folders) throws JocMissingRequiredParameterException {
+    private Set<String> getFoldersWithoutDuplicatesAndSubfolders(Collection<Folder> folders) throws JocMissingRequiredParameterException {
         Set<String> set = new HashSet<String>();
         if (folders == null || folders.size() == 0) {
             return set;
@@ -195,7 +206,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         return set;
     }
 
-    private Set<String> getJobChainsWithoutDuplicates(List<JobChainPath> jobChains) throws JocMissingRequiredParameterException {
+    private Set<String> getJobChainsWithoutDuplicates(Collection<JobChainPath> jobChains) throws JocMissingRequiredParameterException {
         Set<String> set = new HashSet<String>();
         if (jobChains == null || jobChains.size() == 0) {
             return set;
