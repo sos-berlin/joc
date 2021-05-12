@@ -1,0 +1,27 @@
+{
+	"title": "JobStream Starters",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "List of all JobStream Starters",
+	"javaType": "com.sos.joc.model.jobstreams.JobStreamStartersSelector",
+	"type": "object",
+	"required": [
+		"jobschedulerId"
+	],
+	"properties": {
+		"jobschedulerId": {
+			"$ref": "../common/filename100-schema.json"
+		},
+		"jobStream": {
+			"$ref": "../common/string255-schema.json"
+		},
+		"jobstreamStarters": {
+			"type": "array",
+			"items": {
+				"$ref": "jobstreamStartData-schema.json"
+			}
+		},
+		"auditLog": {
+			"$ref": "../audit/auditParams-schema.json"
+		}
+	}
+}
