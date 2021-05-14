@@ -297,48 +297,45 @@ public class JobStreamStartersImpl extends JOCResourceImpl implements IJobStream
             jobStreamStartesStarted.setJobschedulerId(jobStreamStartersSelector.getJobschedulerId());
 
             try {
+                sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_START);
                 jobStreamStartesStarted.setJobstreamStarted(new ArrayList<JobStreamStarted>());
                 DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
                 for (JobStreamStartData jobStreamStartData : jobStreamStartersSelector.getJobstreamStarters()) {
                     if ((jobStreamStartData.getJobStreamStarterId() != null) || (jobStreamStartData.getStarterName() != null)) {
 
                         JobStreamStarted jobStreamStarted = new JobStreamStarted();
-                        try {
-                            sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_START);
-                            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
-                            FilterJobStreamStarters filter = new FilterJobStreamStarters();
-                            filter.setId(jobStreamStartData.getJobStreamStarterId());
-                            filter.setStarterName(jobStreamStartData.getStarterName());
-                            List<DBItemJobStreamStarter> listOfStartes = dbLayerJobStreamStarters.getJobStreamStartersList(filter, 0);
-                            if (listOfStartes.size() > 0) {
-                                String jobStream = "";
-                                DBItemJobStream dbItemJobStream = dbLayerJobStreams.getJobStreamsDbItem(listOfStartes.get(0).getJobStream());
-                                if (dbItemJobStream != null) {
-                                    jobStream = dbLayerJobStreams.getJobStreamsDbItem(listOfStartes.get(0).getJobStream()).getJobStream();
-                                }
 
-                                jobStreamStarted.setStarterExists(true);
-                                jobStreamStarted.setStarterName(listOfStartes.get(0).getStarterName());
-                                jobStreamStarted.setJobStreamStarterId(listOfStartes.get(0).getId());
-
-                                jobStreamStartData.setJobStreamStarterId(listOfStartes.get(0).getId());
-                                setAudit(jobStream, jobStreamStartData, jobStreamStartersSelector);
-                                jobStreamStarted.setParams(jobStreamStartData.getParams());
-                                UUID contextId = UUID.randomUUID();
-                                String session = contextId.toString();
-                                jobStreamStarted.setSession(session);
-                                notifyEventHandlerStart(accessToken, contextId, jobStreamStartData);
-                            } else {
-                                jobStreamStarted.setParams(null);
-                                jobStreamStarted.setJobStreamStarterId(jobStreamStartData.getJobStreamStarterId());
-                                jobStreamStarted.setStarterName(jobStreamStartData.getStarterName());
-                                jobStreamStarted.setStarterExists(false);
+                        DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+                        FilterJobStreamStarters filter = new FilterJobStreamStarters();
+                        filter.setId(jobStreamStartData.getJobStreamStarterId());
+                        filter.setStarterName(jobStreamStartData.getStarterName());
+                        List<DBItemJobStreamStarter> listOfStartes = dbLayerJobStreamStarters.getJobStreamStartersList(filter, 0);
+                        if (listOfStartes.size() > 0) {
+                            String jobStream = "";
+                            DBItemJobStream dbItemJobStream = dbLayerJobStreams.getJobStreamsDbItem(listOfStartes.get(0).getJobStream());
+                            if (dbItemJobStream != null) {
+                                jobStream = dbLayerJobStreams.getJobStreamsDbItem(listOfStartes.get(0).getJobStream()).getJobStream();
                             }
-                            jobStreamStartesStarted.getJobstreamStarted().add(jobStreamStarted);
 
-                        } finally {
-                            Globals.disconnect(sosHibernateSession);
+                            jobStreamStarted.setStarterExists(true);
+                            jobStreamStarted.setStarterName(listOfStartes.get(0).getStarterName());
+                            jobStreamStarted.setJobStreamStarterId(listOfStartes.get(0).getId());
+
+                            jobStreamStartData.setJobStreamStarterId(listOfStartes.get(0).getId());
+                            setAudit(jobStream, jobStreamStartData, jobStreamStartersSelector);
+                            jobStreamStarted.setParams(jobStreamStartData.getParams());
+                            UUID contextId = UUID.randomUUID();
+                            String session = contextId.toString();
+                            jobStreamStarted.setSession(session);
+                            notifyEventHandlerStart(accessToken, contextId, jobStreamStartData);
+                        } else {
+                            jobStreamStarted.setParams(null);
+                            jobStreamStarted.setJobStreamStarterId(jobStreamStartData.getJobStreamStarterId());
+                            jobStreamStarted.setStarterName(jobStreamStartData.getStarterName());
+                            jobStreamStarted.setStarterExists(false);
                         }
+                        jobStreamStartesStarted.getJobstreamStarted().add(jobStreamStarted);
+
                     }
                 }
 
