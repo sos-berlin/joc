@@ -18,7 +18,6 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.audit.DeleteEventsAudit;
 import com.sos.joc.classes.audit.ModifyEventAudit;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
@@ -33,8 +32,6 @@ import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.schema.JsonValidator;
 import com.sos.xml.XMLBuilder;
-
-import sos.scheduler.job.JobSchedulerEventJob;
 
 @Path("events")
 public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IModifyCustomEventResource {
@@ -57,7 +54,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
         return executeModifyEvent(ADD, modifyOrdersBytes, accessToken);
     }
 
-    private void createProcessOrder(String jobChain) throws JocException {
+    private void createProcessOrder(String jobChain, ModifyEvent modifyEvent) throws JocException {
 
         SOSHibernateSession session = null;
         try {
@@ -72,7 +69,16 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
                 dbItemInventorySupervisorInstance = dbItemInventoryInstance;
             }
             Element xml = XMLBuilder.create("add_order").addAttribute("job_chain", normalizePath(jobChain));
-            xml.addElement("params").addElement("param").addAttribute("name", "action").addAttribute("value", PROCESS);
+            Element params = xml.addElement("params");
+            params.addElement("param").addAttribute("name", "action").addAttribute("value", PROCESS);
+            if (modifyEvent != null) {
+                if (modifyEvent.getEventClass() != null) {
+                    params.addElement("param").addAttribute("name", "event_class").addAttribute("value", modifyEvent.getEventClass());
+                }
+                if (modifyEvent.getJobChain() != null) {
+                    params.addElement("param").addAttribute("name", "job_chain").addAttribute("value", modifyEvent.getJobChain());
+                }
+            }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventorySupervisorInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
@@ -187,7 +193,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
                     performEventRequest(request, modifyEvent);
                     schedulerEventDBLayer.commit();
                     storeAuditLogEntry(orderAudit);
-                    createProcessOrder(order.getJobChain());
+                    createProcessOrder(order.getJobChain(), modifyEvent);
                 }
             }
             notify(schedulerEventDBLayer, accessToken);
@@ -299,7 +305,9 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             schedulerEventDBLayer.beginTransaction();
             performEventRequest(ADD, modifyEvent);
             schedulerEventDBLayer.commit();
+            createProcessOrder(JOB_CHAIN_EVENT_SERVICE, modifyEvent);
             storeAuditLogEntry(modifyEventAudit);
+
             notify(schedulerEventDBLayer, accessToken);
 
             return JOCDefaultResponse.responseStatusJSOk(new Date());
@@ -347,7 +355,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             storeAuditLogEntry(modifyEventAudit);
             if (rows > 0) {
                 notify(schedulerEventDBLayer, accessToken);
-                createProcessOrder(JOB_CHAIN_EVENT_SERVICE);
+                createProcessOrder(JOB_CHAIN_EVENT_SERVICE, null);
             }
 
             return JOCDefaultResponse.responseStatusJSOk(new Date());
