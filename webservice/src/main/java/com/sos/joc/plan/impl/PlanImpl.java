@@ -408,7 +408,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                                 p.setJobStream(dailyPlanDBItem.getJobStream());
 
                                 String path;
-                                if (dailyPlanDBItem.getJob() != null) {
+                                if (dailyPlanDBItem.getJob() != null && dailyPlanDBItem.getJob() != ".") {
                                     path = dailyPlanDBItem.getJob();
                                 } else {
                                     path = dailyPlanDBItem.getJobChain();
