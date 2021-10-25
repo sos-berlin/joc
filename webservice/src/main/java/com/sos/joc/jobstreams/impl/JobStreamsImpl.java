@@ -430,26 +430,25 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 } else {
                     listOfCalendars = new ArrayList<Calendar>();
                 }
-            }
 
-            List<String> listOfCalendarPaths = new ArrayList<String>();
-            for (Calendar calendar : listOfCalendars) {
-                listOfCalendarPaths.add(calendar.getBasedOn());
-            }
+                List<String> listOfCalendarPaths = new ArrayList<String>();
+                for (Calendar calendar : listOfCalendars) {
+                    listOfCalendarPaths.add(calendar.getBasedOn());
+                }
 
-            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
-                    CalendarObjectType.JOBSTREAM, jobStream.getJobStream(), runTimeXml, listOfCalendars);
-            calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
-            CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
-            if (calEvt != null) {
-                if (clusterMembers != null) {
-                    SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
-                } else {
-                    SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
+                CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
+                        CalendarObjectType.JOBSTREAM, jobStream.getJobStream(), runTimeXml, listOfCalendars);
+                calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
+                CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
+                if (calEvt != null) {
+                    if (clusterMembers != null) {
+                        SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
+                    } else {
+                        SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
+                    }
                 }
             }
         }
-
     }
 
     public JOCDefaultResponse jobStream(String accessToken, byte[] filterBytes, String apiCall) {
@@ -844,7 +843,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 if (jobStreamLocation.getJobStream() != null) {
                     filterJobStreams.setJobStream(jobStreamLocation.getJobStream());
                     filterJobStreams.setFolder(jobStreamLocation.getFolder());
-                    jobStreamsLocation = getListOfJobstreams(sosHibernateSession, addedJobstreams,filterJobStreams, true);
+                    jobStreamsLocation = getListOfJobstreams(sosHibernateSession, addedJobstreams, filterJobStreams, true);
                     for (JobStream jobStream : jobStreamsLocation.getJobstreams()) {
                         jobStreams.getJobstreams().add(jobStream);
                     }

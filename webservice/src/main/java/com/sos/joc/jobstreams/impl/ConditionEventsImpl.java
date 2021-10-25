@@ -31,7 +31,6 @@ import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
 import com.sos.jitl.jobstreams.db.FilterEvents;
 import com.sos.jitl.jobstreams.db.FilterInConditions;
 import com.sos.jitl.jobstreams.db.FilterJobStreams;
-import com.sos.jobstreams.classes.CheckHistoryValue;
 import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.resolver.JSCondition;
 import com.sos.jobstreams.resolver.JSConditionResolver;
@@ -152,11 +151,12 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                         if (dbItemOutCondition != null) {
                             conditionEvent.setEvent(dbItemEvent.getEvent());
                             conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
-                            conditionEvent.setSession(dbItemEvent.getSession());
+                           // conditionEvent.setSession(dbItemEvent.getSession());
+                            conditionEvent.setSession(conditionEventsFilter.getSession());
                             conditionEvent.setJobStream(dbItemEvent.getJobStream());
                             conditionEvent.setPath(dbItemOutCondition.getPath());
                             conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
-
+                            conditionEvents.getConditionEvents().add(conditionEvent);
                         }
                     }
                 }
