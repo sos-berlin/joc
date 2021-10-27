@@ -83,14 +83,14 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 compact = conditionJobsFilterSchema.getCompact();
             }
 
+            if (Constants.settings == null) {
+                Constants.settings = new EventHandlerSettings();
+            }
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
             }
-            if (Constants.settings == null) {
-                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-                Constants.settings = new EventHandlerSettings();
-                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
-            }
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 

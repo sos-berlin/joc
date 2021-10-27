@@ -116,8 +116,6 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
         List<DBItemInConditionWithCommand> listOfInConditionsWithCommand = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
 
-        EventHandlerSettings settings = new EventHandlerSettings();
-        settings.setSchedulerId(jobSchedulerId);
         JSJobInConditions jsJobInConditions = new JSJobInConditions();
         jsJobInConditions.setListOfJobInConditions(sosHibernateSession, null, listOfInConditionsWithCommand);
 
