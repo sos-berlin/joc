@@ -56,19 +56,27 @@ public class SOSShiroIniShare {
 
     }
 
-    private void checkForceFile() throws SOSHibernateException, JocException, UnsupportedEncodingException, IOException {
+    private void checkForceFile()
+            throws SOSHibernateException, JocException, UnsupportedEncodingException, IOException {
         File forceFile = new File(iniFileName);
 
-        if (forceFile.exists()) {
-            LOGGER.debug(forceFile.getAbsoluteFile() + " found. Will be moved to database");
-            copyFileToDb(forceFile);
-            forceFile.delete();
-            File iniFile = new File(Globals.getIniFileForShiro(iniFileName));
-            File destinationFile = new File(iniFileName + ".backup");
-            destinationFile.delete();
-            iniFile.renameTo(destinationFile);
-        }
+        double fileSize = forceFile.length() / 1024d;
+        fileSize = fileSize / 1024d;
 
+        if (forceFile.exists()) {
+            if (fileSize < 1 && fileSize > 0) {
+                LOGGER.debug(forceFile.getAbsoluteFile() + " found. Will be moved to database");
+                copyFileToDb(forceFile);
+                forceFile.delete();
+                File iniFile = new File(Globals.getIniFileForShiro(iniFileName));
+                File destinationFile = new File(iniFileName + ".backup");
+                destinationFile.delete();
+                iniFile.renameTo(destinationFile);
+            } else {
+                LOGGER.info(forceFile.getAbsoluteFile() + " found. Will be ignored and deleted due to an invalid filesize");
+                forceFile.delete();
+            }
+        }
     }
 
     public void copyFileToDb(File iniFile) throws SOSHibernateException, JocException, UnsupportedEncodingException, IOException {
