@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
@@ -116,8 +115,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
         List<DBItemInConditionWithCommand> listOfInConditionsWithCommand = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
 
-        EventHandlerSettings settings = new EventHandlerSettings();
-        settings.setSchedulerId(jobSchedulerId);
+ 
         JSJobInConditions jsJobInConditions = new JSJobInConditions();
         jsJobInConditions.setListOfJobInConditions(sosHibernateSession, null, listOfInConditionsWithCommand);
 
