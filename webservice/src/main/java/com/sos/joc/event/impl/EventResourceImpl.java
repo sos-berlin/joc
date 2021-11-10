@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
+import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
@@ -67,7 +68,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
     private String urlOfCurrentJs = null;
     private ScheduledThreadPoolExecutor executor = null;
     public static final Integer EVENT_TIMEOUT = 90;
-    
+
     @Override
     public JOCDefaultResponse postEvent(String accessToken, byte[] eventBodyBytes) {
 
@@ -81,7 +82,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         try {
             JsonValidator.validateFailFast(eventBodyBytes, RegisterEvent.class);
             RegisterEvent eventBody = Globals.objectMapper.readValue(eventBodyBytes, RegisterEvent.class);
-            
+
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, eventBody, accessToken, "", getPermissonsJocCockpit("", accessToken)
                     .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -113,7 +114,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             if (eventBody.getJobscheduler() == null && eventBody.getJobscheduler().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'jobscheduler'");
             }
-            
+
             Long defaultEventId = Instant.now().toEpochMilli() * 1000;
             List<EventCallable> tasks = new ArrayList<EventCallable>();
             Set<JOCJsonCommand> jocJsonCommands = new HashSet<JOCJsonCommand>();
@@ -133,13 +134,14 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 List<EventCallable> tasksOfClusterMember = new ArrayList<EventCallable>();
 
                 if (isCurrentJobScheduler) {
-                    sendNexStartsFromDailyPlan(connection, jsObject.getJobschedulerId(), jsEvent.getEventId(), new JOCXmlCommand(instance), accessToken);
+                    sendNexStartsFromDailyPlan(connection, jsObject.getJobschedulerId(), jsEvent.getEventId(), new JOCXmlCommand(instance),
+                            accessToken);
                     tasksOfClusterMember.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, instance.getId(),
                             shiroUser, getNestedJobChains(jobChainLayer, instance)));
                 } else {
                     tasksOfClusterMember.add(new EventCallable(command, jsEvent, accessToken, session, instance.getId()));
                 }
-                
+
                 if (instance.getSupervisorId() > 0) {
                     jocJsonCommandsOfClusterMember.add(command);
                     DBItemInventoryInstance supervisor = instanceLayer.getInventoryInstanceByKey(instance.getSupervisorId());
@@ -147,8 +149,8 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                         JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, supervisor.getId(), defaultEventId);
                         JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, setMappedUrl(supervisor), "SchedulerEvent");
                         jocJsonCommandsOfClusterMember.add(commandOfMember);
-                        tasksOfClusterMember.add(new EventCallablePassiveJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
-                                supervisor.getId()));
+                        tasksOfClusterMember.add(new EventCallablePassiveJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken,
+                                session, supervisor.getId()));
                     } else {
                         Boolean supervisorWarningIsLogged = (Boolean) session.getAttribute("supervisorWarningIsLogged");
                         if (supervisorWarningIsLogged == null) {
@@ -159,7 +161,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     }
                 }
                 List<DBItemInventoryInstance> jobSchedulerMembers = null;
-                
+
                 switch (instance.getClusterType()) {
                 case "standalone":
                     break;
@@ -173,8 +175,8 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                             JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, jobSchedulerMember.getId(), defaultEventId);
                             JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, setMappedUrl(jobSchedulerMember), "SchedulerEvent");
                             jocJsonCommandsOfClusterMember.add(commandOfMember);
-                            tasksOfClusterMember.add(new EventCallablePassiveJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
-                                    jobSchedulerMember.getId()));
+                            tasksOfClusterMember.add(new EventCallablePassiveJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken,
+                                    session, jobSchedulerMember.getId()));
                         }
                     }
                     break;
@@ -188,15 +190,16 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                                 continue;
                             }
                             JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, jobSchedulerMember.getId(), defaultEventId);
-                            JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, setMappedUrl(jobSchedulerMember), "SchedulerEvent,TaskEvent,OrderEvent,VariablesCustomEvent");
+                            JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, setMappedUrl(jobSchedulerMember),
+                                    "SchedulerEvent,TaskEvent,OrderEvent,VariablesCustomEvent");
                             jocJsonCommandsOfClusterMember.add(commandOfMember);
-                            tasksOfClusterMember.add(new EventCallableActiveJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
-                                    jobSchedulerMember.getId(), distributedJobChains, distributedJobs));
+                            tasksOfClusterMember.add(new EventCallableActiveJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken,
+                                    session, jobSchedulerMember.getId(), distributedJobChains, distributedJobs));
                         }
                     }
                     break;
                 }
-                
+
                 if (tasksOfClusterMember.size() == 1) {
                     tasks.add(tasksOfClusterMember.get(0));
                 } else {
@@ -241,9 +244,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
         } catch (DBConnectionRefusedException e) {
-        	LOGGER.info(e.getMessage());
+            LOGGER.info(e.getMessage());
         } catch (ForcedClosingHttpClientException e) {
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
@@ -261,8 +264,15 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 entity.setDeliveryDate(Date.from(Instant.now()));
             }
         } catch (SessionNotExistException e) {
+            LOGGER.info(e.getMessage());
             e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatus434JSError(e);
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
+            sosShiroCurrentUserAnswer.setAccessToken(accessToken);
+            sosShiroCurrentUserAnswer.setSessionTimeout(0L);
+            sosShiroCurrentUserAnswer.setIsPermitted(false);
+            sosShiroCurrentUserAnswer.setHasRole(false);
+            sosShiroCurrentUserAnswer.setMessage(e.getMessage());
+            return JOCDefaultResponse.responseStatus401(sosShiroCurrentUserAnswer);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -365,7 +375,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         }
         return instance;
     }
-    
+
     private void sendNexStartsFromDailyPlan(SOSHibernateSession connection, String jobschedulerId, String eventId, JOCXmlCommand jocXmlCommand,
             String accessToken) {
         try {
