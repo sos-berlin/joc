@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -39,14 +40,14 @@ public class JocServletContainer extends ServletContainer {
         try {
             cleanupOldDeployedFolders(false);
         } catch (Exception e) {
-            LOGGER.warn("cleanup deployed files: ", e);
+            LOGGER.warn("cleanup deployed files: " + e.toString());
         }
 
         Globals.servletContextContextPath = getServletContext().getContextPath();
         try {
             Globals.servletContextRealPath = Paths.get(getServletContext().getRealPath("/"));
         } catch (Throwable e) {
-            LOGGER.warn("servletContextRealPath:", e);
+            LOGGER.warn("servletContextRealPath:" + e.toString());
         }
         LOGGER.info(String.format("servletContextRealPath=%s", Globals.servletContextRealPath));
     }
@@ -79,8 +80,8 @@ public class JocServletContainer extends ServletContainer {
 
     private Set<Path> getDeployedFolders() throws IOException {
         final Path deployParentDir = Paths.get(System.getProperty("java.io.tmpdir").toString());
-        final Pattern pattern = Pattern.compile("^jetty-\\d{1,3}(\\.\\d{1,3}){3}-\\d{1,5}-joc.war-_joc-.+\\.dir$");
-        return Files.list(deployParentDir).filter(p -> pattern.matcher(p.getFileName().toString()).find()).collect(Collectors.toSet());
+        final Predicate<String> predicate = Pattern.compile("^jetty-\\d{1,3}(.\\d{1,3}){3}-\\d{1,5}-joc.war-_joc-.+\\.dir$").asPredicate();
+        return Files.list(deployParentDir).filter(p -> predicate.test(p.getFileName().toString())).collect(Collectors.toSet());
     }
 
     private Optional<Path> getCurrentDeployedFolder(Set<Path> deployedFolders) throws IOException {
