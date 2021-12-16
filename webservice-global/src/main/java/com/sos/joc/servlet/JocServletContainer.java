@@ -80,7 +80,7 @@ public class JocServletContainer extends ServletContainer {
 
     private Set<Path> getDeployedFolders() throws IOException {
         final Path deployParentDir = Paths.get(System.getProperty("java.io.tmpdir").toString());
-        final Predicate<String> predicate = Pattern.compile("^jetty-\\d{1,3}(.\\d{1,3}){3}-\\d{1,5}-joc.war-_joc-.+\\.dir$").asPredicate();
+        final Predicate<String> predicate = Pattern.compile("^jetty-\\d{1,3}(.\\d{1,3}){3}-\\d{1,5}-joc.war-_joc-.+\\d+(\\.dir)?$").asPredicate();
         return Files.list(deployParentDir).filter(p -> predicate.test(p.getFileName().toString())).collect(Collectors.toSet());
     }
 
