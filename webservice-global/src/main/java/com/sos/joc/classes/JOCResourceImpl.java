@@ -75,6 +75,8 @@ public class JOCResourceImpl {
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
         try {
             sosPermissionsCreator.loginFromAccessToken(accessToken);
+        } catch (UnknownSessionException ee) {
+            LOGGER.info("SessionNotExistException: Session doesn't exist");
         } catch (DBInvalidDataException e) {
             LOGGER.warn("Have to create a new sosHibernateFactory", e);
             Globals.sosHibernateFactory.close();
@@ -98,6 +100,7 @@ public class JOCResourceImpl {
 
     protected SOSPermissionJocCockpit getPermissonsJocCockpit(String masterId, String accessToken) throws JocException {
         initGetPermissions(accessToken);
+
         masterId = getMasterId(masterId);
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit(masterId);
     }
@@ -188,7 +191,12 @@ public class JOCResourceImpl {
         this.accessToken = accessToken;
 
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
-        sosPermissionsCreator.loginFromAccessToken(accessToken);
+      
+        try {
+            sosPermissionsCreator.loginFromAccessToken(accessToken);
+        } catch (UnknownSessionException ee) {
+            LOGGER.info("SessionNotExistException: Session doesn't exist");
+        }
 
         try {
             SessionKey s = new DefaultSessionKey(accessToken);
@@ -199,7 +207,7 @@ public class JOCResourceImpl {
                 LOGGER.info(e.getMessage());
 
             } catch (UnknownSessionException e) {
-             }
+            }
 
             if (session != null && "true".equals(session.getAttribute("dao"))) {
                 if (!sessionExistInDb(accessToken)) {
@@ -229,6 +237,10 @@ public class JOCResourceImpl {
             initLogging(request, body);
             return init(schedulerId, permission);
         } catch (JocAuthenticationException ej) {
+            if (jobschedulerUser == null) {
+                jobschedulerUser = new JobSchedulerUser(accessToken);
+            }
+
             return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
         }
     }
@@ -240,7 +252,11 @@ public class JOCResourceImpl {
         }
 
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
-        sosPermissionsCreator.loginFromAccessToken(accessToken);
+        try {
+            sosPermissionsCreator.loginFromAccessToken(accessToken);
+        } catch (UnknownSessionException ee) {
+            LOGGER.info("SessionNotExistException: Session doesn't exist");
+        }
 
         initLogging(request, null);
         return init401And440();
