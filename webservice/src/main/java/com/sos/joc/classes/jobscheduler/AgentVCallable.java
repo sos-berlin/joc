@@ -43,7 +43,7 @@ public class AgentVCallable implements Callable<AgentOfCluster> {
         agent.setUrl(agentUrl);
         JobSchedulerState state = new JobSchedulerState();
         try {
-            JsonObject json = jocJsonCommand.getJsonObjectFromGetWithRetry(accessToken);
+            JsonObject json = jocJsonCommand.getJsonObjectFromGetWithHTTPConnection(accessToken);
             agent.setRunningTasks(json.getInt("currentTaskCount", 0));
             agent.setStartedAt(JobSchedulerDate.getDateFromISO8601String(json.getString("startedAt")));
             JsonObject system = json.getJsonObject("system");
