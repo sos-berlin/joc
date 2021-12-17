@@ -1,6 +1,6 @@
 #%RAML 0.8
 title: JOC API
-version: 1.13.9
+version: 1.13.10
 protocols: [ HTTP, HTTPS ]
 #baseUri: http://test.sos-berlin.com:3001/joc/api
 #mediaType: application/json
@@ -1630,9 +1630,9 @@ traits:
       postJSON:
         description: A list of job streams.
         description1: !include documentation/jobstreams/jobStream.md
-        description2: !include documentation/jobstreams/folder.md
-        description3: !include documentation/jobstreams/folders.md
-        description4: " "
+        description2: !include documentation/jobstreams/jobStreams.md
+        description3: !include documentation/jobstreams/folder.md
+        description4: !include documentation/jobstreams/folders.md
         description5: " "
         description6: " "
         description7: " "
@@ -1668,8 +1668,8 @@ traits:
       postJSON:
         description: Start job streams identified by the job stream starter name.
         description1: !include documentation/jobstreams/jobStreamStarters.md
-        description2: !include documentation/audit/auditLog.md
-        description3: " "
+        description2: !include documentation/jobstreams/starter/jobStream.md
+        description3: !include documentation/audit/auditLog.md
         description4: " "
         description5: " "
         description6: " "
@@ -1678,7 +1678,7 @@ traits:
         description9: " "
         description10: " "
         description200: " "
-        schema: !include schemas/jobstreams/jobstreamStartersFilter-schema.json
+        schema: !include schemas/jobstreams/jobstreamStartersSelector-schema.json
         schema200: !include schemas/jobstreams/jobstreamStartersStarted-schema.json
         example: !include examples/jobstreams/jobstreamStarters-example.json 
         example200: " "

@@ -31,7 +31,6 @@ import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
 import com.sos.jitl.jobstreams.db.FilterEvents;
 import com.sos.jitl.jobstreams.db.FilterInConditions;
 import com.sos.jitl.jobstreams.db.FilterJobStreams;
-import com.sos.jobstreams.classes.CheckHistoryValue;
 import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.resolver.JSCondition;
 import com.sos.jobstreams.resolver.JSConditionResolver;
@@ -98,6 +97,8 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                 filter.setJobStream(conditionEventsFilter.getJobStream());
                 filter.setSession(conditionEventsFilter.getSession());
 
+                Set<String> setOfGlobalEvents = new HashSet<String>();
+
                 List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filter, conditionEventsFilter.getLimit());
                 conditionEvents.setDeliveryDate(new Date());
                 conditionEvents.setSession(filter.getSession());
@@ -113,6 +114,9 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                             conditionEvent.setJobStream(dbItemEvent.getJobStream());
                             conditionEvent.setPath(dbItemOutCondition.getPath());
                             conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
+                            if (dbItemEvent.getGlobalEvent()) {
+                                setOfGlobalEvents.add(dbItemEvent.getEvent());
+                            }
 
                             if (conditionEventsFilter.getPath() == null || conditionEventsFilter.getPath().isEmpty() || dbItemOutCondition.getFolder()
                                     .equals(conditionEventsFilter.getPath())) {
@@ -130,14 +134,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                     }
                 }
 
+                if (Constants.settings == null) {
+                    Constants.settings = new EventHandlerSettings();
+                }
                 if (Globals.schedulerVariables == null) {
                     readJobSchedulerVariables();
                 }
-                if (Constants.settings == null) {
-                    Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-                    Constants.settings = new EventHandlerSettings();
-                    Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
-                }
+                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
 
                 filter.setJobStream("");
                 filter.setGlobalEvent(true);
@@ -152,11 +156,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
                         if (dbItemOutCondition != null) {
                             conditionEvent.setEvent(dbItemEvent.getEvent());
                             conditionEvent.setOutConditionId(dbItemEvent.getOutConditionId());
-                            conditionEvent.setSession(dbItemEvent.getSession());
+                            // conditionEvent.setSession(dbItemEvent.getSession());
+                            conditionEvent.setSession(conditionEventsFilter.getSession());
                             conditionEvent.setJobStream(dbItemEvent.getJobStream());
                             conditionEvent.setPath(dbItemOutCondition.getPath());
                             conditionEvent.setGlobalEvent(dbItemEvent.getGlobalEvent());
-
+                            if (!setOfGlobalEvents.contains(dbItemEvent.getEvent())) {
+                                conditionEvents.getConditionEvents().add(conditionEvent);
+                            }
                         }
                     }
                 }
@@ -192,16 +199,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             }
             checkRequiredParameter("session", conditionJobsFilterSchema.getSession());
 
+            if (Constants.settings == null) {
+                Constants.settings = new EventHandlerSettings();
+            }
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
             }
-
-            if (Constants.settings == null) {
-                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-                Constants.settings = new EventHandlerSettings();
-                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
-            }
-
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_EXPRESSION_EVENTS);
 
@@ -278,8 +283,6 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
                 List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
 
-                EventHandlerSettings settings = new EventHandlerSettings();
-                settings.setSchedulerId(conditionJobsFilterSchema.getJobschedulerId());
                 JSJobInConditions jsJobInConditions = new JSJobInConditions();
                 Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages = new HashMap<String, List<DBItemCalendarWithUsages>>();
                 jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfCalendarUsages, listOfInConditions);
@@ -380,15 +383,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL_ADD_EVENT);
 
+            if (Constants.settings == null) {
+                Constants.settings = new EventHandlerSettings();
+            }
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
             }
-
-            if (Constants.settings == null) {
-                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-                Constants.settings = new EventHandlerSettings();
-                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
-            }
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
 
             checkRequiredParameter("jobStream", conditionEvent.getJobStream());
             checkRequiredParameter("outConditionId", conditionEvent.getOutConditionId());
@@ -476,15 +478,14 @@ public class ConditionEventsImpl extends JOCResourceImpl implements IConditionEv
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
+            if (Constants.settings == null) {
+                Constants.settings = new EventHandlerSettings();
+            }
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
             }
-            if (Constants.settings == null) {
-                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-                Constants.settings = new EventHandlerSettings();
-                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
-            }
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
 
             checkRequiredParameter("event", conditionEvent.getEvent());
             checkRequiredParameter("session", conditionEvent.getSession());

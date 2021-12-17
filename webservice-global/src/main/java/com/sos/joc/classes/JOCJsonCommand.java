@@ -2,6 +2,7 @@ package com.sos.joc.classes;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,9 +14,11 @@ import javax.json.JsonReader;
 import javax.json.JsonStructure;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
 import com.sos.exception.SOSConnectionRefusedException;
 import com.sos.exception.SOSConnectionResetException;
 import com.sos.exception.SOSNoResponseException;
@@ -507,6 +510,25 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         }
     }
     
+    public <T extends JsonStructure> T getJsonObjectFromGetWithHTTPConnection(String csrfToken) throws JocException {
+        HttpURLConnection httpConn = null;
+        JocError jocError = new JocError();
+        jocError.appendMetaInfo("JS-URL: " + (getURI() == null ? "null" : getURI().toString()));
+        try {
+            httpConn = getHttpURLConnection(getURI().toURL(), Globals.httpSocketTimeout, Globals.httpConnectionTimeout);
+            httpConn.setRequestProperty("X-CSRF-Token", getCsrfToken(csrfToken));
+            return getJsonObjectFromResponse2(httpConn, getURI(), jocError);
+        } catch (JocException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(jocError, e);
+        } finally {
+            if (httpConn != null) {
+                httpConn.disconnect(); 
+            }
+        }
+    }
+    
     private void setProperties() {
         setAllowAllHostnameVerifier(!Globals.withHostnameVerification);
         setConnectionTimeout(Globals.httpConnectionTimeout);
@@ -569,6 +591,45 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                 }
             default:
                 throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase() + ": " + uri.toString());
+            }
+        } catch (JocException e) {
+            e.addErrorMetaInfo(jocError);
+            throw e;
+        }
+    }
+    
+    private <T extends JsonStructure> T getJsonObjectFromResponse2(HttpURLConnection connection, URI uri, JocError jocError) throws JocException, IOException {
+        int httpReplyCode = connection.getResponseCode();
+        try {
+            switch (httpReplyCode) {
+            case 200:
+                String response = IOUtils.toString(connection.getInputStream(), Charsets.UTF_8);
+
+                if (response.isEmpty()) {
+                    throw new JobSchedulerNoResponseException("Unexpected empty response");
+                }
+                JsonReader rdr = Json.createReader(new StringReader(response));
+                @SuppressWarnings("unchecked")
+                T json = (T) rdr.read();
+                rdr.close();
+                LOGGER.debug(json.toString());
+                return json;
+
+            case 400:
+                String errResponse = IOUtils.toString(connection.getErrorStream(), Charsets.UTF_8);
+                if ("Unknown Agent".equalsIgnoreCase(errResponse)) {
+                    throw new UnknownJobSchedulerAgentException(uri.toString().replaceFirst(".*/(https?://.*)$", "$1"));
+                }
+                if (errResponse.contains("SCHEDULER-161") || errResponse.contains("SCHEDULER-162")) {
+                    throw new JobSchedulerObjectNotExistException(errResponse);
+                }
+                // Async call while JobScheduler is terminating 
+                if (errResponse.contains("com.sos.scheduler.engine.common.async.CallQueue$ClosedException")) {
+                    throw new JobSchedulerConnectionResetException(errResponse);
+                }
+                throw new JobSchedulerBadRequestException(errResponse);
+            default:
+                throw new JobSchedulerBadRequestException(httpReplyCode + " " + connection.getResponseMessage() + ": " + uri.toString());
             }
         } catch (JocException e) {
             e.addErrorMetaInfo(jocError);

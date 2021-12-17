@@ -9,7 +9,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionKey;
 import org.slf4j.Logger;
@@ -73,6 +75,8 @@ public class JOCResourceImpl {
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
         try {
             sosPermissionsCreator.loginFromAccessToken(accessToken);
+        } catch (UnknownSessionException ee) {
+            LOGGER.info("SessionNotExistException: Session doesn't exist");
         } catch (DBInvalidDataException e) {
             LOGGER.warn("Have to create a new sosHibernateFactory", e);
             Globals.sosHibernateFactory.close();
@@ -96,6 +100,7 @@ public class JOCResourceImpl {
 
     protected SOSPermissionJocCockpit getPermissonsJocCockpit(String masterId, String accessToken) throws JocException {
         initGetPermissions(accessToken);
+
         masterId = getMasterId(masterId);
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit(masterId);
     }
@@ -186,36 +191,58 @@ public class JOCResourceImpl {
         this.accessToken = accessToken;
 
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
-        sosPermissionsCreator.loginFromAccessToken(accessToken);
+      
+        try {
+            sosPermissionsCreator.loginFromAccessToken(accessToken);
+        } catch (UnknownSessionException ee) {
+            LOGGER.info("SessionNotExistException: Session doesn't exist");
+        }
 
-        SessionKey s = new DefaultSessionKey(accessToken);
-        Session session = SecurityUtils.getSecurityManager().getSession(s);
-        if (session != null && "true".equals(session.getAttribute("dao"))) {
-            if (!sessionExistInDb(accessToken)) {
-                if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
-                    Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
+        try {
+            SessionKey s = new DefaultSessionKey(accessToken);
+            Session session = null;
+            try {
+                session = SecurityUtils.getSecurityManager().getSession(s);
+            } catch (ExpiredSessionException e) {
+                LOGGER.info(e.getMessage());
+
+            } catch (UnknownSessionException e) {
+            }
+
+            if (session != null && "true".equals(session.getAttribute("dao"))) {
+                if (!sessionExistInDb(accessToken)) {
+                    if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
+                        Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
+                    }
                 }
             }
-        }
 
-        if (Globals.jocWebserviceDataContainer == null || Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
-            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
-            sosShiroCurrentUserAnswer.setMessage("Session is broken and no longer valid. New login neccessary");
-            throw new JocAuthenticationException(sosShiroCurrentUserAnswer);
-        }
+            if (Globals.jocWebserviceDataContainer == null || Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
+                SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
+                sosShiroCurrentUserAnswer.setMessage("Session is broken and no longer valid. New login neccessary");
+                throw new JocAuthenticationException(sosShiroCurrentUserAnswer);
+            }
 
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUserByToken(accessToken);
-        if (sosShiroCurrentUserAnswer.getSessionTimeout() == 0L) {
-            sosShiroCurrentUserAnswer.setMessage("Session is broken and no longer valid. New login neccessary");
-            throw new JocAuthenticationException(sosShiroCurrentUserAnswer);
-        }
+            if (jobschedulerUser == null) {
+                jobschedulerUser = new JobSchedulerUser(accessToken);
+            }
 
-        if (jobschedulerUser == null) {
-            jobschedulerUser = new JobSchedulerUser(accessToken);
-        }
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUserByToken(
+                    accessToken);
+            if (sosShiroCurrentUserAnswer.getSessionTimeout() == 0L) {
+                sosShiroCurrentUserAnswer.setMessage("Session is broken and no longer valid. New login neccessary");
+                throw new JocAuthenticationException(sosShiroCurrentUserAnswer);
+            }
 
-        initLogging(request, body);
-        return init(schedulerId, permission);
+            initLogging(request, body);
+            return init(schedulerId, permission);
+        } catch (JocAuthenticationException ej) {
+            if (jobschedulerUser == null) {
+                jobschedulerUser = new JobSchedulerUser(accessToken);
+            }
+
+            return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
+        }
     }
 
     public JOCDefaultResponse init(String request, String accessToken) throws Exception {
@@ -225,7 +252,11 @@ public class JOCResourceImpl {
         }
 
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
-        sosPermissionsCreator.loginFromAccessToken(accessToken);
+        try {
+            sosPermissionsCreator.loginFromAccessToken(accessToken);
+        } catch (UnknownSessionException ee) {
+            LOGGER.info("SessionNotExistException: Session doesn't exist");
+        }
 
         initLogging(request, null);
         return init401And440();

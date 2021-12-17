@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +23,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sos.classes.CustomEventsUtil;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
@@ -115,8 +115,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
         List<DBItemInConditionWithCommand> listOfInConditionsWithCommand = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
 
-        EventHandlerSettings settings = new EventHandlerSettings();
-        settings.setSchedulerId(jobSchedulerId);
+ 
         JSJobInConditions jsJobInConditions = new JSJobInConditions();
         jsJobInConditions.setListOfJobInConditions(sosHibernateSession, null, listOfInConditionsWithCommand);
 
@@ -212,8 +211,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         return listOfOutConditions;
     }
 
-    private JobStreams getListOfJobstreams(SOSHibernateSession sosHibernateSession, FilterJobStreams filterJobStreams, Boolean forExport)
-            throws SOSHibernateException, JsonParseException, JsonMappingException, IOException {
+    private JobStreams getListOfJobstreams(SOSHibernateSession sosHibernateSession, Set<String> addedJobstreams, FilterJobStreams filterJobStreams,
+            Boolean forExport) throws SOSHibernateException, JsonParseException, JsonMappingException, IOException {
         DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
         DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
         DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
@@ -230,6 +229,10 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
         jobStreams.setJobschedulerId(filterJobStreams.getSchedulerId());
 
         for (DBItemJobStream dbItemJobStream : listOfJobStreams) {
+
+            if (addedJobstreams != null && addedJobstreams.contains(dbItemJobStream.getJobStream())) {
+                continue;
+            }
 
             try {
                 String p;
@@ -330,6 +333,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 jobStream.setJobs(jobStreamJobs);
             }
 
+            addedJobstreams.add(jobStream.getJobStream());
             jobStreams.getJobstreams().add(jobStream);
         }
         return jobStreams;
@@ -356,6 +360,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 notifyEventHandler(accessToken);
             }
 
+            Set<String> addedJobstreams = new LinkedHashSet<String>();
+
             JobStreams jobStreams = new JobStreams();
             jobStreams.setJobstreams(new ArrayList<JobStream>());
             FilterJobStreams filterJobStreams = new FilterJobStreams();
@@ -366,23 +372,34 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 filterJobStreams.setStatus(jobStreamsFilter.getStatus());
                 filterJobStreams.setLimit(jobStreamsFilter.getLimit());
 
-                if (jobStreamsFilter.getJobStream() != null) {
-                    jobStreams = getListOfJobstreams(sosHibernateSession, filterJobStreams, false);
+                if (jobStreamsFilter.getJobStream() != null && !jobStreamsFilter.getJobStream().isEmpty()) {
+                    jobStreams = getListOfJobstreams(sosHibernateSession, addedJobstreams, filterJobStreams, false);
                 }
 
                 if (jobStreamsFilter.getFolder() != null) {
                     filterJobStreams.setJobStream(null);
                     filterJobStreams.setFolder(jobStreamsFilter.getFolder());
-                    jobStreams.getJobstreams().addAll(getListOfJobstreams(sosHibernateSession, filterJobStreams, false).getJobstreams());
+                    jobStreams.getJobstreams().addAll(getListOfJobstreams(sosHibernateSession, addedJobstreams, filterJobStreams, false)
+                            .getJobstreams());
                 }
 
                 filterJobStreams.setFolder(null);
                 filterJobStreams.setJobStream(null);
             }
 
+            for (String jobStream : jobStreamsFilter.getJobStreams()) {
+                if (!jobStream.isEmpty()) {
+                    filterJobStreams.setJobStream(jobStream);
+                    JobStreams jobStreamsFromJobStreams = getListOfJobstreams(sosHibernateSession, addedJobstreams, filterJobStreams, false);
+                    jobStreams.getJobstreams().addAll(jobStreamsFromJobStreams.getJobstreams());
+                }
+            }
+
+            filterJobStreams.setJobStream(null);
+
             for (Folder folder : jobStreamsFilter.getFolders()) {
                 filterJobStreams.setFolderItem(folder);
-                JobStreams jobStreamsFromFolders = getListOfJobstreams(sosHibernateSession, filterJobStreams, false);
+                JobStreams jobStreamsFromFolders = getListOfJobstreams(sosHibernateSession, addedJobstreams, filterJobStreams, false);
                 jobStreams.getJobstreams().addAll(jobStreamsFromFolders.getJobstreams());
             }
 
@@ -411,26 +428,25 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 } else {
                     listOfCalendars = new ArrayList<Calendar>();
                 }
-            }
 
-            List<String> listOfCalendarPaths = new ArrayList<String>();
-            for (Calendar calendar : listOfCalendars) {
-                listOfCalendarPaths.add(calendar.getBasedOn());
-            }
+                List<String> listOfCalendarPaths = new ArrayList<String>();
+                for (Calendar calendar : listOfCalendars) {
+                    listOfCalendarPaths.add(calendar.getBasedOn());
+                }
 
-            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
-                    CalendarObjectType.JOBSTREAM, jobStream.getJobStream(), runTimeXml, listOfCalendars);
-            calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
-            CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
-            if (calEvt != null) {
-                if (clusterMembers != null) {
-                    SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
-                } else {
-                    SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
+                CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(sosHibernateSession, dbItemInventoryInstance.getSchedulerId(),
+                        CalendarObjectType.JOBSTREAM, jobStream.getJobStream(), runTimeXml, listOfCalendars);
+                calendarUsedByWriter.updateUsedByList(listOfCalendarPaths);
+                CalendarEvent calEvt = calendarUsedByWriter.getCalendarEvent();
+                if (calEvt != null) {
+                    if (clusterMembers != null) {
+                        SendCalendarEventsUtil.sendEvent(calEvt, clusterMembers, getAccessToken());
+                    } else {
+                        SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
+                    }
                 }
             }
         }
-
     }
 
     public JOCDefaultResponse jobStream(String accessToken, byte[] filterBytes, String apiCall) {
@@ -803,6 +819,8 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
             }
 
+            Set<String> addedJobstreams = new LinkedHashSet<String>();
+
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -823,7 +841,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
                 if (jobStreamLocation.getJobStream() != null) {
                     filterJobStreams.setJobStream(jobStreamLocation.getJobStream());
                     filterJobStreams.setFolder(jobStreamLocation.getFolder());
-                    jobStreamsLocation = getListOfJobstreams(sosHibernateSession, filterJobStreams, true);
+                    jobStreamsLocation = getListOfJobstreams(sosHibernateSession, addedJobstreams, filterJobStreams, true);
                     for (JobStream jobStream : jobStreamsLocation.getJobstreams()) {
                         jobStreams.getJobstreams().add(jobStream);
                     }
@@ -835,7 +853,7 @@ public class JobStreamsImpl extends JOCResourceImpl implements IJobStreamsResour
 
             for (Folder folder : jobStreamSelector.getFolders()) {
                 filterJobStreams.setFolderItem(folder);
-                jobStreamsFolders = getListOfJobstreams(sosHibernateSession, filterJobStreams, true);
+                jobStreamsFolders = getListOfJobstreams(sosHibernateSession, addedJobstreams, filterJobStreams, true);
                 for (JobStream jobStream : jobStreamsFolders.getJobstreams()) {
                     jobStreams.getJobstreams().add(jobStream);
                 }

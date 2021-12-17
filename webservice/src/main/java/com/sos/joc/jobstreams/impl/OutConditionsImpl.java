@@ -1,6 +1,5 @@
 package com.sos.joc.jobstreams.impl;
 
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,14 +83,14 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
                 compact = conditionJobsFilterSchema.getCompact();
             }
 
+            if (Constants.settings == null) {
+                Constants.settings = new EventHandlerSettings();
+            }
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
             }
-            if (Constants.settings == null) {
-                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-                Constants.settings = new EventHandlerSettings();
-                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
-            }
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
@@ -172,6 +171,8 @@ public class OutConditionsImpl extends JOCResourceImpl implements IOutConditions
 
             if (!compact) {
                 jsConditionResolver.initEvents(sosHibernateSession, contextId);
+                jsConditionResolver.addEvents(sosHibernateSession, Constants.getSession());
+
             }
 
             Map<String, Integer> mapOfExitCodes = new HashMap<String, Integer>();

@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +66,8 @@ public class SOSShiroCurrentUser {
         if (this.haveAnyIpPermission == null) {
 
             if (currentSubject != null) {
-                SOSListOfPermissions sosListOfPermissions = new SOSListOfPermissions(this,false);
- 
+                SOSListOfPermissions sosListOfPermissions = new SOSListOfPermissions(this, false);
+
                 this.haveAnyIpPermission = false;
                 String[] ipParts = this.getCallerIpAddress().split("\\.");
                 for (String p : sosListOfPermissions.getSosPermissionShiro().getSOSPermissions().getSOSPermissionListJoc().getSOSPermission()) {
@@ -300,7 +301,12 @@ public class SOSShiroCurrentUser {
 
     public boolean isAuthenticated() {
         if (currentSubject != null) {
-            return currentSubject.isAuthenticated();
+            try {
+                return currentSubject.isAuthenticated();
+            } catch (UnknownSessionException e) {
+                return false;
+            }
+
         } else {
             return false;
         }
@@ -407,7 +413,7 @@ public class SOSShiroCurrentUser {
             return "";
         }
     }
-    
+
     public HttpServletRequest getHttpServletRequest() {
         return httpServletRequest;
     }

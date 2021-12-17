@@ -97,15 +97,14 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
             if (conditionJobsFilterSchema.getCompact() != null) {
                 compact = conditionJobsFilterSchema.getCompact();
             }
+            if (Constants.settings == null) {
+                Constants.settings = new EventHandlerSettings();
+            }
             if (Globals.schedulerVariables == null) {
                 readJobSchedulerVariables();
             }
-            
-            if (Constants.settings == null) {
-                Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
-                Constants.settings = new EventHandlerSettings();
-                Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
-            }
+            Constants.periodBegin = Globals.schedulerVariables.get("sos.jobstream_period_begin");
+            Constants.settings.setTimezone(dbItemInventoryInstance.getTimeZone());
 
             sosHibernateSession = Globals.createSosHibernateStatelessConnection(API_CALL);
 
@@ -225,7 +224,7 @@ public class InConditionsImpl extends JOCResourceImpl implements IInConditionsRe
                         }
                     }
                 }
-                
+
                 JSJobInConditions jsJobInConditions = new JSJobInConditions();
                 jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfCalendarUsages, listOfInConditions);
 

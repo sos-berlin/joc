@@ -329,7 +329,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", MediaType.APPLICATION_JSON).cacheControl(
                 setNoCaching());
         if (entity.getMessage() != null) {
-            LOGGER.error(entity.getMessage());
+            LOGGER.info(entity.getMessage());
         }
         responseBuilder.entity(entity);
         return new JOCDefaultResponse(responseBuilder.build());
@@ -402,7 +402,6 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         entity.setHasRole(false);
         entity.setIsPermitted(false);
         entity.setIsAuthenticated(sosJobschedulerUser.isAuthenticated());
-        // LOGGER.error(message);
         entity.setMessage(message);
         return entity;
     }

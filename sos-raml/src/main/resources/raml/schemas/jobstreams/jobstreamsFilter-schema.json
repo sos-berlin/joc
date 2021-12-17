@@ -8,7 +8,6 @@
 		"jobschedulerId"
 	],
 	"properties": {
-		
 		"jobschedulerId": {
 			"$ref": "../common/filename100-schema.json"
 		},
@@ -26,6 +25,12 @@
 		},
 		"jobStream": {
 			"$ref": "../common/string255-schema.json"
+		},
+		"jobStreams": {
+			"type": "array",
+			"items": {
+				"$ref": "../common/string255-schema.json"
+			}
 		},
 		"status": {
 			"$ref": "../common/string255-schema.json"
