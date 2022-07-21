@@ -53,6 +53,9 @@
     "numOfNodes": {
       "$ref": "../common/nonNegativeInteger-schema.json"
     },
+    "hasFileOrderSources": {
+      "type": "boolean"
+    },
     "nodes": {
       "type": "array",
       "minItems": 1,
