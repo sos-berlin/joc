@@ -225,23 +225,24 @@ public class InventoryInstancesDBLayer extends DBLayer {
         switch (schedulerInstancesDBList.get(0).getClusterType()) {
         case "passive":
             DBItemInventoryInstance schedulerInstancesDBItemOfWaitingScheduler = null;
-            for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
-                try {
-                    String xml = "<show_state subsystems=\"folder\" what=\"folders no_subfolders\" path=\"/does/not/exist\" />";
-                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem);
-                    resourceImpl.executePost(xml, accessToken);
-                    String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
-                    if ("running,paused".contains(state)) {
-                        schedulerInstancesDBItemOfWaitingScheduler = null;
-                        return schedulerInstancesDBItem;
-                    }
-                    if (schedulerInstancesDBItemOfWaitingScheduler == null && "waiting_for_activation".equals(state)) {
-                        schedulerInstancesDBItemOfWaitingScheduler = schedulerInstancesDBItem;
-                    }
-                } catch (Exception e) {
-                    // unreachable
-                }
-            }
+			for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
+				try {
+					String xml = "<show_state subsystems=\"folder\" what=\"folders no_subfolders\" path=\"/does/not/exist\" />";
+					JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem);
+					resourceImpl.executePost(xml, accessToken);
+					String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
+					if ("running,paused".contains(state)) {
+						schedulerInstancesDBItemOfWaitingScheduler = null;
+						return schedulerInstancesDBItem;
+					}
+					if (schedulerInstancesDBItemOfWaitingScheduler == null && ("waiting_for_activation".equals(state)
+							|| "waiting_for_activation_paused".equals(state))) {
+						schedulerInstancesDBItemOfWaitingScheduler = schedulerInstancesDBItem;
+					}
+				} catch (Exception e) {
+					// unreachable
+				}
+			}
 //            if (schedulerInstancesDBItemOfWaitingScheduler != null) {
 //                return schedulerInstancesDBItemOfWaitingScheduler;
 //            }

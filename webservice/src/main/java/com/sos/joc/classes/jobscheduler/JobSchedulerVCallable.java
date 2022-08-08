@@ -106,6 +106,10 @@ public class JobSchedulerVCallable implements Callable<JobSchedulerV> {
                 jobSchedulerState.set_text(JobSchedulerStateText.WAITING_FOR_ACTIVATION);
                 jobSchedulerState.setSeverity(3);
                 break;
+            case "waiting_for_activation_paused":
+                jobSchedulerState.set_text(JobSchedulerStateText.WAITING_FOR_ACTIVATION_PAUSED);
+                jobSchedulerState.setSeverity(3);
+                break;
             }
         }
         return jobSchedulerState;
