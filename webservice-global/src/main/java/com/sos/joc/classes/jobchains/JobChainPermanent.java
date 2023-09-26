@@ -55,6 +55,7 @@ public class JobChainPermanent {
             Map<String,Integer> levels = new HashMap<String,Integer>();
             if (jobChainNodesFromDb != null) {
                 int numOfNodes = 0;
+                boolean hasFileOrderSources = false;
                 for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
                     switch (node.getNodeType()) {
                     case 1:
@@ -105,6 +106,7 @@ public class JobChainPermanent {
                         break;
                     case 3:
                         // FileOrderSource -> FileOrderSource
+                    	hasFileOrderSources = true;
                         FileWatchingNodeP fileOrderSource = new FileWatchingNodeP();
                         fileOrderSource.setDirectory(node.getDirectory());
                         fileOrderSource.setNextNode(node.getNextState());
@@ -148,6 +150,7 @@ public class JobChainPermanent {
                     }
                 }
                 jobChain.setNumOfNodes(numOfNodes);
+                jobChain.setHasFileOrderSources(hasFileOrderSources);
             }
             if (!jobChainNodes.isEmpty()) {
                 jobChain.setNodes(jobChainNodes);
@@ -167,15 +170,19 @@ public class JobChainPermanent {
         } else {
             if (jobChainNodesFromDb != null) {
                 int numOfNodes = 0;
+                boolean hasFileOrderSources = false;
                 for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
                     if (node.getNodeType() < 3) { //JobNode and JobChainNode
                         numOfNodes += 1;
                         if (node.getNodeType() == 1 && node.getJobName() != null && !node.getJobName().isEmpty()) {
                             JOB_PATHS.add(node.getJobName());
                         }
+                    } else if (node.getNodeType() == 3) {
+                    	hasFileOrderSources = true;
                     }
                 }
                 jobChain.setNumOfNodes(numOfNodes);
+                jobChain.setHasFileOrderSources(hasFileOrderSources);
             }
             jobChain.setNodes(null);
             jobChain.setFileOrderSources(null);
